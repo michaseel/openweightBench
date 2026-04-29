@@ -4,6 +4,9 @@ Lokaler Benchmark für Open-Weight-Modelle, die in LM Studio laufen.
 Mehrere Test-Kategorien, interaktiver HTML-Report, der nicht nur Zahlen, sondern
 auch das tatsächliche Modell-Ergebnis zum Selber-Anschauen zeigt.
 
+**Live-Report:** https://openweightbench.pages.dev/ (Cloudflare Pages) ·
+Mirror: https://michaseel.github.io/openweightBench/ (GitHub Pages)
+
 ## Setup
 
 ```bash
