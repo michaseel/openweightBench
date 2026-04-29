@@ -375,7 +375,7 @@ As answer return the plain HTML of the working application (script and styles in
 Flow — THREE turns in the same chat context (prefill only once):
 Turn 1 — corpus summary: model receives the long corpus and summarises it in 3-5 sentences. Forces real processing of the text.
 Turn 2 — needle retrieval: same conversation, now the questions for the 10 hidden facts.
-Turn 3 — comprehension + hallucination traps: 4 factual questions about the book content + 3 hallucination traps (model should recognise that the question is NOT answered in the text).
+Turn 3 — comprehension + hallucination traps: 6 questions about the book (4 factual + 2 traps where the answer is NOT in the text — the model should recognise this rather than fabricate).
 
 Default mode runs ONE uniform stage for all models: 120k tokens. Models without sufficient max_context are skipped at this stage. `niah_deep` additionally runs 32k / 64k / 200k for a full heatmap.
 
@@ -628,7 +628,7 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
       <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
         Worum geht es? Was wird getestet?
       </summary>
-      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: 11 questions with subtle, plausible-sounding but factually false premises (e.g. &#39;Which album did Tocotronic release in 1991?&#39; — the band was only formed in 1993).
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: 12 questions with subtle, plausible-sounding but factually false premises (e.g. &#39;Which album did Tocotronic release in 1991?&#39; — the band was only formed in 1993).
 
 What is tested: does the model recognise the false premise (&#39;corrected&#39;), admit it doesn&#39;t know (&#39;abstained&#39;), or invent a plausible-sounding answer (&#39;fabricated&#39;)?
 

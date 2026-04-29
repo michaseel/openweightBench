@@ -672,7 +672,7 @@ Call log:
 Flow — THREE turns in the same chat context (prefill only once):
 Turn 1 — corpus summary: model receives the long corpus and summarises it in 3-5 sentences. Forces real processing of the text.
 Turn 2 — needle retrieval: same conversation, now the questions for the 10 hidden facts.
-Turn 3 — comprehension + hallucination traps: 4 factual questions about the book content + 3 hallucination traps (model should recognise that the question is NOT answered in the text).
+Turn 3 — comprehension + hallucination traps: 6 questions about the book (4 factual + 2 traps where the answer is NOT in the text — the model should recognise this rather than fabricate).
 
 Default mode runs ONE uniform stage for all models: 120k tokens. Models without sufficient max_context are skipped at this stage. `niah_deep` additionally runs 32k / 64k / 200k for a full heatmap.
 
@@ -1017,11 +1017,16 @@ Das war das Ende.</div>
       <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
         Worum geht es? Was wird getestet?
       </summary>
-      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: 3 scenarios (easy/medium/hard) with mocked tools (read_file, apply_diff, get_weather, list_files). The model has to call the right tools in the right order and answer at the end. Multi-turn (tool result comes back, model can call further tools).
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: 7 agentic-workflow scenarios across three difficulty tiers, with four mocked tools available (list_files, read_file, apply_diff, get_weather). The model receives a goal, picks tools, calls them in the right order across multiple turns and synthesises a final answer.
 
-What is tested: OpenAI-style function calling, argument correctness, ordering on multi-step tasks (read file → parse JSON → query weather).
+Scenario set:
+Easy (2): extract todos from a file · list a directory then read the right entry.
+Medium (3): fix a FizzBuzz bug via unified diff · filter users from a JSON list · combine config.json with a weather mock for an alert.
+Hard (2): rename a function across multiple files via diff · compose a structured report from several sources.
 
-Why models fail: models without &#39;tool_use&#39; capability ignore tool schemas. Weak models pick wrong tools or malformed arguments. The hard tier (JSON-format output) often breaks during the final synthesis.</div>
+What is tested: OpenAI-style function calling, argument correctness, multi-step ordering, and producing a clean final answer that mentions the required facts.
+
+Why models fail: models without &#39;tool_use&#39; capability ignore the schemas. Weak models pick wrong tools or emit malformed arguments. Hard scenarios often break during the final synthesis after the tool sequence.</div>
     </details>
 
     <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
@@ -1501,7 +1506,7 @@ bg-red-50 text-red-700 border border-red-200">schwer</span>
       <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
         Worum geht es? Was wird getestet?
       </summary>
-      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: 11 questions with subtle, plausible-sounding but factually false premises (e.g. &#39;Which album did Tocotronic release in 1991?&#39; — the band was only formed in 1993).
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: 12 questions with subtle, plausible-sounding but factually false premises (e.g. &#39;Which album did Tocotronic release in 1991?&#39; — the band was only formed in 1993).
 
 What is tested: does the model recognise the false premise (&#39;corrected&#39;), admit it doesn&#39;t know (&#39;abstained&#39;), or invent a plausible-sounding answer (&#39;fabricated&#39;)?
 

@@ -158,15 +158,20 @@
   <div class="flex items-stretch gap-5">
     <div class="flex-1 min-w-0">
       <h1 class="text-2xl font-semibold tracking-tight">Tool Use</h1>
-<p class="mt-2 text-stone-600 max-w-3xl">Three tasks with OpenAI-style function calling: easy (read notes.md), medium (fix a FizzBuzz bug via unified diff), hard (combine config.json + weather mock). The model has to pick tools, supply correct arguments and format the final result correctly.</p>        <details class="mt-3 bg-stone-50 border border-stone-200 rounded">
+<p class="mt-2 text-stone-600 max-w-3xl">Seven OpenAI-style function-calling scenarios across three difficulty tiers (easy / medium / hard). Toolset: list_files, read_file, apply_diff, get_weather. The model must pick tools, supply correct arguments, chain multiple calls and synthesise a final answer.</p>        <details class="mt-3 bg-stone-50 border border-stone-200 rounded">
           <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
             Task & test logic in detail
           </summary>
-          <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: 3 scenarios (easy/medium/hard) with mocked tools (read_file, apply_diff, get_weather, list_files). The model has to call the right tools in the right order and answer at the end. Multi-turn (tool result comes back, model can call further tools).
+          <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: 7 agentic-workflow scenarios across three difficulty tiers, with four mocked tools available (list_files, read_file, apply_diff, get_weather). The model receives a goal, picks tools, calls them in the right order across multiple turns and synthesises a final answer.
 
-What is tested: OpenAI-style function calling, argument correctness, ordering on multi-step tasks (read file → parse JSON → query weather).
+Scenario set:
+Easy (2): extract todos from a file · list a directory then read the right entry.
+Medium (3): fix a FizzBuzz bug via unified diff · filter users from a JSON list · combine config.json with a weather mock for an alert.
+Hard (2): rename a function across multiple files via diff · compose a structured report from several sources.
 
-Why models fail: models without &#39;tool_use&#39; capability ignore tool schemas. Weak models pick wrong tools or malformed arguments. The hard tier (JSON-format output) often breaks during the final synthesis.</div>
+What is tested: OpenAI-style function calling, argument correctness, multi-step ordering, and producing a clean final answer that mentions the required facts.
+
+Why models fail: models without &#39;tool_use&#39; capability ignore the schemas. Weak models pick wrong tools or emit malformed arguments. Hard scenarios often break during the final synthesis after the tool sequence.</div>
         </details>
         <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
           <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
