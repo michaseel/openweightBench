@@ -89,6 +89,7 @@ def _env() -> Environment:
     e.filters["short_id"] = short_model_id
     e.filters["mb"] = lambda v: f"{v:.0f} MB" if v else "—"
     e.filters["gb"] = lambda v: f"{v / 1024:.1f} GB" if v else "—"
+    e.filters["pct"] = lambda v: "—" if v is None else f"{v * 100:.0f}%"
     return e
 
 

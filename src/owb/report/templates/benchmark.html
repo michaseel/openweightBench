@@ -55,7 +55,7 @@
 
 {% if scatter_rows %}
   {% set sp_w = 920 %}
-  {% set sp_h = 360 %}
+  {% set sp_h = 432 %}
   {% set sp_pad_l = 50 %}
   {% set sp_pad_r = 16 %}
   {% set sp_pad_t = 16 %}
@@ -84,7 +84,7 @@
       </div>
     </div>
     <p class="text-xs text-stone-500 mb-3">
-      X = wall-time for <em>this</em> bench · Y = score (0–1) in this bench. Optimum is top-left — fast and good. RAM estimate for 64k context: 4&nbsp;GB system + model weights + max(2&nbsp;GB, 40% of weights) for KV cache.
+      X = wall-time for <em>this</em> bench · Y = score (0–100&nbsp;%) in this bench. Optimum is top-left — fast and good. RAM estimate for 64k context: 4&nbsp;GB system + model weights + max(2&nbsp;GB, 40% of weights) for KV cache.
     </p>
     <p class="text-xs text-stone-500 mb-3 flex flex-wrap items-center gap-x-4 gap-y-1">
       <span>Colour = vendor · Number = total parameters (B)</span>
@@ -99,14 +99,14 @@
     </p>
 
     <div class="bg-white border border-stone-200 rounded-lg p-4 relative" id="sp-card">
-      <svg viewBox="0 0 {{ sp_w }} {{ sp_h }}" class="w-full num" style="height:360px" preserveAspectRatio="xMidYMid meet">
+      <svg viewBox="0 0 {{ sp_w }} {{ sp_h }}" class="w-full num" style="height:432px" preserveAspectRatio="xMidYMid meet">
         <line x1="{{ sp_pad_l }}" y1="{{ sp_pad_t + sp_inner_h }}" x2="{{ sp_pad_l + sp_inner_w }}" y2="{{ sp_pad_t + sp_inner_h }}" stroke="#d6d3d1" stroke-width="1"/>
         <line x1="{{ sp_pad_l }}" y1="{{ sp_pad_t }}" x2="{{ sp_pad_l }}" y2="{{ sp_pad_t + sp_inner_h }}" stroke="#d6d3d1" stroke-width="1"/>
         {# Y-Achse: Score 0..1 #}
         {% for tick_pct in [0, 25, 50, 75, 100] %}
           {% set y = sp_pad_t + sp_inner_h - (sp_inner_h * tick_pct / 100) %}
           <line x1="{{ sp_pad_l }}" y1="{{ y }}" x2="{{ sp_pad_l + sp_inner_w }}" y2="{{ y }}" stroke="#f5f5f4" stroke-width="1" stroke-dasharray="2,3"/>
-          <text x="{{ sp_pad_l - 6 }}" y="{{ y + 3 }}" font-size="10" fill="#78716c" text-anchor="end">{{ "%.2f"|format(tick_pct / 100) }}</text>
+          <text x="{{ sp_pad_l - 6 }}" y="{{ y + 3 }}" font-size="10" fill="#78716c" text-anchor="end">{{ tick_pct }}%</text>
         {% endfor %}
         {# X-Achse: Wall-Time 0..sp_max_wall #}
         {% for tick_pct in [0, 25, 50, 75, 100] %}
@@ -120,7 +120,7 @@
         {% for m in scatter_rows %}
           {% set x = sp_pad_l + (sp_inner_w * m.wall_s / sp_max_wall) %}
           {% set y = sp_pad_t + sp_inner_h - (sp_inner_h * m.score) %}
-          {% set lbl = m.params_b|string if m.params_b else "" %}
+          {% set lbl = ("%.0f"|format(m.params_b)) if m.params_b else "" %}
           {% set lbl_size = 6 if lbl|length > 2 else 8 %}
           <g class="sp-dot" data-model-id="{{ m.model_id }}" data-total-ram="{{ m.total_ram_gb or '' }}" data-moe="{{ '1' if m.is_moe else '0' }}" style="cursor:pointer">
             <circle cx="{{ x }}" cy="{{ y }}" r="9" fill="{{ m.color }}" fill-opacity="0.78"
@@ -152,7 +152,7 @@
             <a href="../models/{{ m.model_id|safe_id }}.html#{{ task_name }}" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="{{ m.model_id }}">{{ m.short_id }}</a>
             {% if m.quant %}<span class="text-[11px] text-stone-400 num shrink-0">{{ m.quant }}</span>{% endif %}
             <span class="text-xs text-stone-500 num shrink-0 ml-auto">
-              {{ "%.2f"|format(m.score) }} · {{ "%.0f"|format(m.wall_s) }}s
+              {{ m.score|pct }} · {{ "%.0f"|format(m.wall_s) }}s
               {% if m.tps %} · {{ "%.0f"|format(m.tps) }} t/s{% endif %}
               {% if m.total_ram_gb %} · {{ "%.0f"|format(m.total_ram_gb) }} GB{% endif %}
             </span>
@@ -251,7 +251,7 @@
         : 'RAM unknown';
       tip.innerHTML = `<div style="font-weight:600">${m.short_id}</div>
 <div style="opacity:0.7">by ${m.vendor} · ${m.quant}</div>
-<div style="margin-top:4px">Score: <b>${m.score?.toFixed(2)}</b></div>
+<div style="margin-top:4px">Score: <b>${m.score != null ? Math.round(m.score * 100) + '%' : '—'}</b></div>
 <div>Wall-time: <b>${m.wall_s?.toFixed(1)} s</b>${m.tps != null ? ` · ${m.tps.toFixed(0)} tok/s` : ''}${m.tokens != null ? ` · ${m.tokens} tokens` : ''}</div>
 <div style="margin-top:4px;opacity:0.85">${ramTxt}</div>`;
       tip.classList.remove('hidden');
@@ -566,12 +566,12 @@
                 {% endif %}
               {% elif r.preliminary %}
                 <span class="font-bold text-lg text-stone-400" title="Judge not yet run — value is the linter score only">
-                  {{ "%.2f"|format(r.score) }}
+                  {{ r.score|pct }}
                 </span>
                 <span class="block text-[10px] text-stone-400 uppercase tracking-wider">preliminary</span>
               {% elif r.score is not none %}
                 <span class="font-bold text-lg {% if r.score >= 0.7 %}text-emerald-700{% elif r.score > 0 %}text-amber-700{% else %}text-red-600{% endif %}">
-                  {{ "%.2f"|format(r.score) }}
+                  {{ r.score|pct }}
                 </span>
               {% else %}—{% endif %}
             </td>

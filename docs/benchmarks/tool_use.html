@@ -203,7 +203,7 @@ Why models fail: models without &#39;tool_use&#39; capability ignore tool schema
       </div>
     </div>
     <p class="text-xs text-stone-500 mb-3">
-      X = wall-time for <em>this</em> bench · Y = score (0–1) in this bench. Optimum is top-left — fast and good. RAM estimate for 64k context: 4&nbsp;GB system + model weights + max(2&nbsp;GB, 40% of weights) for KV cache.
+      X = wall-time for <em>this</em> bench · Y = score (0–100&nbsp;%) in this bench. Optimum is top-left — fast and good. RAM estimate for 64k context: 4&nbsp;GB system + model weights + max(2&nbsp;GB, 40% of weights) for KV cache.
     </p>
     <p class="text-xs text-stone-500 mb-3 flex flex-wrap items-center gap-x-4 gap-y-1">
       <span>Colour = vendor · Number = total parameters (B)</span>
@@ -218,55 +218,55 @@ Why models fail: models without &#39;tool_use&#39; capability ignore tool schema
     </p>
 
     <div class="bg-white border border-stone-200 rounded-lg p-4 relative" id="sp-card">
-      <svg viewBox="0 0 920 360" class="w-full num" style="height:360px" preserveAspectRatio="xMidYMid meet">
-        <line x1="50" y1="324" x2="904" y2="324" stroke="#d6d3d1" stroke-width="1"/>
-        <line x1="50" y1="16" x2="50" y2="324" stroke="#d6d3d1" stroke-width="1"/>
-          <line x1="50" y1="324.0" x2="904" y2="324.0" stroke="#f5f5f4" stroke-width="1" stroke-dasharray="2,3"/>
-          <text x="44" y="327.0" font-size="10" fill="#78716c" text-anchor="end">0.00</text>
-          <line x1="50" y1="247.0" x2="904" y2="247.0" stroke="#f5f5f4" stroke-width="1" stroke-dasharray="2,3"/>
-          <text x="44" y="250.0" font-size="10" fill="#78716c" text-anchor="end">0.25</text>
-          <line x1="50" y1="170.0" x2="904" y2="170.0" stroke="#f5f5f4" stroke-width="1" stroke-dasharray="2,3"/>
-          <text x="44" y="173.0" font-size="10" fill="#78716c" text-anchor="end">0.50</text>
-          <line x1="50" y1="93.0" x2="904" y2="93.0" stroke="#f5f5f4" stroke-width="1" stroke-dasharray="2,3"/>
-          <text x="44" y="96.0" font-size="10" fill="#78716c" text-anchor="end">0.75</text>
+      <svg viewBox="0 0 920 432" class="w-full num" style="height:432px" preserveAspectRatio="xMidYMid meet">
+        <line x1="50" y1="396" x2="904" y2="396" stroke="#d6d3d1" stroke-width="1"/>
+        <line x1="50" y1="16" x2="50" y2="396" stroke="#d6d3d1" stroke-width="1"/>
+          <line x1="50" y1="396.0" x2="904" y2="396.0" stroke="#f5f5f4" stroke-width="1" stroke-dasharray="2,3"/>
+          <text x="44" y="399.0" font-size="10" fill="#78716c" text-anchor="end">0%</text>
+          <line x1="50" y1="301.0" x2="904" y2="301.0" stroke="#f5f5f4" stroke-width="1" stroke-dasharray="2,3"/>
+          <text x="44" y="304.0" font-size="10" fill="#78716c" text-anchor="end">25%</text>
+          <line x1="50" y1="206.0" x2="904" y2="206.0" stroke="#f5f5f4" stroke-width="1" stroke-dasharray="2,3"/>
+          <text x="44" y="209.0" font-size="10" fill="#78716c" text-anchor="end">50%</text>
+          <line x1="50" y1="111.0" x2="904" y2="111.0" stroke="#f5f5f4" stroke-width="1" stroke-dasharray="2,3"/>
+          <text x="44" y="114.0" font-size="10" fill="#78716c" text-anchor="end">75%</text>
           <line x1="50" y1="16.0" x2="904" y2="16.0" stroke="#f5f5f4" stroke-width="1" stroke-dasharray="2,3"/>
-          <text x="44" y="19.0" font-size="10" fill="#78716c" text-anchor="end">1.00</text>
-          <line x1="50.0" y1="16" x2="50.0" y2="324" stroke="#f5f5f4" stroke-width="1" stroke-dasharray="2,3"/>
-          <text x="50.0" y="340" font-size="10" fill="#78716c" text-anchor="middle">0s</text>
-          <line x1="263.5" y1="16" x2="263.5" y2="324" stroke="#f5f5f4" stroke-width="1" stroke-dasharray="2,3"/>
-          <text x="263.5" y="340" font-size="10" fill="#78716c" text-anchor="middle">165s</text>
-          <line x1="477.0" y1="16" x2="477.0" y2="324" stroke="#f5f5f4" stroke-width="1" stroke-dasharray="2,3"/>
-          <text x="477.0" y="340" font-size="10" fill="#78716c" text-anchor="middle">330s</text>
-          <line x1="690.5" y1="16" x2="690.5" y2="324" stroke="#f5f5f4" stroke-width="1" stroke-dasharray="2,3"/>
-          <text x="690.5" y="340" font-size="10" fill="#78716c" text-anchor="middle">495s</text>
-          <line x1="904.0" y1="16" x2="904.0" y2="324" stroke="#f5f5f4" stroke-width="1" stroke-dasharray="2,3"/>
-          <text x="904.0" y="340" font-size="10" fill="#78716c" text-anchor="middle">660s</text>
-        <text x="477.0" y="356" font-size="10" fill="#57534e" text-anchor="middle">Wall-time (s) →</text>
-        <text x="14" y="170.0" font-size="10" fill="#57534e" text-anchor="middle" transform="rotate(-90 14 170.0)">Score</text>
+          <text x="44" y="19.0" font-size="10" fill="#78716c" text-anchor="end">100%</text>
+          <line x1="50.0" y1="16" x2="50.0" y2="396" stroke="#f5f5f4" stroke-width="1" stroke-dasharray="2,3"/>
+          <text x="50.0" y="412" font-size="10" fill="#78716c" text-anchor="middle">0s</text>
+          <line x1="263.5" y1="16" x2="263.5" y2="396" stroke="#f5f5f4" stroke-width="1" stroke-dasharray="2,3"/>
+          <text x="263.5" y="412" font-size="10" fill="#78716c" text-anchor="middle">165s</text>
+          <line x1="477.0" y1="16" x2="477.0" y2="396" stroke="#f5f5f4" stroke-width="1" stroke-dasharray="2,3"/>
+          <text x="477.0" y="412" font-size="10" fill="#78716c" text-anchor="middle">330s</text>
+          <line x1="690.5" y1="16" x2="690.5" y2="396" stroke="#f5f5f4" stroke-width="1" stroke-dasharray="2,3"/>
+          <text x="690.5" y="412" font-size="10" fill="#78716c" text-anchor="middle">495s</text>
+          <line x1="904.0" y1="16" x2="904.0" y2="396" stroke="#f5f5f4" stroke-width="1" stroke-dasharray="2,3"/>
+          <text x="904.0" y="412" font-size="10" fill="#78716c" text-anchor="middle">660s</text>
+        <text x="477.0" y="428" font-size="10" fill="#57534e" text-anchor="middle">Wall-time (s) →</text>
+        <text x="14" y="206.0" font-size="10" fill="#57534e" text-anchor="middle" transform="rotate(-90 14 206.0)">Score</text>
 
           <g class="sp-dot" data-model-id="google/gemma-4-e2b" data-total-ram="10.11" data-moe="0" style="cursor:pointer">
             <circle cx="115.78595561328288" cy="16.0" r="9" fill="#dc2626" fill-opacity="0.78"
                     stroke="#dc2626" stroke-width="1.75"
                     class="sp-circle"/>
               <text x="115.78595561328288" y="16.0" text-anchor="middle" dominant-baseline="central"
-                    font-size="6" font-weight="700" fill="#fff"
-                    pointer-events="none" class="sp-label">4.6</text>
+                    font-size="8" font-weight="700" fill="#fff"
+                    pointer-events="none" class="sp-label">5</text>
           </g>
           <g class="sp-dot" data-model-id="google/gemma-4-e2b@q8_0" data-total-ram="11.76" data-moe="0" style="cursor:pointer">
             <circle cx="150.79034040574774" cy="16.0" r="9" fill="#dc2626" fill-opacity="0.78"
                     stroke="#dc2626" stroke-width="1.75"
                     class="sp-circle"/>
               <text x="150.79034040574774" y="16.0" text-anchor="middle" dominant-baseline="central"
-                    font-size="6" font-weight="700" fill="#fff"
-                    pointer-events="none" class="sp-label">4.6</text>
+                    font-size="8" font-weight="700" fill="#fff"
+                    pointer-events="none" class="sp-label">5</text>
           </g>
           <g class="sp-dot" data-model-id="google/gemma-4-e4b" data-total-ram="12.25" data-moe="0" style="cursor:pointer">
             <circle cx="153.6830225200163" cy="16.0" r="9" fill="#dc2626" fill-opacity="0.78"
                     stroke="#dc2626" stroke-width="1.75"
                     class="sp-circle"/>
               <text x="153.6830225200163" y="16.0" text-anchor="middle" dominant-baseline="central"
-                    font-size="6" font-weight="700" fill="#fff"
-                    pointer-events="none" class="sp-label">7.5</text>
+                    font-size="8" font-weight="700" fill="#fff"
+                    pointer-events="none" class="sp-label">8</text>
           </g>
           <g class="sp-dot" data-model-id="nvidia/nemotron-3-nano-omni" data-total-ram="38.04" data-moe="1" style="cursor:pointer">
             <circle cx="311.6328953599434" cy="16.0" r="9" fill="#a3e635" fill-opacity="0.78"
@@ -297,8 +297,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                     stroke="#dc2626" stroke-width="1.75"
                     class="sp-circle"/>
               <text x="171.5621537754859" y="16.0" text-anchor="middle" dominant-baseline="central"
-                    font-size="6" font-weight="700" fill="#fff"
-                    pointer-events="none" class="sp-label">7.5</text>
+                    font-size="8" font-weight="700" fill="#fff"
+                    pointer-events="none" class="sp-label">8</text>
           </g>
           <g class="sp-dot" data-model-id="glm-4.5-air-mlx" data-total-ram="82.44" data-moe="1" style="cursor:pointer">
             <circle cx="238.2795761386698" cy="16.0" r="9" fill="#f97316" fill-opacity="0.78"
@@ -341,164 +341,164 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                     pointer-events="none" class="sp-label">27</text>
           </g>
           <g class="sp-dot" data-model-id="openai/gpt-oss-20b" data-total-ram="19.78" data-moe="1" style="cursor:pointer">
-            <circle cx="177.4694307649293" cy="21.5" r="9" fill="#15803d" fill-opacity="0.78"
+            <circle cx="177.4694307649293" cy="22.785714285714278" r="9" fill="#15803d" fill-opacity="0.78"
                     stroke="#15803d" stroke-width="1.75"
 stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
-              <text x="177.4694307649293" y="21.5" text-anchor="middle" dominant-baseline="central"
+              <text x="177.4694307649293" y="22.785714285714278" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">20</text>
           </g>
           <g class="sp-dot" data-model-id="zai-org/glm-4.7-flash@q4_k_m" data-total-ram="27.64" data-moe="1" style="cursor:pointer">
-            <circle cx="119.03342642571184" cy="21.5" r="9" fill="#f97316" fill-opacity="0.78"
+            <circle cx="119.03342642571184" cy="22.785714285714278" r="9" fill="#f97316" fill-opacity="0.78"
                     stroke="#f97316" stroke-width="1.75"
 stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
-              <text x="119.03342642571184" y="21.5" text-anchor="middle" dominant-baseline="central"
+              <text x="119.03342642571184" y="22.785714285714278" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">30</text>
           </g>
           <g class="sp-dot" data-model-id="qwen/qwen3-coder-next" data-total-ram="67.39" data-moe="1" style="cursor:pointer">
-            <circle cx="99.18466736099747" cy="21.5" r="9" fill="#7c3aed" fill-opacity="0.78"
+            <circle cx="99.18466736099747" cy="22.785714285714278" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
 stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
-              <text x="99.18466736099747" y="21.5" text-anchor="middle" dominant-baseline="central"
+              <text x="99.18466736099747" y="22.785714285714278" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">80</text>
           </g>
           <g class="sp-dot" data-model-id="google/gemma-4-26b-a4b" data-total-ram="27.46" data-moe="1" style="cursor:pointer">
-            <circle cx="97.62111602001224" cy="23.333333333333314" r="9" fill="#dc2626" fill-opacity="0.78"
+            <circle cx="97.62111602001224" cy="25.047619047619037" r="9" fill="#dc2626" fill-opacity="0.78"
                     stroke="#dc2626" stroke-width="1.75"
 stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
-              <text x="97.62111602001224" y="23.333333333333314" text-anchor="middle" dominant-baseline="central"
+              <text x="97.62111602001224" y="25.047619047619037" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">26</text>
           </g>
           <g class="sp-dot" data-model-id="qwen/qwen3.5-35b-a3b" data-total-ram="32.78" data-moe="1" style="cursor:pointer">
-            <circle cx="94.80804713408068" cy="27.0" r="9" fill="#7c3aed" fill-opacity="0.78"
+            <circle cx="94.80804713408068" cy="29.571428571428555" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
 stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
-              <text x="94.80804713408068" y="27.0" text-anchor="middle" dominant-baseline="central"
+              <text x="94.80804713408068" y="29.571428571428555" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">35</text>
           </g>
           <g class="sp-dot" data-model-id="qwen/qwen3-coder-30b" data-total-ram="26.41" data-moe="1" style="cursor:pointer">
-            <circle cx="92.6847835433874" cy="30.66666666666663" r="9" fill="#7c3aed" fill-opacity="0.78"
+            <circle cx="92.6847835433874" cy="34.095238095238074" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
 stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
-              <text x="92.6847835433874" y="30.66666666666663" text-anchor="middle" dominant-baseline="central"
+              <text x="92.6847835433874" y="34.095238095238074" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">30</text>
           </g>
           <g class="sp-dot" data-model-id="qwen/qwen3.6-35b-a3b" data-total-ram="32.78" data-moe="1" style="cursor:pointer">
-            <circle cx="121.72036775901039" cy="32.5" r="9" fill="#7c3aed" fill-opacity="0.78"
+            <circle cx="121.72036775901039" cy="36.35714285714289" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
 stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
-              <text x="121.72036775901039" y="32.5" text-anchor="middle" dominant-baseline="central"
+              <text x="121.72036775901039" y="36.35714285714289" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">35</text>
           </g>
           <g class="sp-dot" data-model-id="zai-org/glm-4.7-flash" data-total-ram="45.52" data-moe="1" style="cursor:pointer">
-            <circle cx="116.08622869818302" cy="35.25" r="9" fill="#f97316" fill-opacity="0.78"
+            <circle cx="116.08622869818302" cy="39.75" r="9" fill="#f97316" fill-opacity="0.78"
                     stroke="#f97316" stroke-width="1.75"
 stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
-              <text x="116.08622869818302" y="35.25" text-anchor="middle" dominant-baseline="central"
+              <text x="116.08622869818302" y="39.75" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">30</text>
           </g>
           <g class="sp-dot" data-model-id="openai/gpt-oss-120b" data-total-ram="86.65" data-moe="1" style="cursor:pointer">
-            <circle cx="141.67630495284155" cy="41.66666666666663" r="9" fill="#15803d" fill-opacity="0.78"
+            <circle cx="141.67630495284155" cy="47.66666666666663" r="9" fill="#15803d" fill-opacity="0.78"
                     stroke="#15803d" stroke-width="1.75"
 stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
-              <text x="141.67630495284155" y="41.66666666666663" text-anchor="middle" dominant-baseline="central"
+              <text x="141.67630495284155" y="47.66666666666663" text-anchor="middle" dominant-baseline="central"
                     font-size="6" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">120</text>
           </g>
           <g class="sp-dot" data-model-id="qwen/qwen3-4b-2507" data-total-ram="8.12" data-moe="0" style="cursor:pointer">
-            <circle cx="84.17535059579691" cy="49.0" r="9" fill="#7c3aed" fill-opacity="0.78"
+            <circle cx="84.17535059579691" cy="56.71428571428572" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
                     class="sp-circle"/>
-              <text x="84.17535059579691" y="49.0" text-anchor="middle" dominant-baseline="central"
+              <text x="84.17535059579691" y="56.71428571428572" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">4</text>
           </g>
           <g class="sp-dot" data-model-id="nvidia/nemotron-3-nano-4b" data-total-ram="8.64" data-moe="0" style="cursor:pointer">
-            <circle cx="190.75254547504434" cy="49.0" r="9" fill="#a3e635" fill-opacity="0.78"
+            <circle cx="190.75254547504434" cy="56.71428571428572" r="9" fill="#a3e635" fill-opacity="0.78"
                     stroke="#a3e635" stroke-width="1.75"
                     class="sp-circle"/>
-              <text x="190.75254547504434" y="49.0" text-anchor="middle" dominant-baseline="central"
+              <text x="190.75254547504434" y="56.71428571428572" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#1c1917"
                     pointer-events="none" class="sp-label">4</text>
           </g>
           <g class="sp-dot" data-model-id="qwen/qwen3-4b-thinking-2507" data-total-ram="8.12" data-moe="0" style="cursor:pointer">
-            <circle cx="596.3611381799811" cy="49.0" r="9" fill="#7c3aed" fill-opacity="0.78"
+            <circle cx="596.3611381799811" cy="56.71428571428572" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
                     class="sp-circle"/>
-              <text x="596.3611381799811" y="49.0" text-anchor="middle" dominant-baseline="central"
+              <text x="596.3611381799811" y="56.71428571428572" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">4</text>
           </g>
           <g class="sp-dot" data-model-id="ibm/granite-4-h-tiny" data-total-ram="9.94" data-moe="0" style="cursor:pointer">
-            <circle cx="91.59704611200564" cy="49.78571428571428" r="9" fill="#475569" fill-opacity="0.78"
+            <circle cx="91.59704611200564" cy="57.68367346938777" r="9" fill="#475569" fill-opacity="0.78"
                     stroke="#475569" stroke-width="1.75"
                     class="sp-circle"/>
-              <text x="91.59704611200564" y="49.78571428571428" text-anchor="middle" dominant-baseline="central"
+              <text x="91.59704611200564" y="57.68367346938777" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">7</text>
           </g>
           <g class="sp-dot" data-model-id="qwen3.5-9b-mlx" data-total-ram="11.79" data-moe="0" style="cursor:pointer">
-            <circle cx="154.25476997092218" cy="71.0" r="9" fill="#7c3aed" fill-opacity="0.78"
+            <circle cx="154.25476997092218" cy="83.85714285714289" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
                     class="sp-circle"/>
-              <text x="154.25476997092218" y="71.0" text-anchor="middle" dominant-baseline="central"
+              <text x="154.25476997092218" y="83.85714285714289" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">9</text>
           </g>
           <g class="sp-dot" data-model-id="qwen3.5-4b" data-total-ram="9.15" data-moe="0" style="cursor:pointer">
-            <circle cx="103.83428254854499" cy="93.0" r="9" fill="#7c3aed" fill-opacity="0.78"
+            <circle cx="103.83428254854499" cy="111.0" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
                     class="sp-circle"/>
-              <text x="103.83428254854499" y="93.0" text-anchor="middle" dominant-baseline="central"
+              <text x="103.83428254854499" y="111.0" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">4</text>
           </g>
           <g class="sp-dot" data-model-id="qwen3.5-2b" data-total-ram="7.81" data-moe="0" style="cursor:pointer">
-            <circle cx="90.49927548267138" cy="94.46666666666667" r="9" fill="#7c3aed" fill-opacity="0.78"
+            <circle cx="90.49927548267138" cy="112.8095238095238" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
                     class="sp-circle"/>
-              <text x="90.49927548267138" y="94.46666666666667" text-anchor="middle" dominant-baseline="central"
+              <text x="90.49927548267138" y="112.8095238095238" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">2</text>
           </g>
           <g class="sp-dot" data-model-id="qwen/qwen3.5-9b" data-total-ram="12.54" data-moe="0" style="cursor:pointer">
-            <circle cx="258.0130108553052" cy="108.39999999999998" r="9" fill="#7c3aed" fill-opacity="0.78"
+            <circle cx="258.0130108553052" cy="130.0" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
                     class="sp-circle"/>
-              <text x="258.0130108553052" y="108.39999999999998" text-anchor="middle" dominant-baseline="central"
+              <text x="258.0130108553052" y="130.0" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">9</text>
           </g>
           <g class="sp-dot" data-model-id="qwen/qwen3.5-9b@q8_0" data-total-ram="17.62" data-moe="0" style="cursor:pointer">
-            <circle cx="139.59735247394048" cy="111.33333333333334" r="9" fill="#7c3aed" fill-opacity="0.78"
+            <circle cx="139.59735247394048" cy="133.61904761904765" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
                     class="sp-circle"/>
-              <text x="139.59735247394048" y="111.33333333333334" text-anchor="middle" dominant-baseline="central"
+              <text x="139.59735247394048" y="133.61904761904765" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">9</text>
           </g>
           <g class="sp-dot" data-model-id="liquid/lfm2-24b-a2b" data-total-ram="21.5" data-moe="1" style="cursor:pointer">
-            <circle cx="77.8982558535419" cy="177.33333333333331" r="9" fill="#22d3ee" fill-opacity="0.78"
+            <circle cx="77.8982558535419" cy="215.04761904761904" r="9" fill="#22d3ee" fill-opacity="0.78"
                     stroke="#22d3ee" stroke-width="1.75"
 stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
-              <text x="77.8982558535419" y="177.33333333333331" text-anchor="middle" dominant-baseline="central"
+              <text x="77.8982558535419" y="215.04761904761904" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#1c1917"
                     pointer-events="none" class="sp-label">24</text>
           </g>
           <g class="sp-dot" data-model-id="liquid/lfm2.5-1.2b" data-total-ram="7.16" data-moe="0" style="cursor:pointer">
-            <circle cx="62.49356906103238" cy="309.3333333333333" r="9" fill="#22d3ee" fill-opacity="0.78"
+            <circle cx="62.49356906103238" cy="377.9047619047619" r="9" fill="#22d3ee" fill-opacity="0.78"
                     stroke="#22d3ee" stroke-width="1.75"
                     class="sp-circle"/>
-              <text x="62.49356906103238" y="309.3333333333333" text-anchor="middle" dominant-baseline="central"
-                    font-size="6" font-weight="700" fill="#1c1917"
-                    pointer-events="none" class="sp-label">1.2</text>
+              <text x="62.49356906103238" y="377.9047619047619" text-anchor="middle" dominant-baseline="central"
+                    font-size="8" font-weight="700" fill="#1c1917"
+                    pointer-events="none" class="sp-label">1</text>
           </g>
       </svg>
       <div id="sp-tooltip" class="pointer-events-none absolute hidden bg-stone-900 text-stone-50 text-xs px-3 py-2 rounded shadow-lg num" style="white-space:nowrap;line-height:1.45"></div>
@@ -516,7 +516,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#dc2626"></span>
             <a href="../models/google_gemma-4-e2b.html#tool_use" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="google/gemma-4-e2b">gemma-4-e2b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
-              1.00 · 51s
+              100% · 51s
  · 132 t/s · 10 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
@@ -525,7 +525,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#dc2626"></span>
             <a href="../models/google_gemma-4-e2b@q8_0.html#tool_use" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="google/gemma-4-e2b@q8_0">gemma-4-e2b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 8bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
-              1.00 · 78s
+              100% · 78s
  · 113 t/s · 12 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
@@ -534,7 +534,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#dc2626"></span>
             <a href="../models/google_gemma-4-e4b.html#tool_use" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="google/gemma-4-e4b">gemma-4-e4b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
-              1.00 · 80s
+              100% · 80s
  · 89 t/s · 12 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
@@ -543,7 +543,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#a3e635"></span>
             <a href="../models/nvidia_nemotron-3-nano-omni.html#tool_use" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="nvidia/nemotron-3-nano-omni">nemotron-3-nano-omni</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
-              1.00 · 202s
+              100% · 202s
  · 87 t/s · 38 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
@@ -552,7 +552,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#dc2626"></span>
             <a href="../models/google_gemma-4-26b-a4b@q8_0.html#tool_use" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="google/gemma-4-26b-a4b@q8_0">gemma-4-26b-a4b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 8bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
-              1.00 · 132s
+              100% · 132s
  · 75 t/s · 41 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
@@ -561,7 +561,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#7c3aed"></span>
             <a href="../models/qwen_qwen3.6-35b-a3b@q8_0.html#tool_use" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="qwen/qwen3.6-35b-a3b@q8_0">qwen3.6-35b-a3b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 8bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
-              1.00 · 70s
+              100% · 70s
  · 70 t/s · 53 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
@@ -570,7 +570,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#dc2626"></span>
             <a href="../models/google_gemma-4-e4b@q8_0.html#tool_use" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="google/gemma-4-e4b@q8_0">gemma-4-e4b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 8bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
-              1.00 · 94s
+              100% · 94s
  · 68 t/s · 16 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
@@ -579,7 +579,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#f97316"></span>
             <a href="../models/glm-4.5-air-mlx.html#tool_use" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="glm-4.5-air-mlx">glm-4.5-air-mlx</a>
 <span class="text-[11px] text-stone-400 num shrink-0">mlx 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
-              1.00 · 146s
+              100% · 146s
  · 43 t/s · 82 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
@@ -588,7 +588,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#7c3aed"></span>
             <a href="../models/qwen_qwen3.6-27b.html#tool_use" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="qwen/qwen3.6-27b">qwen3.6-27b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
-              1.00 · 179s
+              100% · 179s
  · 22 t/s · 27 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
@@ -597,7 +597,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#dc2626"></span>
             <a href="../models/google_gemma-4-31b.html#tool_use" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="google/gemma-4-31b">gemma-4-31b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
-              1.00 · 249s
+              100% · 249s
  · 21 t/s · 30 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
@@ -606,7 +606,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#7c3aed"></span>
             <a href="../models/qwen3.5-122b-a10b.html#tool_use" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="qwen3.5-122b-a10b">qwen3.5-122b-a10b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
-              1.00 · 266s
+              100% · 266s
  · 12 t/s · 102 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
@@ -615,7 +615,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#7c3aed"></span>
             <a href="../models/qwen3.5-27b-claude-4.6-opus-distilled-mlx.html#tool_use" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="qwen3.5-27b-claude-4.6-opus-distilled-mlx">qwen3.5-27b-claude-4.6-opus-distilled-mlx</a>
 <span class="text-[11px] text-stone-400 num shrink-0">mlx 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
-              1.00 · 651s
+              100% · 651s
  · 9 t/s · 24 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
@@ -624,7 +624,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#15803d"></span>
             <a href="../models/openai_gpt-oss-20b.html#tool_use" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="openai/gpt-oss-20b">gpt-oss-20b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">mlx 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
-              0.98 · 99s
+              98% · 99s
  · 114 t/s · 20 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
@@ -633,7 +633,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#f97316"></span>
             <a href="../models/zai-org_glm-4.7-flash@q4_k_m.html#tool_use" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="zai-org/glm-4.7-flash@q4_k_m">glm-4.7-flash</a>
 <span class="text-[11px] text-stone-400 num shrink-0">mlx 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
-              0.98 · 53s
+              98% · 53s
  · 85 t/s · 28 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
@@ -642,7 +642,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#7c3aed"></span>
             <a href="../models/qwen_qwen3-coder-next.html#tool_use" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="qwen/qwen3-coder-next">qwen3-coder-next</a>
 <span class="text-[11px] text-stone-400 num shrink-0">mlx 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
-              0.98 · 38s
+              98% · 38s
  · 74 t/s · 67 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
@@ -651,7 +651,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#dc2626"></span>
             <a href="../models/google_gemma-4-26b-a4b.html#tool_use" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="google/gemma-4-26b-a4b">gemma-4-26b-a4b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
-              0.98 · 37s
+              98% · 37s
  · 94 t/s · 27 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
@@ -660,7 +660,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#7c3aed"></span>
             <a href="../models/qwen_qwen3.5-35b-a3b.html#tool_use" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="qwen/qwen3.5-35b-a3b">qwen3.5-35b-a3b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
-              0.96 · 35s
+              96% · 35s
  · 81 t/s · 33 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
@@ -669,7 +669,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#7c3aed"></span>
             <a href="../models/qwen_qwen3-coder-30b.html#tool_use" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="qwen/qwen3-coder-30b">qwen3-coder-30b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">mlx 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
-              0.95 · 33s
+              95% · 33s
  · 109 t/s · 26 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
@@ -678,7 +678,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#7c3aed"></span>
             <a href="../models/qwen_qwen3.6-35b-a3b.html#tool_use" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="qwen/qwen3.6-35b-a3b">qwen3.6-35b-a3b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
-              0.95 · 55s
+              95% · 55s
  · 83 t/s · 33 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
@@ -687,7 +687,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#f97316"></span>
             <a href="../models/zai-org_glm-4.7-flash.html#tool_use" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="zai-org/glm-4.7-flash">glm-4.7-flash</a>
 <span class="text-[11px] text-stone-400 num shrink-0">mlx 8bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
-              0.94 · 51s
+              94% · 51s
  · 57 t/s · 46 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
@@ -696,7 +696,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#15803d"></span>
             <a href="../models/openai_gpt-oss-120b.html#tool_use" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="openai/gpt-oss-120b">gpt-oss-120b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
-              0.92 · 71s
+              92% · 71s
  · 82 t/s · 87 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
@@ -705,7 +705,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#7c3aed"></span>
             <a href="../models/qwen_qwen3-4b-2507.html#tool_use" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="qwen/qwen3-4b-2507">qwen3-4b-2507</a>
 <span class="text-[11px] text-stone-400 num shrink-0">mlx 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
-              0.89 · 26s
+              89% · 26s
  · 150 t/s · 8 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
@@ -714,7 +714,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#a3e635"></span>
             <a href="../models/nvidia_nemotron-3-nano-4b.html#tool_use" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="nvidia/nemotron-3-nano-4b">nemotron-3-nano-4b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
-              0.89 · 109s
+              89% · 109s
  · 86 t/s · 9 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
@@ -723,7 +723,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#7c3aed"></span>
             <a href="../models/qwen_qwen3-4b-thinking-2507.html#tool_use" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="qwen/qwen3-4b-thinking-2507">qwen3-4b-thinking-2507</a>
 <span class="text-[11px] text-stone-400 num shrink-0">mlx 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
-              0.89 · 422s
+              89% · 422s
  · 49 t/s · 8 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
@@ -732,7 +732,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#475569"></span>
             <a href="../models/ibm_granite-4-h-tiny.html#tool_use" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="ibm/granite-4-h-tiny">granite-4-h-tiny</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
-              0.89 · 32s
+              89% · 32s
  · 118 t/s · 10 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
@@ -741,7 +741,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#7c3aed"></span>
             <a href="../models/qwen3.5-9b-mlx.html#tool_use" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="qwen3.5-9b-mlx">qwen3.5-9b-mlx</a>
 <span class="text-[11px] text-stone-400 num shrink-0">mlx 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
-              0.82 · 81s
+              82% · 81s
  · 89 t/s · 12 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
@@ -750,7 +750,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#7c3aed"></span>
             <a href="../models/qwen3.5-4b.html#tool_use" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="qwen3.5-4b">qwen3.5-4b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
-              0.75 · 42s
+              75% · 42s
  · 88 t/s · 9 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
@@ -759,7 +759,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#7c3aed"></span>
             <a href="../models/qwen3.5-2b.html#tool_use" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="qwen3.5-2b">qwen3.5-2b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
-              0.75 · 31s
+              75% · 31s
  · 166 t/s · 8 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
@@ -768,7 +768,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#7c3aed"></span>
             <a href="../models/qwen_qwen3.5-9b.html#tool_use" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="qwen/qwen3.5-9b">qwen3.5-9b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
-              0.70 · 161s
+              70% · 161s
  · 61 t/s · 13 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
@@ -777,7 +777,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#7c3aed"></span>
             <a href="../models/qwen_qwen3.5-9b@q8_0.html#tool_use" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="qwen/qwen3.5-9b@q8_0">qwen3.5-9b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 8bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
-              0.69 · 69s
+              69% · 69s
  · 45 t/s · 18 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
@@ -786,7 +786,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#22d3ee"></span>
             <a href="../models/liquid_lfm2-24b-a2b.html#tool_use" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="liquid/lfm2-24b-a2b">lfm2-24b-a2b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">mlx 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
-              0.48 · 22s
+              48% · 22s
  · 154 t/s · 22 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
@@ -795,7 +795,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#22d3ee"></span>
             <a href="../models/liquid_lfm2.5-1.2b.html#tool_use" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="liquid/lfm2.5-1.2b">lfm2.5-1.2b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">mlx 8bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
-              0.05 · 10s
+              5% · 10s
  · 287 t/s · 7 GB            </span>
           </li>
       </ol>
@@ -891,7 +891,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
         : 'RAM unknown';
       tip.innerHTML = `<div style="font-weight:600">${m.short_id}</div>
 <div style="opacity:0.7">by ${m.vendor} · ${m.quant}</div>
-<div style="margin-top:4px">Score: <b>${m.score?.toFixed(2)}</b></div>
+<div style="margin-top:4px">Score: <b>${m.score != null ? Math.round(m.score * 100) + '%' : '—'}</b></div>
 <div>Wall-time: <b>${m.wall_s?.toFixed(1)} s</b>${m.tps != null ? ` · ${m.tps.toFixed(0)} tok/s` : ''}${m.tokens != null ? ` · ${m.tokens} tokens` : ''}</div>
 <div style="margin-top:4px;opacity:0.85">${ramTxt}</div>`;
       tip.classList.remove('hidden');
@@ -961,7 +961,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="50.84160504071042">50.8 s</td>
             <td class="px-3 py-2 num text-right" data-sort="1.0">
                 <span class="font-bold text-lg text-emerald-700">
-                  1.00
+                  100%
                 </span>
             </td>
           </tr>
@@ -982,7 +982,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="77.89417408406734">77.9 s</td>
             <td class="px-3 py-2 num text-right" data-sort="1.0">
                 <span class="font-bold text-lg text-emerald-700">
-                  1.00
+                  100%
                 </span>
             </td>
           </tr>
@@ -1003,7 +1003,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="80.12973637378309">80.1 s</td>
             <td class="px-3 py-2 num text-right" data-sort="1.0">
                 <span class="font-bold text-lg text-emerald-700">
-                  1.00
+                  100%
                 </span>
             </td>
           </tr>
@@ -1024,7 +1024,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="202.1987247512443">202.2 s</td>
             <td class="px-3 py-2 num text-right" data-sort="1.0">
                 <span class="font-bold text-lg text-emerald-700">
-                  1.00
+                  100%
                 </span>
             </td>
           </tr>
@@ -1045,7 +1045,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="131.6507942910539">131.7 s</td>
             <td class="px-3 py-2 num text-right" data-sort="1.0">
                 <span class="font-bold text-lg text-emerald-700">
-                  1.00
+                  100%
                 </span>
             </td>
           </tr>
@@ -1066,7 +1066,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="69.54674366745166">69.5 s</td>
             <td class="px-3 py-2 num text-right" data-sort="1.0">
                 <span class="font-bold text-lg text-emerald-700">
-                  1.00
+                  100%
                 </span>
             </td>
           </tr>
@@ -1087,7 +1087,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="93.94733195763547">93.9 s</td>
             <td class="px-3 py-2 num text-right" data-sort="1.0">
                 <span class="font-bold text-lg text-emerald-700">
-                  1.00
+                  100%
                 </span>
             </td>
           </tr>
@@ -1108,7 +1108,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="145.50880591513123">145.5 s</td>
             <td class="px-3 py-2 num text-right" data-sort="1.0">
                 <span class="font-bold text-lg text-emerald-700">
-                  1.00
+                  100%
                 </span>
             </td>
           </tr>
@@ -1129,7 +1129,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="179.41144049994182">179.4 s</td>
             <td class="px-3 py-2 num text-right" data-sort="1.0">
                 <span class="font-bold text-lg text-emerald-700">
-                  1.00
+                  100%
                 </span>
             </td>
           </tr>
@@ -1150,7 +1150,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="249.2127141249366">249.2 s</td>
             <td class="px-3 py-2 num text-right" data-sort="1.0">
                 <span class="font-bold text-lg text-emerald-700">
-                  1.00
+                  100%
                 </span>
             </td>
           </tr>
@@ -1171,7 +1171,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="265.8697292068973">265.9 s</td>
             <td class="px-3 py-2 num text-right" data-sort="1.0">
                 <span class="font-bold text-lg text-emerald-700">
-                  1.00
+                  100%
                 </span>
             </td>
           </tr>
@@ -1192,7 +1192,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="650.6425839560106">650.6 s</td>
             <td class="px-3 py-2 num text-right" data-sort="1.0">
                 <span class="font-bold text-lg text-emerald-700">
-                  1.00
+                  100%
                 </span>
             </td>
           </tr>
@@ -1213,7 +1213,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="98.51267483003903">98.5 s</td>
             <td class="px-3 py-2 num text-right" data-sort="0.9821428571428571">
                 <span class="font-bold text-lg text-emerald-700">
-                  0.98
+                  98%
                 </span>
             </td>
           </tr>
@@ -1234,7 +1234,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="53.35136000113562">53.4 s</td>
             <td class="px-3 py-2 num text-right" data-sort="0.9821428571428571">
                 <span class="font-bold text-lg text-emerald-700">
-                  0.98
+                  98%
                 </span>
             </td>
           </tr>
@@ -1255,7 +1255,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="38.01156962325331">38.0 s</td>
             <td class="px-3 py-2 num text-right" data-sort="0.9821428571428571">
                 <span class="font-bold text-lg text-emerald-700">
-                  0.98
+                  98%
                 </span>
             </td>
           </tr>
@@ -1276,7 +1276,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="36.80320441827644">36.8 s</td>
             <td class="px-3 py-2 num text-right" data-sort="0.9761904761904762">
                 <span class="font-bold text-lg text-emerald-700">
-                  0.98
+                  98%
                 </span>
             </td>
           </tr>
@@ -1297,7 +1297,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="34.62916991626844">34.6 s</td>
             <td class="px-3 py-2 num text-right" data-sort="0.9642857142857143">
                 <span class="font-bold text-lg text-emerald-700">
-                  0.96
+                  96%
                 </span>
             </td>
           </tr>
@@ -1318,7 +1318,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="32.988240209175274">33.0 s</td>
             <td class="px-3 py-2 num text-right" data-sort="0.9523809523809524">
                 <span class="font-bold text-lg text-emerald-700">
-                  0.95
+                  95%
                 </span>
             </td>
           </tr>
@@ -1339,7 +1339,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="55.42791887698695">55.4 s</td>
             <td class="px-3 py-2 num text-right" data-sort="0.9464285714285714">
                 <span class="font-bold text-lg text-emerald-700">
-                  0.95
+                  95%
                 </span>
             </td>
           </tr>
@@ -1360,7 +1360,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="51.07366620702669">51.1 s</td>
             <td class="px-3 py-2 num text-right" data-sort="0.9375">
                 <span class="font-bold text-lg text-emerald-700">
-                  0.94
+                  94%
                 </span>
             </td>
           </tr>
@@ -1381,7 +1381,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="70.85054012748878">70.9 s</td>
             <td class="px-3 py-2 num text-right" data-sort="0.9166666666666667">
                 <span class="font-bold text-lg text-emerald-700">
-                  0.92
+                  92%
                 </span>
             </td>
           </tr>
@@ -1402,7 +1402,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="26.41186345811002">26.4 s</td>
             <td class="px-3 py-2 num text-right" data-sort="0.8928571428571429">
                 <span class="font-bold text-lg text-emerald-700">
-                  0.89
+                  89%
                 </span>
             </td>
           </tr>
@@ -1423,7 +1423,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="108.77831383317243">108.8 s</td>
             <td class="px-3 py-2 num text-right" data-sort="0.8928571428571429">
                 <span class="font-bold text-lg text-emerald-700">
-                  0.89
+                  89%
                 </span>
             </td>
           </tr>
@@ -1444,7 +1444,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="422.24631287914235">422.2 s</td>
             <td class="px-3 py-2 num text-right" data-sort="0.8928571428571429">
                 <span class="font-bold text-lg text-emerald-700">
-                  0.89
+                  89%
                 </span>
             </td>
           </tr>
@@ -1465,7 +1465,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="32.14760003972333">32.1 s</td>
             <td class="px-3 py-2 num text-right" data-sort="0.8903061224489796">
                 <span class="font-bold text-lg text-emerald-700">
-                  0.89
+                  89%
                 </span>
             </td>
           </tr>
@@ -1486,7 +1486,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="80.57160208525602">80.6 s</td>
             <td class="px-3 py-2 num text-right" data-sort="0.8214285714285714">
                 <span class="font-bold text-lg text-emerald-700">
-                  0.82
+                  82%
                 </span>
             </td>
           </tr>
@@ -1507,7 +1507,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="41.60494904220104">41.6 s</td>
             <td class="px-3 py-2 num text-right" data-sort="0.75">
                 <span class="font-bold text-lg text-emerald-700">
-                  0.75
+                  75%
                 </span>
             </td>
           </tr>
@@ -1528,7 +1528,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="31.2992058765376">31.3 s</td>
             <td class="px-3 py-2 num text-right" data-sort="0.7452380952380953">
                 <span class="font-bold text-lg text-emerald-700">
-                  0.75
+                  75%
                 </span>
             </td>
           </tr>
@@ -1549,7 +1549,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="160.75946974765975">160.8 s</td>
             <td class="px-3 py-2 num text-right" data-sort="0.7000000000000001">
                 <span class="font-bold text-lg text-emerald-700">
-                  0.70
+                  70%
                 </span>
             </td>
           </tr>
@@ -1570,7 +1570,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="69.24385554192122">69.2 s</td>
             <td class="px-3 py-2 num text-right" data-sort="0.6904761904761905">
                 <span class="font-bold text-lg text-amber-700">
-                  0.69
+                  69%
                 </span>
             </td>
           </tr>
@@ -1591,7 +1591,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="21.560712954727933">21.6 s</td>
             <td class="px-3 py-2 num text-right" data-sort="0.4761904761904762">
                 <span class="font-bold text-lg text-amber-700">
-                  0.48
+                  48%
                 </span>
             </td>
           </tr>
@@ -1612,7 +1612,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="9.655451499158517">9.7 s</td>
             <td class="px-3 py-2 num text-right" data-sort="0.047619047619047616">
                 <span class="font-bold text-lg text-amber-700">
-                  0.05
+                  5%
                 </span>
             </td>
           </tr>

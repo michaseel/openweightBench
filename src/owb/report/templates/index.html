@@ -31,7 +31,7 @@
         <p class="mt-2 text-sm text-stone-600">{{ c.description }}</p>
         <div class="mt-4 flex items-center gap-6 text-xs text-stone-500">
           {% if c.best_score is not none %}
-            <span>Top score <span class="font-mono num text-stone-900">{{ "%.2f"|format(c.best_score) }}</span></span>
+            <span>Top score <span class="font-mono num text-stone-900">{{ c.best_score|pct }}</span></span>
           {% endif %}
           {% if c.median_speed is not none %}
             <span>Median <span class="font-mono num text-stone-900">{{ "%.0f"|format(c.median_speed) }}</span> tok/s</span>
@@ -50,12 +50,12 @@
 <section class="mt-12">
   <h2 class="text-lg font-medium tracking-tight">Overall summary across all models</h2>
   <p class="mt-1 text-sm text-stone-600">
-    Score 0–1 per benchmark. Overall = weighted mean: Coding counts double, Tool Use half. RAM = on-disk size of the model (Q4 file). Wall = cumulative bench time across all tasks.
+    Score 0–100&nbsp;% per benchmark. Overall = weighted mean: Coding counts double, Tool Use half. RAM = on-disk size of the model (Q4 file). Wall = cumulative bench time across all tasks.
   </p>
 
   {% if overall_scatter_rows %}
     {% set sp_w = 920 %}
-    {% set sp_h = 340 %}
+    {% set sp_h = 408 %}
     {% set sp_pad_l = 54 %}
     {% set sp_pad_r = 18 %}
     {% set sp_pad_t = 18 %}
@@ -99,13 +99,13 @@
         </span>
         <span><span id="os-count">{{ overall_scatter_rows|length }}</span>/{{ overall_scatter_rows|length }} visible</span>
       </div>
-      <svg viewBox="0 0 {{ sp_w }} {{ sp_h }}" class="w-full num" style="height:340px" preserveAspectRatio="xMidYMid meet">
+      <svg viewBox="0 0 {{ sp_w }} {{ sp_h }}" class="w-full num" style="height:408px" preserveAspectRatio="xMidYMid meet">
         <line x1="{{ sp_pad_l }}" y1="{{ sp_pad_t + sp_inner_h }}" x2="{{ sp_pad_l + sp_inner_w }}" y2="{{ sp_pad_t + sp_inner_h }}" stroke="#d6d3d1" stroke-width="1"/>
         <line x1="{{ sp_pad_l }}" y1="{{ sp_pad_t }}" x2="{{ sp_pad_l }}" y2="{{ sp_pad_t + sp_inner_h }}" stroke="#d6d3d1" stroke-width="1"/>
         {% for tick_pct in [0, 25, 50, 75, 100] %}
           {% set y = sp_pad_t + sp_inner_h - (sp_inner_h * tick_pct / 100) %}
           <line x1="{{ sp_pad_l }}" y1="{{ y }}" x2="{{ sp_pad_l + sp_inner_w }}" y2="{{ y }}" stroke="#f5f5f4" stroke-width="1" stroke-dasharray="2,3"/>
-          <text x="{{ sp_pad_l - 6 }}" y="{{ y + 3 }}" font-size="10" fill="#78716c" text-anchor="end">{{ "%.2f"|format(tick_pct / 100) }}</text>
+          <text x="{{ sp_pad_l - 6 }}" y="{{ y + 3 }}" font-size="10" fill="#78716c" text-anchor="end">{{ tick_pct }}%</text>
         {% endfor %}
         {% for tick_pct in [0, 25, 50, 75, 100] %}
           {% set x = sp_pad_l + (sp_inner_w * tick_pct / 100) %}
@@ -118,14 +118,14 @@
         {% for m in overall_scatter_rows %}
           {% set x = sp_pad_l + (sp_inner_w * m.wall_s / sp_max_wall) %}
           {% set y = sp_pad_t + sp_inner_h - (sp_inner_h * m.score) %}
-          {% set lbl = m.params_b|string if m.params_b else "" %}
+          {% set lbl = ("%.0f"|format(m.params_b)) if m.params_b else "" %}
           {% set lbl_size = 6 if lbl|length > 2 else 8 %}
           <a href="models/{{ m.model_id|safe_id }}.html" class="os-dot" data-total-ram="{{ m.total_ram_gb or '' }}">
             <circle cx="{{ x }}" cy="{{ y }}" r="9" fill="{{ m.color }}" fill-opacity="0.78"
                     stroke="{{ m.color }}" stroke-width="1.75"
                     {% if m.is_moe %}stroke-dasharray="2.5,1.5"{% endif %}
                     style="cursor:pointer"
-                    data-tooltip="{{ m.short_id }} · Score {{ "%.2f"|format(m.score) }} · Wall {{ "%.0f"|format(m.wall_s) }}s{% if m.total_ram_gb %} · ~{{ "%.0f"|format(m.total_ram_gb) }} GB RAM (64k)"{% elif m.ram_gb %} · RAM {{ "%.1f"|format(m.ram_gb) }} GB"{% else %}"{% endif %}/>
+                    data-tooltip="{{ m.short_id }} · Score {{ m.score|pct }} · Wall {{ "%.0f"|format(m.wall_s) }}s{% if m.total_ram_gb %} · ~{{ "%.0f"|format(m.total_ram_gb) }} GB RAM (64k)"{% elif m.ram_gb %} · RAM {{ "%.1f"|format(m.ram_gb) }} GB"{% else %}"{% endif %}/>
             {% if lbl %}
               <text x="{{ x }}" y="{{ y }}" text-anchor="middle" dominant-baseline="central"
                     font-size="{{ lbl_size }}" font-weight="700" fill="{{ m.label_color }}"
@@ -194,7 +194,7 @@
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="{{ r.model_id|short_id }}" title="{{ r.model_id }}">{{ r.model_id|short_id }}</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">{{ r.quant }}</td>
             <td class="px-3 py-2 num text-right font-bold {% if r.overall_score is none %}text-stone-300{% elif r.overall_score >= 0.7 %}text-emerald-700{% elif r.overall_score > 0 %}text-amber-700{% else %}text-red-600{% endif %}" data-sort="{{ r.overall_score if r.overall_score is not none else -1 }}">
-              {% if r.overall_score is not none %}{{ "%.2f"|format(r.overall_score) }}{% else %}—{% endif %}
+              {{ r.overall_score|pct }}
             </td>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="{{ r.ram_mb or 0 }}">
               {% if r.ram_mb %}{{ "%.1f"|format(r.ram_mb / 1024) }} GB{% else %}—{% endif %}
@@ -211,11 +211,11 @@
                   </td>
                 {% elif c.preliminary %}
                   <td class="px-3 py-2 text-right num font-bold text-stone-400" data-sort="{{ c.score }}" title="Judge not yet run — value is the linter score only">
-                    {{ "%.2f"|format(c.score) }}<span class="block text-[9px] uppercase tracking-wider text-stone-400">prelim.</span>
+                    {{ c.score|pct }}<span class="block text-[9px] uppercase tracking-wider text-stone-400">prelim.</span>
                   </td>
                 {% elif c.score is not none %}
                   <td class="px-3 py-2 text-right num font-bold {% if c.score >= 0.7 %}text-emerald-700{% elif c.score > 0 %}text-amber-700{% else %}text-red-600{% endif %}" data-sort="{{ c.score }}">
-                    {{ "%.2f"|format(c.score) }}
+                    {{ c.score|pct }}
                   </td>
                 {% else %}
                   <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>

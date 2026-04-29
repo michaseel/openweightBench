@@ -76,7 +76,7 @@
                 <span class="text-sm font-semibold {% if t.error %}text-red-500{% elif _nav_pending %}text-stone-400{% elif t.score is not none and t.score >= 0.7 %}text-emerald-700{% elif t.score is not none and t.score > 0 %}text-amber-700{% else %}text-stone-400{% endif %}">
                   {% if t.error and 'timeout' in t.error|lower %}—
                   {% elif t.error %}!
-                  {% elif t.score is not none %}{{ "%.2f"|format(t.score) }}
+                  {% elif t.score is not none %}{{ t.score|pct }}
                   {% else %}—{% endif %}
                 </span>
                 <span class="text-[10px] text-stone-400 w-10 text-right">{% if t.metrics.wall_seconds >= 60 %}{{ "%.0f"|format(t.metrics.wall_seconds / 60) }}m{% else %}{{ "%.0f"|format(t.metrics.wall_seconds) }}s{% endif %}</span>
@@ -111,7 +111,7 @@
       <div class="mt-1 text-5xl font-bold num leading-none {% if _judge_pending %}text-stone-400{% elif t.score is not none and t.score >= 0.7 %}text-emerald-700{% elif t.score is not none and t.score > 0 %}text-amber-700{% else %}text-stone-400{% endif %}">
         {% if t.error and 'timeout' in t.error|lower %}timeout
         {% elif t.error %}error
-        {% elif t.score is not none %}{{ "%.2f"|format(t.score) }}
+        {% elif t.score is not none %}{{ t.score|pct }}
         {% else %}—{% endif %}
       </div>
       {% if _judge_pending %}
@@ -124,15 +124,15 @@
         <div class="mt-3 grid grid-cols-3 gap-2 text-center">
           <div class="rounded border border-stone-200 px-2 py-1.5">
             <div class="text-[10px] uppercase tracking-wider text-stone-500">Static</div>
-            <div class="text-base font-bold num {% if _lint_v is none %}text-stone-300{% elif _lint_v >= 0.7 %}text-emerald-700{% elif _lint_v > 0 %}text-amber-700{% else %}text-red-600{% endif %}">{% if _lint_v is none %}—{% else %}{{ "%.2f"|format(_lint_v) }}{% endif %}</div>
+            <div class="text-base font-bold num {% if _lint_v is none %}text-stone-300{% elif _lint_v >= 0.7 %}text-emerald-700{% elif _lint_v > 0 %}text-amber-700{% else %}text-red-600{% endif %}">{{ _lint_v|pct }}</div>
           </div>
           <div class="rounded border border-stone-200 px-2 py-1.5">
             <div class="text-[10px] uppercase tracking-wider text-stone-500">Functional</div>
-            <div class="text-base font-bold num {% if _e2e_v is none %}text-stone-300{% elif _e2e_v >= 0.7 %}text-emerald-700{% elif _e2e_v > 0 %}text-amber-700{% else %}text-red-600{% endif %}">{% if _e2e_v is none %}—{% else %}{{ "%.2f"|format(_e2e_v) }}{% endif %}</div>
+            <div class="text-base font-bold num {% if _e2e_v is none %}text-stone-300{% elif _e2e_v >= 0.7 %}text-emerald-700{% elif _e2e_v > 0 %}text-amber-700{% else %}text-red-600{% endif %}">{{ _e2e_v|pct }}</div>
           </div>
           <div class="rounded border border-stone-200 px-2 py-1.5">
             <div class="text-[10px] uppercase tracking-wider text-stone-500">Qualitative</div>
-            <div class="text-base font-bold num {% if _judge_v is none %}text-stone-300{% elif _judge_v >= 0.7 %}text-emerald-700{% elif _judge_v > 0 %}text-amber-700{% else %}text-red-600{% endif %}">{% if _judge_v is none %}—{% else %}{{ "%.2f"|format(_judge_v) }}{% endif %}</div>
+            <div class="text-base font-bold num {% if _judge_v is none %}text-stone-300{% elif _judge_v >= 0.7 %}text-emerald-700{% elif _judge_v > 0 %}text-amber-700{% else %}text-red-600{% endif %}">{{ _judge_v|pct }}</div>
           </div>
         </div>
       {% endif %}
@@ -218,7 +218,7 @@
     <p class="mt-5 text-sm text-stone-600">
       {% if t.score_breakdown.judge and t.score_breakdown.judge.judge_score is not none %}
         <span class="font-semibold text-amber-700">LLM-Judge aktiv</span>
-        <span class="num">({{ t.score_breakdown.judge.judge_model }}, Score {{ "%.2f"|format(t.score_breakdown.judge.judge_score) }})</span>
+        <span class="num">({{ t.score_breakdown.judge.judge_model }}, Score {{ t.score_breakdown.judge.judge_score|pct }})</span>
         · heuristische Klassifikation:
       {% else %}
         <span class="font-semibold text-stone-700">Heuristischer Grader</span>
@@ -242,7 +242,7 @@
             </div>
           </div>
           <div class="text-3xl font-bold num {% if hj.judge_score >= 0.7 %}text-emerald-700{% elif hj.judge_score == 0 %}text-red-700{% else %}text-amber-700{% endif %}">
-            {{ "%.2f"|format(hj.judge_score) }}
+            {{ hj.judge_score|pct }}
           </div>
         </div>
       </div>
@@ -321,10 +321,10 @@
                 <div class="text-sm num">
                   {% if L.judge and L.judge.judge_score is not none %}
                     <span class="font-bold text-base {% if L.judge.judge_score >= 0.7 %}text-emerald-700{% elif L.judge.judge_score == 0 %}text-red-700{% else %}text-amber-700{% endif %}">
-                      {{ "%.2f"|format(L.judge.judge_score) }}
+                      {{ L.judge.judge_score|pct }}
                     </span>
                     <span class="text-stone-500">LLM judge</span>
-                    <span class="ml-2 text-xs text-stone-400">heur. {{ "%.2f"|format(L.summary_score) }}</span>
+                    <span class="ml-2 text-xs text-stone-400">heur. {{ L.summary_score|pct }}</span>
                   {% else %}
                     <span class="font-bold text-base {% if L.summary_passed == L.summary_total %}text-emerald-700{% elif L.summary_passed == 0 %}text-red-700{% else %}text-amber-700{% endif %}">
                       {{ L.summary_passed }}/{{ L.summary_total }}
@@ -340,14 +340,14 @@
                   <div class="mt-3 border border-amber-200 bg-amber-50 rounded p-3">
                     <div class="flex items-baseline justify-between gap-3">
                       <span class="text-xs uppercase tracking-wider text-amber-700">LLM judge summary ({{ L.judge.judge_model }})</span>
-                      <span class="text-lg font-bold num {% if L.judge.judge_score >= 0.7 %}text-emerald-700{% elif L.judge.judge_score == 0 %}text-red-700{% else %}text-amber-700{% endif %}">{{ "%.2f"|format(L.judge.judge_score) }}</span>
+                      <span class="text-lg font-bold num {% if L.judge.judge_score >= 0.7 %}text-emerald-700{% elif L.judge.judge_score == 0 %}text-red-700{% else %}text-amber-700{% endif %}">{{ L.judge.judge_score|pct }}</span>
                     </div>
                     {% if L.judge.axes %}
                       <ul class="mt-2 grid grid-cols-2 md:grid-cols-6 gap-2 text-xs">
                         {% for k, v in L.judge.axes.items() %}
                           <li class="bg-white border border-amber-100 rounded px-2 py-1 text-center">
                             <div class="text-stone-500">{{ k.replace("_", " ") }}</div>
-                            <div class="font-bold num {% if v >= 0.7 %}text-emerald-700{% elif v == 0 %}text-red-700{% else %}text-amber-700{% endif %}">{{ "%.2f"|format(v) }}</div>
+                            <div class="font-bold num {% if v >= 0.7 %}text-emerald-700{% elif v == 0 %}text-red-700{% else %}text-amber-700{% endif %}">{{ v|pct }}</div>
                           </li>
                         {% endfor %}
                       </ul>
@@ -415,13 +415,13 @@
                 <div class="text-sm num">
                   {% if L.comprehension_judge and L.comprehension_judge.judge_score is not none %}
                     <span class="font-bold text-base {% if L.comprehension_judge.judge_score >= 0.7 %}text-emerald-700{% elif L.comprehension_judge.judge_score == 0 %}text-red-700{% else %}text-amber-700{% endif %}">
-                      {{ "%.2f"|format(L.comprehension_judge.judge_score) }}
+                      {{ L.comprehension_judge.judge_score|pct }}
                     </span>
                     <span class="text-stone-500">LLM judge</span>
-                    <span class="ml-2 text-xs text-stone-400">heur. {{ "%.2f"|format(L.comprehension_score) }}</span>
+                    <span class="ml-2 text-xs text-stone-400">heur. {{ L.comprehension_score|pct }}</span>
                   {% else %}
                     <span class="font-bold text-base {% if L.comprehension_score >= 0.7 %}text-emerald-700{% elif L.comprehension_score == 0 %}text-red-700{% else %}text-amber-700{% endif %}">
-                      {{ "%.2f"|format(L.comprehension_score) }}
+                      {{ L.comprehension_score|pct }}
                     </span>
                   {% endif %}
                   <span class="ml-2 text-xs text-stone-600">
@@ -448,7 +448,7 @@
                       <div class="text-sm font-medium text-stone-900 flex-1">{{ q.prompt }}</div>
                       {% if qj.value %}
                         <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
-                              data-tooltip="LLM judge {{ "%.2f"|format(qj.value.score) }} · {{ qj.value.verdict }}{% if qj.value.comment %}: {{ qj.value.comment }}{% endif %}">
+                              data-tooltip="LLM judge {{ qj.value.score|pct }} · {{ qj.value.verdict }}{% if qj.value.comment %}: {{ qj.value.comment }}{% endif %}">
                           J
                         </span>
                       {% endif %}
@@ -606,7 +606,7 @@
             <span class="text-red-700 text-sm">{{ s.error }}</span>
           {% else %}
             <div class="text-sm num">
-              <span class="font-medium {% if s.score >= 0.7 %}text-emerald-700{% endif %}">{{ "%.2f"|format(s.score) }}</span>
+              <span class="font-medium {% if s.score >= 0.7 %}text-emerald-700{% endif %}">{{ s.score|pct }}</span>
               <span class="text-stone-500"> · {{ s.passed }}/{{ s.total }} checks</span>
             </div>
           {% endif %}
@@ -665,7 +665,7 @@
             {% else %}
               <span class="text-red-700 font-medium">✗ SVG not parseable</span>
             {% endif %}
-            {% if d.grade %}<span class="ml-3 font-bold num {% if d.grade.score >= 0.7 %}text-emerald-700{% elif d.grade.score > 0 %}text-amber-700{% else %}text-red-600{% endif %}">{{ "%.2f"|format(d.grade.score) }}</span>{% endif %}
+            {% if d.grade %}<span class="ml-3 font-bold num {% if d.grade.score >= 0.7 %}text-emerald-700{% elif d.grade.score > 0 %}text-amber-700{% else %}text-red-600{% endif %}">{{ d.grade.score|pct }}</span>{% endif %}
           </div>
         </div>
         {% if d.error %}
@@ -697,7 +697,7 @@
                 <li class="border rounded px-3 py-2 {% if d.grade.parsed and d.grade.has_root and d.grade.element_count >= 5 and d.grade.text_count >= 1 %}border-emerald-200 bg-emerald-50{% else %}border-red-200 bg-red-50{% endif %}">
                   <div class="flex items-baseline justify-between gap-3">
                     <span class="font-medium text-stone-900">SVG validity</span>
-                    <span class="font-bold num {% if d.grade.parsed and d.grade.has_root and d.grade.element_count >= 5 and d.grade.text_count >= 1 %}text-emerald-700{% else %}text-red-600{% endif %}">{% if d.grade.parsed and d.grade.has_root and d.grade.element_count >= 5 and d.grade.text_count >= 1 %}1.00{% else %}0.00{% endif %}</span>
+                    <span class="font-bold num {% if d.grade.parsed and d.grade.has_root and d.grade.element_count >= 5 and d.grade.text_count >= 1 %}text-emerald-700{% else %}text-red-600{% endif %}">{% if d.grade.parsed and d.grade.has_root and d.grade.element_count >= 5 and d.grade.text_count >= 1 %}100%{% else %}0%{% endif %}</span>
                   </div>
                   <div class="mt-1 text-stone-600">
                     {% if d.grade.parse_error %}Parse error: <span class="num">{{ d.grade.parse_error }}</span>
@@ -709,7 +709,7 @@
                 <li class="border rounded px-3 py-2 {% if _coverage >= 0.7 %}border-emerald-200 bg-emerald-50{% elif _coverage > 0 %}border-amber-200 bg-amber-50{% else %}border-red-200 bg-red-50{% endif %}">
                   <div class="flex items-baseline justify-between gap-3">
                     <span class="font-medium text-stone-900">Term coverage</span>
-                    <span class="font-bold num {% if _coverage >= 0.7 %}text-emerald-700{% elif _coverage > 0 %}text-amber-700{% else %}text-red-600{% endif %}">{{ "%.2f"|format(_coverage) }}</span>
+                    <span class="font-bold num {% if _coverage >= 0.7 %}text-emerald-700{% elif _coverage > 0 %}text-amber-700{% else %}text-red-600{% endif %}">{{ _coverage|pct }}</span>
                   </div>
                   <div class="mt-1 text-stone-600 num">{{ d.grade.matched_terms|length }}/{{ d.grade.matched_terms|length + d.grade.missing_terms|length }} matched</div>
                   {% if d.grade.missing_terms %}
@@ -727,13 +727,13 @@
             <div class="border-t border-stone-100 px-4 py-3 bg-amber-50">
               <div class="flex items-baseline justify-between mb-2">
                 <span class="text-xs uppercase tracking-wider text-amber-700">Qualitative · judge ({{ d.judge.judge_model }})</span>
-                <span class="text-2xl font-bold num text-amber-700">{{ "%.2f"|format(d.judge.judge_score) }}</span>
+                <span class="text-2xl font-bold num text-amber-700">{{ d.judge.judge_score|pct }}</span>
               </div>
               <ul class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
                 {% for k, v in (d.judge.scores or {}).items() %}
                   <li class="text-center bg-white border border-amber-200 rounded p-2">
                     <div class="text-stone-500 capitalize">{{ k.replace("_", " ") }}</div>
-                    <div class="text-base font-bold num {% if v >= 0.7 %}text-emerald-700{% elif v > 0 %}text-amber-700{% else %}text-red-600{% endif %}">{{ "%.2f"|format(v) }}</div>
+                    <div class="text-base font-bold num {% if v >= 0.7 %}text-emerald-700{% elif v > 0 %}text-amber-700{% else %}text-red-600{% endif %}">{{ v|pct }}</div>
                   </li>
                 {% endfor %}
               </ul>
@@ -753,7 +753,7 @@
           <div class="text-sm">
             {% if d.starts_with_keyword %}
               <span class="text-emerald-700 font-medium">✓ recognised as <span class="num">{{ d.diagram_kind }}</span></span>
-              {% if d.grade %}<span class="ml-3 font-bold num {% if d.grade.score >= 0.7 %}text-emerald-700{% elif d.grade.score > 0 %}text-amber-700{% else %}text-red-600{% endif %}">{{ "%.2f"|format(d.grade.score) }}</span>{% endif %}
+              {% if d.grade %}<span class="ml-3 font-bold num {% if d.grade.score >= 0.7 %}text-emerald-700{% elif d.grade.score > 0 %}text-amber-700{% else %}text-red-600{% endif %}">{{ d.grade.score|pct }}</span>{% endif %}
             {% else %}
               <span class="text-red-700 font-medium">✗ no valid Mermaid header</span>
             {% endif %}
@@ -795,7 +795,7 @@
                   <li class="border rounded px-3 py-2 {% if c.passed %}border-emerald-200 bg-emerald-50{% else %}border-amber-200 bg-amber-50{% endif %}">
                     <div class="flex items-baseline justify-between gap-3">
                       <span class="font-medium text-stone-900">{{ c.label }}</span>
-                      <span class="font-bold num {% if c.score >= 0.7 %}text-emerald-700{% elif c.score > 0 %}text-amber-700{% else %}text-red-600{% endif %}">{{ "%.2f"|format(c.score) }}</span>
+                      <span class="font-bold num {% if c.score >= 0.7 %}text-emerald-700{% elif c.score > 0 %}text-amber-700{% else %}text-red-600{% endif %}">{{ c.score|pct }}</span>
                     </div>
                     {% if c.detail %}<div class="mt-1 text-stone-600">{{ c.detail }}</div>{% endif %}
                     {% if c.missing %}
@@ -854,7 +854,7 @@
               {% endif %}
             {% endif %}
             <div class="text-3xl font-bold num leading-none {% if s.score >= 0.7 %}text-emerald-700{% elif s.score == 0 %}text-red-600{% else %}text-amber-700{% endif %}">
-              {% if s.error %}—{% else %}{{ "%.2f"|format(s.score) }}{% endif %}
+              {% if s.error %}—{% else %}{{ s.score|pct }}{% endif %}
             </div>
           </div>
         </div>
@@ -948,7 +948,7 @@
             <span class="text-xs uppercase tracking-wider text-amber-700">Qualitative · LLM-as-judge ({{ j.judge_model }})</span>
             <span class="ml-3 text-xs text-stone-500 num">{{ j.scored_at }}</span>
           </div>
-          <div class="text-3xl font-bold num text-amber-700">{{ "%.2f"|format(j.judge_score) }}</div>
+          <div class="text-3xl font-bold num text-amber-700">{{ j.judge_score|pct }}</div>
         </div>
         <div class="px-4 py-3 border-b border-amber-200">
           <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Visual (screenshot)</div>
@@ -958,7 +958,7 @@
               {% if v is not none %}
                 <li class="text-center">
                   <div class="text-stone-500 capitalize">{{ k.replace("_", " ") }}</div>
-                  <div class="text-base font-bold num {% if v >= 0.7 %}text-emerald-700{% elif v == 0 %}text-red-600{% else %}text-amber-700{% endif %}">{{ "%.2f"|format(v) }}</div>
+                  <div class="text-base font-bold num {% if v >= 0.7 %}text-emerald-700{% elif v == 0 %}text-red-600{% else %}text-amber-700{% endif %}">{{ v|pct }}</div>
                 </li>
               {% endif %}
             {% endfor %}
@@ -973,7 +973,7 @@
               {% if v is not none %}
                 <li class="text-center">
                   <div class="text-stone-500 capitalize">{{ k.replace("_", " ") }}</div>
-                  <div class="text-base font-bold num {% if v >= 0.7 %}text-emerald-700{% elif v == 0 %}text-red-600{% else %}text-amber-700{% endif %}">{{ "%.2f"|format(v) }}</div>
+                  <div class="text-base font-bold num {% if v >= 0.7 %}text-emerald-700{% elif v == 0 %}text-red-600{% else %}text-amber-700{% endif %}">{{ v|pct }}</div>
                 </li>
               {% endif %}
             {% endfor %}
@@ -984,7 +984,7 @@
           <div class="px-4 py-3">
             <div class="text-xs uppercase tracking-wider text-stone-500 mb-2 flex items-baseline justify-between">
               <span>Render ↔ code consistency</span>
-              <span class="text-base font-bold num {% if j.scores.render_matches_code >= 0.7 %}text-emerald-700{% elif j.scores.render_matches_code == 0 %}text-red-600{% else %}text-amber-700{% endif %}">{{ "%.2f"|format(j.scores.render_matches_code) }}</span>
+              <span class="text-base font-bold num {% if j.scores.render_matches_code >= 0.7 %}text-emerald-700{% elif j.scores.render_matches_code == 0 %}text-red-600{% else %}text-amber-700{% endif %}">{{ j.scores.render_matches_code|pct }}</span>
             </div>
             {% if j.comment_consistency %}<div class="text-sm text-stone-700">{{ j.comment_consistency }}</div>{% endif %}
           </div>

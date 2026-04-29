@@ -456,7 +456,7 @@ def _reclassify_niah(store: BenchStore) -> None:
             r.score = sum(L["combined_score"] for L in scoring_lengths) / len(scoring_lengths)
         store.save(r)
         changed += 1
-        score_str = f"{r.score:.3f}" if r.score is not None else "n/a"
+        score_str = f"{r.score * 100:.0f}%" if r.score is not None else "n/a"
         console.print(f"  ↺ {r.model_id}  score={score_str}")
     console.print(f"[green]Reclassified {changed} niah result(s).[/green]")
 
@@ -517,7 +517,7 @@ def reclassify_cmd(
         # Persist
         store.save(r)
         changed += 1
-        console.print(f"  ↺ {r.model_id}  score={r.score:.2f}")
+        console.print(f"  ↺ {r.model_id}  score={r.score * 100:.0f}%")
     console.print(f"[green]Reclassified {changed} {task} result(s).[/green]")
 
 
@@ -595,7 +595,7 @@ def judge_cmd(
                 console.print(f"[dim]{judge.get('reason', 'skip')}[/dim]")
             else:
                 js = judge.get("judge_score")
-                console.print(f"[magenta]judge_score={js:.2f}[/magenta]" if js is not None else "[magenta]done[/magenta]")
+                console.print(f"[magenta]judge_score={js * 100:.0f}%[/magenta]" if js is not None else "[magenta]done[/magenta]")
         except Exception as e:  # noqa: BLE001
             failed += 1
             console.print(f"[red]✗ {e}[/red]")

@@ -74,7 +74,7 @@ class Runner:
                 )
             else:
                 js = judge.get("judge_score")
-                msg = f"judge_score={js:.2f}" if js is not None else "done"
+                msg = f"judge_score={js * 100:.0f}%" if js is not None else "done"
                 console.print(f"  [magenta]→ judge ({result.task}) {msg}[/magenta]")
                 self._rebuild_report()
         except Exception as e:  # noqa: BLE001
