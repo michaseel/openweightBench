@@ -1,0 +1,275 @@
+{
+  "task": "diagram_to_svg",
+  "model_id": "qwen/qwen3-vl-8b",
+  "model_info": {
+    "id": "qwen/qwen3-vl-8b",
+    "type": "vlm",
+    "publisher": "qwen",
+    "arch": "qwen3_vl",
+    "compatibility_type": "mlx",
+    "quantization": "4bit",
+    "state": "not-loaded",
+    "max_context_length": 262144,
+    "capabilities": [
+      "tool_use"
+    ],
+    "loaded_context_length": null
+  },
+  "started_at": "2026-04-29T21:32:23.512231Z",
+  "completed_at": "2026-04-29T21:34:29.284904Z",
+  "metrics": {
+    "wall_seconds": 122.48557229188737,
+    "tokens_generated": 7617,
+    "tokens_per_second": 76.39029598901328,
+    "time_to_first_token_ms": null,
+    "peak_rss_mb": 5509.2
+  },
+  "score": 0.9930555555555557,
+  "score_breakdown": {
+    "diagrams": [
+      {
+        "id": "diagram_eisenhower",
+        "image_name": "diagram_eisenhower.png",
+        "image_path": "artifacts/qwen_qwen3-vl-8b/diagram_to_svg/diagram_eisenhower.png",
+        "svg_path": "artifacts/qwen_qwen3-vl-8b/diagram_to_svg/diagram_eisenhower.svg",
+        "render_path": "artifacts/qwen_qwen3-vl-8b/diagram_to_svg/diagram_eisenhower.render.png",
+        "raw_length": 6579,
+        "svg_length": 6579,
+        "grade": {
+          "score": 0.9791666666666667,
+          "parsed": true,
+          "has_root": true,
+          "element_count": 82,
+          "text_count": 30,
+          "matched_terms": [
+            "Wichtig",
+            "Dringend",
+            "Nicht wichtig",
+            "Nicht dringend",
+            "Content-Strategie",
+            "Brand schärfen",
+            "SEO",
+            "Zielgruppen",
+            "Kampagne retten",
+            "Shitstorm",
+            "Newsletter",
+            "falschem Link",
+            "viral gehen",
+            "Merch-Ideen",
+            "Glitzer",
+            "Buzzword-Bingo",
+            "TikTok",
+            "Maskottchen",
+            "Hashtag",
+            "Last-Minute-Meeting",
+            "Logo größer",
+            "LinkedIn-Post",
+            "Folie 27"
+          ],
+          "missing_terms": [
+            "Weltag der Büroklammer"
+          ],
+          "parse_error": null
+        },
+        "score": 0.9791666666666667,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-29T21:34:37.862579+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "scores": {
+            "completeness": 0.72,
+            "labels": 0.66,
+            "connections": 0.9,
+            "grouping": 0.88,
+            "layout_readability": 0.52,
+            "diagram_kind_match": 0.96,
+            "aesthetic_quality": 0.38
+          },
+          "judge_score": 0.6749999999999999,
+          "comment": "Die 2×2-Matrix mit Achsen und fast allen Listenpunkten ist vorhanden; auch die vier Quadranten sind korrekt angeordnet. Mehrere Beschriftungen fehlen oder sind beschädigt: die Quadranten-Titel fehlen weitgehend, der Titel ist vereinfacht, und Randnotizen wie „Kaffee zählt nicht. Aber hilft.“ sowie „Erledigen, wenn das Internet wieder da ist.“ sind überlagert oder abgeschnitten; dekorative Skizzen aus dem Original wurden durch unpassende schwarze Symbole ersetzt. Die Gruppierung als Eisenhower-Matrix stimmt gut, aber das Render wirkt deutlich roher und teils unleserlich durch Kollisionen oben rechts und unten links."
+        }
+      },
+      {
+        "id": "diagram_service_architecture",
+        "image_name": "diagram_service_architecture.png",
+        "image_path": "artifacts/qwen_qwen3-vl-8b/diagram_to_svg/diagram_service_architecture.png",
+        "svg_path": "artifacts/qwen_qwen3-vl-8b/diagram_to_svg/diagram_service_architecture.svg",
+        "render_path": "artifacts/qwen_qwen3-vl-8b/diagram_to_svg/diagram_service_architecture.render.png",
+        "raw_length": 6999,
+        "svg_length": 6999,
+        "grade": {
+          "score": 1.0,
+          "parsed": true,
+          "has_root": true,
+          "element_count": 76,
+          "text_count": 35,
+          "matched_terms": [
+            "Frontend",
+            "React",
+            "API Gateway",
+            "Kong",
+            "Auth Service",
+            "JWT",
+            "User DB",
+            "Backend",
+            "FastAPI",
+            "Database",
+            "External API",
+            "Payment Provider",
+            "Message Queue",
+            "RabbitMQ",
+            "Worker Service",
+            "File Storage",
+            "S3",
+            "Monitoring",
+            "Prometheus",
+            "Grafana"
+          ],
+          "missing_terms": [],
+          "parse_error": null
+        },
+        "score": 1.0,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-29T21:34:44.897217+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "scores": {
+            "completeness": 0.93,
+            "labels": 0.9,
+            "connections": 0.42,
+            "direction": 0.38,
+            "grouping": 0.7,
+            "layout_readability": 0.62,
+            "diagram_kind_match": 0.95,
+            "aesthetic_quality": 0.58
+          },
+          "judge_score": 0.6733333333333333,
+          "comment": "Fast alle Hauptknoten aus dem Original sind vorhanden, inklusive Frontend, API Gateway, Auth Service, Backend, Message Queue, Worker Service, Monitoring sowie der drei externen Speicher/API-Elemente; nur der Titel fehlt und die Legende ist ungenau reproduziert. Die Labels sind überwiegend korrekt, aber „API Gateway“ wurde zu „APIGateway“ zusammengezogen und die Legende setzt „External“ falsch neben die User-DB-Zeile. Topologisch gibt es mehrere Fehler: Die Verbindung API Gateway→External API fehlt bzw. ist falsch geführt, Backend→Message Queue fehlt, dafür entstehen unpassende Kanten wie External API→Monitoring und Message Queue→Worker als durchgezogene statt gestrichelte bzw. teilweise anders geroutete Verbindungen. Die Grundstruktur als Service-Architektur ist klar erkennbar, aber mehrere Pfeilrichtungen/Arrowheads und die Sync/Async-Unterscheidung stimmen nicht sauber mit dem Original überein."
+        }
+      },
+      {
+        "id": "diagram_sso_sequence",
+        "image_name": "diagram_sso_sequence.png",
+        "image_path": "artifacts/qwen_qwen3-vl-8b/diagram_to_svg/diagram_sso_sequence.png",
+        "svg_path": "artifacts/qwen_qwen3-vl-8b/diagram_to_svg/diagram_sso_sequence.svg",
+        "render_path": "artifacts/qwen_qwen3-vl-8b/diagram_to_svg/diagram_sso_sequence.render.png",
+        "raw_length": 4429,
+        "svg_length": 4429,
+        "grade": {
+          "score": 1.0,
+          "parsed": true,
+          "has_root": true,
+          "element_count": 48,
+          "text_count": 19,
+          "matched_terms": [
+            "Benutzer",
+            "App",
+            "Service Provider",
+            "Identity Provider",
+            "IdP",
+            "Login-Seite",
+            "Anmeldedaten",
+            "Authentifizierung",
+            "Token",
+            "Assertion",
+            "SSO-Response",
+            "Zugriff",
+            "Ressourcen",
+            "Nein",
+            "Ja"
+          ],
+          "missing_terms": [],
+          "parse_error": null
+        },
+        "score": 1.0,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-29T21:34:50.917577+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "scores": {
+            "completeness": 0.95,
+            "labels": 0.72,
+            "connections": 0.58,
+            "direction": 0.52,
+            "layout_readability": 0.34,
+            "diagram_kind_match": 0.92,
+            "aesthetic_quality": 0.28
+          },
+          "judge_score": 0.57375,
+          "comment": "Die Hauptknoten sind fast vollständig vorhanden: Benutzer, App/Service Provider, Identity Provider, Login-Seite, Entscheidungsdiamant und „Zugriff gewährt“ sind erkennbar. Mehrere Labels sind jedoch verrutscht oder an der falschen Stelle überlagert, besonders bei Identity Provider/Login-Seite sowie rund um „Benutzer gibt Anmeldedaten ein“ und „Nein“. Die Verbindungen sind nur teilweise korrekt: Der grobe Ablauf eines SSO-Flowcharts bleibt erhalten, aber Linien und Pfeile enden teils an falschen Punkten oder überkreuzen die Formen, sodass Rücksprung und Entscheidungszweige nicht mehr klar dem Original entsprechen. Insgesamt derselbe Diagrammtyp, aber deutlich unruhiger und visuell roh als die Vorlage."
+        }
+      }
+    ],
+    "judge": {
+      "scored_at": "2026-04-29T21:34:50.917587+00:00",
+      "judge_model": "openai/gpt-5.4",
+      "judge_score": 0.6406944444444443
+    }
+  },
+  "raw_response": "",
+  "artifacts": [
+    {
+      "kind": "image",
+      "label": "Source diagram_eisenhower",
+      "path": "artifacts/qwen_qwen3-vl-8b/diagram_to_svg/diagram_eisenhower.png",
+      "mime": "image/jpeg"
+    },
+    {
+      "kind": "text",
+      "label": "SVG diagram_eisenhower",
+      "path": "artifacts/qwen_qwen3-vl-8b/diagram_to_svg/diagram_eisenhower.svg",
+      "mime": "image/svg+xml"
+    },
+    {
+      "kind": "image",
+      "label": "Render diagram_eisenhower",
+      "path": "artifacts/qwen_qwen3-vl-8b/diagram_to_svg/diagram_eisenhower.render.png",
+      "mime": "image/png"
+    },
+    {
+      "kind": "image",
+      "label": "Source diagram_service_architecture",
+      "path": "artifacts/qwen_qwen3-vl-8b/diagram_to_svg/diagram_service_architecture.png",
+      "mime": "image/jpeg"
+    },
+    {
+      "kind": "text",
+      "label": "SVG diagram_service_architecture",
+      "path": "artifacts/qwen_qwen3-vl-8b/diagram_to_svg/diagram_service_architecture.svg",
+      "mime": "image/svg+xml"
+    },
+    {
+      "kind": "image",
+      "label": "Render diagram_service_architecture",
+      "path": "artifacts/qwen_qwen3-vl-8b/diagram_to_svg/diagram_service_architecture.render.png",
+      "mime": "image/png"
+    },
+    {
+      "kind": "image",
+      "label": "Source diagram_sso_sequence",
+      "path": "artifacts/qwen_qwen3-vl-8b/diagram_to_svg/diagram_sso_sequence.png",
+      "mime": "image/jpeg"
+    },
+    {
+      "kind": "text",
+      "label": "SVG diagram_sso_sequence",
+      "path": "artifacts/qwen_qwen3-vl-8b/diagram_to_svg/diagram_sso_sequence.svg",
+      "mime": "image/svg+xml"
+    },
+    {
+      "kind": "image",
+      "label": "Render diagram_sso_sequence",
+      "path": "artifacts/qwen_qwen3-vl-8b/diagram_to_svg/diagram_sso_sequence.render.png",
+      "mime": "image/png"
+    }
+  ],
+  "error": null,
+  "hardware": {
+    "platform": "macOS-26.4.1-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "ram_total_gb": 128.0,
+    "cpu_count": 16
+  },
+  "bench_version": "0.1.0"
+}

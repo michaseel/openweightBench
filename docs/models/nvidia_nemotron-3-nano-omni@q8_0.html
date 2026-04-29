@@ -183,7 +183,7 @@
         </div>
         <div>
           <dt class="text-stone-500">Wall total</dt>
-          <dd class="font-semibold text-stone-900 num">13.4 min</dd>
+          <dd class="font-semibold text-stone-900 num">16.6 min</dd>
         </div>
       </dl>
       <div class="mt-4 pt-3 border-t border-stone-200 text-xs uppercase tracking-wider text-stone-500">Benchmarks</div>
@@ -196,6 +196,17 @@
 39%
                 </span>
                 <span class="text-[10px] text-stone-400 w-10 text-right">2m</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="#vision" class="flex items-center justify-between gap-2 py-1.5 px-2 rounded hover:bg-stone-50 group">
+              <span class="text-sm text-stone-700 group-hover:text-stone-900 truncate">vision</span>
+              <span class="flex items-baseline gap-2 num shrink-0">
+                <span class="text-sm font-semibold text-amber-700">
+28%
+                </span>
+                <span class="text-[10px] text-stone-400 w-10 text-right">3m</span>
               </span>
             </a>
           </li>
@@ -635,6 +646,752 @@ Call log:
         <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/nvidia_nemotron-3-nano-omni@q8_0/coding/output.html" target="_blank">Generierte App</a>
         <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/nvidia_nemotron-3-nano-omni@q8_0/coding/raw_response.txt" target="_blank">Raw model response</a>
         <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/nvidia_nemotron-3-nano-omni@q8_0/coding/screenshot.png" target="_blank">Screenshot der gerenderten App</a>
+    </div>
+</section>
+<section id="vision" class="mb-12 scroll-mt-24">
+  <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
+    <h2 class="text-lg font-medium tracking-tight">vision</h2>
+    <a href="../benchmarks/vision.html" class="text-xs text-stone-500 hover:text-stone-900">all models in this bench →</a>
+  </div>
+
+
+  <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+    <div class="md:col-span-1 bg-white border-2 border-amber-400 rounded-lg p-5 flex flex-col justify-center">
+      <div class="text-xs uppercase tracking-wider text-stone-500">Score</div>
+      <div class="mt-1 text-5xl font-bold num leading-none text-amber-700">
+28%
+      </div>
+    </div>
+    <div class="md:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">tok/s</dt>
+        <dd class="mt-1 text-xl font-semibold num">77</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Tokens</dt>
+        <dd class="mt-1 text-xl font-semibold num">14548</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Wall</dt>
+        <dd class="mt-1 text-xl font-semibold num">192.4 s</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">RAM</dt>
+        <dd class="mt-1 text-xl font-semibold num">32.8 GB</dd>
+      </div>
+    </div>
+  </div>
+
+    <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Worum geht es? Was wird getestet?
+      </summary>
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: Four OCR sub-tasks, one image each.
+(1)–(3) Handwritten meeting notes in three difficulty tiers (easy / medium / hard) — the model must transcribe the text.
+(4) An old book page in Fraktur typeface — same task.
+
+What is tested: OCR quality, recognising layout structure (columns, bullet points, dates), handling of illegible handwriting and historical letterforms (long-s, ligatures).
+
+Why models fail: text-only models have no vision capability (filtered out). Weak VLMs only recognise the clearest part. Some truncate output or get stuck in reasoning without producing a visible answer.</div>
+    </details>
+
+    <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Prompt
+      </summary>
+      <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">Du bist OCR-Spezialist für deutsche Handschrift.</pre>
+          </div>
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Developer prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">Auf dem Bild siehst du eine handschriftliche Meeting-Notiz mit klarer Struktur und gut lesbarer Schrift. Transkribiere den gesamten lesbaren Text. Behalte die Anordnung bei (Überschrift, Spalten, To-Dos). Bei unleserlichen Stellen schreibe &#39;[unleserlich]&#39;. Gib ausschließlich den puren OCR-Text im Markdown-Format zurück — keine Vorbemerkung, keine Erklärungen, kein Code-Fence.</pre>
+          </div>
+      </div>
+    </details>
+
+      <div class="mt-5 bg-white border border-stone-200 rounded overflow-hidden">
+        <div class="px-4 py-3 border-b border-stone-200 flex items-center justify-between bg-stone-50 gap-3 flex-wrap">
+          <div>
+            <span class="font-medium">Handschrift OCR – leicht</span>
+            <span class="ml-3 text-xs text-stone-500 num">
+19.6 s · 77 t/s            </span>
+          </div>
+          <div class="flex items-center gap-4 num">
+              <div class="text-xs">
+                <span class="text-stone-500">Recall</span>
+                <span class="font-bold text-base text-emerald-700">69%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">Precision</span>
+                <span class="font-bold text-base text-emerald-700">70%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">53/77</span>
+                <span class="text-amber-600">+23</span>
+              </div>
+                <div class="text-xs text-stone-500">
+<span class="text-violet-700">1 fuzzy</span>                </div>
+            <div class="text-3xl font-bold num leading-none text-amber-700">
+69%            </div>
+          </div>
+        </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
+            <div class="p-3 bg-stone-50 grid grid-cols-1 gap-2">
+                <div class="zoom-frame">
+                  <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom image" title="Zoom image">⛶</button>
+                  <img src="../assets/artifacts/nvidia_nemotron-3-nano-omni@q8_0/vision/handwriting_easy.jpg"
+                       class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded cursor-zoom-in"
+                       loading="lazy">
+                </div>
+            </div>
+            <div>
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider">Model response</div>
+              <pre class="p-4 text-sm whitespace-pre-wrap max-h-[500px] overflow-y-auto">
+Meeting.net-zen Website - Relaunch  
+12.06.75, 09.30 Uhr  
+
+**Gesendet:** Anna, Ben, Mia, Jonas, Ric  
+**CMS Konzept**
+
+### Theorien
+- Startseite  
+- Text  
+- Bildauswahl  
+- Layout-Textein  
+- offene Fragen  
+
+### Stand
+- Design: Sack Final  
+- Texte für über-50er noch nach  
+- Bilder vom Team noch nicht komplett  
+- Mobile Ansicht prüfen  
+
+### To-Dos
+- Ben → Bilder anfertigen  
+- Mia → Startseite angepasst  
+- Jonas → Feedback Runde  
+- Anna → SEO-Check  
+
+### Offen
+- Berichtsheft final?  
+- Freigabe Runde bis Freitag  
+- Wie heißt Kontaktformular?  
+
+**Nächstes Meeting:** 19.06., 10 Uhr</pre>
+            </div>
+          </div>
+
+            <div class="border-t border-stone-200 bg-white">
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider flex items-center justify-between">
+                <span>Word diff ground truth ↔ model</span>
+                <span class="num">
+                  <span class="text-emerald-700">●</span> matched ·
+                  <span class="text-sky-700">●</span> relocated ·
+                  <span class="text-violet-700">●</span> fuzzy ·
+                  <span class="text-red-600">●</span> missing in model ·
+                  <span class="text-amber-600">●</span> extra/wrong
+                </span>
+              </div>
+              <div class="p-4 text-sm leading-relaxed font-mono max-h-[500px] overflow-y-auto">
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">meetingnotizen</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">meeting net zen</span>
+<span class="text-stone-700">website relaunch 12 06</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">25</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">75</span>
+<span class="text-stone-700">09 30 uhr</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">anwesend</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">gesendet</span>
+<span class="text-stone-700">anna ben</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">mira</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">mia</span>
+<span class="text-stone-700">jonas</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">ece</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">ric</span>
+<span class="text-stone-700">cms</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">langsam themen</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">konzept theorien</span>
+<span class="text-stone-700">startseite</span>
+<span class="bg-violet-50 text-violet-700 px-0.5 rounded">texte ≈ text</span>
+<span class="text-stone-700">bildauswahl</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">launch termin</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">layout textein</span>
+<span class="text-stone-700">offene fragen stand design</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">fast</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">sack</span>
+<span class="text-stone-700">final texte für über</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">uns fehlen</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">50er</span>
+<span class="text-stone-700">noch</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">nach</span>
+<span class="text-stone-700">bilder vom team noch nicht komplett mobile ansicht prüfen</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">bitte kurz halten</span>
+<span class="text-stone-700">to dos ben bilder</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">anfragen mira</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">anfertigen mia</span>
+<span class="text-stone-700">startseite</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">anpassen</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">angepasst</span>
+<span class="text-stone-700">jonas feedback</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">kunde</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">runde</span>
+<span class="text-stone-700">anna seo check offen</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">rechtstexte</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">berichtsheft</span>
+<span class="text-stone-700">final freigabe</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">kunde</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">runde</span>
+<span class="text-stone-700">bis freitag</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">wer testet</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">wie heißt</span>
+<span class="text-stone-700">kontaktformular nächstes meeting</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">17</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">19</span>
+<span class="text-stone-700">06 10 uhr</span>
+              </div>
+              <details class="border-t border-stone-100">
+                <summary class="cursor-pointer px-4 py-2 text-xs text-stone-500 hover:text-stone-900">Ground truth (for comparison)</summary>
+                <pre class="p-4 text-xs bg-stone-50 whitespace-pre-wrap">Meetingnotizen Website-Relaunch
+12.06.25, 09:30 Uhr
+
+Anwesend:
+Anna, Ben, Mira, Jonas, Ece
+
+CMS langsam?
+
+Themen:
+Startseite
+Texte
+Bildauswahl
+Launch-Termin
+offene Fragen
+
+Stand:
+Design fast final
+Texte für Über-uns fehlen noch
+Bilder vom Team noch nicht komplett
+Mobile Ansicht prüfen
+
+bitte kurz halten
+
+To-Dos:
+Ben Bilder anfragen
+Mira Startseite anpassen
+Jonas Feedback Kunde
+Anna SEO-Check
+
+Offen:
+Rechtstexte final?
+Freigabe Kunde bis Freitag
+Wer testet Kontaktformular?
+
+Nächstes Meeting: 17.06., 10 Uhr</pre>
+              </details>
+            </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded overflow-hidden">
+        <div class="px-4 py-3 border-b border-stone-200 flex items-center justify-between bg-stone-50 gap-3 flex-wrap">
+          <div>
+            <span class="font-medium">Handschrift OCR – mittel</span>
+            <span class="ml-3 text-xs text-stone-500 num">
+48.5 s · 77 t/s            </span>
+          </div>
+          <div class="flex items-center gap-4 num">
+              <div class="text-xs">
+                <span class="text-stone-500">Recall</span>
+                <span class="font-bold text-base text-emerald-700">24%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">Precision</span>
+                <span class="font-bold text-base text-emerald-700">29%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">32/136</span>
+                <span class="text-amber-600">+78</span>
+              </div>
+                <div class="text-xs text-stone-500">
+<span class="text-sky-700">6 relocated</span> · <span class="text-violet-700">2 fuzzy</span>                </div>
+            <div class="text-3xl font-bold num leading-none text-amber-700">
+26%            </div>
+          </div>
+        </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
+            <div class="p-3 bg-stone-50 grid grid-cols-1 gap-2">
+                <div class="zoom-frame">
+                  <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom image" title="Zoom image">⛶</button>
+                  <img src="../assets/artifacts/nvidia_nemotron-3-nano-omni@q8_0/vision/handwriting_medium.jpg"
+                       class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded cursor-zoom-in"
+                       loading="lazy">
+                </div>
+            </div>
+            <div>
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider">Model response</div>
+              <pre class="p-4 text-sm whitespace-pre-wrap max-h-[500px] overflow-y-auto">
+# Besprechung Protokoll  
+**Datum:** 20.04.  
+
+## Thema 1: Projektstruktur / Projekt  
+- Struktur (vgl. …)  
+- Budget – ist noch nicht  
+- Timeline / Meilensteine  
+- Risiken  
+
+## Präsentationen  
+- Kredit: P. Tacke (T+S)  
+- Kredit: S. Rieger + C1  
+- Präsentation: [unleserlich] / [unleserlich]  
+- Budget 20 (Hinweis rechts)  
+
+## Budget  
+- 20 % aller Plan  
+- Kredit: [unleserlich] / [unleserlich]  
+- Hinweis: Budget 20, 30 (rechts)  
+
+## Coffee Break  
+- Präsenz von Kund. [unleserlich] nach ca. 15 min  
+- Arbeitsblätter zu Sprint 2 erhalten (ca. 17)  
+- Sichtung für neues Projekt? [unleserlich]  
+
+## T+Zm 1  
+- T+S: Sprint‑Report = 20.04.  
+- K8: Präsentationen/Feedback  
+- [unleserlich] Diskussionen, offene Punkte  
+
+**Wichtige Punkte:**  
+- Budget 20  
+- 30.04. bis 10.05.  
+- Datum 20.04.  
+
+## Rückfragen  
+- Wie gehen wir mit dem Risiko um?  
+- Priorisierung der Themen anhand von …</pre>
+            </div>
+          </div>
+
+            <div class="border-t border-stone-200 bg-white">
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider flex items-center justify-between">
+                <span>Word diff ground truth ↔ model</span>
+                <span class="num">
+                  <span class="text-emerald-700">●</span> matched ·
+                  <span class="text-sky-700">●</span> relocated ·
+                  <span class="text-violet-700">●</span> fuzzy ·
+                  <span class="text-red-600">●</span> missing in model ·
+                  <span class="text-amber-600">●</span> extra/wrong
+                </span>
+              </div>
+              <div class="p-4 text-sm leading-relaxed font-mono max-h-[500px] overflow-y-auto">
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">meetingprotokoll 21 05 25 11 uhr teilnehmer m schulz t wagner l becker s klein später h jt</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">themen</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">projektstatus update</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">besprechung protokoll datum 20 04 thema 1 projektstruktur projekt struktur vgl</span>
+<span class="text-stone-700">budget ist</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">zu hoch</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">noch nicht</span>
+<span class="text-stone-700">timeline</span>
+<span class="bg-violet-50 text-violet-700 px-0.5 rounded">meilenstein ≈ meilensteine</span>
+<span class="text-stone-700">risiken</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">projektstatus modul a fertig team</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">präsentationen kredit p tacke t</span>
+<span class="text-stone-700">s</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">modul b verzögert sich testphase startet nächste woche hoffentlich kundenfeedback steht noch aus details in jira</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">kredit s rieger c1 präsentation unleserlich unleserlich</span>
+<span class="text-stone-700">budget 20</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">über</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">hinweis rechts budget 20 aller</span>
+<span class="text-stone-700">plan</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">ursache unklare anforderungen nachbessern nötig nächstes mal genauer kalkulieren bitte</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">kredit unleserlich unleserlich hinweis budget 20 30 rechts coffee break präsenz von unleserlich nach ca min arbeitsblätter zu sprint erhalten ca 17 sichtung für projekt unleserlich t zm 1 t s sprint</span>
+<span class="text-stone-700">report</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">bis 28 05</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">20 04 k8 präsentationen unleserlich diskussionen</span>
+<span class="text-stone-700">offene punkte</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">freigabe von</span>
+<span class="bg-violet-50 text-violet-700 px-0.5 rounded">kunde ≈ kund</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">fehlt noch t w kümmert sich schnittstelle zu system x unklar rücksprache mit it schulung für</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">neues</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">tool noch nicht geplant wer macht das to dos t w</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">wichtige punkte</span>
+<span class="text-stone-700">budget</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">report 28</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">20 30 04 bis</span>
+<span class="text-stone-700">05</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">l b kunden anstupsen wg</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">feedback</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">dokumentation aktualisieren nächstes meeting</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">datum 20</span>
+<span class="text-stone-700">04</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">06 25</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">10</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">uhr raum</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">2 15</span>
+<span class="text-stone-700">rückfragen wie gehen wir mit dem risiko um priorisierung der</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">features nochmal prüfen</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">anhand von</span>
+              </div>
+              <details class="border-t border-stone-100">
+                <summary class="cursor-pointer px-4 py-2 text-xs text-stone-500 hover:text-stone-900">Ground truth (for comparison)</summary>
+                <pre class="p-4 text-xs bg-stone-50 whitespace-pre-wrap">Meetingprotokoll
+21.05.25
+11 Uhr
+
+Teilnehmer: M. Schulz, T. Wagner, L. Becker, S. Klein (später), H. Jt.
+
+Themen:
+Projektstatus / Update
+Budget — ist zu hoch
+Timeline / Meilenstein!
+Risiken
+
+Projektstatus:
+Modul A fertig (Team S.)
+Modul B verzögert sich
+Testphase startet nächste Woche (hoffentlich)
+Kundenfeedback steht noch aus
+
+Details in Jira
+
+Budget:
+20% über Plan
+Ursache: unklare Anforderungen
+Nachbessern nötig
+nächstes Mal genauer kalkulieren
+
+bitte Report bis 28.05.
+
+Offene Punkte:
+Freigabe von Kunde fehlt noch (T.W. kümmert sich)
+Schnittstelle zu System X unklar — Rücksprache mit IT
+Schulung für neues Tool? noch nicht geplant — wer macht das?
+
+To-Dos:
+T.W.: Budget-Report — 28.05.
+L.B.: Kunden anstupsen wg. Feedback
+Dokumentation aktualisieren
+
+Nächstes Meeting: 04.06.25, 10 Uhr (Raum 2.15?)
+
+Rückfragen:
+Wie gehen wir mit dem Risiko um?
+Priorisierung der Features nochmal prüfen
+...</pre>
+              </details>
+            </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded overflow-hidden">
+        <div class="px-4 py-3 border-b border-stone-200 flex items-center justify-between bg-stone-50 gap-3 flex-wrap">
+          <div>
+            <span class="font-medium">Handschrift OCR – schwer</span>
+            <span class="ml-3 text-xs text-stone-500 num">
+45.2 s · 77 t/s            </span>
+          </div>
+          <div class="flex items-center gap-4 num">
+              <div class="text-xs">
+                <span class="text-stone-500">Recall</span>
+                <span class="font-bold text-base text-emerald-700">14%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">Precision</span>
+                <span class="font-bold text-base text-emerald-700">17%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">21/148</span>
+                <span class="text-amber-600">+102</span>
+              </div>
+                <div class="text-xs text-stone-500">
+<span class="text-sky-700">7 relocated</span> · <span class="text-violet-700">2 fuzzy</span>                </div>
+            <div class="text-3xl font-bold num leading-none text-amber-700">
+15%            </div>
+          </div>
+        </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
+            <div class="p-3 bg-stone-50 grid grid-cols-1 gap-2">
+                <div class="zoom-frame">
+                  <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom image" title="Zoom image">⛶</button>
+                  <img src="../assets/artifacts/nvidia_nemotron-3-nano-omni@q8_0/vision/handwriting_hard.jpg"
+                       class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded cursor-zoom-in"
+                       loading="lazy">
+                </div>
+            </div>
+            <div>
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider">Model response</div>
+              <pre class="p-4 text-sm whitespace-pre-wrap max-h-[500px] overflow-y-auto">
+Begeisterung - Brainstorm (?)
+28.05 ab 14:30 Uhr Kampf
+
+In Verstand:
+- Idea
+- Ziel
+- Lern
+- Szenen (Menschen, Orte)
+
+Bsp.
+- Markt am See ?
+- -&gt; Sammlung
+- Fremdheit / Fremde?
+- -&gt; Personen / Menschen ?
+- -&gt; [unleserlich]
+Personen / Menschen?
+
+Meine Themen:
+- Bsp.: 2025
+- 24.11.
+- kurze Update
+
+am 17. Juli
+
+Essen / Trinken:
+- Grill, ...
+- Schnelle Speisen -&gt;
+- -&gt; Kochen?
+- Geflügel / Vögel
+- Kochbuch?
+- Bier, Limonade, ...
+- 3er-Layer, Bier, ...
+- -&gt; [unleserlich]
+
+Möbel:
+- Markierung / Lagerplatz
+- Möglich?
+- Stoffe / Pflanzen
+- Wandfarbe / Farbton / Wandfarbenwahl ?
+- mit Geruchs- oder ...
+- Farbkarten, Farben, Regeln?
+- Abteilung: Pflasterung der Erde, Mauer, ...
+- -&gt; Dach, Terrasse
+- -&gt; [unleserlich]
+- -&gt; [unleserlich]
+
+Stühle / Tische:
+- Wandfarbe / Farbton / Wandfarbenwahl ?
+- mit Geruchs- oder ...
+- Farbkarten, Farben, Regeln?
+- Abteilung: Pflasterung der Erde, Mauer, ...
+- -&gt; Dach, Terrasse
+- -&gt; [unleserlich]
+- -&gt; [unleserlich]
+
+Bücher:
+- Welt / Raum?
+- Farbton?
+- Kurzfristig?
+- -&gt; [unleserlich]
+
+Welt:
+- Bücher?
+- Neue Fragen?
+- Farbton, ...? (Kurzfristig?)
+- Geld / Show im Haus?
+- Müll / Reinigung, etc.
+
+Beispiel
+24.11.
+Kurzfristig?
+-&gt; [unleserlich]</pre>
+            </div>
+          </div>
+
+            <div class="border-t border-stone-200 bg-white">
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider flex items-center justify-between">
+                <span>Word diff ground truth ↔ model</span>
+                <span class="num">
+                  <span class="text-emerald-700">●</span> matched ·
+                  <span class="text-sky-700">●</span> relocated ·
+                  <span class="text-violet-700">●</span> fuzzy ·
+                  <span class="text-red-600">●</span> missing in model ·
+                  <span class="text-amber-600">●</span> extra/wrong
+                </span>
+              </div>
+              <div class="p-4 text-sm leading-relaxed font-mono max-h-[500px] overflow-y-auto">
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">besprechung sommerfest 23</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">begeisterung brainstorm 28</span>
+<span class="text-stone-700">05</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">24</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">10 15</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">ab 14</span>
+<span class="text-stone-700">uhr</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">konfi chef fragen teilnehmer max jule tobi leni simon konnte nur kurz</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">kampf in idea</span>
+<span class="text-stone-700">ziel</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">entspanntes beisammensein spaß haben nächster termin do</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">30</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">05</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">11</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">uhr</span>
+<span class="bg-violet-50 text-violet-700 px-0.5 rounded">kurzes ≈ kurze</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">update</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">an hr schicken ort park</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">lern szenen menschen orte bsp markt</span>
+<span class="text-stone-700">am see</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">genehmigung firmenhof</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">terrasse terrasse</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">reservieren wer macht das leni</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">sammlung fremdheit fremde personen menschen unleserlich personen menschen meine themen bsp 2025 am 17 juli</span>
+<span class="text-stone-700">essen trinken</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">grillen evtl vegetarische optionen vergessen getränkeliste machen</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">schnelle speisen kochen geflügel vögel kochbuch</span>
+<span class="text-stone-700">bier</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">limo wasser was noch aperol zu teuer</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">grill</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">wer tobi</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">limonade 3er layer bier unleserlich möbel markierung lagerplatz möglich stoffe pflanzen wandfarbe farbton wandfarbenwahl mit geruchs oder farbkarten farben regeln abteilung pflasterung der erde mauer dach unleserlich unleserlich stühle tische wandfarbe farbton wandfarbenwahl mit geruchs oder farbkarten farben regeln abteilung pflasterung der erde mauer dach unleserlich unleserlich bücher welt raum farbton kurzfristig unleserlich welt bücher neue</span>
+<span class="text-stone-700">fragen</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">kuchen jule macht was wetter backup pavillon wer bringt mit max hat einen zelt mieten zu teuer plan b kantine musik musikbox organisieren playlist deko unnötig evtl luftballons neee budget ca 15 p p kosten noch offen spiele programm volleyball federball evtl cornhole oder wikingerschach fotoecke idee requisiten einladung einladung bis ende woche raus text leni liste an simon</span>
+<span class="bg-violet-50 text-violet-700 px-0.5 rounded">versand ≈ verstand</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">jule offene fragen wer grillt muss jemand schulung haben gibt s strom</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">farbton kurzfristig geld show</span>
+<span class="text-stone-700">im</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">park</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">haus</span>
+<span class="text-stone-700">müll reinigung</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">klären</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">etc beispiel 24 11 kurzfristig unleserlich</span>
+              </div>
+              <details class="border-t border-stone-100">
+                <summary class="cursor-pointer px-4 py-2 text-xs text-stone-500 hover:text-stone-900">Ground truth (for comparison)</summary>
+                <pre class="p-4 text-xs bg-stone-50 whitespace-pre-wrap">Besprechung Sommerfest
+23.05.24 10:15 Uhr (Konfi)
+
+Chef fragen!!
+
+Teilnehmer:
+Max
+Jule
+Tobi
+Leni
+Simon (konnte nur kurz)
+
+Ziel: entspanntes Beisammensein &amp; Spaß haben
+
+Nächster Termin:
+Do, 30.05.
+11 Uhr
+kurzes Update
+an HR schicken
+
+Ort?:
+Park am See?
+Genehmigung?
+Firmenhof / Terrasse?
+Terrasse reservieren?? — wer macht das? Leni?
+
+Essen / Trinken:
+Grillen evtl.
+vegetarische Optionen vergessen?
+Getränkeliste machen!
+Bier, Limo, Wasser, was noch? (Aperol? zu teuer?)
+Grill wer? (Tobi fragen)
+Kuchen? Jule macht was
+
+Wetter / Backup:
+Pavillon? Wer bringt mit?
+Max hat einen?
+Zelt mieten → zu teuer
+Plan B: Kantine?
+
+Musik:
+Musikbox organisieren
+Playlist?
+
+Deko:
+unnötig?
+evtl. Luftballons? neee
+
+Budget:
+ca. 15€ p.P.?
+Kosten noch offen!
+
+Spiele / Programm:
+Volleyball / Federball
+evtl. Cornhole oder Wikingerschach?
+Fotoecke Idee? Requisiten?
+
+Einladung:
+Einladung bis Ende Woche raus!
+Text: Leni?
+Liste an Simon
+Versand: Jule
+
+Offene Fragen:
+Wer grillt? (muss jemand Schulung haben?)
+Gibt&#39;s Strom im Park?
+Müll / Reinigung klären</pre>
+              </details>
+            </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded overflow-hidden">
+        <div class="px-4 py-3 border-b border-stone-200 flex items-center justify-between bg-stone-50 gap-3 flex-wrap">
+          <div>
+            <span class="font-medium">Fraktur OCR</span>
+            <span class="ml-3 text-xs text-stone-500 num">
+79.1 s · 77 t/s            </span>
+          </div>
+          <div class="flex items-center gap-4 num">
+              <div class="text-xs">
+                <span class="text-stone-500">Recall</span>
+                <span class="font-bold text-base text-emerald-700">0%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">Precision</span>
+                <span class="font-bold text-base text-emerald-700">0%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">0/382</span>
+                <span class="text-amber-600">+0</span>
+              </div>
+            <div class="text-3xl font-bold num leading-none text-red-600">
+0%            </div>
+          </div>
+        </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
+            <div class="p-3 bg-stone-50 grid grid-cols-1 gap-2">
+                <div class="zoom-frame">
+                  <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom image" title="Zoom image">⛶</button>
+                  <img src="../assets/artifacts/nvidia_nemotron-3-nano-omni@q8_0/vision/fraktur_innerpage.jpg"
+                       class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded cursor-zoom-in"
+                       loading="lazy">
+                </div>
+            </div>
+            <div>
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider">Model response</div>
+              <pre class="p-4 text-sm whitespace-pre-wrap max-h-[500px] overflow-y-auto"></pre>
+            </div>
+          </div>
+
+            <div class="border-t border-stone-200 bg-white">
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider flex items-center justify-between">
+                <span>Word diff ground truth ↔ model</span>
+                <span class="num">
+                  <span class="text-emerald-700">●</span> matched ·
+                  <span class="text-sky-700">●</span> relocated ·
+                  <span class="text-violet-700">●</span> fuzzy ·
+                  <span class="text-red-600">●</span> missing in model ·
+                  <span class="text-amber-600">●</span> extra/wrong
+                </span>
+              </div>
+              <div class="p-4 text-sm leading-relaxed font-mono max-h-[500px] overflow-y-auto">
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">deiner großmutter wohl nur geträumt haben nein meinte malineken hartnäckig sie hat ja auch die prinzessin vom see gesehen und das ist etwas ganz besonderes davon habe ich noch nie gehört antwortete gottlieb so kann sie es dir erzählen frag sie nur aus sie weiß alles der kahn war mittlerweile der insel ganz nahe gekommen die kinder landeten an einer dazu geeigneten stelle und befestigten ihn an einem aus dem wasser ragenden pflock sie erstiegen die kleine anhöhe auf der sich das gehöft befand in dem kurzen feinen grase welches den boden bedeckte blühte der thymian ein festgetretener weg führte gerade auf die schilfhütte zu die lag heimlich unter den weiden das mächtige geäst der majestätischen bäume mit silbergrauem spitzblättrigem laube beladen breitete sich weit und wuchtig über das niedere dach welches sich der erde zuneigte dahinter erblickte man ein stück garten und ackerland von rohr und schilf wie mit einem wall umschlossen eine alte frau saß vor der thür des hüttchens und spann ihr haar war so weiß wie das gewebe der spinnen welches im herbst über die stoppeln fliegt um ihren rocken hatte sie ein schwarzes band gebunden gottlieb und malineken kamen mit dem korbe und blieben vor ihr stehen großmutter sagte letztere er will nicht glauben daß du die seejungfern gesehen hast und er weiß nichts von der prinzessin vom see sie netzte ihren faden geht ihr man eures weges gab sie ihnen zur antwort großmutter du könntest ihm die geschichte von der prinzessin vom see wohl erzählen bat malineken sie läßt sich schön anhören und man muß sie doch wissen wenn man über den see fährt und in dem blumental tag für tag herumwandert ich meine ihr könntet euer vesper brauchen sagte die großmutter es hat eben vier uhr geschlagen ach ja rief malineken inbrünstig erdbeeren mit milch und ein stück brot dazu und dieweil wir das aufzehren erzählt ihr dem gottlieb die geschichte sie ließ nicht nach sie mußte ihren willen haben ein weilchen danach saßen die kinder auf einem baumstamm vor der hütte und hatten zwischen sich einen napf mit süßer milch in der schwammen die erdbeeren so dick daß man nicht wußte war das milch mit erdbeeren oder erdbeeren mit milch doch es mochte wohl auf eins herauskommen die großmutter blickte zuweilen nach ihnen hin</span>
+              </div>
+              <details class="border-t border-stone-100">
+                <summary class="cursor-pointer px-4 py-2 text-xs text-stone-500 hover:text-stone-900">Ground truth (for comparison)</summary>
+                <pre class="p-4 text-xs bg-stone-50 whitespace-pre-wrap">deiner Großmutter wohl nur geträumt haben. „Nein,&#34; meinte Malineken hartnäckig, „sie hat ja auch die Prinzessin vom See gesehen, und das ist etwas ganz Besonderes.&#34; „Davon habe ich noch nie gehört,&#34; antwortete Gottlieb. „So kann sie es dir erzählen, frag sie nur aus, sie weiß alles.&#34;
+
+Der Kahn war mittlerweile der Insel ganz nahe gekommen; die Kinder landeten an einer dazu geeigneten Stelle und befestigten ihn an einem aus dem Wasser ragenden Pflock. Sie erstiegen die kleine Anhöhe, auf der sich das Gehöft befand. In dem kurzen, feinen Grase, welches den Boden bedeckte, blühte der Thymian; ein festgetretener Weg führte gerade auf die Schilfhütte zu, die lag heimlich unter den Weiden. Das mächtige Geäst der majestätischen Bäume, mit silbergrauem, spitzblättrigem Laube beladen, breitete sich weit und wuchtig über das niedere Dach, welches sich der Erde zuneigte. Dahinter erblickte man ein Stück Garten und Ackerland, von Rohr und Schilf wie mit einem Wall umschlossen. Eine alte Frau saß vor der Thür des Hüttchens und spann. Ihr Haar war so weiß wie das Gewebe der Spinnen, welches im Herbst über die Stoppeln fliegt, um ihren Rocken hatte sie ein schwarzes Band gebunden. Gottlieb und Malineken kamen mit dem Korbe und blieben vor ihr stehen. „Großmutter,&#34; sagte letztere, „er will nicht glauben, daß du die Seejungfern gesehen hast, und er weiß nichts von der Prinzessin vom See.&#34; Sie netzte ihren Faden. „Geht ihr man eures Weges,&#34; gab sie ihnen zur Antwort. „Großmutter, du könntest ihm die Geschichte von der Prinzessin vom See wohl erzählen,&#34; bat Malineken, „sie läßt sich schön anhören, und man muß sie doch wissen, wenn man über den See fährt und in dem Blumental Tag für Tag herumwandert.&#34; „Ich meine, ihr könntet euer Vesper brauchen,&#34; sagte die Großmutter, „es hat eben vier Uhr geschlagen.&#34; „Ach ja,&#34; rief Malineken inbrünstig, „Erdbeeren mit Milch und ein Stück Brot dazu; und dieweil wir das aufzehren, erzählt Ihr dem Gottlieb die Geschichte.&#34; Sie ließ nicht nach, sie mußte ihren Willen haben. Ein Weilchen danach saßen die Kinder auf einem Baumstamm vor der Hütte und hatten zwischen sich einen Napf mit süßer Milch, in der schwammen die Erdbeeren so dick, daß man nicht wußte, war das Milch mit Erdbeeren, oder Erdbeeren mit Milch; doch es mochte wohl auf eins herauskommen. Die Großmutter blickte zuweilen nach ihnen hin</pre>
+              </details>
+            </div>
+      </div>
+
+
+    <div class="mt-4 text-xs text-stone-500">
+      Artefacts:
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/nvidia_nemotron-3-nano-omni@q8_0/vision/handwriting_easy.txt" target="_blank">Handschrift OCR – leicht – Antwort</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/nvidia_nemotron-3-nano-omni@q8_0/vision/handwriting_easy.jpg" target="_blank">Handschrift OCR – leicht – Bild</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/nvidia_nemotron-3-nano-omni@q8_0/vision/handwriting_medium.txt" target="_blank">Handschrift OCR – mittel – Antwort</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/nvidia_nemotron-3-nano-omni@q8_0/vision/handwriting_medium.jpg" target="_blank">Handschrift OCR – mittel – Bild</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/nvidia_nemotron-3-nano-omni@q8_0/vision/handwriting_hard.txt" target="_blank">Handschrift OCR – schwer – Antwort</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/nvidia_nemotron-3-nano-omni@q8_0/vision/handwriting_hard.jpg" target="_blank">Handschrift OCR – schwer – Bild</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/nvidia_nemotron-3-nano-omni@q8_0/vision/fraktur_ocr.txt" target="_blank">Fraktur OCR – Antwort</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/nvidia_nemotron-3-nano-omni@q8_0/vision/fraktur_innerpage.jpg" target="_blank">Fraktur OCR – Bild</a>
     </div>
 </section>
 <section id="niah" class="mb-12 scroll-mt-24">

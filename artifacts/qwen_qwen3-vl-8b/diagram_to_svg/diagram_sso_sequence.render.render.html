@@ -1,0 +1,107 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html,body{margin:0;background:#fff;font-family:system-ui,-apple-system,sans-serif}
+  .wrap{padding:24px;display:inline-block;background:#fff}
+  /* Force a concrete render box: many model-emitted SVGs only set viewBox.
+     Without a width here, an inline-block parent collapses the SVG to its
+     intrinsic ~300x150 (or smaller) and the screenshot becomes a tiny
+     blank tile. Fixed width + auto height uses viewBox aspect-ratio. */
+  .wrap svg{display:block;width:1200px;height:auto;max-width:none}
+</style></head><body><div class="wrap"><svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .text { font-family: Arial, sans-serif; font-size: 14px; fill: black; }
+    .box { fill: #f9f9f9; stroke: black; stroke-width: 2; }
+    .arrow { stroke: black; stroke-width: 2; marker-end: url(#arrowhead); }
+    .decision { fill: #f9f9f9; stroke: black; stroke-width: 2; }
+  </style>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" viewBox="0 0 10 7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0,0 10,3.5 0,7" fill="black" />
+    </marker>
+  </defs>
+
+  <!-- User Icon -->
+  <g id="user">
+    <circle cx="100" cy="150" r="10" fill="black" />
+    <line x1="100" y1="150" x2="100" y2="170" stroke="black" stroke-width="2" />
+    <line x1="100" y1="170" x2="90" y2="190" stroke="black" stroke-width="2" />
+    <line x1="100" y1="170" x2="110" y2="190" stroke="black" stroke-width="2" />
+    <text x="80" y="210" font-size="14" font-family="Arial" fill="black">Benutzer</text>
+  </g>
+
+  <!-- App / Service Provider Box -->
+  <g id="app-provider">
+    <rect x="200" y="100" width="200" height="80" class="box" />
+    <text x="210" y="130" font-size="14" font-family="Arial" fill="black">App / Service Provider</text>
+  </g>
+
+  <!-- Identity Provider Box -->
+  <g id="identity-provider">
+    <rect x="500" y="100" width="250" height="80" class="box" />
+    <text x="510" y="130" font-size="14" font-family="Arial" fill="black">Identity Provider (IdP)</text>
+  </g>
+
+  <!-- Login Page Box -->
+  <g id="login-page">
+    <rect x="500" y="200" width="250" height="80" class="box" />
+    <text x="510" y="230" font-size="14" font-family="Arial" fill="black">Login-Seite</text>
+  </g>
+
+  <!-- Decision Box -->
+  <g id="decision">
+    <polygon points="600,300 700,300 650,350 600,300" class="decision" />
+    <text x="610" y="320" font-size="14" font-family="Arial" fill="black">Anmeldedaten korrekt?</text>
+  </g>
+
+  <!-- Resource Access Box -->
+  <g id="resource-access">
+    <rect x="200" y="500" width="200" height="80" class="box" />
+    <text x="210" y="530" font-size="14" font-family="Arial" fill="black">Zugriff gewährt</text>
+  </g>
+
+  <!-- Step 1: User accesses App -->
+  <line x1="100" y1="170" x2="200" y2="170" class="arrow" />
+  <text x="120" y="160" font-size="14" font-family="Arial" fill="black">1. Zugang zu App</text>
+
+  <!-- Step 2: Redirect to Login Page -->
+  <line x1="400" y1="100" x2="500" y2="100" class="arrow" />
+  <text x="350" y="90" font-size="14" font-family="Arial" fill="black">2. Weiterleitung zur Login-Seite</text>
+
+  <!-- Step 3: Show Login Page -->
+  <line x1="500" y1="100" x2="500" y2="200" class="arrow" />
+  <text x="510" y="120" font-size="14" font-family="Arial" fill="black">3. Login-Seite anzeigen</text>
+
+  <!-- Step 4: Authenticate -->
+  <line x1="500" y1="200" x2="600" y2="300" class="arrow" />
+  <text x="510" y="220" font-size="14" font-family="Arial" fill="black">4. Authentifizierung</text>
+
+  <!-- Step 5: SSO Response -->
+  <line x1="600" y1="300" x2="600" y2="400" class="arrow" />
+  <text x="580" y="330" font-size="14" font-family="Arial" fill="black">5. Token / Assertion (SSO-Response)</text>
+
+  <!-- Step 6: Redirect back to App with Token -->
+  <line x1="600" y1="400" x2="400" y2="400" class="arrow" />
+  <text x="450" y="390" font-size="14" font-family="Arial" fill="black">6. Redirect zurück zur App mit Token</text>
+
+  <!-- Step 7: Access Resources -->
+  <line x1="400" y1="400" x2="200" y2="500" class="arrow" />
+  <text x="250" y="480" font-size="14" font-family="Arial" fill="black">7. Zugriff auf Ressourcen</text>
+
+  <!-- Decision branches -->
+  <line x1="650" y1="350" x2="650" y2="450" class="arrow" />
+  <text x="660" y="400" font-size="14" font-family="Arial" fill="black">Ja</text>
+
+  <line x1="650" y1="350" x2="650" y2="450" class="arrow" />
+  <text x="660" y="400" font-size="14" font-family="Arial" fill="black">Nein</text>
+
+  <!-- User input annotation -->
+  <text x="750" y="350" font-size="14" font-family="Arial" fill="black">Benutzer gibt Anmeldedaten ein</text>
+
+  <!-- Title -->
+  <text x="400" y="50" font-size="24" font-family="Arial" fill="black">SSO - Ablaufdiagramm</text>
+
+  <!-- Diagram labels -->
+  <text x="200" y="600" font-size="14" font-family="Arial" fill="black">7. Zugriff auf Ressourcen</text>
+  <text x="200" y="630" font-size="14" font-family="Arial" fill="black">Zugriff gewährt</text>
+</svg></div></body></html>

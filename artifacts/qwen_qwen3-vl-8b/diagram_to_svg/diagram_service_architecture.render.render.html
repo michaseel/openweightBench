@@ -1,0 +1,160 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html,body{margin:0;background:#fff;font-family:system-ui,-apple-system,sans-serif}
+  .wrap{padding:24px;display:inline-block;background:#fff}
+  /* Force a concrete render box: many model-emitted SVGs only set viewBox.
+     Without a width here, an inline-block parent collapses the SVG to its
+     intrinsic ~300x150 (or smaller) and the screenshot becomes a tiny
+     blank tile. Fixed width + auto height uses viewBox aspect-ratio. */
+  .wrap svg{display:block;width:1200px;height:auto;max-width:none}
+</style></head><body><div class="wrap"><svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .box { fill: #f9f9f9; stroke: #333; stroke-width: 2; }
+    .sync { stroke: #000; }
+    .async { stroke: #666; }
+    .external { stroke: #d33; fill: #f9f2f2; }
+    .label { font-family: Arial, sans-serif; font-size: 14px; fill: #333; }
+    .legend { font-family: Arial, sans-serif; font-size: 12px; fill: #333; }
+    .marker { marker-end: url(#arrowhead); }
+  </style>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0,0 10,3.5 0,7" fill="#333" />
+    </marker>
+  </defs>
+
+  <!-- Legend -->
+  <g transform="translate(850, 50)">
+    <line x1="0" y1="10" x2="100" y2="10" stroke="#000" />
+    <text x="10" y="15" class="legend">Sync</text>
+    <line x1="0" y1="30" x2="100" y2="30" stroke="#666" stroke-dasharray="5,5" />
+    <text x="10" y="35" class="legend">Async</text>
+    <rect x="0" y="50" width="100" height="20" fill="#f9f2f2" stroke="#d33" />
+    <text x="10" y="65" class="legend">External</text>
+  </g>
+
+  <!-- Goals -->
+  <g transform="translate(100, 100)">
+    <text x="0" y="0" class="label" font-weight="bold">Goals:</text>
+    <text x="0" y="25" class="label">- Scalability</text>
+    <text x="0" y="45" class="label">- Reliability</text>
+    <text x="0" y="65" class="label">- Security</text>
+    <text x="0" y="85" class="label">- Maintainability</text>
+  </g>
+
+  <!-- Notes -->
+  <g transform="translate(100, 250)">
+    <text x="0" y="0" class="label" font-weight="bold">Notes:</text>
+    <text x="0" y="25" class="label">- Use Docker for all services</text>
+    <text x="0" y="45" class="label">- CI/CD with GitHub Actions</text>
+    <text x="0" y="65" class="label">- Logs → ELK Stack</text>
+  </g>
+
+  <!-- Frontend -->
+  <rect x="150" y="150" width="180" height="60" class="box" />
+  <text x="160" y="170" class="label">Frontend</text>
+  <text x="160" y="190" class="label">(React)</text>
+
+  <!-- API Gateway -->
+  <rect x="350" y="150" width="180" height="60" class="box" />
+  <text x="360" y="170" class="label">API Gateway</text>
+  <text x="360" y="190" class="label">(Kong)</text>
+
+  <!-- Auth Service -->
+  <rect x="600" y="100" width="180" height="60" class="box" />
+  <text x="610" y="120" class="label">Auth Service</text>
+  <text x="610" y="140" class="label">(JWT)</text>
+
+  <!-- User DB -->
+  <g transform="translate(780, 100)">
+    <circle cx="10" cy="10" r="10" fill="#f9f2f2" stroke="#333" />
+    <text x="20" y="15" class="label">User DB</text>
+    <text x="20" y="25" class="label">(PostgreSQL)</text>
+  </g>
+
+  <!-- Backend -->
+  <rect x="600" y="250" width="180" height="60" class="box" />
+  <text x="610" y="270" class="label">Backend</text>
+  <text x="610" y="290" class="label">(Python / FastAPI)</text>
+
+  <!-- Database -->
+  <g transform="translate(780, 250)">
+    <circle cx="10" cy="10" r="10" fill="#f9f2f2" stroke="#333" />
+    <text x="20" y="15" class="label">Database</text>
+    <text x="20" y="25" class="label">(PostgreSQL)</text>
+  </g>
+
+  <!-- Message Queue -->
+  <rect x="400" y="350" width="180" height="60" class="box" />
+  <text x="410" y="370" class="label">Message Queue</text>
+  <text x="410" y="390" class="label">(RabbitMQ)</text>
+
+  <!-- Worker Service -->
+  <rect x="600" y="400" width="180" height="60" class="box" />
+  <text x="610" y="420" class="label">Worker Service</text>
+  <text x="610" y="440" class="label">(Python)</text>
+
+  <!-- File Storage -->
+  <g transform="translate(780, 400)">
+    <circle cx="10" cy="10" r="10" fill="#f9f2f2" stroke="#333" />
+    <text x="20" y="15" class="label">File Storage</text>
+    <text x="20" y="25" class="label">(S3)</text>
+  </g>
+
+  <!-- External API -->
+  <rect x="200" y="400" width="180" height="60" class="external" />
+  <text x="210" y="420" class="label">External API</text>
+  <text x="210" y="440" class="label">(Payment Provider)</text>
+
+  <!-- Monitoring -->
+  <rect x="400" y="500" width="180" height="60" class="box" />
+  <text x="410" y="520" class="label">Monitoring</text>
+  <text x="410" y="540" class="label">(Prometheus + Grafana)</text>
+
+  <!-- Connections -->
+  <!-- Frontend -> API Gateway -->
+  <line x1="330" y1="180" x2="350" y2="180" class="sync" stroke="#000" stroke-width="2" marker-mid="none" marker-end="url(#arrowhead)" />
+
+  <!-- API Gateway -> Auth Service -->
+  <line x1="530" y1="180" x2="600" y2="130" class="sync" stroke="#000" stroke-width="2" marker-mid="none" marker-end="url(#arrowhead)" />
+
+  <!-- API Gateway -> Backend -->
+  <line x1="530" y1="220" x2="600" y2="270" class="sync" stroke="#000" stroke-width="2" marker-mid="none" marker-end="url(#arrowhead)" />
+
+  <!-- API Gateway -> External API -->
+  <line x1="350" y1="330" x2="200" y2="400" class="async" stroke="#666" stroke-width="2" marker-mid="none" marker-end="url(#arrowhead)" />
+
+  <!-- Auth Service <-> User DB -->
+  <line x1="780" y1="130" x2="780" y2="100" class="sync" stroke="#000" stroke-width="2" marker-mid="none" marker-end="url(#arrowhead)" />
+  <line x1="780" y1="130" x2="780" y2="160" class="sync" stroke="#000" stroke-width="2" marker-mid="none" marker-start="url(#arrowhead)" />
+
+  <!-- Backend <-> Database -->
+  <line x1="780" y1="270" x2="780" y2="250" class="sync" stroke="#000" stroke-width="2" marker-mid="none" marker-end="url(#arrowhead)" />
+  <line x1="780" y1="270" x2="780" y2="290" class="sync" stroke="#000" stroke-width="2" marker-mid="none" marker-start="url(#arrowhead)" />
+
+  <!-- Backend -> Message Queue -->
+  <line x1="530" y1="290" x2="400" y2="350" class="sync" stroke="#000" stroke-width="2" marker-mid="none" marker-end="url(#arrowhead)" />
+
+  <!-- Message Queue -> Worker Service -->
+  <line x1="400" y1="390" x2="600" y2="400" class="sync" stroke="#000" stroke-width="2" marker-mid="none" marker-end="url(#arrowhead)" />
+
+  <!-- Worker Service <-> File Storage -->
+  <line x1="780" y1="400" x2="780" y2="380" class="sync" stroke="#000" stroke-width="2" marker-mid="none" marker-end="url(#arrowhead)" />
+  <line x1="780" y1="400" x2="780" y2="420" class="sync" stroke="#000" stroke-width="2" marker-mid="none" marker-start="url(#arrowhead)" />
+
+  <!-- Message Queue -> Monitoring -->
+  <line x1="400" y1="410" x2="400" y2="500" class="sync" stroke="#000" stroke-width="2" marker-mid="none" marker-end="url(#arrowhead)" />
+
+  <!-- External API -> Monitoring -->
+  <line x1="200" y1="400" x2="400" y2="500" class="async" stroke="#666" stroke-width="2" marker-mid="none" marker-end="url(#arrowhead)" />
+
+  <!-- Monitoring -> Worker Service -->
+  <line x1="400" y1="500" x2="600" y2="400" class="sync" stroke="#000" stroke-width="2" marker-mid="none" marker-end="url(#arrowhead)" />
+
+  <!-- Monitoring -> Message Queue -->
+  <line x1="400" y1="500" x2="400" y2="390" class="sync" stroke="#000" stroke-width="2" marker-mid="none" marker-end="url(#arrowhead)" />
+
+  <!-- HTTP/HTTPS Label -->
+  <text x="280" y="180" class="label" font-size="12">HTTPS</text>
+</svg></div></body></html>
