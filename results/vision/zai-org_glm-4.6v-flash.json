@@ -1,0 +1,1442 @@
+{
+  "task": "vision",
+  "model_id": "zai-org/glm-4.6v-flash",
+  "model_info": {
+    "id": "zai-org/glm-4.6v-flash",
+    "type": "vlm",
+    "publisher": "zai-org",
+    "arch": "glm4v",
+    "compatibility_type": "mlx",
+    "quantization": "4bit",
+    "state": "not-loaded",
+    "max_context_length": 131072,
+    "capabilities": [
+      "tool_use"
+    ],
+    "loaded_context_length": null
+  },
+  "started_at": "2026-04-29T20:24:23.095724Z",
+  "completed_at": "2026-04-29T20:25:45.455906Z",
+  "metrics": {
+    "wall_seconds": 82.17953141592443,
+    "tokens_generated": 3559,
+    "tokens_per_second": 64.32591123403998,
+    "time_to_first_token_ms": null,
+    "peak_rss_mb": 6765.5
+  },
+  "score": 0.9061628996076097,
+  "score_breakdown": {
+    "subtasks": [
+      {
+        "id": "handwriting_easy",
+        "label": "Handschrift OCR – leicht",
+        "prompt": "Auf dem Bild siehst du eine handschriftliche Meeting-Notiz mit klarer Struktur und gut lesbarer Schrift. Transkribiere den gesamten lesbaren Text. Behalte die Anordnung bei (Überschrift, Spalten, To-Dos). Bei unleserlichen Stellen schreibe '[unleserlich]'. Gib ausschließlich den puren OCR-Text im Markdown-Format zurück — keine Vorbemerkung, keine Erklärungen, kein Code-Fence.",
+        "image_paths": [
+          "artifacts/zai-org_glm-4.6v-flash/vision/handwriting_easy.jpg"
+        ],
+        "answer": "\n<|begin_of_box|>Meetingnotizen Website-Relaunch\n12.06.25, 09:30 Uhr\n\nAnwesend:\nCMS langsam?\nAnna, Ben, Mira, Jonas, Ece\n\nThemen:\nStand:\n- Startseite\n  - Design fast final ✓\n- Texte\n  - Texte für Über-uns fehlen noch\n- Bildauswahl\n  - Bilder vom Team noch nicht komplett\n- Launch-Termin\n  - Mobile Ansicht prüfen\n- offene Fragen\n\nbitte kurz halten\n\nTo-Dos:\nOffen:\n- Ben → Bilder anfragen\n  - Rechtstexte final?\n- Mira → Startseite anpassen\n  - Freigabe Kunde bis Freitag\n- Jonas → Feedback Kunde\n  - Wer testet Kontaktformular?\n- Anna → SEO - Check\n\nNächstes Meeting:\n17.06., 10 Uhr<|end_of_box|>",
+        "ground_truth": "Meetingnotizen Website-Relaunch\n12.06.25, 09:30 Uhr\n\nAnwesend:\nAnna, Ben, Mira, Jonas, Ece\n\nCMS langsam?\n\nThemen:\nStartseite\nTexte\nBildauswahl\nLaunch-Termin\noffene Fragen\n\nStand:\nDesign fast final\nTexte für Über-uns fehlen noch\nBilder vom Team noch nicht komplett\nMobile Ansicht prüfen\n\nbitte kurz halten\n\nTo-Dos:\nBen Bilder anfragen\nMira Startseite anpassen\nJonas Feedback Kunde\nAnna SEO-Check\n\nOffen:\nRechtstexte final?\nFreigabe Kunde bis Freitag\nWer testet Kontaktformular?\n\nNächstes Meeting: 17.06., 10 Uhr",
+        "expected_keywords": [],
+        "ocr": {
+          "recall": 0.974025974025974,
+          "precision": 0.9493670886075949,
+          "f1": 0.9615384615384615,
+          "matched": 75,
+          "ordered_matched": 59,
+          "relocated_matched": 16,
+          "fuzzy_matched": 0,
+          "missed": 2,
+          "extra": 4,
+          "gt_total": 77,
+          "pred_total": 79,
+          "opcodes": [
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "begin_of_box"
+            },
+            {
+              "tag": "equal",
+              "gt": "meetingnotizen website relaunch 12 06 25 09 30 uhr anwesend",
+              "pred": "meetingnotizen website relaunch 12 06 25 09 30 uhr anwesend"
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "cms"
+            },
+            {
+              "tag": "equal",
+              "gt": "anna ben mira jonas ece",
+              "pred": "anna ben mira jonas ece"
+            },
+            {
+              "tag": "delete",
+              "gt": "cms",
+              "pred": ""
+            },
+            {
+              "tag": "moved",
+              "gt": "langsam",
+              "pred": "langsam"
+            },
+            {
+              "tag": "equal",
+              "gt": "themen startseite",
+              "pred": "themen startseite"
+            },
+            {
+              "tag": "moved",
+              "gt": "texte bildauswahl launch termin offene fragen stand",
+              "pred": "texte bildauswahl launch termin offene fragen stand"
+            },
+            {
+              "tag": "equal",
+              "gt": "design fast final texte für über uns fehlen noch bilder vom team noch nicht komplett mobile ansicht prüfen bitte kurz halten to dos ben bilder anfragen mira startseite anpassen",
+              "pred": "design fast final texte für über uns fehlen noch bilder vom team noch nicht komplett mobile ansicht prüfen bitte kurz halten to dos ben bilder anfragen mira startseite anpassen"
+            },
+            {
+              "tag": "moved",
+              "gt": "jonas feedback kunde anna",
+              "pred": "jonas feedback kunde anna"
+            },
+            {
+              "tag": "delete",
+              "gt": "seo",
+              "pred": ""
+            },
+            {
+              "tag": "moved",
+              "gt": "check offen rechtstexte final",
+              "pred": "check offen rechtstexte final"
+            },
+            {
+              "tag": "equal",
+              "gt": "freigabe kunde bis freitag wer testet kontaktformular",
+              "pred": "freigabe kunde bis freitag wer testet kontaktformular"
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "seo"
+            },
+            {
+              "tag": "equal",
+              "gt": "nächstes meeting 17 06 10 uhr",
+              "pred": "nächstes meeting 17 06 10 uhr"
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "end_of_box"
+            }
+          ]
+        },
+        "score": 0.9615384615384615,
+        "error": null,
+        "wall_seconds": 14.913707250030711,
+        "tokens_per_second": 64.12884535332982
+      },
+      {
+        "id": "handwriting_medium",
+        "label": "Handschrift OCR – mittel",
+        "prompt": "Auf dem Bild siehst du ein handschriftliches Meeting-Protokoll mit organisierter Struktur, aber kleinerer und teils flüchtiger Schrift. Transkribiere den lesbaren Text und behalte die Gliederung bei (Datum, Themen, Einzelpunkte). Bei unleserlichen Stellen '[unleserlich]'. Gib ausschließlich den puren OCR-Text im Markdown-Format zurück — keine Vorbemerkung, keine Erklärungen, kein Code-Fence.",
+        "image_paths": [
+          "artifacts/zai-org_glm-4.6v-flash/vision/handwriting_medium.jpg"
+        ],
+        "answer": "\n<|begin_of_box|>Meeting protokoll  \n21.05.25  \nM Uhr  \n\nTeilnehmer: M. Schulz, T.Wagner, L.Becker, S.Klein (später), H.Jt.  \n\nThemen: - Projektstatus ! Update  \n- Budget -> ist zu hoch  \n- Timeline / Meilensteine  \n- Risiken  \n\nProjektstatus: - Modul A fertig (Team S.) Details in Jira  \n- Modul B verzögert sich 😞 → Details in Jira  \n- Testphase startet nächste Woche (hoffentlich)  \n- Kunden feedback steht noch aus  \n\nBudget: ~20% über Plan ⚠️ bitte Report bis 28.05.  \nUrsache: unklare Anforderungen → Nachbesseren nötig nächstes Mal genauer kalkulieren !!  \n\nOffene Punkte: - Freigabe von Kunde fehlt noch → T.W. kommt sich  \n- Schnittstelle zu System X unklar 📌 Rückspiele mit IT  \n- Schulung für neues Tool ? ✏️ noch nicht geplant wer macht das ?  \n\nTo-Dos: - T.W.: Budget-Report → 28.05.  \n- L.B.: Kunden anstupsen wg. Feedback  \n- Etapet: Dokumentation aktualisieren  \n\nNächstes Meeting: 04.06.25, 10 Uhr (Raum 2.15?)  \n\nRückfragen: - Wie gehen wir mit dem Risiko um ?  \n- Priorisierung der Features nochmal prüfen  \n- ...<|end_of_box|>",
+        "ground_truth": "Meetingprotokoll\n21.05.25\n11 Uhr\n\nTeilnehmer: M. Schulz, T. Wagner, L. Becker, S. Klein (später), H. Jt.\n\nThemen:\nProjektstatus / Update\nBudget — ist zu hoch\nTimeline / Meilenstein!\nRisiken\n\nProjektstatus:\nModul A fertig (Team S.)\nModul B verzögert sich\nTestphase startet nächste Woche (hoffentlich)\nKundenfeedback steht noch aus\n\nDetails in Jira\n\nBudget:\n20% über Plan\nUrsache: unklare Anforderungen\nNachbessern nötig\nnächstes Mal genauer kalkulieren\n\nbitte Report bis 28.05.\n\nOffene Punkte:\nFreigabe von Kunde fehlt noch (T.W. kümmert sich)\nSchnittstelle zu System X unklar — Rücksprache mit IT\nSchulung für neues Tool? noch nicht geplant — wer macht das?\n\nTo-Dos:\nT.W.: Budget-Report — 28.05.\nL.B.: Kunden anstupsen wg. Feedback\nDokumentation aktualisieren\n\nNächstes Meeting: 04.06.25, 10 Uhr (Raum 2.15?)\n\nRückfragen:\nWie gehen wir mit dem Risiko um?\nPriorisierung der Features nochmal prüfen\n...",
+        "expected_keywords": [],
+        "ocr": {
+          "recall": 0.9485294117647058,
+          "precision": 0.8958333333333334,
+          "f1": 0.9214285714285715,
+          "matched": 129,
+          "ordered_matched": 121,
+          "relocated_matched": 6,
+          "fuzzy_matched": 2,
+          "missed": 7,
+          "extra": 15,
+          "gt_total": 136,
+          "pred_total": 144,
+          "opcodes": [
+            {
+              "tag": "delete",
+              "gt": "meetingprotokoll",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "begin_of_box meeting protokoll"
+            },
+            {
+              "tag": "equal",
+              "gt": "21 05 25",
+              "pred": "21 05 25"
+            },
+            {
+              "tag": "delete",
+              "gt": "11",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "m"
+            },
+            {
+              "tag": "equal",
+              "gt": "uhr teilnehmer m schulz t wagner l becker s klein später h jt themen projektstatus update budget ist zu hoch timeline",
+              "pred": "uhr teilnehmer m schulz t wagner l becker s klein später h jt themen projektstatus update budget ist zu hoch timeline"
+            },
+            {
+              "tag": "fuzzy",
+              "gt": "meilenstein",
+              "pred": "meilensteine"
+            },
+            {
+              "tag": "equal",
+              "gt": "risiken projektstatus modul a fertig team s",
+              "pred": "risiken projektstatus modul a fertig team s"
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "in"
+            },
+            {
+              "tag": "equal",
+              "gt": "modul b verzögert sich",
+              "pred": "modul b verzögert sich"
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "details in jira"
+            },
+            {
+              "tag": "equal",
+              "gt": "testphase startet nächste woche hoffentlich",
+              "pred": "testphase startet nächste woche hoffentlich"
+            },
+            {
+              "tag": "delete",
+              "gt": "kundenfeedback",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "kunden feedback"
+            },
+            {
+              "tag": "equal",
+              "gt": "steht noch aus",
+              "pred": "steht noch aus"
+            },
+            {
+              "tag": "moved",
+              "gt": "details",
+              "pred": "details"
+            },
+            {
+              "tag": "delete",
+              "gt": "in",
+              "pred": ""
+            },
+            {
+              "tag": "moved",
+              "gt": "jira",
+              "pred": "jira"
+            },
+            {
+              "tag": "equal",
+              "gt": "budget 20 über plan",
+              "pred": "budget 20 über plan"
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "bis"
+            },
+            {
+              "tag": "equal",
+              "gt": "ursache unklare anforderungen",
+              "pred": "ursache unklare anforderungen"
+            },
+            {
+              "tag": "fuzzy",
+              "gt": "nachbessern",
+              "pred": "nachbesseren"
+            },
+            {
+              "tag": "equal",
+              "gt": "nötig nächstes mal genauer kalkulieren",
+              "pred": "nötig nächstes mal genauer kalkulieren"
+            },
+            {
+              "tag": "moved",
+              "gt": "bitte report",
+              "pred": "bitte report"
+            },
+            {
+              "tag": "delete",
+              "gt": "bis",
+              "pred": ""
+            },
+            {
+              "tag": "moved",
+              "gt": "28 05",
+              "pred": "28 05"
+            },
+            {
+              "tag": "equal",
+              "gt": "offene punkte freigabe von kunde fehlt noch t w",
+              "pred": "offene punkte freigabe von kunde fehlt noch t w"
+            },
+            {
+              "tag": "delete",
+              "gt": "kümmert",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "kommt"
+            },
+            {
+              "tag": "equal",
+              "gt": "sich schnittstelle zu system x unklar",
+              "pred": "sich schnittstelle zu system x unklar"
+            },
+            {
+              "tag": "delete",
+              "gt": "rücksprache",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "rückspiele"
+            },
+            {
+              "tag": "equal",
+              "gt": "mit it schulung für neues tool noch nicht geplant wer macht das to dos t w budget report 28 05 l b kunden anstupsen wg feedback",
+              "pred": "mit it schulung für neues tool noch nicht geplant wer macht das to dos t w budget report 28 05 l b kunden anstupsen wg feedback"
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "etapet"
+            },
+            {
+              "tag": "equal",
+              "gt": "dokumentation aktualisieren nächstes meeting 04 06 25 10 uhr raum 2 15 rückfragen wie gehen wir mit dem risiko um priorisierung der features nochmal prüfen",
+              "pred": "dokumentation aktualisieren nächstes meeting 04 06 25 10 uhr raum 2 15 rückfragen wie gehen wir mit dem risiko um priorisierung der features nochmal prüfen"
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "end_of_box"
+            }
+          ]
+        },
+        "score": 0.9214285714285715,
+        "error": null,
+        "wall_seconds": 17.035418250015937,
+        "tokens_per_second": 64.73388828241315
+      },
+      {
+        "id": "handwriting_hard",
+        "label": "Handschrift OCR – schwer",
+        "prompt": "Auf dem Bild siehst du eine handschriftliche Notiz mit unleserlicher, geknitterter Schrift und vielen Abkürzungen. Versuche so viel wie möglich zu transkribieren. Behalte die räumliche Anordnung bei. Markiere unleserliche Stellen mit '[unleserlich]'. Wenn du gar nichts erkennen kannst, sag das ausdrücklich. Gib ausschließlich den puren OCR-Text im Markdown-Format zurück — keine Vorbemerkung, keine Erklärungen, kein Code-Fence.",
+        "image_paths": [
+          "artifacts/zai-org_glm-4.6v-flash/vision/handwriting_hard.jpg"
+        ],
+        "answer": "\n<|begin_of_box|>Besprechung Sommerfest 😊  \n23.05.24 10:15 Uhr (Konfi')  \n\nTeilnehmer : - Max  \n- Jule  \n- Tobi  \n- Leni  \n- Simon (konnte nur kurz)  \n\nZiel : entspanntes  \nBeisammensein  \n& Spass haben  \n\n\nOrt ? - Park am See ? ✶  \n  - Genehmigung ?  \n    → wer macht das ?  \n- Firmenhof / Terrasse ? → Leni ?  \n  Terrasse reservieren ???\n\n\nNächster Termin : Do, 30.05.  \n11 Uhr kurzes Update  \n\nan HR schicken  \n\n\nEssen | Trinken : - Grillen evtl.  \n  → Grill wer ? (Tobi fragen)  \n- vegetarische Optionen  \n  vergessen ? → Kuchen ? Jule macht was 😊  \n- Getränkeliste machen ! Bier, Limo, Wasser, was noch ? (Aperol ? zu teuer?)  \n\n\nWetter - Backup : - Pavillon ? Wer bringt mit ? Max hat einen ?  \n- Zeit mieten → zu teuer  \n- Plan B: Kantine ?  \n\n\nMusik : - Musikbox organisieren  \n- Playlist ?  \n\n\nSpiele | Programm : - Volleyball / Federball  \n  evtl. Cornhole oder Wikingerschach ? Requisiten ?  \n\nFotoecke Idee ? ✓  \n\n\nEinladung : → Einladung bis Ende Woche raus !  \n  - Text: leni ?  \n    → Liste an Simon  \n    → Versand: Jule  \n\n\nOffene Fragen : - Wer grillt ? (muss jemand Schulung haben?)  \n- Gibt's Strom im Park ?  \n- Müll / Reinigung klären !<|end_of_box|>",
+        "ground_truth": "Besprechung Sommerfest\n23.05.24 10:15 Uhr (Konfi)\n\nChef fragen!!\n\nTeilnehmer:\nMax\nJule\nTobi\nLeni\nSimon (konnte nur kurz)\n\nZiel: entspanntes Beisammensein & Spaß haben\n\nNächster Termin:\nDo, 30.05.\n11 Uhr\nkurzes Update\nan HR schicken\n\nOrt?:\nPark am See?\nGenehmigung?\nFirmenhof / Terrasse?\nTerrasse reservieren?? — wer macht das? Leni?\n\nEssen / Trinken:\nGrillen evtl.\nvegetarische Optionen vergessen?\nGetränkeliste machen!\nBier, Limo, Wasser, was noch? (Aperol? zu teuer?)\nGrill wer? (Tobi fragen)\nKuchen? Jule macht was\n\nWetter / Backup:\nPavillon? Wer bringt mit?\nMax hat einen?\nZelt mieten → zu teuer\nPlan B: Kantine?\n\nMusik:\nMusikbox organisieren\nPlaylist?\n\nDeko:\nunnötig?\nevtl. Luftballons? neee\n\nBudget:\nca. 15€ p.P.?\nKosten noch offen!\n\nSpiele / Programm:\nVolleyball / Federball\nevtl. Cornhole oder Wikingerschach?\nFotoecke Idee? Requisiten?\n\nEinladung:\nEinladung bis Ende Woche raus!\nText: Leni?\nListe an Simon\nVersand: Jule\n\nOffene Fragen:\nWer grillt? (muss jemand Schulung haben?)\nGibt's Strom im Park?\nMüll / Reinigung klären",
+        "expected_keywords": [],
+        "ocr": {
+          "recall": 0.8378378378378378,
+          "precision": 0.9185185185185185,
+          "f1": 0.8763250883392226,
+          "matched": 124,
+          "ordered_matched": 109,
+          "relocated_matched": 15,
+          "fuzzy_matched": 0,
+          "missed": 24,
+          "extra": 11,
+          "gt_total": 148,
+          "pred_total": 135,
+          "opcodes": [
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "begin_of_box"
+            },
+            {
+              "tag": "equal",
+              "gt": "besprechung sommerfest 23 05 24 10 15 uhr konfi",
+              "pred": "besprechung sommerfest 23 05 24 10 15 uhr konfi"
+            },
+            {
+              "tag": "delete",
+              "gt": "chef",
+              "pred": ""
+            },
+            {
+              "tag": "moved",
+              "gt": "fragen",
+              "pred": "fragen"
+            },
+            {
+              "tag": "equal",
+              "gt": "teilnehmer max jule tobi leni simon konnte nur kurz ziel entspanntes beisammensein",
+              "pred": "teilnehmer max jule tobi leni simon konnte nur kurz ziel entspanntes beisammensein"
+            },
+            {
+              "tag": "delete",
+              "gt": "spaß",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "spass"
+            },
+            {
+              "tag": "equal",
+              "gt": "haben",
+              "pred": "haben"
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "ort am see wer das"
+            },
+            {
+              "tag": "equal",
+              "gt": "nächster termin do 30 05 11 uhr kurzes update an hr schicken",
+              "pred": "nächster termin do 30 05 11 uhr kurzes update an hr schicken"
+            },
+            {
+              "tag": "delete",
+              "gt": "ort",
+              "pred": ""
+            },
+            {
+              "tag": "moved",
+              "gt": "park",
+              "pred": "park"
+            },
+            {
+              "tag": "delete",
+              "gt": "am see",
+              "pred": ""
+            },
+            {
+              "tag": "moved",
+              "gt": "genehmigung firmenhof terrasse terrasse reservieren",
+              "pred": "genehmigung firmenhof terrasse terrasse reservieren"
+            },
+            {
+              "tag": "delete",
+              "gt": "wer",
+              "pred": ""
+            },
+            {
+              "tag": "moved",
+              "gt": "macht",
+              "pred": "macht"
+            },
+            {
+              "tag": "delete",
+              "gt": "das",
+              "pred": ""
+            },
+            {
+              "tag": "moved",
+              "gt": "leni",
+              "pred": "leni"
+            },
+            {
+              "tag": "equal",
+              "gt": "essen trinken grillen evtl",
+              "pred": "essen trinken grillen evtl"
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "wer"
+            },
+            {
+              "tag": "equal",
+              "gt": "vegetarische optionen vergessen",
+              "pred": "vegetarische optionen vergessen"
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "was"
+            },
+            {
+              "tag": "equal",
+              "gt": "getränkeliste machen bier limo wasser was noch aperol zu teuer",
+              "pred": "getränkeliste machen bier limo wasser was noch aperol zu teuer"
+            },
+            {
+              "tag": "moved",
+              "gt": "grill",
+              "pred": "grill"
+            },
+            {
+              "tag": "delete",
+              "gt": "wer",
+              "pred": ""
+            },
+            {
+              "tag": "moved",
+              "gt": "tobi",
+              "pred": "tobi"
+            },
+            {
+              "tag": "delete",
+              "gt": "fragen",
+              "pred": ""
+            },
+            {
+              "tag": "moved",
+              "gt": "kuchen jule macht",
+              "pred": "kuchen jule macht"
+            },
+            {
+              "tag": "delete",
+              "gt": "was",
+              "pred": ""
+            },
+            {
+              "tag": "equal",
+              "gt": "wetter backup pavillon wer bringt mit max hat einen",
+              "pred": "wetter backup pavillon wer bringt mit max hat einen"
+            },
+            {
+              "tag": "delete",
+              "gt": "zelt",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "zeit"
+            },
+            {
+              "tag": "equal",
+              "gt": "mieten zu teuer plan b kantine musik musikbox organisieren playlist",
+              "pred": "mieten zu teuer plan b kantine musik musikbox organisieren playlist"
+            },
+            {
+              "tag": "delete",
+              "gt": "deko unnötig evtl luftballons neee budget ca 15 p p kosten noch offen",
+              "pred": ""
+            },
+            {
+              "tag": "equal",
+              "gt": "spiele programm volleyball federball evtl cornhole oder wikingerschach fotoecke idee",
+              "pred": "spiele programm volleyball federball evtl cornhole oder wikingerschach fotoecke idee"
+            },
+            {
+              "tag": "moved",
+              "gt": "requisiten",
+              "pred": "requisiten"
+            },
+            {
+              "tag": "equal",
+              "gt": "einladung einladung bis ende woche raus text leni liste an simon versand jule offene fragen wer grillt muss jemand schulung haben gibt s strom im park müll reinigung klären",
+              "pred": "einladung einladung bis ende woche raus text leni liste an simon versand jule offene fragen wer grillt muss jemand schulung haben gibt s strom im park müll reinigung klären"
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "end_of_box"
+            }
+          ]
+        },
+        "score": 0.8763250883392226,
+        "error": null,
+        "wall_seconds": 20.5664729999844,
+        "tokens_per_second": 64.39830037907892
+      },
+      {
+        "id": "fraktur_ocr",
+        "label": "Fraktur OCR",
+        "prompt": "Auf dem Bild siehst du eine Buchseite aus einer alten deutschen Erzählung in Frakturschrift (Seite 14). Transkribiere den gesamten Fließtext der Seite in moderne Antiqua-Schreibweise. Behalte die Absatzstruktur. Schreibe 'ß' wo es im Text steht. Bei unklaren Stellen [unleserlich]. Gib ausschließlich den puren OCR-Text im Markdown-Format zurück — keine Vorbemerkung, keine Erklärungen, kein Code-Fence.",
+        "image_paths": [
+          "artifacts/zai-org_glm-4.6v-flash/vision/fraktur_innerpage.jpg"
+        ],
+        "answer": "\n<|begin_of_box|>deiner Großmutter wohl nur geträumt haben.\" ,,Rein,\" meinte Malinefen hartnädig, ,,sie hat ja auch die Prinzessin vom See gesehen, und das ist etwas ganz Besonderes.\" ,,Dabon habe ich noch nie gehört,\" antwortete Gottlieb. ,,So fann fie es dir erzählen, frag fie nur aus, fie weiß alles.\"\n\nDer Kahn war mittlerweile der Insel ganz nahe gekommen; die Kinder landeten an einer dazu geeigneten Stelle und befestigten ihn an einem aus dem Wasser ragenden Pflog. Sie erfreigen die kleine Anhöhe, auf der sich das Gehäuft befand. In dem furzen, feinen Grabe, welches den Boden bedekte, blühte der Thymian; ein festgetretener Weg führte gerade auf die Schilfhuette zu, die lagheimlich unter den Weiden. Das mächtige Geäst der majestäätischen Bäume, mit silbergraumem, spigblattrigem Laube beladen, breitete sich weit und muchtig über das niedere Dach, welches sich der Crde zuneigte. Dahinter erblickte man ein Stück Garten und Uferland, von Rohr und Schilf wie mit einem Ball umschlossen. Eine alte Frau stieg vor der Tür des Hüttchens und spann. Ihr Haar war so weiß wie das Gewebe der Spinnen, welches im Herbst über die Stopfen fliegt, um ihren Boden hatte sie ein schwarzes Band gebunden. Gottlieb und Malinefen fassen mit dem Rorbe und blieben vor ihr stehen. ,,Großmutter,\" sagte Lestere, ,,er will nicht glauben, dass du die Seejungfern gesehen hast, und er weiß nichts von der Prinzessin vom See.\" Sie neigte ihren Haden. ,,Geht ihr man eures Weges,\" gab fie ihnen zur Antwort. ,,Großmutter, du fünntet ihm die Geschichte von der Prinzessin vom See wohl erzählen,\" bat Malinefen, ,,sie läht fich schön anhören, und man mufs fie doch wissen, wenn man über den See fährt und in dem Blumental Tag für Tag herumwandert.\" ,,Ich meine, ihr fönntet euer Belper brauchen,\" sagte die Großmutter, ,,es hat eben hier Ihr gejchlagen.\" ,,Ich ja,\" rief Malinefen einbrünstig, ,,Grdbeeren mit Milchlagen.\" ,,Und Stüff Brot dazu; und dieviel wir das aufzehren, erzählt Ihr dem Gottlieb die Geschichte.\" Sie ließ nicht nach, sie müste ihren Willen haben. Ein Weilchen danach fassen die Kinder auf einem Baumftramm vor der Hütte und hatten zwischen sich einen Napf mit ihrer Milch, in der schwammen die Grdbeeren so did, dass man nicht wuchte, war das Milch mit Grdbeeren, oder Grdbeeren mit Milch; doch es mochte wohl auf eins heraus-tommen. Die Großmutter blidte zuweilen nach ihnen hin-<|end_of_box|>",
+        "ground_truth": "deiner Großmutter wohl nur geträumt haben. „Nein,\" meinte Malineken hartnäckig, „sie hat ja auch die Prinzessin vom See gesehen, und das ist etwas ganz Besonderes.\" „Davon habe ich noch nie gehört,\" antwortete Gottlieb. „So kann sie es dir erzählen, frag sie nur aus, sie weiß alles.\"\n\nDer Kahn war mittlerweile der Insel ganz nahe gekommen; die Kinder landeten an einer dazu geeigneten Stelle und befestigten ihn an einem aus dem Wasser ragenden Pflock. Sie erstiegen die kleine Anhöhe, auf der sich das Gehöft befand. In dem kurzen, feinen Grase, welches den Boden bedeckte, blühte der Thymian; ein festgetretener Weg führte gerade auf die Schilfhütte zu, die lag heimlich unter den Weiden. Das mächtige Geäst der majestätischen Bäume, mit silbergrauem, spitzblättrigem Laube beladen, breitete sich weit und wuchtig über das niedere Dach, welches sich der Erde zuneigte. Dahinter erblickte man ein Stück Garten und Ackerland, von Rohr und Schilf wie mit einem Wall umschlossen. Eine alte Frau saß vor der Thür des Hüttchens und spann. Ihr Haar war so weiß wie das Gewebe der Spinnen, welches im Herbst über die Stoppeln fliegt, um ihren Rocken hatte sie ein schwarzes Band gebunden. Gottlieb und Malineken kamen mit dem Korbe und blieben vor ihr stehen. „Großmutter,\" sagte letztere, „er will nicht glauben, daß du die Seejungfern gesehen hast, und er weiß nichts von der Prinzessin vom See.\" Sie netzte ihren Faden. „Geht ihr man eures Weges,\" gab sie ihnen zur Antwort. „Großmutter, du könntest ihm die Geschichte von der Prinzessin vom See wohl erzählen,\" bat Malineken, „sie läßt sich schön anhören, und man muß sie doch wissen, wenn man über den See fährt und in dem Blumental Tag für Tag herumwandert.\" „Ich meine, ihr könntet euer Vesper brauchen,\" sagte die Großmutter, „es hat eben vier Uhr geschlagen.\" „Ach ja,\" rief Malineken inbrünstig, „Erdbeeren mit Milch und ein Stück Brot dazu; und dieweil wir das aufzehren, erzählt Ihr dem Gottlieb die Geschichte.\" Sie ließ nicht nach, sie mußte ihren Willen haben. Ein Weilchen danach saßen die Kinder auf einem Baumstamm vor der Hütte und hatten zwischen sich einen Napf mit süßer Milch, in der schwammen die Erdbeeren so dick, daß man nicht wußte, war das Milch mit Erdbeeren, oder Erdbeeren mit Milch; doch es mochte wohl auf eins herauskommen. Die Großmutter blickte zuweilen nach ihnen hin",
+        "expected_keywords": [],
+        "ocr": {
+          "recall": 0.8664921465968587,
+          "precision": 0.8642297650130548,
+          "f1": 0.865359477124183,
+          "matched": 331,
+          "ordered_matched": 315,
+          "relocated_matched": 0,
+          "fuzzy_matched": 16,
+          "missed": 51,
+          "extra": 52,
+          "gt_total": 382,
+          "pred_total": 383,
+          "opcodes": [
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "begin_of_box"
+            },
+            {
+              "tag": "equal",
+              "gt": "deiner großmutter wohl nur geträumt haben",
+              "pred": "deiner großmutter wohl nur geträumt haben"
+            },
+            {
+              "tag": "delete",
+              "gt": "nein",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "rein"
+            },
+            {
+              "tag": "equal",
+              "gt": "meinte",
+              "pred": "meinte"
+            },
+            {
+              "tag": "fuzzy",
+              "gt": "malineken hartnäckig",
+              "pred": "malinefen hartnädig"
+            },
+            {
+              "tag": "equal",
+              "gt": "sie hat ja auch die prinzessin vom see gesehen und das ist etwas ganz besonderes",
+              "pred": "sie hat ja auch die prinzessin vom see gesehen und das ist etwas ganz besonderes"
+            },
+            {
+              "tag": "delete",
+              "gt": "davon",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "dabon"
+            },
+            {
+              "tag": "equal",
+              "gt": "habe ich noch nie gehört antwortete gottlieb so",
+              "pred": "habe ich noch nie gehört antwortete gottlieb so"
+            },
+            {
+              "tag": "delete",
+              "gt": "kann sie",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "fann fie"
+            },
+            {
+              "tag": "equal",
+              "gt": "es dir erzählen frag",
+              "pred": "es dir erzählen frag"
+            },
+            {
+              "tag": "delete",
+              "gt": "sie",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "fie"
+            },
+            {
+              "tag": "equal",
+              "gt": "nur aus",
+              "pred": "nur aus"
+            },
+            {
+              "tag": "delete",
+              "gt": "sie",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "fie"
+            },
+            {
+              "tag": "equal",
+              "gt": "weiß alles der kahn war mittlerweile der insel ganz nahe gekommen die kinder landeten an einer dazu geeigneten stelle und befestigten ihn an einem aus dem wasser ragenden",
+              "pred": "weiß alles der kahn war mittlerweile der insel ganz nahe gekommen die kinder landeten an einer dazu geeigneten stelle und befestigten ihn an einem aus dem wasser ragenden"
+            },
+            {
+              "tag": "delete",
+              "gt": "pflock",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "pflog"
+            },
+            {
+              "tag": "equal",
+              "gt": "sie",
+              "pred": "sie"
+            },
+            {
+              "tag": "delete",
+              "gt": "erstiegen",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "erfreigen"
+            },
+            {
+              "tag": "equal",
+              "gt": "die kleine anhöhe auf der sich das",
+              "pred": "die kleine anhöhe auf der sich das"
+            },
+            {
+              "tag": "delete",
+              "gt": "gehöft",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "gehäuft"
+            },
+            {
+              "tag": "equal",
+              "gt": "befand in dem",
+              "pred": "befand in dem"
+            },
+            {
+              "tag": "delete",
+              "gt": "kurzen",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "furzen"
+            },
+            {
+              "tag": "equal",
+              "gt": "feinen",
+              "pred": "feinen"
+            },
+            {
+              "tag": "delete",
+              "gt": "grase",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "grabe"
+            },
+            {
+              "tag": "equal",
+              "gt": "welches den boden",
+              "pred": "welches den boden"
+            },
+            {
+              "tag": "fuzzy",
+              "gt": "bedeckte",
+              "pred": "bedekte"
+            },
+            {
+              "tag": "equal",
+              "gt": "blühte der thymian ein festgetretener weg führte gerade auf die",
+              "pred": "blühte der thymian ein festgetretener weg führte gerade auf die"
+            },
+            {
+              "tag": "fuzzy",
+              "gt": "schilfhütte",
+              "pred": "schilfhuette"
+            },
+            {
+              "tag": "equal",
+              "gt": "zu die",
+              "pred": "zu die"
+            },
+            {
+              "tag": "delete",
+              "gt": "lag heimlich",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "lagheimlich"
+            },
+            {
+              "tag": "equal",
+              "gt": "unter den weiden das mächtige geäst der",
+              "pred": "unter den weiden das mächtige geäst der"
+            },
+            {
+              "tag": "fuzzy",
+              "gt": "majestätischen",
+              "pred": "majestäätischen"
+            },
+            {
+              "tag": "equal",
+              "gt": "bäume mit",
+              "pred": "bäume mit"
+            },
+            {
+              "tag": "fuzzy",
+              "gt": "silbergrauem",
+              "pred": "silbergraumem"
+            },
+            {
+              "tag": "delete",
+              "gt": "spitzblättrigem",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "spigblattrigem"
+            },
+            {
+              "tag": "equal",
+              "gt": "laube beladen breitete sich weit und",
+              "pred": "laube beladen breitete sich weit und"
+            },
+            {
+              "tag": "delete",
+              "gt": "wuchtig",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "muchtig"
+            },
+            {
+              "tag": "equal",
+              "gt": "über das niedere dach welches sich der",
+              "pred": "über das niedere dach welches sich der"
+            },
+            {
+              "tag": "delete",
+              "gt": "erde",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "crde"
+            },
+            {
+              "tag": "equal",
+              "gt": "zuneigte dahinter erblickte man ein stück garten und",
+              "pred": "zuneigte dahinter erblickte man ein stück garten und"
+            },
+            {
+              "tag": "delete",
+              "gt": "ackerland",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "uferland"
+            },
+            {
+              "tag": "equal",
+              "gt": "von rohr und schilf wie mit einem",
+              "pred": "von rohr und schilf wie mit einem"
+            },
+            {
+              "tag": "delete",
+              "gt": "wall",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "ball"
+            },
+            {
+              "tag": "equal",
+              "gt": "umschlossen eine alte frau",
+              "pred": "umschlossen eine alte frau"
+            },
+            {
+              "tag": "delete",
+              "gt": "saß",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "stieg"
+            },
+            {
+              "tag": "equal",
+              "gt": "vor der",
+              "pred": "vor der"
+            },
+            {
+              "tag": "delete",
+              "gt": "thür",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "tür"
+            },
+            {
+              "tag": "equal",
+              "gt": "des hüttchens und spann ihr haar war so weiß wie das gewebe der spinnen welches im herbst über die",
+              "pred": "des hüttchens und spann ihr haar war so weiß wie das gewebe der spinnen welches im herbst über die"
+            },
+            {
+              "tag": "delete",
+              "gt": "stoppeln",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "stopfen"
+            },
+            {
+              "tag": "equal",
+              "gt": "fliegt um ihren",
+              "pred": "fliegt um ihren"
+            },
+            {
+              "tag": "delete",
+              "gt": "rocken",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "boden"
+            },
+            {
+              "tag": "equal",
+              "gt": "hatte sie ein schwarzes band gebunden gottlieb und",
+              "pred": "hatte sie ein schwarzes band gebunden gottlieb und"
+            },
+            {
+              "tag": "fuzzy",
+              "gt": "malineken",
+              "pred": "malinefen"
+            },
+            {
+              "tag": "delete",
+              "gt": "kamen",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "fassen"
+            },
+            {
+              "tag": "equal",
+              "gt": "mit dem",
+              "pred": "mit dem"
+            },
+            {
+              "tag": "delete",
+              "gt": "korbe",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "rorbe"
+            },
+            {
+              "tag": "equal",
+              "gt": "und blieben vor ihr stehen großmutter sagte",
+              "pred": "und blieben vor ihr stehen großmutter sagte"
+            },
+            {
+              "tag": "delete",
+              "gt": "letztere",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "lestere"
+            },
+            {
+              "tag": "equal",
+              "gt": "er will nicht glauben",
+              "pred": "er will nicht glauben"
+            },
+            {
+              "tag": "delete",
+              "gt": "daß",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "dass"
+            },
+            {
+              "tag": "equal",
+              "gt": "du die seejungfern gesehen hast und er weiß nichts von der prinzessin vom see sie",
+              "pred": "du die seejungfern gesehen hast und er weiß nichts von der prinzessin vom see sie"
+            },
+            {
+              "tag": "delete",
+              "gt": "netzte",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "neigte"
+            },
+            {
+              "tag": "equal",
+              "gt": "ihren",
+              "pred": "ihren"
+            },
+            {
+              "tag": "delete",
+              "gt": "faden",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "haden"
+            },
+            {
+              "tag": "equal",
+              "gt": "geht ihr man eures weges gab",
+              "pred": "geht ihr man eures weges gab"
+            },
+            {
+              "tag": "delete",
+              "gt": "sie",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "fie"
+            },
+            {
+              "tag": "equal",
+              "gt": "ihnen zur antwort großmutter du",
+              "pred": "ihnen zur antwort großmutter du"
+            },
+            {
+              "tag": "delete",
+              "gt": "könntest",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "fünntet"
+            },
+            {
+              "tag": "equal",
+              "gt": "ihm die geschichte von der prinzessin vom see wohl erzählen bat",
+              "pred": "ihm die geschichte von der prinzessin vom see wohl erzählen bat"
+            },
+            {
+              "tag": "fuzzy",
+              "gt": "malineken",
+              "pred": "malinefen"
+            },
+            {
+              "tag": "equal",
+              "gt": "sie",
+              "pred": "sie"
+            },
+            {
+              "tag": "delete",
+              "gt": "läßt sich",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "läht fich"
+            },
+            {
+              "tag": "equal",
+              "gt": "schön anhören und man",
+              "pred": "schön anhören und man"
+            },
+            {
+              "tag": "delete",
+              "gt": "muß sie",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "mufs fie"
+            },
+            {
+              "tag": "equal",
+              "gt": "doch wissen wenn man über den see fährt und in dem blumental tag für tag herumwandert ich meine ihr",
+              "pred": "doch wissen wenn man über den see fährt und in dem blumental tag für tag herumwandert ich meine ihr"
+            },
+            {
+              "tag": "delete",
+              "gt": "könntet",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "fönntet"
+            },
+            {
+              "tag": "equal",
+              "gt": "euer",
+              "pred": "euer"
+            },
+            {
+              "tag": "delete",
+              "gt": "vesper",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "belper"
+            },
+            {
+              "tag": "equal",
+              "gt": "brauchen sagte die großmutter es hat eben",
+              "pred": "brauchen sagte die großmutter es hat eben"
+            },
+            {
+              "tag": "delete",
+              "gt": "vier uhr",
+              "pred": ""
+            },
+            {
+              "tag": "fuzzy",
+              "gt": "geschlagen",
+              "pred": "gejchlagen"
+            },
+            {
+              "tag": "delete",
+              "gt": "ach",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "hier ihr ich"
+            },
+            {
+              "tag": "equal",
+              "gt": "ja rief",
+              "pred": "ja rief"
+            },
+            {
+              "tag": "fuzzy",
+              "gt": "malineken inbrünstig erdbeeren",
+              "pred": "malinefen einbrünstig grdbeeren"
+            },
+            {
+              "tag": "equal",
+              "gt": "mit",
+              "pred": "mit"
+            },
+            {
+              "tag": "delete",
+              "gt": "milch",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "milchlagen"
+            },
+            {
+              "tag": "equal",
+              "gt": "und",
+              "pred": "und"
+            },
+            {
+              "tag": "delete",
+              "gt": "ein stück",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "stüff"
+            },
+            {
+              "tag": "equal",
+              "gt": "brot dazu und",
+              "pred": "brot dazu und"
+            },
+            {
+              "tag": "delete",
+              "gt": "dieweil",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "dieviel"
+            },
+            {
+              "tag": "equal",
+              "gt": "wir das aufzehren erzählt ihr dem gottlieb die geschichte sie ließ nicht nach sie",
+              "pred": "wir das aufzehren erzählt ihr dem gottlieb die geschichte sie ließ nicht nach sie"
+            },
+            {
+              "tag": "delete",
+              "gt": "mußte",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "müste"
+            },
+            {
+              "tag": "equal",
+              "gt": "ihren willen haben ein weilchen danach",
+              "pred": "ihren willen haben ein weilchen danach"
+            },
+            {
+              "tag": "delete",
+              "gt": "saßen",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "fassen"
+            },
+            {
+              "tag": "equal",
+              "gt": "die kinder auf einem",
+              "pred": "die kinder auf einem"
+            },
+            {
+              "tag": "fuzzy",
+              "gt": "baumstamm",
+              "pred": "baumftramm"
+            },
+            {
+              "tag": "equal",
+              "gt": "vor der hütte und hatten zwischen sich einen napf mit",
+              "pred": "vor der hütte und hatten zwischen sich einen napf mit"
+            },
+            {
+              "tag": "delete",
+              "gt": "süßer",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "ihrer"
+            },
+            {
+              "tag": "equal",
+              "gt": "milch in der schwammen die",
+              "pred": "milch in der schwammen die"
+            },
+            {
+              "tag": "fuzzy",
+              "gt": "erdbeeren",
+              "pred": "grdbeeren"
+            },
+            {
+              "tag": "equal",
+              "gt": "so",
+              "pred": "so"
+            },
+            {
+              "tag": "delete",
+              "gt": "dick daß",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "did dass"
+            },
+            {
+              "tag": "equal",
+              "gt": "man nicht",
+              "pred": "man nicht"
+            },
+            {
+              "tag": "delete",
+              "gt": "wußte",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "wuchte"
+            },
+            {
+              "tag": "equal",
+              "gt": "war das milch mit",
+              "pred": "war das milch mit"
+            },
+            {
+              "tag": "fuzzy",
+              "gt": "erdbeeren",
+              "pred": "grdbeeren"
+            },
+            {
+              "tag": "equal",
+              "gt": "oder",
+              "pred": "oder"
+            },
+            {
+              "tag": "fuzzy",
+              "gt": "erdbeeren",
+              "pred": "grdbeeren"
+            },
+            {
+              "tag": "equal",
+              "gt": "mit milch doch es mochte wohl auf eins",
+              "pred": "mit milch doch es mochte wohl auf eins"
+            },
+            {
+              "tag": "delete",
+              "gt": "herauskommen",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "heraus tommen"
+            },
+            {
+              "tag": "equal",
+              "gt": "die großmutter",
+              "pred": "die großmutter"
+            },
+            {
+              "tag": "delete",
+              "gt": "blickte",
+              "pred": ""
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "blidte"
+            },
+            {
+              "tag": "equal",
+              "gt": "zuweilen nach ihnen hin",
+              "pred": "zuweilen nach ihnen hin"
+            },
+            {
+              "tag": "insert",
+              "gt": "",
+              "pred": "end_of_box"
+            }
+          ]
+        },
+        "score": 0.865359477124183,
+        "error": null,
+        "wall_seconds": 29.663932915893383,
+        "tokens_per_second": 64.04261092133804
+      }
+    ]
+  },
+  "raw_response": "",
+  "artifacts": [
+    {
+      "kind": "text",
+      "label": "Handschrift OCR – leicht – Antwort",
+      "path": "artifacts/zai-org_glm-4.6v-flash/vision/handwriting_easy.txt",
+      "mime": "text/plain"
+    },
+    {
+      "kind": "image",
+      "label": "Handschrift OCR – leicht – Bild",
+      "path": "artifacts/zai-org_glm-4.6v-flash/vision/handwriting_easy.jpg",
+      "mime": "image/jpeg"
+    },
+    {
+      "kind": "text",
+      "label": "Handschrift OCR – mittel – Antwort",
+      "path": "artifacts/zai-org_glm-4.6v-flash/vision/handwriting_medium.txt",
+      "mime": "text/plain"
+    },
+    {
+      "kind": "image",
+      "label": "Handschrift OCR – mittel – Bild",
+      "path": "artifacts/zai-org_glm-4.6v-flash/vision/handwriting_medium.jpg",
+      "mime": "image/jpeg"
+    },
+    {
+      "kind": "text",
+      "label": "Handschrift OCR – schwer – Antwort",
+      "path": "artifacts/zai-org_glm-4.6v-flash/vision/handwriting_hard.txt",
+      "mime": "text/plain"
+    },
+    {
+      "kind": "image",
+      "label": "Handschrift OCR – schwer – Bild",
+      "path": "artifacts/zai-org_glm-4.6v-flash/vision/handwriting_hard.jpg",
+      "mime": "image/jpeg"
+    },
+    {
+      "kind": "text",
+      "label": "Fraktur OCR – Antwort",
+      "path": "artifacts/zai-org_glm-4.6v-flash/vision/fraktur_ocr.txt",
+      "mime": "text/plain"
+    },
+    {
+      "kind": "image",
+      "label": "Fraktur OCR – Bild",
+      "path": "artifacts/zai-org_glm-4.6v-flash/vision/fraktur_innerpage.jpg",
+      "mime": "image/jpeg"
+    }
+  ],
+  "error": null,
+  "hardware": {
+    "platform": "macOS-26.4.1-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "ram_total_gb": 128.0,
+    "cpu_count": 16
+  },
+  "bench_version": "0.1.0"
+}

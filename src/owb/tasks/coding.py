@@ -50,7 +50,7 @@ class CodingTask(Task):
         try:
             resp = client.chat(
                 model.id, messages,
-                temperature=0.6, max_tokens=-1, timeout_s=900.0,
+                temperature=0.6, max_tokens=16000, timeout_s=900.0,
             )
             text = resp.text or resp.reasoning or ""
             metrics = resp.metrics

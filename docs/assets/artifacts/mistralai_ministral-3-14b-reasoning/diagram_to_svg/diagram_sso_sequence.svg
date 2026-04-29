@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#000"/>
+    </marker>
+  </defs>
+
+  <!-- User -->
+  <g id="user">
+    <circle cx="100" cy="200" r="25" stroke="#000" stroke-width="2" fill="none"/>
+    <text x="90" y="230" font-size="14">Benutzer</text>
+  </g>
+
+  <!-- App / Service Provider -->
+  <g id="app">
+    <rect x="300" y="150" width="150" height="100" stroke="#000" stroke-width="2" fill="none"/>
+    <text x="310" y="180" font-size="14">App /</text>
+    <text x="310" y="200" font-size="14">Service Provider</text>
+  </g>
+
+  <!-- Identity Provider (IdP) -->
+  <g id="idp">
+    <rect x="600" y="50" width="180" height="80" stroke="#000" stroke-width="2" fill="none"/>
+    <text x="610" y="80" font-size="14">Identity Provider</text>
+    <text x="610" y="100" font-size="14">(IdP)</text>
+  </g>
+
+  <!-- Login-Seite -->
+  <g id="login">
+    <rect x="600" y="250" width="180" height="80" stroke="#000" stroke-width="2" fill="none"/>
+    <text x="610" y="280" font-size="14">Login-Seite</text>
+  </g>
+
+  <!-- Decision -->
+  <g id="decision">
+    <rect x="500" y="450" width="200" height="100" stroke="#000" stroke-width="2" fill="none"/>
+    <text x="510" y="480" font-size="14">Anmeldedaten</text>
+    <text x="510" y="500" font-size="14">korrekt?</text>
+  </g>
+
+  <!-- Access Granted -->
+  <g id="access-granted">
+    <rect x="300" y="600" width="180" height="80" stroke="#000" stroke-width="2" fill="none"/>
+    <text x="310" y="630" font-size="14">Zugang</text>
+    <text x="310" y="650" font-size="14">gewährt</text>
+  </g>
+
+  <!-- Arrows -->
+  <line x1="125" y1="200" x2="300" y2="200" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="210" y="205" font-size="14">1. Zugang zur App</text>
+
+  <line x1="450" y1="200" x2="600" y2="90" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="525" y="130" font-size="14">2. Weiterleitung</text>
+  <text x="525" y="150" font-size="14">zur Login-Seite</text>
+
+  <line x1="780" y1="90" x2="780" y2="250" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="630" y="140" font-size="14">3. Login-Seite</text>
+  <text x="630" y="160" font-size="14">anzeigen</text>
+
+  <line x1="780" y1="330" x2="500" y2="450" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="630" y="370" font-size="14">4. Authentifizierung</text>
+
+  <line x1="780" y1="530" x2="780" y2="600" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="630" y="570" font-size="14">5. Token / Assertion</text>
+  <text x="630" y="590" font-size="14">(SSO-Response)</text>
+
+  <line x1="500" y1="550" x2="780" y2="530" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="630" y="540" font-size="14">Nein</text>
+
+  <line x1="500" y1="550" x2="780" y2="530" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="630" y="540" font-size="14">Ja</text>
+
+  <line x1="500" y1="550" x2="780" y2="530" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="630" y="540" font-size="14">Nein</text>
+
+  <line x1="450" y1="700" x2="300" y2="600" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="380" y="650" font-size="14">6. Redirect zurück</text>
+  <text x="380" y="670" font-size="14">zur App mit Token</text>
+
+  <line x1="450" y1="200" x2="300" y2="600" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="380" y="400" font-size="14">7. Zugang</text>
+  <text x="380" y="420" font-size="14">auf Ressourcen</text>
+
+  <!-- Dashed line for user input -->
+  <line x1="780" y1="330" x2="650" y2="330" stroke="#000" stroke-width="2" stroke-dasharray="5,5"/>
+  <text x="630" y="340" font-size="14">Benutzer gibt</text>
+  <text x="630" y="360" font-size="14">Anmeldedaten ein</text>
+</svg>

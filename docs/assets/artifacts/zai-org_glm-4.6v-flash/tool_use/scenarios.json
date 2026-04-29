@@ -1,0 +1,462 @@
+[
+  {
+    "id": "easy_extract_todos",
+    "difficulty": "leicht",
+    "user_prompt": "In notes.md stehen Sprint-Notizen. Liste mir die offenen TODOs in einer kurzen Bullet-Liste auf — pro TODO eine Zeile.",
+    "history": [
+      {
+        "tool": "read_file",
+        "args": {
+          "path": "notes.md"
+        },
+        "result": "# Sprint Notes — KW 17\n\n## Erledigt\n- API-Endpoint /users mit Pagination\n- Migrations für `orders` Tabelle eingespielt\n\n## Offen\n- TODO: Caching-Layer für Produktsuche evaluieren (Redis vs in-memory)\n- TODO: Logging vereinheitlichen — momentan mischen wir loguru + logging\n- Bugfix: Datumsformat in der Rechnungs-PDF (siehe Issue #4711)\n- TODO: Stripe-Webhook-Handler braucht Idempotency-Keys\n\n## Notizen aus dem Standup\nKunde X meldet, dass beim Login-Redirect manchmal die `next`-URL verloren geht. Reproduzierbar nur in Safari iOS. Verdacht auf Service-Worker-Cache.\n\nTODO: Safari-Repro-Setup auf "
+      }
+    ],
+    "final_text": "\n{\"offene_TODOS\": [\"Caching-Layer für Produktsuche evaluieren (Redis vs in-memory)\", \"Logging vereinheitlichen — momentan mischen wir loguru + logging\", \"Safari-Repro-Setup auf TestFlight provisionieren\"]}",
+    "metrics": {
+      "wall_seconds": 11.706695125089027,
+      "tokens": 268,
+      "tps": 66.87468321938539,
+      "iterations": 1
+    },
+    "checks": [
+      {
+        "id": "called_read_file",
+        "label": "Tool 'read_file' aufgerufen",
+        "passed": true,
+        "detail": "history: read_file"
+      },
+      {
+        "id": "args_read_file",
+        "label": "Arguments for 'read_file'",
+        "passed": true,
+        "detail": "path='notes.md'"
+      },
+      {
+        "id": "soft_mention",
+        "label": "Response mentions 3/4 of the key terms",
+        "passed": true,
+        "detail": "mentioned: ['Caching', 'Logging', 'Safari'], missing: ['Stripe']"
+      }
+    ],
+    "score": 1.0,
+    "passed": 3,
+    "total": 3
+  },
+  {
+    "id": "easy_list_then_read",
+    "difficulty": "leicht",
+    "user_prompt": "Ich weiß nicht mehr, welche Datei in diesem Projekt die Konfiguration enthält. Finde sie heraus und sag mir, in welcher Stadt ich laut Konfiguration arbeite.",
+    "history": [],
+    "final_text": "\nIch werde nun alle Dateien im Projektverzeichnis auflisten, um die Konfigurationsdatei zu finden.\n",
+    "metrics": {
+      "wall_seconds": 5.269111208035611,
+      "tokens": 186,
+      "tps": 67.32608015861781,
+      "iterations": 0
+    },
+    "checks": [
+      {
+        "id": "called_list_files",
+        "label": "Tool 'list_files' aufgerufen",
+        "passed": false,
+        "detail": "history: —"
+      },
+      {
+        "id": "called_read_file",
+        "label": "Tool 'read_file' aufgerufen",
+        "passed": false,
+        "detail": "history: —"
+      },
+      {
+        "id": "args_read_file",
+        "label": "Arguments for 'read_file'",
+        "passed": false,
+        "detail": "tool not called"
+      },
+      {
+        "id": "soft_mention",
+        "label": "Response mentions 1/1 of the key terms",
+        "passed": false,
+        "detail": "mentioned: [], missing: ['München']"
+      }
+    ],
+    "score": 0.0,
+    "passed": 0,
+    "total": 4
+  },
+  {
+    "id": "medium_fizzbuzz_fix",
+    "difficulty": "mittel",
+    "user_prompt": "fizzbuzz.py hat einen Bug — die Funktion liefert die Werte 1..n-1 statt 1..n. Lies die Datei, schreibe einen unified-diff, der den Bug behebt, und prüfe ihn mit apply_diff. Antworte am Ende mit einer kurzen Erklärung des Fixes.",
+    "history": [
+      {
+        "tool": "read_file",
+        "args": {
+          "path": "fizzbuzz.py"
+        },
+        "result": "\"\"\"Simple FizzBuzz with a deliberate off-by-one bug.\"\"\"\n\n\ndef fizzbuzz(n: int) -> list[str]:\n    out: list[str] = []\n    # BUG: range stops at n (exclusive), but FizzBuzz from 1..=n needs n+1.\n    for i in range(1, n):\n        if i % 15 == 0:\n            out.append(\"FizzBuzz\")\n        elif i % 3 == 0:\n            out.append(\"Fizz\")\n        elif i % 5 == 0:\n            out.append(\"Buzz\")\n        else:\n            out.append(str(i))\n    return out\n\n\nif __name__ == \"__main__\":\n    print(fizzbuzz(15))\n"
+      },
+      {
+        "tool": "apply_diff",
+        "args": {
+          "path": "fizzbuzz.py",
+          "diff": "@@ -5,7 +5,7 @@\n     out: list[str] = []\n     # BUG: range stops at n (exclusive), but FizzBuzz from 1..=n needs n+1.\n-    for i in range(1, n):\n+    for i in range(1, n + 1):"
+        },
+        "result": "{\"ok\": true, \"applied\": 2, \"added_lines\": 1, \"removed_lines\": 1, \"note\": \"structural-validation only; no real write performed\"}"
+      }
+    ],
+    "final_text": "\n```json\n{\"fix\": \"Der Bug wurde behoben, indem die `range`-Funktion von `range(1, n)` zu `range(1, n + 1)` geändert wurde. Dies sorgt dafür, dass die Schleife von 1 bis n (inklusiv) läuft, anstatt nur bis zu n-1.\"}\n```",
+    "metrics": {
+      "wall_seconds": 25.698802958009765,
+      "tokens": 1171,
+      "tps": 67.16747109332586,
+      "iterations": 2
+    },
+    "checks": [
+      {
+        "id": "called_read_file",
+        "label": "Tool 'read_file' aufgerufen",
+        "passed": true,
+        "detail": "history: read_file, apply_diff"
+      },
+      {
+        "id": "called_apply_diff",
+        "label": "Tool 'apply_diff' aufgerufen",
+        "passed": true,
+        "detail": "history: read_file, apply_diff"
+      },
+      {
+        "id": "args_read_file",
+        "label": "Arguments for 'read_file'",
+        "passed": true,
+        "detail": "path='fizzbuzz.py'"
+      },
+      {
+        "id": "args_apply_diff",
+        "label": "Arguments for 'apply_diff'",
+        "passed": true,
+        "detail": "path='fizzbuzz.py'"
+      },
+      {
+        "id": "diff_validates",
+        "label": "Diff for fizzbuzz.py validates structurally",
+        "passed": true,
+        "detail": "applied=2, calls=1"
+      },
+      {
+        "id": "diff_min_changes",
+        "label": "Diff changes ≥2 lines",
+        "passed": true,
+        "detail": "applied: 2"
+      }
+    ],
+    "score": 1.0,
+    "passed": 6,
+    "total": 6
+  },
+  {
+    "id": "medium_filter_users",
+    "difficulty": "mittel",
+    "user_prompt": "users.json enthält eine Liste aller Nutzer. Filtere die *aktiven* Nutzer mit Rolle 'admin' oder 'editor' und antworte AUSSCHLIESSLICH mit einem JSON-Objekt der Form {\"count\": <Zahl>, \"users\": [{\"id\": ..., \"name\": ..., \"role\": ...}, ...]}. Keine Markdown-Fences, kein Vor- oder Nachtext.",
+    "history": [
+      {
+        "tool": "list_files",
+        "args": {},
+        "result": "[\"config.json\", \"fizzbuzz.py\", \"inventory.py\", \"notes.md\", \"users.json\"]"
+      },
+      {
+        "tool": "read_file",
+        "args": {
+          "path": "users.json"
+        },
+        "result": "{\n  \"exported_at\": \"2026-04-28T08:30:00Z\",\n  \"users\": [\n    {\n      \"id\": 1001,\n      \"name\": \"Anja Sommer\",\n      \"email\": \"anja.sommer@example.com\",\n      \"role\": \"admin\",\n      \"active\": true,\n      \"last_login_iso\": \"2026-04-27T11:42:18Z\"\n    },\n    {\n      \"id\": 1002,\n      \"name\": \"Bernd Wagner\",\n      \"email\": \"bernd.wagner@example.com\",\n      \"role\": \"viewer\",\n      \"active\": false,\n      \"last_login_iso\": \"2025-11-03T07:15:02Z\"\n    },\n    {\n      \"id\": 1003,\n      \"name\": \"Cara Lindgren\",\n      \"email\": \"cara@example.com\",\n      \"role\": \"editor\",\n      \"active\": true,\n      \"last_logi"
+      }
+    ],
+    "final_text": "\n{\"count\": 4, \"users\": [{\"id\": 1001, \"name\": \"Anja Sommer\", \"role\": \"admin\"}, {\"id\": 1003, \"name\": \"Cara Lindgren\", \"role\": \"editor\"}, {\"id\": 1004, \"name\": \"Dennis Pohl\", \"role\": \"editor\"}, {\"id\": 1006, \"name\": \"Frederik Otto\", \"role\": \"admin\"}]}\n",
+    "metrics": {
+      "wall_seconds": 23.95066479209345,
+      "tokens": 1038,
+      "tps": 66.73591642505556,
+      "iterations": 2
+    },
+    "checks": [
+      {
+        "id": "called_read_file",
+        "label": "Tool 'read_file' aufgerufen",
+        "passed": true,
+        "detail": "history: list_files, read_file"
+      },
+      {
+        "id": "args_read_file",
+        "label": "Arguments for 'read_file'",
+        "passed": true,
+        "detail": "path='users.json'"
+      },
+      {
+        "id": "json_format",
+        "label": "Response contains valid JSON",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "json_keys",
+        "label": "JSON contains fields ['count', 'users']",
+        "passed": true,
+        "detail": "all fields present"
+      },
+      {
+        "id": "json_eq_count",
+        "label": "count == 4",
+        "passed": true,
+        "detail": "actual=4"
+      },
+      {
+        "id": "json_users_ids",
+        "label": "users.ids == [1001, 1003, 1004, 1006]",
+        "passed": true,
+        "detail": "actual=[1001, 1003, 1004, 1006]"
+      }
+    ],
+    "score": 1.0,
+    "passed": 6,
+    "total": 6
+  },
+  {
+    "id": "medium_weather_alert",
+    "difficulty": "mittel",
+    "user_prompt": "Lies config.json und hol das Wetter für die dort eingetragene Stadt. Antworte AUSSCHLIESSLICH mit einem JSON-Objekt {\"city\": ..., \"temp_c\": ..., \"condition\": ..., \"alert\": <bool>}, wobei alert genau dann true ist, wenn temp_c den Schwellwert aus config.json überschreitet.",
+    "history": [
+      {
+        "tool": "read_file",
+        "args": {
+          "path": "config.json"
+        },
+        "result": "{\n  \"service\": \"owb-test-fixture\",\n  \"city\": \"München\",\n  \"language\": \"de\",\n  \"alert_threshold_celsius\": 30\n}\n"
+      },
+      {
+        "tool": "get_weather",
+        "args": {
+          "city": "München"
+        },
+        "result": "{\"city\": \"M\\u00fcnchen\", \"temp_c\": 9, \"condition\": \"bew\\u00f6lkt\", \"wind_kmh\": 7}"
+      }
+    ],
+    "final_text": "\n```json\n{\n  \"city\": \"München\",\n  \"temp_c\": 9,\n  \"condition\": \"bewölkt\",\n  \"alert\": false\n}\n```",
+    "metrics": {
+      "wall_seconds": 14.746668832958676,
+      "tokens": 449,
+      "tps": 66.78354287158865,
+      "iterations": 2
+    },
+    "checks": [
+      {
+        "id": "called_read_file",
+        "label": "Tool 'read_file' aufgerufen",
+        "passed": true,
+        "detail": "history: read_file, get_weather"
+      },
+      {
+        "id": "called_get_weather",
+        "label": "Tool 'get_weather' aufgerufen",
+        "passed": true,
+        "detail": "history: read_file, get_weather"
+      },
+      {
+        "id": "args_read_file",
+        "label": "Arguments for 'read_file'",
+        "passed": true,
+        "detail": "path='config.json'"
+      },
+      {
+        "id": "args_get_weather",
+        "label": "Arguments for 'get_weather'",
+        "passed": true,
+        "detail": "city='München'"
+      },
+      {
+        "id": "json_format",
+        "label": "Response contains valid JSON",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "json_keys",
+        "label": "JSON contains fields ['city', 'temp_c', 'condition', 'alert']",
+        "passed": true,
+        "detail": "all fields present"
+      },
+      {
+        "id": "json_eq_alert",
+        "label": "alert == False",
+        "passed": true,
+        "detail": "actual=False"
+      }
+    ],
+    "score": 1.0,
+    "passed": 7,
+    "total": 7
+  },
+  {
+    "id": "hard_rename_function",
+    "difficulty": "schwer",
+    "user_prompt": "Die Funktion calculate_total in inventory.py soll konsistent zum Projekt-Stil in compute_total umbenannt werden. Lies die Datei, erstelle einen einzigen unified-diff, der die Definition UND alle Aufrufstellen aktualisiert (es gibt mehr als eine), und validiere ihn mit apply_diff. Achte darauf, keine anderen Identifier-Vorkommen zu verändern. Antworte am Ende kurz, wie viele Stellen du geändert hast.",
+    "history": [
+      {
+        "tool": "read_file",
+        "args": {
+          "path": "inventory.py"
+        },
+        "result": "\"\"\"Mini inventory accounting module — used as fixture for diff-edit benchmark.\n\nThe function calculate_total() is called from 3 different places. A typical\nagentic task asks the model to rename it consistently across all call sites\nwithout breaking anything else.\n\"\"\"\n\nfrom __future__ import annotations\n\nfrom dataclasses import dataclass\nfrom typing import Iterable\n\n\n@dataclass\nclass LineItem:\n    sku: str\n    quantity: int\n    unit_price_cents: int\n    discount_pct: float = 0.0\n\n\ndef calculate_total(items: Iterable[LineItem]) -> int:\n    \"\"\"Return total in cents, applying per-item discount.\"\"\""
+      },
+      {
+        "tool": "apply_diff",
+        "args": {
+          "path": "inventory.py",
+          "diff": "--- inventory.py\t2024-01-15 09:53:21.842941+01:00\n+++ inventory.py\t2024-01-15 09:53:21.842941+01:00\n@@ -20,7 +20,7 @@\n \n def calculate_total(items: Iterable[LineItem]) -> int:\n     \"\"\"Return total in cents, applying per-item discount.\"\"\"\n-    total = 0\n+    total_cents = 0\n     for item in items:\n         gross = item.quantity * item.unit_price_cents\n         net = int(gross * (1.0 - item.discount_pct))\n@@ -28,7 +28,7 @@\n     return total\n \n-def format_receipt(items: list[LineItem], currency: str = \"EUR\") -> str:\n+def compute_total(items: Iterable[LineItem]) -> int:\n     \"\"\"Return total in cents, applying per-item discount.\"\"\"\n     total = 0\n     for item in items:\n@@ -36,7 +36,7 @@\n \n def format_receipt(items: list[LineItem], currency: str = \"EUR\") -> str:\n     \"\"\"Render a receipt showing each line and the grand total.\"\"\"\n-    lines = []\n+    lines_cents = []\n     for it in items:\n         lines.append(\n             f\"{it.sku:<10} x{it.quantity:>3}  {it.unit_price_cents / 100:>7.2f} {currency}\"\n@@ -44,7 +44,7 @@\n     grand_total = calculate_total(items)\n     lines.append(\"-\" * 40)\n-    lines.append(f\"{'TOTAL':<10}        {grand_total / 100:>7.2f} {currency}\")\n+    lines.append(f\"{'TOTAL':<10}        {grand_total / 100:>7.2f} {currency}\")\n     return \"\\n\".join(lines)\n \n def average_basket(baskets: list[list[LineItem]]) -> float:\n@@ -52,7 +52,7 @@\n     totals = [calculate_total(b) for b in baskets]\n     return sum(totals) / len(totals) / 100.0\n \n-def basket_above_threshold(items: list[LineItem], threshold_eur: float) -> bool:\n+def basket_above_threshold(items: list[LineItem], threshold_eur: float) -> bool:\n     \"\"\"True if the basket total exceeds the given threshold in EUR.\"\"\"\n     return calculate_total(items) > threshold_eur * 100"
+        },
+        "result": "{\"ok\": true, \"applied\": 10, \"added_lines\": 5, \"removed_lines\": 5, \"note\": \"structural-validation only; no real write performed\"}"
+      }
+    ],
+    "final_text": "\n{\"changed_places\": 10}",
+    "metrics": {
+      "wall_seconds": 25.678428707877174,
+      "tokens": 977,
+      "tps": 66.06569014854892,
+      "iterations": 2
+    },
+    "checks": [
+      {
+        "id": "called_read_file",
+        "label": "Tool 'read_file' aufgerufen",
+        "passed": true,
+        "detail": "history: read_file, apply_diff"
+      },
+      {
+        "id": "called_apply_diff",
+        "label": "Tool 'apply_diff' aufgerufen",
+        "passed": true,
+        "detail": "history: read_file, apply_diff"
+      },
+      {
+        "id": "args_read_file",
+        "label": "Arguments for 'read_file'",
+        "passed": true,
+        "detail": "path='inventory.py'"
+      },
+      {
+        "id": "args_apply_diff",
+        "label": "Arguments for 'apply_diff'",
+        "passed": true,
+        "detail": "path='inventory.py'"
+      },
+      {
+        "id": "diff_validates",
+        "label": "Diff for inventory.py validates structurally",
+        "passed": true,
+        "detail": "applied=10, calls=1"
+      },
+      {
+        "id": "diff_min_changes",
+        "label": "Diff changes ≥8 lines",
+        "passed": true,
+        "detail": "applied: 10"
+      },
+      {
+        "id": "diff_contains_compute_total",
+        "label": "Diff contains 'compute_total'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "diff_contains_calculate_total",
+        "label": "Diff contains 'calculate_total'",
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "score": 1.0,
+    "passed": 8,
+    "total": 8
+  },
+  {
+    "id": "hard_compose_report",
+    "difficulty": "schwer",
+    "user_prompt": "Erstelle eine Zusammenfassung aus zwei Quellen. Lies users.json und config.json. Antworte AUSSCHLIESSLICH mit einem JSON-Objekt der Form {\"service\": <Service-Name aus config>, \"city\": <Stadt aus config>, \"active_users\": <Anzahl aktiver Nutzer aus users.json>, \"admin_emails\": [<E-Mails aller aktiven Admins, sortiert>]}. Keine Markdown-Fences.",
+    "history": [
+      {
+        "tool": "list_files",
+        "args": {},
+        "result": "[\"config.json\", \"fizzbuzz.py\", \"inventory.py\", \"notes.md\", \"users.json\"]"
+      },
+      {
+        "tool": "read_file",
+        "args": {
+          "path": "config.json"
+        },
+        "result": "{\n  \"service\": \"owb-test-fixture\",\n  \"city\": \"München\",\n  \"language\": \"de\",\n  \"alert_threshold_celsius\": 30\n}\n"
+      },
+      {
+        "tool": "read_file",
+        "args": {
+          "path": "users.json"
+        },
+        "result": "{\n  \"exported_at\": \"2026-04-28T08:30:00Z\",\n  \"users\": [\n    {\n      \"id\": 1001,\n      \"name\": \"Anja Sommer\",\n      \"email\": \"anja.sommer@example.com\",\n      \"role\": \"admin\",\n      \"active\": true,\n      \"last_login_iso\": \"2026-04-27T11:42:18Z\"\n    },\n    {\n      \"id\": 1002,\n      \"name\": \"Bernd Wagner\",\n      \"email\": \"bernd.wagner@example.com\",\n      \"role\": \"viewer\",\n      \"active\": false,\n      \"last_login_iso\": \"2025-11-03T07:15:02Z\"\n    },\n    {\n      \"id\": 1003,\n      \"name\": \"Cara Lindgren\",\n      \"email\": \"cara@example.com\",\n      \"role\": \"editor\",\n      \"active\": true,\n      \"last_logi"
+      }
+    ],
+    "final_text": "\n{\"service\": \"owb-test-fixture\", \"city\": \"München\", \"active_users\": 4, \"admin_emails\": [\"anja.sommer@example.com\", \"frederik.otto@example.com\"]}\n",
+    "metrics": {
+      "wall_seconds": 26.82111304195132,
+      "tokens": 1014,
+      "tps": 66.6224751780257,
+      "iterations": 3
+    },
+    "checks": [
+      {
+        "id": "called_read_file",
+        "label": "Tool 'read_file' aufgerufen",
+        "passed": true,
+        "detail": "history: list_files, read_file, read_file"
+      },
+      {
+        "id": "json_format",
+        "label": "Response contains valid JSON",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "json_keys",
+        "label": "JSON contains fields ['service', 'city', 'active_users', 'admin_emails']",
+        "passed": true,
+        "detail": "all fields present"
+      },
+      {
+        "id": "json_eq_service",
+        "label": "service == 'owb-test-fixture'",
+        "passed": true,
+        "detail": "actual='owb-test-fixture'"
+      },
+      {
+        "id": "json_eq_city",
+        "label": "city == 'München'",
+        "passed": true,
+        "detail": "actual='München'"
+      },
+      {
+        "id": "json_eq_active_users",
+        "label": "active_users == 4",
+        "passed": true,
+        "detail": "actual=4"
+      },
+      {
+        "id": "json_admin_emails",
+        "label": "admin_emails == ['anja.sommer@example.com', 'frederik.otto@example.com']",
+        "passed": true,
+        "detail": "actual=['anja.sommer@example.com', 'frederik.otto@example.com']"
+      }
+    ],
+    "score": 1.0,
+    "passed": 7,
+    "total": 7
+  }
+]

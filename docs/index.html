@@ -154,6 +154,63 @@
     on a MacBook Pro M4 Max (128 GB). Six categories, each with visible
     results — not just numbers.
   </p>
+
+  <details class="mt-4 max-w-3xl bg-stone-50 border border-stone-200 rounded">
+    <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+      Why a MacBook Pro can run 100&nbsp;B-parameter models — unified memory &amp; bandwidth
+    </summary>
+    <div class="px-4 py-3 border-t border-stone-200 bg-white text-sm text-stone-700 space-y-3 rounded-b">
+      <p>
+        Apple Silicon uses a <span class="font-medium">unified memory architecture</span>: CPU,
+        GPU and Neural Engine all share the <em>same</em> physical RAM pool over a single high-bandwidth
+        fabric. There is no separate VRAM, no PCIe bottleneck, no copy step from system RAM to GPU
+        memory before inference. Every byte the GPU needs to read a weight tensor is already addressable
+        in place — which is why a 128&nbsp;GB Mac can hold and run a model that would normally require a
+        workstation GPU with 80&nbsp;GB+ of VRAM.
+      </p>
+      <p>
+        For LLM inference, throughput is dominated by how fast you can stream the weights past the
+        compute units. That makes <span class="font-medium">memory bandwidth</span>, not raw FLOPS,
+        the limiting factor on a Mac. The M4 Max ships with up to
+        <span class="font-mono num text-stone-900">546&nbsp;GB/s</span> of unified memory bandwidth
+        (the binned 14-core variant tops out at 410&nbsp;GB/s).
+      </p>
+      <div class="border border-stone-200 rounded overflow-hidden">
+        <table class="w-full text-xs num">
+          <thead class="bg-stone-50 text-stone-600">
+            <tr>
+              <th class="px-3 py-2 text-left font-medium">Memory</th>
+              <th class="px-3 py-2 text-right font-medium">Typical bandwidth</th>
+              <th class="px-3 py-2 text-right font-medium">vs. M4 Max</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-stone-100">
+            <tr>
+              <td class="px-3 py-2">M4 Max unified memory</td>
+              <td class="px-3 py-2 text-right font-bold text-stone-900">546 GB/s</td>
+              <td class="px-3 py-2 text-right text-stone-500">1.0×</td>
+            </tr>
+            <tr>
+              <td class="px-3 py-2">Desktop DDR5-6400, dual-channel</td>
+              <td class="px-3 py-2 text-right">~102 GB/s</td>
+              <td class="px-3 py-2 text-right text-stone-500">~5× slower</td>
+            </tr>
+            <tr>
+              <td class="px-3 py-2">Desktop DDR4-3200, dual-channel</td>
+              <td class="px-3 py-2 text-right">~51 GB/s</td>
+              <td class="px-3 py-2 text-right text-stone-500">~10× slower</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="text-stone-500 text-xs">
+        Sources: <a class="underline decoration-stone-400 hover:text-stone-900" href="https://www.apple.com/newsroom/2024/10/apple-introduces-m4-pro-and-m4-max/">Apple newsroom — M4 Pro &amp; M4 Max</a>,
+        <a class="underline decoration-stone-400 hover:text-stone-900" href="https://en.wikipedia.org/wiki/DDR5_SDRAM">DDR5 SDRAM (Wikipedia)</a>,
+        <a class="underline decoration-stone-400 hover:text-stone-900" href="https://www.kingston.com/en/blog/pc-performance/ddr5-overview">Kingston DDR5 overview</a>.
+        Desktop figures are for two-DIMM consumer setups; servers with quad/octo-channel reach much higher.
+      </p>
+    </div>
+  </details>
 </section>
 
 <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -167,12 +224,12 @@
       <div class="flex-1 p-5 min-w-0">
         <div class="flex items-baseline justify-between gap-3">
           <h2 class="text-lg font-medium tracking-tight">Coding</h2>
-          <span class="text-xs text-stone-500 shrink-0">40 models</span>
+          <span class="text-xs text-stone-500 shrink-0">42 models</span>
         </div>
         <p class="mt-2 text-sm text-stone-600">Single-shot code generation (Kanban board as an HTML file). Measures how fast and how functionally models solve a concrete UI task. Hovering over a model row shows a screenshot of the rendered app.</p>
         <div class="mt-4 flex items-center gap-6 text-xs text-stone-500">
             <span>Top score <span class="font-mono num text-stone-900">93%</span></span>
-            <span>Median <span class="font-mono num text-stone-900">80</span> tok/s</span>
+            <span>Median <span class="font-mono num text-stone-900">79</span> tok/s</span>
           <span class="ml-auto text-stone-400 group-hover:text-stone-700">open →</span>
         </div>
       </div>
@@ -187,12 +244,12 @@
       <div class="flex-1 p-5 min-w-0">
         <div class="flex items-baseline justify-between gap-3">
           <h2 class="text-lg font-medium tracking-tight">Vision</h2>
-          <span class="text-xs text-stone-500 shrink-0">22 models</span>
+          <span class="text-xs text-stone-500 shrink-0">23 models</span>
         </div>
         <p class="mt-2 text-sm text-stone-600">Three sub-tests for vision-capable models: handwriting OCR from a notebook, OCR of an old book page (Fraktur), and comparison/aggregation of three sketchnote photos.</p>
         <div class="mt-4 flex items-center gap-6 text-xs text-stone-500">
             <span>Top score <span class="font-mono num text-stone-900">98%</span></span>
-            <span>Median <span class="font-mono num text-stone-900">80</span> tok/s</span>
+            <span>Median <span class="font-mono num text-stone-900">79</span> tok/s</span>
           <span class="ml-auto text-stone-400 group-hover:text-stone-700">open →</span>
         </div>
       </div>
@@ -207,12 +264,12 @@
       <div class="flex-1 p-5 min-w-0">
         <div class="flex items-baseline justify-between gap-3">
           <h2 class="text-lg font-medium tracking-tight">Needle in a Haystack</h2>
-          <span class="text-xs text-stone-500 shrink-0">36 models</span>
+          <span class="text-xs text-stone-500 shrink-0">38 models</span>
         </div>
         <p class="mt-2 text-sm text-stone-600">Three sub-benchmarks in one chat (prefill only once): corpus summary · needle retrieval (10 hidden facts in 120k tokens — uniform across all models) · comprehension questions + hallucination traps about the actual book content.</p>
         <div class="mt-4 flex items-center gap-6 text-xs text-stone-500">
             <span>Top score <span class="font-mono num text-stone-900">90%</span></span>
-            <span>Median <span class="font-mono num text-stone-900">49</span> tok/s</span>
+            <span>Median <span class="font-mono num text-stone-900">48</span> tok/s</span>
           <span class="ml-auto text-stone-400 group-hover:text-stone-700">open →</span>
         </div>
       </div>
@@ -227,7 +284,7 @@
       <div class="flex-1 p-5 min-w-0">
         <div class="flex items-baseline justify-between gap-3">
           <h2 class="text-lg font-medium tracking-tight">Tool Use</h2>
-          <span class="text-xs text-stone-500 shrink-0">32 models</span>
+          <span class="text-xs text-stone-500 shrink-0">34 models</span>
         </div>
         <p class="mt-2 text-sm text-stone-600">Three tasks with OpenAI-style function calling: easy (read notes.md), medium (fix a FizzBuzz bug via unified diff), hard (combine config.json + weather mock). The model has to pick tools, supply correct arguments and format the final result correctly.</p>
         <div class="mt-4 flex items-center gap-6 text-xs text-stone-500">
@@ -247,7 +304,7 @@
       <div class="flex-1 p-5 min-w-0">
         <div class="flex items-baseline justify-between gap-3">
           <h2 class="text-lg font-medium tracking-tight">Diagram → SVG</h2>
-          <span class="text-xs text-stone-500 shrink-0">23 models</span>
+          <span class="text-xs text-stone-500 shrink-0">24 models</span>
         </div>
         <p class="mt-2 text-sm text-stone-600">An image of a diagram (architecture, flowchart, sequence, quadrant) is produced by the model directly as inline SVG. The original image and the SVG render sit side-by-side in the report — visual comparability without an external render engine. Score = 15% SVG validity, 15% term coverage and 70% `diagram-svg-judge`; aesthetics is double-weighted within the judge.</p>
         <div class="mt-4 flex items-center gap-6 text-xs text-stone-500">
@@ -267,7 +324,7 @@
       <div class="flex-1 p-5 min-w-0">
         <div class="flex items-baseline justify-between gap-3">
           <h2 class="text-lg font-medium tracking-tight">Hallucination</h2>
-          <span class="text-xs text-stone-500 shrink-0">40 models</span>
+          <span class="text-xs text-stone-500 shrink-0">42 models</span>
         </div>
         <p class="mt-2 text-sm text-stone-600">Questions with fabricated premises. Does the model invent an answer, say &#39;I don&#39;t know&#39;, or correct the premise?</p>
         <div class="mt-4 flex items-center gap-6 text-xs text-stone-500">
@@ -283,7 +340,7 @@
 <section class="mt-12">
   <h2 class="text-lg font-medium tracking-tight">Overall summary across all models</h2>
   <p class="mt-1 text-sm text-stone-600">
-    Score 0–1 per benchmark. Overall = weighted mean: Coding counts double, Tool Use half. RAM = on-disk size of the model (Q4 file). Wall = cumulative bench time across all tasks.
+    Score 0–100&nbsp;% per benchmark. Overall = weighted mean: Coding counts double, Tool Use half. RAM = on-disk size of the model (Q4 file). Wall = cumulative bench time across all tasks.
   </p>
 
 
@@ -317,7 +374,7 @@
           <svg width="14" height="14"><circle cx="7" cy="7" r="5.5" fill="#475569" fill-opacity="0.78" stroke="#475569" stroke-width="2" stroke-dasharray="3,2"/></svg>
           MoE
         </span>
-        <span><span id="os-count">40</span>/40 visible</span>
+        <span><span id="os-count">42</span>/42 visible</span>
       </div>
       <svg viewBox="0 0 920 408" class="w-full num" style="height:408px" preserveAspectRatio="xMidYMid meet">
         <line x1="54" y1="370" x2="902" y2="370" stroke="#d6d3d1" stroke-width="1"/>
@@ -543,6 +600,15 @@ stroke-dasharray="2.5,1.5"                    style="cursor:pointer"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none">30</text>
           </a>
+          <a href="models/zai-org_glm-4.6v-flash.html" class="os-dot" data-total-ram="13.25">
+            <circle cx="544.7172976331759" cy="134.2705285183748" r="9" fill="#f97316" fill-opacity="0.78"
+                    stroke="#f97316" stroke-width="1.75"
+                    style="cursor:pointer"
+                    data-tooltip="glm-4.6v-flash · Score 67% · Wall 2083s · ~13 GB RAM (64k)"/>
+              <text x="544.7172976331759" y="134.2705285183748" text-anchor="middle" dominant-baseline="central"
+                    font-size="8" font-weight="700" fill="#fff"
+                    pointer-events="none">9</text>
+          </a>
           <a href="models/google_gemma-3-12b.html" class="os-dot" data-total-ram="14.52">
             <circle cx="161.49384062776136" cy="140.268581781286" r="9" fill="#dc2626" fill-opacity="0.78"
                     stroke="#dc2626" stroke-width="1.75"
@@ -578,6 +644,15 @@ stroke-dasharray="2.5,1.5"                    style="cursor:pointer"
               <text x="151.77080099573254" y="148.22155045752612" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none">2</text>
+          </a>
+          <a href="models/qwen_qwen3-8b.html" class="os-dot" data-total-ram="10.31">
+            <circle cx="158.73993898645975" cy="158.10121481481485" r="9" fill="#7c3aed" fill-opacity="0.78"
+                    stroke="#7c3aed" stroke-width="1.75"
+                    style="cursor:pointer"
+                    data-tooltip="qwen3-8b · Score 60% · Wall 445s · ~10 GB RAM (64k)"/>
+              <text x="158.73993898645975" y="158.10121481481485" text-anchor="middle" dominant-baseline="central"
+                    font-size="8" font-weight="700" fill="#fff"
+                    pointer-events="none">8</text>
           </a>
           <a href="models/qwen3.5-4b.html" class="os-dot" data-total-ram="9.15">
             <circle cx="333.53178732351347" cy="160.73054822131434" r="9" fill="#7c3aed" fill-opacity="0.78"
@@ -633,15 +708,6 @@ stroke-dasharray="2.5,1.5"                    style="cursor:pointer"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none">4</text>
           </a>
-          <a href="models/zai-org_glm-4.6v-flash.html" class="os-dot" data-total-ram="13.25">
-            <circle cx="350.0609600598784" cy="192.38666666666668" r="9" fill="#f97316" fill-opacity="0.78"
-                    stroke="#f97316" stroke-width="1.75"
-                    style="cursor:pointer"
-                    data-tooltip="glm-4.6v-flash · Score 50% · Wall 1257s · ~13 GB RAM (64k)"/>
-              <text x="350.0609600598784" y="192.38666666666668" text-anchor="middle" dominant-baseline="central"
-                    font-size="8" font-weight="700" fill="#fff"
-                    pointer-events="none">9</text>
-          </a>
           <a href="models/ouro-2.6b.html" class="os-dot" data-total-ram="">
             <circle cx="266.0" cy="194.0" r="9" fill="#475569" fill-opacity="0.78"
                     stroke="#475569" stroke-width="1.75"
@@ -677,6 +743,15 @@ stroke-dasharray="2.5,1.5"                    style="cursor:pointer"
               <text x="141.89868974530344" y="220.11877248677246" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#1c1917"
                     pointer-events="none">4</text>
+          </a>
+          <a href="models/mistralai_ministral-3-14b-reasoning.html" class="os-dot" data-total-ram="15.89">
+            <circle cx="122.45635567763199" cy="235.6398888888889" r="9" fill="#475569" fill-opacity="0.78"
+                    stroke="#475569" stroke-width="1.75"
+                    style="cursor:pointer"
+                    data-tooltip="ministral-3-14b-reasoning · Score 38% · Wall 291s · ~16 GB RAM (64k)"/>
+              <text x="122.45635567763199" y="235.6398888888889" text-anchor="middle" dominant-baseline="central"
+                    font-size="8" font-weight="700" fill="#fff"
+                    pointer-events="none">14</text>
           </a>
           <a href="models/google_gemma-3n-e4b.html" class="os-dot" data-total-ram="11.64">
             <circle cx="88.23899898146382" cy="254.79370661369225" r="9" fill="#dc2626" fill-opacity="0.78"
@@ -1368,6 +1443,35 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     33%
                   </td>
           </tr>
+          <tr class="cursor-pointer row-link" onclick="window.location='models/zai-org_glm-4.6v-flash.html'">
+            <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="glm-4.6v-flash" title="zai-org/glm-4.6v-flash">glm-4.6v-flash</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
+            <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.6696859985273443">
+              67%
+            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="6765.5">
+6.6 GB            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="2083.233810706879">
+              2083 s
+            </td>
+                  <td class="px-3 py-2 text-right" data-sort="-1">
+                    <span class="text-red-600 text-xs" title="Client error &#39;400 Bad Request&#39; for url &#39;http://127.0.0.1:1234/api/v0/chat/completions&#39;
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400">error</span>
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.9061628996076097">
+                    91%
+                  </td>
+                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.8571428571428571">
+                    86%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.46749999999999997">
+                    47%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.5416666666666666">
+                    54%
+                  </td>
+          </tr>
           <tr class="cursor-pointer row-link" onclick="window.location='models/google_gemma-3-12b.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-3-12b" title="google/gemma-3-12b">gemma-3-12b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
@@ -1482,6 +1586,32 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                   </td>
                   <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.3333333333333333">
                     33%
+                  </td>
+          </tr>
+          <tr class="cursor-pointer row-link" onclick="window.location='models/qwen_qwen3-8b.html'">
+            <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3-8b" title="qwen/qwen3-8b">qwen3-8b</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
+            <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.6019851851851851">
+              60%
+            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="4409.8">
+4.3 GB            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="444.65068437648006">
+              445 s
+            </td>
+                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.3908333333333333">
+                    39%
+                  </td>
+                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.7606">
+                    76%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="1.0">
+                    100%
+                  </td>
+                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
+                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.6666666666666666">
+                    67%
                   </td>
           </tr>
           <tr class="cursor-pointer row-link" onclick="window.location='models/qwen3.5-4b.html'">
@@ -1638,31 +1768,6 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     67%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/zai-org_glm-4.6v-flash.html'">
-            <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="glm-4.6v-flash" title="zai-org/glm-4.6v-flash">glm-4.6v-flash</td>
-            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
-            <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.5045833333333333">
-              50%
-            </td>
-            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="6765.5">
-6.6 GB            </td>
-            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="1256.8625662919367">
-              1257 s
-            </td>
-                  <td class="px-3 py-2 text-right" data-sort="-1">
-                    <span class="text-red-600 text-xs" title="Client error &#39;400 Bad Request&#39; for url &#39;http://127.0.0.1:1234/api/v0/chat/completions&#39;
-For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400">error</span>
-                  </td>
-                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
-                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
-                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
-                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.46749999999999997">
-                    47%
-                  </td>
-                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.5416666666666666">
-                    54%
-                  </td>
-          </tr>
           <tr class="cursor-pointer row-link" onclick="window.location='models/ouro-2.6b.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="ouro-2.6b" title="ouro-2.6b">ouro-2.6b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
@@ -1764,6 +1869,30 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                   <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
                   <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.5">
                     50%
+                  </td>
+          </tr>
+          <tr class="cursor-pointer row-link" onclick="window.location='models/mistralai_ministral-3-14b-reasoning.html'">
+            <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="ministral-3-14b-reasoning" title="mistralai/ministral-3-14b-reasoning">ministral-3-14b-reasoning</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 4bit</td>
+            <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.3817048611111111">
+              38%
+            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="8694.8">
+8.5 GB            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="290.61660429183394">
+              291 s
+            </td>
+                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.22499999999999998">
+                    22%
+                  </td>
+                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
+                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
+                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
+                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.49348611111111107">
+                    49%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.5833333333333334">
+                    58%
                   </td>
           </tr>
           <tr class="cursor-pointer row-link" onclick="window.location='models/google_gemma-3n-e4b.html'">

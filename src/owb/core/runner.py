@@ -200,7 +200,7 @@ class Runner:
 
                     if result.error is None:
                         score_str = (
-                            f"{result.score:.2f}" if result.score is not None else "—"
+                            f"{result.score * 100:.0f}%" if result.score is not None else "—"
                         )
                         console.print(
                             f"[green]✓[/green] score={score_str} "

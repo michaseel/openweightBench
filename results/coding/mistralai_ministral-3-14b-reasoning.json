@@ -1,0 +1,201 @@
+{
+  "task": "coding",
+  "model_id": "mistralai/ministral-3-14b-reasoning",
+  "model_info": {
+    "id": "mistralai/ministral-3-14b-reasoning",
+    "type": "vlm",
+    "publisher": "mistralai",
+    "arch": "mistral3",
+    "compatibility_type": "gguf",
+    "quantization": "Q4_K_M",
+    "state": "not-loaded",
+    "max_context_length": 262144,
+    "capabilities": [
+      "tool_use"
+    ],
+    "loaded_context_length": null
+  },
+  "started_at": "2026-04-29T20:33:32.300578Z",
+  "completed_at": "2026-04-29T20:35:48.323775Z",
+  "metrics": {
+    "wall_seconds": 136.0268155420199,
+    "tokens_generated": 5531,
+    "tokens_per_second": 45.970698604181315,
+    "time_to_first_token_ms": 822.0,
+    "peak_rss_mb": 8694.8
+  },
+  "score": 0.625,
+  "score_breakdown": {
+    "looks_like_html": true,
+    "html_length": 24210,
+    "raw_length": 26218,
+    "lint_checks": [
+      {
+        "id": "col_backlog",
+        "label": "Spalte 'Backlog'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_in_progress",
+        "label": "Spalte 'In Progress'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_review",
+        "label": "Spalte 'Review'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_done",
+        "label": "Spalte 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "drag_drop",
+        "label": "HTML5 drag & drop or sortable lib",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "local_storage",
+        "label": "localStorage persistence",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "tailwind_cdn",
+        "label": "Tailwind via CDN",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "confetti",
+        "label": "Confetti animation on 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Add card button",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "vanilla_js",
+        "label": "Vanilla JS (no React/Vue/Angular/Svelte)",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_alert_prompt",
+        "label": "No window.alert/prompt for CRUD",
+        "passed": false,
+        "detail": "alert/prompt used"
+      },
+      {
+        "id": "editable_cards",
+        "label": "Editable cards (contenteditable / input)",
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "lint_passed": 11,
+    "lint_total": 12,
+    "lint_score": 0.9166666666666666,
+    "e2e_checks": [
+      {
+        "id": "renders",
+        "label": "Page loads with all 4 columns",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Add card via button",
+        "passed": false,
+        "detail": "card was not created (count unchanged)"
+      },
+      {
+        "id": "no_double_add",
+        "label": "Card is added exactly 1× (no double submit)",
+        "passed": false,
+        "detail": "no add happened, so not verifiable"
+      },
+      {
+        "id": "delete_card",
+        "label": "Delete card via button + confirmation",
+        "passed": false,
+        "detail": "no cards available to delete"
+      },
+      {
+        "id": "persistence",
+        "label": "Cards survive a reload",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_console_errors",
+        "label": "No JS console errors",
+        "passed": false,
+        "detail": "pageerror: Cannot read properties of null (reading 'addEventListener'); pageerror: Cannot read properties of null (reading 'addEventListener')"
+      }
+    ],
+    "e2e_passed": 2,
+    "e2e_total": 6,
+    "e2e_score": 0.3333333333333333,
+    "judge": {
+      "scored_at": "2026-04-29T20:36:07.459111+00:00",
+      "judge_model": "openai/gpt-5.4",
+      "scores": {
+        "board_renders": 0.0,
+        "column_completeness": 0.0,
+        "cards_present": 0.0,
+        "ui_affordances": 0.0,
+        "design_quality": 0.0,
+        "code_structure": 0.5,
+        "dom_safety": 0.6,
+        "robustness": 0.2,
+        "code_quality": 0.2,
+        "render_matches_code": 0.0
+      },
+      "judge_score": 0.15,
+      "comment_visual": "Der Screenshot ist vollständig schwarz; es ist weder ein Kanban-Board noch irgendein UI-Element sichtbar. Damit ist das Rendering visuell ein Totalausfall.",
+      "comment_code": "Die Grundidee und Struktur mit State, Render- und Event-Funktionen ist erkennbar, aber der Code hat gravierende Implementierungsfehler. Besonders kritisch sind falsche ID-/Selector-Nutzung für Spalten, fehlerhafte querySelector-Logik und ein kaputtes createCardElement, das Karten zwar erzeugen will, aber nicht korrekt befüllt oder attribuiert.",
+      "comment_consistency": "Code und Render passen klar nicht zusammen: Das HTML verspricht ein vollständiges Kanban-Board, der Screenshot zeigt aber nur Schwarz. Das spricht für einen harten Laufzeitfehler oder ein komplett fehlgeschlagenes Initial-Rendering."
+    }
+  },
+  "raw_response": "Here's a fully functional Kanban board in a single HTML file using vanilla JavaScript, Tailwind CSS via CDN, with all the requested features:\n\n```html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Vibrant Kanban Board</title>\n    <!-- Tailwind CSS via CDN -->\n    <script src=\"https://cdn.tailwindcss.com\"></script>\n    <style>\n        /* Custom styles for transitions and confetti */\n        .card {\n            transition: transform 0.3s ease, box-shadow 0.2s ease;\n        }\n        .card-moving {\n            opacity: 0.5;\n            transform: scale(0.98);\n        }\n        .confetti {\n            position: fixed;\n            top: 0;\n            left: 0;\n            width: 100%;\n            height: 100%;\n            pointer-events: none;\n            z-index: 9999;\n            background: #000;\n        }\n        .confetti-particle {\n            position: absolute;\n            background: hsl(0, 70%, 50%);\n            border-radius: 2px;\n            box-shadow: 0 0 10px rgba(0,0,0,0.2);\n            animation: confetti 3s linear infinite;\n        }\n        @keyframes confetti {\n            0% { transform: translate(0, -100vh) rotate(0deg); opacity: 1; }\n            100% { transform: translate(0, 100vh) rotate(720deg); opacity: 0; }\n        }\n        /* Delete confirmation modal */\n        .delete-modal {\n            backdrop-filter: blur(5px);\n            transition: opacity 0.3s ease;\n        }\n        .delete-modal.hidden {\n            display: none;\n        }\n    </style>\n</head>\n<body class=\"bg-gradient-to-br from-purple-100 to-indigo-200 min-h-screen p-4 md:p-8\">\n    <!-- Confetti container -->\n    <div id=\"confetti\" class=\"confetti\"></div>\n\n    <!-- Kanban Board Container -->\n    <div class=\"max-w-6xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden\">\n        <h1 class=\"text-2xl font-bold text-center py-4 text-indigo-800\">Vibrant Kanban Board</h1>\n     ",
+  "artifacts": [
+    {
+      "kind": "html",
+      "label": "Generierte App",
+      "path": "artifacts/mistralai_ministral-3-14b-reasoning/coding/output.html",
+      "mime": "text/html"
+    },
+    {
+      "kind": "text",
+      "label": "Raw model response",
+      "path": "artifacts/mistralai_ministral-3-14b-reasoning/coding/raw_response.txt",
+      "mime": "text/plain"
+    },
+    {
+      "kind": "image",
+      "label": "Screenshot der gerenderten App",
+      "path": "artifacts/mistralai_ministral-3-14b-reasoning/coding/screenshot.png",
+      "mime": "image/png"
+    }
+  ],
+  "error": null,
+  "hardware": {
+    "platform": "macOS-26.4.1-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "ram_total_gb": 128.0,
+    "cpu_count": 16
+  },
+  "bench_version": "0.1.0"
+}

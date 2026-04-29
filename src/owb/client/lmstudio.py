@@ -369,6 +369,11 @@ class LMStudioClient:
 
         If already loaded with a larger context, no-op. Otherwise unload and
         reload with the requested context size.
+
+        After loading, verifies the actual loaded context length — LM Studio
+        may silently reduce the context window when VRAM is insufficient (e.g.
+        for @q8_0 variants). Returns False in that case so callers can record
+        a clean error instead of sending an oversized request that gets a 400.
         """
         current = self.loaded_context_length(model_id)
         if current is not None and current >= min_context:
@@ -376,7 +381,13 @@ class LMStudioClient:
         # Unload first if currently loaded with smaller context.
         if current is not None:
             self.unload(model_id)
-        return self.load(model_id, context_length=min_context)
+        if not self.load(model_id, context_length=min_context):
+            return False
+        # Verify LM Studio actually honoured the requested context length.
+        import time
+        time.sleep(2)  # brief settle so lms ps picks up the new instance
+        actual = self.loaded_context_length(model_id)
+        return actual is not None and actual >= min_context
 
     def list_variants(self) -> dict[str, list[str]]:
         """Map ``modelKey`` → list of *non-default* variant IDs (e.g. ``…@q8_0``).

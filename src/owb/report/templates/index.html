@@ -12,6 +12,63 @@
     on a MacBook Pro M4 Max (128 GB). Six categories, each with visible
     results — not just numbers.
   </p>
+
+  <details class="mt-4 max-w-3xl bg-stone-50 border border-stone-200 rounded">
+    <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+      Why a MacBook Pro can run 100&nbsp;B-parameter models — unified memory &amp; bandwidth
+    </summary>
+    <div class="px-4 py-3 border-t border-stone-200 bg-white text-sm text-stone-700 space-y-3 rounded-b">
+      <p>
+        Apple Silicon uses a <span class="font-medium">unified memory architecture</span>: CPU,
+        GPU and Neural Engine all share the <em>same</em> physical RAM pool over a single high-bandwidth
+        fabric. There is no separate VRAM, no PCIe bottleneck, no copy step from system RAM to GPU
+        memory before inference. Every byte the GPU needs to read a weight tensor is already addressable
+        in place — which is why a 128&nbsp;GB Mac can hold and run a model that would normally require a
+        workstation GPU with 80&nbsp;GB+ of VRAM.
+      </p>
+      <p>
+        For LLM inference, throughput is dominated by how fast you can stream the weights past the
+        compute units. That makes <span class="font-medium">memory bandwidth</span>, not raw FLOPS,
+        the limiting factor on a Mac. The M4 Max ships with up to
+        <span class="font-mono num text-stone-900">546&nbsp;GB/s</span> of unified memory bandwidth
+        (the binned 14-core variant tops out at 410&nbsp;GB/s).
+      </p>
+      <div class="border border-stone-200 rounded overflow-hidden">
+        <table class="w-full text-xs num">
+          <thead class="bg-stone-50 text-stone-600">
+            <tr>
+              <th class="px-3 py-2 text-left font-medium">Memory</th>
+              <th class="px-3 py-2 text-right font-medium">Typical bandwidth</th>
+              <th class="px-3 py-2 text-right font-medium">vs. M4 Max</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-stone-100">
+            <tr>
+              <td class="px-3 py-2">M4 Max unified memory</td>
+              <td class="px-3 py-2 text-right font-bold text-stone-900">546 GB/s</td>
+              <td class="px-3 py-2 text-right text-stone-500">1.0×</td>
+            </tr>
+            <tr>
+              <td class="px-3 py-2">Desktop DDR5-6400, dual-channel</td>
+              <td class="px-3 py-2 text-right">~102 GB/s</td>
+              <td class="px-3 py-2 text-right text-stone-500">~5× slower</td>
+            </tr>
+            <tr>
+              <td class="px-3 py-2">Desktop DDR4-3200, dual-channel</td>
+              <td class="px-3 py-2 text-right">~51 GB/s</td>
+              <td class="px-3 py-2 text-right text-stone-500">~10× slower</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="text-stone-500 text-xs">
+        Sources: <a class="underline decoration-stone-400 hover:text-stone-900" href="https://www.apple.com/newsroom/2024/10/apple-introduces-m4-pro-and-m4-max/">Apple newsroom — M4 Pro &amp; M4 Max</a>,
+        <a class="underline decoration-stone-400 hover:text-stone-900" href="https://en.wikipedia.org/wiki/DDR5_SDRAM">DDR5 SDRAM (Wikipedia)</a>,
+        <a class="underline decoration-stone-400 hover:text-stone-900" href="https://www.kingston.com/en/blog/pc-performance/ddr5-overview">Kingston DDR5 overview</a>.
+        Desktop figures are for two-DIMM consumer setups; servers with quad/octo-channel reach much higher.
+      </p>
+    </div>
+  </details>
 </section>
 
 <section class="grid grid-cols-1 md:grid-cols-2 gap-4">

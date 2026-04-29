@@ -183,7 +183,7 @@
         </div>
         <div>
           <dt class="text-stone-500">Wall total</dt>
-          <dd class="font-semibold text-stone-900 num">20.9 min</dd>
+          <dd class="font-semibold text-stone-900 num">34.7 min</dd>
         </div>
       </dl>
       <div class="mt-4 pt-3 border-t border-stone-200 text-xs uppercase tracking-wider text-stone-500">Benchmarks</div>
@@ -196,6 +196,38 @@
 !
                 </span>
                 <span class="text-[10px] text-stone-400 w-10 text-right">15m</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="#vision" class="flex items-center justify-between gap-2 py-1.5 px-2 rounded hover:bg-stone-50 group">
+              <span class="text-sm text-stone-700 group-hover:text-stone-900 truncate">vision</span>
+              <span class="flex items-baseline gap-2 num shrink-0">
+                <span class="text-sm font-semibold text-emerald-700">
+91%
+                </span>
+                <span class="text-[10px] text-stone-400 w-10 text-right">1m</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="#niah" class="flex items-center justify-between gap-2 py-1.5 px-2 rounded hover:bg-stone-50 group">
+              <span class="text-sm text-stone-700 group-hover:text-stone-900 truncate">niah</span>
+              <span class="flex items-baseline gap-2 num shrink-0">
+                <span class="text-sm font-semibold text-stone-400">
+—                </span>
+                <span class="text-[10px] text-stone-400 w-10 text-right">10m</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="#tool_use" class="flex items-center justify-between gap-2 py-1.5 px-2 rounded hover:bg-stone-50 group">
+              <span class="text-sm text-stone-700 group-hover:text-stone-900 truncate">tool_use</span>
+              <span class="flex items-baseline gap-2 num shrink-0">
+                <span class="text-sm font-semibold text-emerald-700">
+86%
+                </span>
+                <span class="text-[10px] text-stone-400 w-10 text-right">2m</span>
               </span>
             </a>
           </li>
@@ -338,6 +370,2396 @@ As answer return the plain HTML of the working application (script and styles in
         <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/zai-org_glm-4.6v-flash/coding/raw_response.txt" target="_blank">Raw model response</a>
     </div>
 </section>
+<section id="vision" class="mb-12 scroll-mt-24">
+  <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
+    <h2 class="text-lg font-medium tracking-tight">vision</h2>
+    <a href="../benchmarks/vision.html" class="text-xs text-stone-500 hover:text-stone-900">all models in this bench →</a>
+  </div>
+
+
+  <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+    <div class="md:col-span-1 bg-white border-2 border-emerald-500 rounded-lg p-5 flex flex-col justify-center">
+      <div class="text-xs uppercase tracking-wider text-stone-500">Score</div>
+      <div class="mt-1 text-5xl font-bold num leading-none text-emerald-700">
+91%
+      </div>
+    </div>
+    <div class="md:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">tok/s</dt>
+        <dd class="mt-1 text-xl font-semibold num">64</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Tokens</dt>
+        <dd class="mt-1 text-xl font-semibold num">3559</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Wall</dt>
+        <dd class="mt-1 text-xl font-semibold num">82.2 s</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">RAM</dt>
+        <dd class="mt-1 text-xl font-semibold num">6.6 GB</dd>
+      </div>
+    </div>
+  </div>
+
+    <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Worum geht es? Was wird getestet?
+      </summary>
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: Four sub-tasks, 1 image each. (1) handwritten meeting note easy/medium/hard to read — model must transcribe the text. (2) book page in Fraktur typeface — same task.
+
+What is tested: OCR quality, recognising layout structure (columns, bullet points, dates), handling of illegible handwriting.
+
+Why models fail: text-only models have no vision capability (filtered out). Weak VLMs only recognise the clearest part. Some truncate output or get stuck in reasoning without a visible answer.</div>
+    </details>
+
+    <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Prompt
+      </summary>
+      <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">Du bist OCR-Spezialist für deutsche Handschrift.</pre>
+          </div>
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Developer prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">Auf dem Bild siehst du eine handschriftliche Meeting-Notiz mit klarer Struktur und gut lesbarer Schrift. Transkribiere den gesamten lesbaren Text. Behalte die Anordnung bei (Überschrift, Spalten, To-Dos). Bei unleserlichen Stellen schreibe &#39;[unleserlich]&#39;. Gib ausschließlich den puren OCR-Text im Markdown-Format zurück — keine Vorbemerkung, keine Erklärungen, kein Code-Fence.</pre>
+          </div>
+      </div>
+    </details>
+
+      <div class="mt-5 bg-white border border-stone-200 rounded overflow-hidden">
+        <div class="px-4 py-3 border-b border-stone-200 flex items-center justify-between bg-stone-50 gap-3 flex-wrap">
+          <div>
+            <span class="font-medium">Handschrift OCR – leicht</span>
+            <span class="ml-3 text-xs text-stone-500 num">
+14.9 s · 64 t/s            </span>
+          </div>
+          <div class="flex items-center gap-4 num">
+              <div class="text-xs">
+                <span class="text-stone-500">Recall</span>
+                <span class="font-bold text-base text-emerald-700">97%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">Precision</span>
+                <span class="font-bold text-base text-emerald-700">95%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">75/77</span>
+                <span class="text-amber-600">+4</span>
+              </div>
+                <div class="text-xs text-stone-500">
+<span class="text-sky-700">16 relocated</span>                </div>
+            <div class="text-3xl font-bold num leading-none text-emerald-700">
+96%            </div>
+          </div>
+        </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
+            <div class="p-3 bg-stone-50 grid grid-cols-1 gap-2">
+                <div class="zoom-frame">
+                  <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom image" title="Zoom image">⛶</button>
+                  <img src="../assets/artifacts/zai-org_glm-4.6v-flash/vision/handwriting_easy.jpg"
+                       class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded cursor-zoom-in"
+                       loading="lazy">
+                </div>
+            </div>
+            <div>
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider">Model response</div>
+              <pre class="p-4 text-sm whitespace-pre-wrap max-h-[500px] overflow-y-auto">
+&lt;|begin_of_box|&gt;Meetingnotizen Website-Relaunch
+12.06.25, 09:30 Uhr
+
+Anwesend:
+CMS langsam?
+Anna, Ben, Mira, Jonas, Ece
+
+Themen:
+Stand:
+- Startseite
+  - Design fast final ✓
+- Texte
+  - Texte für Über-uns fehlen noch
+- Bildauswahl
+  - Bilder vom Team noch nicht komplett
+- Launch-Termin
+  - Mobile Ansicht prüfen
+- offene Fragen
+
+bitte kurz halten
+
+To-Dos:
+Offen:
+- Ben → Bilder anfragen
+  - Rechtstexte final?
+- Mira → Startseite anpassen
+  - Freigabe Kunde bis Freitag
+- Jonas → Feedback Kunde
+  - Wer testet Kontaktformular?
+- Anna → SEO - Check
+
+Nächstes Meeting:
+17.06., 10 Uhr&lt;|end_of_box|&gt;</pre>
+            </div>
+          </div>
+
+            <div class="border-t border-stone-200 bg-white">
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider flex items-center justify-between">
+                <span>Word diff ground truth ↔ model</span>
+                <span class="num">
+                  <span class="text-emerald-700">●</span> matched ·
+                  <span class="text-sky-700">●</span> relocated ·
+                  <span class="text-violet-700">●</span> fuzzy ·
+                  <span class="text-red-600">●</span> missing in model ·
+                  <span class="text-amber-600">●</span> extra/wrong
+                </span>
+              </div>
+              <div class="p-4 text-sm leading-relaxed font-mono max-h-[500px] overflow-y-auto">
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">begin_of_box</span>
+<span class="text-stone-700">meetingnotizen website relaunch 12 06 25 09 30 uhr anwesend</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">cms</span>
+<span class="text-stone-700">anna ben mira jonas ece</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">cms</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">langsam</span>
+<span class="text-stone-700">themen startseite</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">texte bildauswahl launch termin offene fragen stand</span>
+<span class="text-stone-700">design fast final texte für über uns fehlen noch bilder vom team noch nicht komplett mobile ansicht prüfen bitte kurz halten to dos ben bilder anfragen mira startseite anpassen</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">jonas feedback kunde anna</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">seo</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">check offen rechtstexte final</span>
+<span class="text-stone-700">freigabe kunde bis freitag wer testet kontaktformular</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">seo</span>
+<span class="text-stone-700">nächstes meeting 17 06 10 uhr</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">end_of_box</span>
+              </div>
+              <details class="border-t border-stone-100">
+                <summary class="cursor-pointer px-4 py-2 text-xs text-stone-500 hover:text-stone-900">Ground truth (for comparison)</summary>
+                <pre class="p-4 text-xs bg-stone-50 whitespace-pre-wrap">Meetingnotizen Website-Relaunch
+12.06.25, 09:30 Uhr
+
+Anwesend:
+Anna, Ben, Mira, Jonas, Ece
+
+CMS langsam?
+
+Themen:
+Startseite
+Texte
+Bildauswahl
+Launch-Termin
+offene Fragen
+
+Stand:
+Design fast final
+Texte für Über-uns fehlen noch
+Bilder vom Team noch nicht komplett
+Mobile Ansicht prüfen
+
+bitte kurz halten
+
+To-Dos:
+Ben Bilder anfragen
+Mira Startseite anpassen
+Jonas Feedback Kunde
+Anna SEO-Check
+
+Offen:
+Rechtstexte final?
+Freigabe Kunde bis Freitag
+Wer testet Kontaktformular?
+
+Nächstes Meeting: 17.06., 10 Uhr</pre>
+              </details>
+            </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded overflow-hidden">
+        <div class="px-4 py-3 border-b border-stone-200 flex items-center justify-between bg-stone-50 gap-3 flex-wrap">
+          <div>
+            <span class="font-medium">Handschrift OCR – mittel</span>
+            <span class="ml-3 text-xs text-stone-500 num">
+17.0 s · 65 t/s            </span>
+          </div>
+          <div class="flex items-center gap-4 num">
+              <div class="text-xs">
+                <span class="text-stone-500">Recall</span>
+                <span class="font-bold text-base text-emerald-700">95%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">Precision</span>
+                <span class="font-bold text-base text-emerald-700">90%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">129/136</span>
+                <span class="text-amber-600">+15</span>
+              </div>
+                <div class="text-xs text-stone-500">
+<span class="text-sky-700">6 relocated</span> · <span class="text-violet-700">2 fuzzy</span>                </div>
+            <div class="text-3xl font-bold num leading-none text-emerald-700">
+92%            </div>
+          </div>
+        </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
+            <div class="p-3 bg-stone-50 grid grid-cols-1 gap-2">
+                <div class="zoom-frame">
+                  <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom image" title="Zoom image">⛶</button>
+                  <img src="../assets/artifacts/zai-org_glm-4.6v-flash/vision/handwriting_medium.jpg"
+                       class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded cursor-zoom-in"
+                       loading="lazy">
+                </div>
+            </div>
+            <div>
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider">Model response</div>
+              <pre class="p-4 text-sm whitespace-pre-wrap max-h-[500px] overflow-y-auto">
+&lt;|begin_of_box|&gt;Meeting protokoll  
+21.05.25  
+M Uhr  
+
+Teilnehmer: M. Schulz, T.Wagner, L.Becker, S.Klein (später), H.Jt.  
+
+Themen: - Projektstatus ! Update  
+- Budget -&gt; ist zu hoch  
+- Timeline / Meilensteine  
+- Risiken  
+
+Projektstatus: - Modul A fertig (Team S.) Details in Jira  
+- Modul B verzögert sich 😞 → Details in Jira  
+- Testphase startet nächste Woche (hoffentlich)  
+- Kunden feedback steht noch aus  
+
+Budget: ~20% über Plan ⚠️ bitte Report bis 28.05.  
+Ursache: unklare Anforderungen → Nachbesseren nötig nächstes Mal genauer kalkulieren !!  
+
+Offene Punkte: - Freigabe von Kunde fehlt noch → T.W. kommt sich  
+- Schnittstelle zu System X unklar 📌 Rückspiele mit IT  
+- Schulung für neues Tool ? ✏️ noch nicht geplant wer macht das ?  
+
+To-Dos: - T.W.: Budget-Report → 28.05.  
+- L.B.: Kunden anstupsen wg. Feedback  
+- Etapet: Dokumentation aktualisieren  
+
+Nächstes Meeting: 04.06.25, 10 Uhr (Raum 2.15?)  
+
+Rückfragen: - Wie gehen wir mit dem Risiko um ?  
+- Priorisierung der Features nochmal prüfen  
+- ...&lt;|end_of_box|&gt;</pre>
+            </div>
+          </div>
+
+            <div class="border-t border-stone-200 bg-white">
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider flex items-center justify-between">
+                <span>Word diff ground truth ↔ model</span>
+                <span class="num">
+                  <span class="text-emerald-700">●</span> matched ·
+                  <span class="text-sky-700">●</span> relocated ·
+                  <span class="text-violet-700">●</span> fuzzy ·
+                  <span class="text-red-600">●</span> missing in model ·
+                  <span class="text-amber-600">●</span> extra/wrong
+                </span>
+              </div>
+              <div class="p-4 text-sm leading-relaxed font-mono max-h-[500px] overflow-y-auto">
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">meetingprotokoll</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">begin_of_box meeting protokoll</span>
+<span class="text-stone-700">21 05 25</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">11</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">m</span>
+<span class="text-stone-700">uhr teilnehmer m schulz t wagner l becker s klein später h jt themen projektstatus update budget ist zu hoch timeline</span>
+<span class="bg-violet-50 text-violet-700 px-0.5 rounded">meilenstein ≈ meilensteine</span>
+<span class="text-stone-700">risiken projektstatus modul a fertig team s</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">in</span>
+<span class="text-stone-700">modul b verzögert sich</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">details in jira</span>
+<span class="text-stone-700">testphase startet nächste woche hoffentlich</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">kundenfeedback</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">kunden feedback</span>
+<span class="text-stone-700">steht noch aus</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">details</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">in</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">jira</span>
+<span class="text-stone-700">budget 20 über plan</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">bis</span>
+<span class="text-stone-700">ursache unklare anforderungen</span>
+<span class="bg-violet-50 text-violet-700 px-0.5 rounded">nachbessern ≈ nachbesseren</span>
+<span class="text-stone-700">nötig nächstes mal genauer kalkulieren</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">bitte report</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">bis</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">28 05</span>
+<span class="text-stone-700">offene punkte freigabe von kunde fehlt noch t w</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">kümmert</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">kommt</span>
+<span class="text-stone-700">sich schnittstelle zu system x unklar</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">rücksprache</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">rückspiele</span>
+<span class="text-stone-700">mit it schulung für neues tool noch nicht geplant wer macht das to dos t w budget report 28 05 l b kunden anstupsen wg feedback</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">etapet</span>
+<span class="text-stone-700">dokumentation aktualisieren nächstes meeting 04 06 25 10 uhr raum 2 15 rückfragen wie gehen wir mit dem risiko um priorisierung der features nochmal prüfen</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">end_of_box</span>
+              </div>
+              <details class="border-t border-stone-100">
+                <summary class="cursor-pointer px-4 py-2 text-xs text-stone-500 hover:text-stone-900">Ground truth (for comparison)</summary>
+                <pre class="p-4 text-xs bg-stone-50 whitespace-pre-wrap">Meetingprotokoll
+21.05.25
+11 Uhr
+
+Teilnehmer: M. Schulz, T. Wagner, L. Becker, S. Klein (später), H. Jt.
+
+Themen:
+Projektstatus / Update
+Budget — ist zu hoch
+Timeline / Meilenstein!
+Risiken
+
+Projektstatus:
+Modul A fertig (Team S.)
+Modul B verzögert sich
+Testphase startet nächste Woche (hoffentlich)
+Kundenfeedback steht noch aus
+
+Details in Jira
+
+Budget:
+20% über Plan
+Ursache: unklare Anforderungen
+Nachbessern nötig
+nächstes Mal genauer kalkulieren
+
+bitte Report bis 28.05.
+
+Offene Punkte:
+Freigabe von Kunde fehlt noch (T.W. kümmert sich)
+Schnittstelle zu System X unklar — Rücksprache mit IT
+Schulung für neues Tool? noch nicht geplant — wer macht das?
+
+To-Dos:
+T.W.: Budget-Report — 28.05.
+L.B.: Kunden anstupsen wg. Feedback
+Dokumentation aktualisieren
+
+Nächstes Meeting: 04.06.25, 10 Uhr (Raum 2.15?)
+
+Rückfragen:
+Wie gehen wir mit dem Risiko um?
+Priorisierung der Features nochmal prüfen
+...</pre>
+              </details>
+            </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded overflow-hidden">
+        <div class="px-4 py-3 border-b border-stone-200 flex items-center justify-between bg-stone-50 gap-3 flex-wrap">
+          <div>
+            <span class="font-medium">Handschrift OCR – schwer</span>
+            <span class="ml-3 text-xs text-stone-500 num">
+20.6 s · 64 t/s            </span>
+          </div>
+          <div class="flex items-center gap-4 num">
+              <div class="text-xs">
+                <span class="text-stone-500">Recall</span>
+                <span class="font-bold text-base text-emerald-700">84%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">Precision</span>
+                <span class="font-bold text-base text-emerald-700">92%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">124/148</span>
+                <span class="text-amber-600">+11</span>
+              </div>
+                <div class="text-xs text-stone-500">
+<span class="text-sky-700">15 relocated</span>                </div>
+            <div class="text-3xl font-bold num leading-none text-emerald-700">
+88%            </div>
+          </div>
+        </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
+            <div class="p-3 bg-stone-50 grid grid-cols-1 gap-2">
+                <div class="zoom-frame">
+                  <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom image" title="Zoom image">⛶</button>
+                  <img src="../assets/artifacts/zai-org_glm-4.6v-flash/vision/handwriting_hard.jpg"
+                       class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded cursor-zoom-in"
+                       loading="lazy">
+                </div>
+            </div>
+            <div>
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider">Model response</div>
+              <pre class="p-4 text-sm whitespace-pre-wrap max-h-[500px] overflow-y-auto">
+&lt;|begin_of_box|&gt;Besprechung Sommerfest 😊  
+23.05.24 10:15 Uhr (Konfi&#39;)  
+
+Teilnehmer : - Max  
+- Jule  
+- Tobi  
+- Leni  
+- Simon (konnte nur kurz)  
+
+Ziel : entspanntes  
+Beisammensein  
+&amp; Spass haben  
+
+
+Ort ? - Park am See ? ✶  
+  - Genehmigung ?  
+    → wer macht das ?  
+- Firmenhof / Terrasse ? → Leni ?  
+  Terrasse reservieren ???
+
+
+Nächster Termin : Do, 30.05.  
+11 Uhr kurzes Update  
+
+an HR schicken  
+
+
+Essen | Trinken : - Grillen evtl.  
+  → Grill wer ? (Tobi fragen)  
+- vegetarische Optionen  
+  vergessen ? → Kuchen ? Jule macht was 😊  
+- Getränkeliste machen ! Bier, Limo, Wasser, was noch ? (Aperol ? zu teuer?)  
+
+
+Wetter - Backup : - Pavillon ? Wer bringt mit ? Max hat einen ?  
+- Zeit mieten → zu teuer  
+- Plan B: Kantine ?  
+
+
+Musik : - Musikbox organisieren  
+- Playlist ?  
+
+
+Spiele | Programm : - Volleyball / Federball  
+  evtl. Cornhole oder Wikingerschach ? Requisiten ?  
+
+Fotoecke Idee ? ✓  
+
+
+Einladung : → Einladung bis Ende Woche raus !  
+  - Text: leni ?  
+    → Liste an Simon  
+    → Versand: Jule  
+
+
+Offene Fragen : - Wer grillt ? (muss jemand Schulung haben?)  
+- Gibt&#39;s Strom im Park ?  
+- Müll / Reinigung klären !&lt;|end_of_box|&gt;</pre>
+            </div>
+          </div>
+
+            <div class="border-t border-stone-200 bg-white">
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider flex items-center justify-between">
+                <span>Word diff ground truth ↔ model</span>
+                <span class="num">
+                  <span class="text-emerald-700">●</span> matched ·
+                  <span class="text-sky-700">●</span> relocated ·
+                  <span class="text-violet-700">●</span> fuzzy ·
+                  <span class="text-red-600">●</span> missing in model ·
+                  <span class="text-amber-600">●</span> extra/wrong
+                </span>
+              </div>
+              <div class="p-4 text-sm leading-relaxed font-mono max-h-[500px] overflow-y-auto">
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">begin_of_box</span>
+<span class="text-stone-700">besprechung sommerfest 23 05 24 10 15 uhr konfi</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">chef</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">fragen</span>
+<span class="text-stone-700">teilnehmer max jule tobi leni simon konnte nur kurz ziel entspanntes beisammensein</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">spaß</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">spass</span>
+<span class="text-stone-700">haben</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">ort am see wer das</span>
+<span class="text-stone-700">nächster termin do 30 05 11 uhr kurzes update an hr schicken</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">ort</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">park</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">am see</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">genehmigung firmenhof terrasse terrasse reservieren</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">wer</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">macht</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">das</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">leni</span>
+<span class="text-stone-700">essen trinken grillen evtl</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">wer</span>
+<span class="text-stone-700">vegetarische optionen vergessen</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">was</span>
+<span class="text-stone-700">getränkeliste machen bier limo wasser was noch aperol zu teuer</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">grill</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">wer</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">tobi</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">fragen</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">kuchen jule macht</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">was</span>
+<span class="text-stone-700">wetter backup pavillon wer bringt mit max hat einen</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">zelt</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">zeit</span>
+<span class="text-stone-700">mieten zu teuer plan b kantine musik musikbox organisieren playlist</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">deko unnötig evtl luftballons neee budget ca 15 p p kosten noch offen</span>
+<span class="text-stone-700">spiele programm volleyball federball evtl cornhole oder wikingerschach fotoecke idee</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">requisiten</span>
+<span class="text-stone-700">einladung einladung bis ende woche raus text leni liste an simon versand jule offene fragen wer grillt muss jemand schulung haben gibt s strom im park müll reinigung klären</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">end_of_box</span>
+              </div>
+              <details class="border-t border-stone-100">
+                <summary class="cursor-pointer px-4 py-2 text-xs text-stone-500 hover:text-stone-900">Ground truth (for comparison)</summary>
+                <pre class="p-4 text-xs bg-stone-50 whitespace-pre-wrap">Besprechung Sommerfest
+23.05.24 10:15 Uhr (Konfi)
+
+Chef fragen!!
+
+Teilnehmer:
+Max
+Jule
+Tobi
+Leni
+Simon (konnte nur kurz)
+
+Ziel: entspanntes Beisammensein &amp; Spaß haben
+
+Nächster Termin:
+Do, 30.05.
+11 Uhr
+kurzes Update
+an HR schicken
+
+Ort?:
+Park am See?
+Genehmigung?
+Firmenhof / Terrasse?
+Terrasse reservieren?? — wer macht das? Leni?
+
+Essen / Trinken:
+Grillen evtl.
+vegetarische Optionen vergessen?
+Getränkeliste machen!
+Bier, Limo, Wasser, was noch? (Aperol? zu teuer?)
+Grill wer? (Tobi fragen)
+Kuchen? Jule macht was
+
+Wetter / Backup:
+Pavillon? Wer bringt mit?
+Max hat einen?
+Zelt mieten → zu teuer
+Plan B: Kantine?
+
+Musik:
+Musikbox organisieren
+Playlist?
+
+Deko:
+unnötig?
+evtl. Luftballons? neee
+
+Budget:
+ca. 15€ p.P.?
+Kosten noch offen!
+
+Spiele / Programm:
+Volleyball / Federball
+evtl. Cornhole oder Wikingerschach?
+Fotoecke Idee? Requisiten?
+
+Einladung:
+Einladung bis Ende Woche raus!
+Text: Leni?
+Liste an Simon
+Versand: Jule
+
+Offene Fragen:
+Wer grillt? (muss jemand Schulung haben?)
+Gibt&#39;s Strom im Park?
+Müll / Reinigung klären</pre>
+              </details>
+            </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded overflow-hidden">
+        <div class="px-4 py-3 border-b border-stone-200 flex items-center justify-between bg-stone-50 gap-3 flex-wrap">
+          <div>
+            <span class="font-medium">Fraktur OCR</span>
+            <span class="ml-3 text-xs text-stone-500 num">
+29.7 s · 64 t/s            </span>
+          </div>
+          <div class="flex items-center gap-4 num">
+              <div class="text-xs">
+                <span class="text-stone-500">Recall</span>
+                <span class="font-bold text-base text-emerald-700">87%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">Precision</span>
+                <span class="font-bold text-base text-emerald-700">86%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">331/382</span>
+                <span class="text-amber-600">+52</span>
+              </div>
+                <div class="text-xs text-stone-500">
+<span class="text-violet-700">16 fuzzy</span>                </div>
+            <div class="text-3xl font-bold num leading-none text-emerald-700">
+87%            </div>
+          </div>
+        </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
+            <div class="p-3 bg-stone-50 grid grid-cols-1 gap-2">
+                <div class="zoom-frame">
+                  <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom image" title="Zoom image">⛶</button>
+                  <img src="../assets/artifacts/zai-org_glm-4.6v-flash/vision/fraktur_innerpage.jpg"
+                       class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded cursor-zoom-in"
+                       loading="lazy">
+                </div>
+            </div>
+            <div>
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider">Model response</div>
+              <pre class="p-4 text-sm whitespace-pre-wrap max-h-[500px] overflow-y-auto">
+&lt;|begin_of_box|&gt;deiner Großmutter wohl nur geträumt haben.&#34; ,,Rein,&#34; meinte Malinefen hartnädig, ,,sie hat ja auch die Prinzessin vom See gesehen, und das ist etwas ganz Besonderes.&#34; ,,Dabon habe ich noch nie gehört,&#34; antwortete Gottlieb. ,,So fann fie es dir erzählen, frag fie nur aus, fie weiß alles.&#34;
+
+Der Kahn war mittlerweile der Insel ganz nahe gekommen; die Kinder landeten an einer dazu geeigneten Stelle und befestigten ihn an einem aus dem Wasser ragenden Pflog. Sie erfreigen die kleine Anhöhe, auf der sich das Gehäuft befand. In dem furzen, feinen Grabe, welches den Boden bedekte, blühte der Thymian; ein festgetretener Weg führte gerade auf die Schilfhuette zu, die lagheimlich unter den Weiden. Das mächtige Geäst der majestäätischen Bäume, mit silbergraumem, spigblattrigem Laube beladen, breitete sich weit und muchtig über das niedere Dach, welches sich der Crde zuneigte. Dahinter erblickte man ein Stück Garten und Uferland, von Rohr und Schilf wie mit einem Ball umschlossen. Eine alte Frau stieg vor der Tür des Hüttchens und spann. Ihr Haar war so weiß wie das Gewebe der Spinnen, welches im Herbst über die Stopfen fliegt, um ihren Boden hatte sie ein schwarzes Band gebunden. Gottlieb und Malinefen fassen mit dem Rorbe und blieben vor ihr stehen. ,,Großmutter,&#34; sagte Lestere, ,,er will nicht glauben, dass du die Seejungfern gesehen hast, und er weiß nichts von der Prinzessin vom See.&#34; Sie neigte ihren Haden. ,,Geht ihr man eures Weges,&#34; gab fie ihnen zur Antwort. ,,Großmutter, du fünntet ihm die Geschichte von der Prinzessin vom See wohl erzählen,&#34; bat Malinefen, ,,sie läht fich schön anhören, und man mufs fie doch wissen, wenn man über den See fährt und in dem Blumental Tag für Tag herumwandert.&#34; ,,Ich meine, ihr fönntet euer Belper brauchen,&#34; sagte die Großmutter, ,,es hat eben hier Ihr gejchlagen.&#34; ,,Ich ja,&#34; rief Malinefen einbrünstig, ,,Grdbeeren mit Milchlagen.&#34; ,,Und Stüff Brot dazu; und dieviel wir das aufzehren, erzählt Ihr dem Gottlieb die Geschichte.&#34; Sie ließ nicht nach, sie müste ihren Willen haben. Ein Weilchen danach fassen die Kinder auf einem Baumftramm vor der Hütte und hatten zwischen sich einen Napf mit ihrer Milch, in der schwammen die Grdbeeren so did, dass man nicht wuchte, war das Milch mit Grdbeeren, oder Grdbeeren mit Milch; doch es mochte wohl auf eins heraus-tommen. Die Großmutter blidte zuweilen nach ihnen hin-&lt;|end_of_box|&gt;</pre>
+            </div>
+          </div>
+
+            <div class="border-t border-stone-200 bg-white">
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider flex items-center justify-between">
+                <span>Word diff ground truth ↔ model</span>
+                <span class="num">
+                  <span class="text-emerald-700">●</span> matched ·
+                  <span class="text-sky-700">●</span> relocated ·
+                  <span class="text-violet-700">●</span> fuzzy ·
+                  <span class="text-red-600">●</span> missing in model ·
+                  <span class="text-amber-600">●</span> extra/wrong
+                </span>
+              </div>
+              <div class="p-4 text-sm leading-relaxed font-mono max-h-[500px] overflow-y-auto">
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">begin_of_box</span>
+<span class="text-stone-700">deiner großmutter wohl nur geträumt haben</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">nein</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">rein</span>
+<span class="text-stone-700">meinte</span>
+<span class="bg-violet-50 text-violet-700 px-0.5 rounded">malineken hartnäckig ≈ malinefen hartnädig</span>
+<span class="text-stone-700">sie hat ja auch die prinzessin vom see gesehen und das ist etwas ganz besonderes</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">davon</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">dabon</span>
+<span class="text-stone-700">habe ich noch nie gehört antwortete gottlieb so</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">kann sie</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">fann fie</span>
+<span class="text-stone-700">es dir erzählen frag</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">sie</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">fie</span>
+<span class="text-stone-700">nur aus</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">sie</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">fie</span>
+<span class="text-stone-700">weiß alles der kahn war mittlerweile der insel ganz nahe gekommen die kinder landeten an einer dazu geeigneten stelle und befestigten ihn an einem aus dem wasser ragenden</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">pflock</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">pflog</span>
+<span class="text-stone-700">sie</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">erstiegen</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">erfreigen</span>
+<span class="text-stone-700">die kleine anhöhe auf der sich das</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">gehöft</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">gehäuft</span>
+<span class="text-stone-700">befand in dem</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">kurzen</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">furzen</span>
+<span class="text-stone-700">feinen</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">grase</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">grabe</span>
+<span class="text-stone-700">welches den boden</span>
+<span class="bg-violet-50 text-violet-700 px-0.5 rounded">bedeckte ≈ bedekte</span>
+<span class="text-stone-700">blühte der thymian ein festgetretener weg führte gerade auf die</span>
+<span class="bg-violet-50 text-violet-700 px-0.5 rounded">schilfhütte ≈ schilfhuette</span>
+<span class="text-stone-700">zu die</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">lag heimlich</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">lagheimlich</span>
+<span class="text-stone-700">unter den weiden das mächtige geäst der</span>
+<span class="bg-violet-50 text-violet-700 px-0.5 rounded">majestätischen ≈ majestäätischen</span>
+<span class="text-stone-700">bäume mit</span>
+<span class="bg-violet-50 text-violet-700 px-0.5 rounded">silbergrauem ≈ silbergraumem</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">spitzblättrigem</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">spigblattrigem</span>
+<span class="text-stone-700">laube beladen breitete sich weit und</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">wuchtig</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">muchtig</span>
+<span class="text-stone-700">über das niedere dach welches sich der</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">erde</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">crde</span>
+<span class="text-stone-700">zuneigte dahinter erblickte man ein stück garten und</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">ackerland</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">uferland</span>
+<span class="text-stone-700">von rohr und schilf wie mit einem</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">wall</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">ball</span>
+<span class="text-stone-700">umschlossen eine alte frau</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">saß</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">stieg</span>
+<span class="text-stone-700">vor der</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">thür</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">tür</span>
+<span class="text-stone-700">des hüttchens und spann ihr haar war so weiß wie das gewebe der spinnen welches im herbst über die</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">stoppeln</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">stopfen</span>
+<span class="text-stone-700">fliegt um ihren</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">rocken</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">boden</span>
+<span class="text-stone-700">hatte sie ein schwarzes band gebunden gottlieb und</span>
+<span class="bg-violet-50 text-violet-700 px-0.5 rounded">malineken ≈ malinefen</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">kamen</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">fassen</span>
+<span class="text-stone-700">mit dem</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">korbe</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">rorbe</span>
+<span class="text-stone-700">und blieben vor ihr stehen großmutter sagte</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">letztere</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">lestere</span>
+<span class="text-stone-700">er will nicht glauben</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">daß</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">dass</span>
+<span class="text-stone-700">du die seejungfern gesehen hast und er weiß nichts von der prinzessin vom see sie</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">netzte</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">neigte</span>
+<span class="text-stone-700">ihren</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">faden</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">haden</span>
+<span class="text-stone-700">geht ihr man eures weges gab</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">sie</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">fie</span>
+<span class="text-stone-700">ihnen zur antwort großmutter du</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">könntest</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">fünntet</span>
+<span class="text-stone-700">ihm die geschichte von der prinzessin vom see wohl erzählen bat</span>
+<span class="bg-violet-50 text-violet-700 px-0.5 rounded">malineken ≈ malinefen</span>
+<span class="text-stone-700">sie</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">läßt sich</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">läht fich</span>
+<span class="text-stone-700">schön anhören und man</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">muß sie</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">mufs fie</span>
+<span class="text-stone-700">doch wissen wenn man über den see fährt und in dem blumental tag für tag herumwandert ich meine ihr</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">könntet</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">fönntet</span>
+<span class="text-stone-700">euer</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">vesper</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">belper</span>
+<span class="text-stone-700">brauchen sagte die großmutter es hat eben</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">vier uhr</span>
+<span class="bg-violet-50 text-violet-700 px-0.5 rounded">geschlagen ≈ gejchlagen</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">ach</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">hier ihr ich</span>
+<span class="text-stone-700">ja rief</span>
+<span class="bg-violet-50 text-violet-700 px-0.5 rounded">malineken inbrünstig erdbeeren ≈ malinefen einbrünstig grdbeeren</span>
+<span class="text-stone-700">mit</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">milch</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">milchlagen</span>
+<span class="text-stone-700">und</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">ein stück</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">stüff</span>
+<span class="text-stone-700">brot dazu und</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">dieweil</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">dieviel</span>
+<span class="text-stone-700">wir das aufzehren erzählt ihr dem gottlieb die geschichte sie ließ nicht nach sie</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">mußte</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">müste</span>
+<span class="text-stone-700">ihren willen haben ein weilchen danach</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">saßen</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">fassen</span>
+<span class="text-stone-700">die kinder auf einem</span>
+<span class="bg-violet-50 text-violet-700 px-0.5 rounded">baumstamm ≈ baumftramm</span>
+<span class="text-stone-700">vor der hütte und hatten zwischen sich einen napf mit</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">süßer</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">ihrer</span>
+<span class="text-stone-700">milch in der schwammen die</span>
+<span class="bg-violet-50 text-violet-700 px-0.5 rounded">erdbeeren ≈ grdbeeren</span>
+<span class="text-stone-700">so</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">dick daß</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">did dass</span>
+<span class="text-stone-700">man nicht</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">wußte</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">wuchte</span>
+<span class="text-stone-700">war das milch mit</span>
+<span class="bg-violet-50 text-violet-700 px-0.5 rounded">erdbeeren ≈ grdbeeren</span>
+<span class="text-stone-700">oder</span>
+<span class="bg-violet-50 text-violet-700 px-0.5 rounded">erdbeeren ≈ grdbeeren</span>
+<span class="text-stone-700">mit milch doch es mochte wohl auf eins</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">herauskommen</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">heraus tommen</span>
+<span class="text-stone-700">die großmutter</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">blickte</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">blidte</span>
+<span class="text-stone-700">zuweilen nach ihnen hin</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">end_of_box</span>
+              </div>
+              <details class="border-t border-stone-100">
+                <summary class="cursor-pointer px-4 py-2 text-xs text-stone-500 hover:text-stone-900">Ground truth (for comparison)</summary>
+                <pre class="p-4 text-xs bg-stone-50 whitespace-pre-wrap">deiner Großmutter wohl nur geträumt haben. „Nein,&#34; meinte Malineken hartnäckig, „sie hat ja auch die Prinzessin vom See gesehen, und das ist etwas ganz Besonderes.&#34; „Davon habe ich noch nie gehört,&#34; antwortete Gottlieb. „So kann sie es dir erzählen, frag sie nur aus, sie weiß alles.&#34;
+
+Der Kahn war mittlerweile der Insel ganz nahe gekommen; die Kinder landeten an einer dazu geeigneten Stelle und befestigten ihn an einem aus dem Wasser ragenden Pflock. Sie erstiegen die kleine Anhöhe, auf der sich das Gehöft befand. In dem kurzen, feinen Grase, welches den Boden bedeckte, blühte der Thymian; ein festgetretener Weg führte gerade auf die Schilfhütte zu, die lag heimlich unter den Weiden. Das mächtige Geäst der majestätischen Bäume, mit silbergrauem, spitzblättrigem Laube beladen, breitete sich weit und wuchtig über das niedere Dach, welches sich der Erde zuneigte. Dahinter erblickte man ein Stück Garten und Ackerland, von Rohr und Schilf wie mit einem Wall umschlossen. Eine alte Frau saß vor der Thür des Hüttchens und spann. Ihr Haar war so weiß wie das Gewebe der Spinnen, welches im Herbst über die Stoppeln fliegt, um ihren Rocken hatte sie ein schwarzes Band gebunden. Gottlieb und Malineken kamen mit dem Korbe und blieben vor ihr stehen. „Großmutter,&#34; sagte letztere, „er will nicht glauben, daß du die Seejungfern gesehen hast, und er weiß nichts von der Prinzessin vom See.&#34; Sie netzte ihren Faden. „Geht ihr man eures Weges,&#34; gab sie ihnen zur Antwort. „Großmutter, du könntest ihm die Geschichte von der Prinzessin vom See wohl erzählen,&#34; bat Malineken, „sie läßt sich schön anhören, und man muß sie doch wissen, wenn man über den See fährt und in dem Blumental Tag für Tag herumwandert.&#34; „Ich meine, ihr könntet euer Vesper brauchen,&#34; sagte die Großmutter, „es hat eben vier Uhr geschlagen.&#34; „Ach ja,&#34; rief Malineken inbrünstig, „Erdbeeren mit Milch und ein Stück Brot dazu; und dieweil wir das aufzehren, erzählt Ihr dem Gottlieb die Geschichte.&#34; Sie ließ nicht nach, sie mußte ihren Willen haben. Ein Weilchen danach saßen die Kinder auf einem Baumstamm vor der Hütte und hatten zwischen sich einen Napf mit süßer Milch, in der schwammen die Erdbeeren so dick, daß man nicht wußte, war das Milch mit Erdbeeren, oder Erdbeeren mit Milch; doch es mochte wohl auf eins herauskommen. Die Großmutter blickte zuweilen nach ihnen hin</pre>
+              </details>
+            </div>
+      </div>
+
+
+    <div class="mt-4 text-xs text-stone-500">
+      Artefacts:
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/zai-org_glm-4.6v-flash/vision/handwriting_easy.txt" target="_blank">Handschrift OCR – leicht – Antwort</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/zai-org_glm-4.6v-flash/vision/handwriting_easy.jpg" target="_blank">Handschrift OCR – leicht – Bild</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/zai-org_glm-4.6v-flash/vision/handwriting_medium.txt" target="_blank">Handschrift OCR – mittel – Antwort</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/zai-org_glm-4.6v-flash/vision/handwriting_medium.jpg" target="_blank">Handschrift OCR – mittel – Bild</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/zai-org_glm-4.6v-flash/vision/handwriting_hard.txt" target="_blank">Handschrift OCR – schwer – Antwort</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/zai-org_glm-4.6v-flash/vision/handwriting_hard.jpg" target="_blank">Handschrift OCR – schwer – Bild</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/zai-org_glm-4.6v-flash/vision/fraktur_ocr.txt" target="_blank">Fraktur OCR – Antwort</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/zai-org_glm-4.6v-flash/vision/fraktur_innerpage.jpg" target="_blank">Fraktur OCR – Bild</a>
+    </div>
+</section>
+<section id="niah" class="mb-12 scroll-mt-24">
+  <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
+    <h2 class="text-lg font-medium tracking-tight">niah</h2>
+    <a href="../benchmarks/niah.html" class="text-xs text-stone-500 hover:text-stone-900">all models in this bench →</a>
+  </div>
+
+
+  <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+    <div class="md:col-span-1 bg-white border-2 border-stone-300 rounded-lg p-5 flex flex-col justify-center">
+      <div class="text-xs uppercase tracking-wider text-stone-500">Score</div>
+      <div class="mt-1 text-5xl font-bold num leading-none text-stone-400">
+—      </div>
+    </div>
+    <div class="md:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">tok/s</dt>
+        <dd class="mt-1 text-xl font-semibold num">27</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Tokens</dt>
+        <dd class="mt-1 text-xl font-semibold num">7999</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Wall</dt>
+        <dd class="mt-1 text-xl font-semibold num">610.3 s</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">RAM</dt>
+        <dd class="mt-1 text-xl font-semibold num">—</dd>
+      </div>
+    </div>
+  </div>
+
+    <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Worum geht es? Was wird getestet?
+      </summary>
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: In a German book corpus (with embedded source code) 10 synthetic facts are hidden at evenly distributed depths (5% – 95%). The model must retrieve all of them.
+
+Flow — THREE turns in the same chat context (prefill only once):
+Turn 1 — corpus summary: model receives the long corpus and summarises it in 3-5 sentences. Forces real processing of the text.
+Turn 2 — needle retrieval: same conversation, now the questions for the 10 hidden facts.
+Turn 3 — comprehension + hallucination traps: 4 factual questions about the book content + 3 hallucination traps (model should recognise that the question is NOT answered in the text).
+
+Default mode runs ONE uniform stage for all models: 120k tokens. Models without sufficient max_context are skipped at this stage. `niah_deep` additionally runs 32k / 64k / 200k for a full heatmap.
+
+Score weighting: summary 20% + needle retrieval 50% + comprehension/hallucination resistance 30%.
+
+Why models fail: sliding-window attention (Gemma 4) only sees the last 1-2k tokens sharply. Reasoning models hit the token limit before answering. Q4 KV cache measurably degrades recall at long contexts. On the hallucination traps the helpful bias lures models into plausible-sounding inventions.</div>
+    </details>
+
+    <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Prompt
+      </summary>
+      <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Developer prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">TURN 1 (User):
+The following section contains a longer mixed text of German narrative and source code.
+
+===== TEXT BEGIN =====
+&lt;corpus with embedded needles, 32k–128k tokens depending on stage&gt;
+===== TEXT END =====
+
+Summarise the text in 3-5 sentences. Mention the main characters, setting and key themes.
+
+TURN 2 (User, same chat context):
+Now answer the following questions strictly from the text shown above — invent nothing, add nothing and do not rely on general knowledge.
+
+Questions:
+1. &lt;question for needle 1&gt;
+2. &lt;question for needle 2&gt;
+...
+
+Answer as a numbered list 1., 2., 3. with one short sentence each.</pre>
+          </div>
+      </div>
+    </details>
+
+    <p class="mt-5 text-sm text-stone-600">
+      For each context length 10 needles are distributed across the corpus. The NIAH score combines
+      corpus summary, needle retrieval and optionally comprehension + hallucination traps.
+      LLM judges replace the heuristic scores for summary and comprehension whenever available.
+    </p>
+
+      <div class="mt-6">
+        <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">
+          Stage: <span class="num font-semibold text-stone-700">120k tokens</span>
+        </div>
+
+            <div class="bg-sky-50 border border-sky-200 rounded-lg overflow-hidden">
+              <div class="px-4 py-3 border-b border-sky-200 flex items-baseline justify-between">
+                <div>
+                  <span class="text-xs uppercase tracking-wider text-sky-700 font-semibold">Sub-benchmark · corpus summary</span>
+                  <span class="ml-2 text-xs text-stone-500">Turn 1</span>
+                </div>
+                <div class="text-sm num">
+                    <span class="font-bold text-base text-red-700">
+                      0/3
+                    </span>
+                    <span class="text-stone-500">criteria</span>
+                  <span class="ml-2 text-xs text-stone-500">~120k tokens input</span>
+                </div>
+              </div>
+              <div class="px-4 py-3 bg-white">
+                <pre class="text-sm text-stone-800 whitespace-pre-wrap leading-relaxed max-h-[500px] overflow-y-auto">Die Hauptfigur ist Malineken, die von der Großmutter.
+Der Ort ist ein Wald, in dem sie sich nicht mehr so ohne Weiteres.
+Die Hauptfigur ist Malineken, die von der Großmuthigsten und tapfersten Mannen, die sich nicht so sehr fürchten.
+Sie hatten sie auch noch mehr als ein tapfer Mann, der sich nicht so sehr fürchten.
+Er hatte die feindliche Verschanzungen
+— — „Der Hauptmann Etienne de Beaumont, der Kapitän, welcher die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitanz.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitanz.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitanz.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitanz.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitanz.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitanz.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitanz.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitanz.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitanz.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitanz.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitanz.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitanz.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitanz.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitanz.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitanz.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitanz.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitanz.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitanz.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitanz
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte die feindliche Verschanzungen
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitans
+— „Der Hauptmann Etienne de Beaumont, der Kapitän.
+Er hatte</pre>
+                  <ul class="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      <li class="text-xs px-2 py-1 rounded border border-red-200 bg-red-50 text-red-800">
+                        ✗ 3-5 sentences · 92 sentences counted
+                      </li>
+                      <li class="text-xs px-2 py-1 rounded border border-red-200 bg-red-50 text-red-800">
+                        ✗ At most 220 words · 3534 words
+                      </li>
+                      <li class="text-xs px-2 py-1 rounded border border-red-200 bg-red-50 text-red-800">
+                        ✗ Corpus keywords (1/4) · ✗ Gottlieb, ✓ Malineken, ✗ Schmied, ✗ Bonaparte
+                      </li>
+                  </ul>
+              </div>
+            </div>
+
+          <div class="mt-4 bg-white border border-stone-200 rounded-lg overflow-hidden">
+            <div class="px-4 py-3 border-b border-stone-200 flex items-baseline justify-between">
+              <div>
+                <span class="text-xs uppercase tracking-wider text-stone-700 font-semibold">Sub-benchmark · needle retrieval</span>
+                <span class="ml-2 text-xs text-stone-500">Turn 2</span>
+              </div>
+              <div class="text-sm num">
+                <span class="font-bold text-base text-red-700">
+                  0/10
+                </span>
+                <span class="text-stone-500">hits</span>
+              </div>
+            </div>
+            <div class="px-4 py-3">
+              <ul class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-red-500">○</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">5% (5 %)</div>
+                      <div class="text-stone-500 mt-0.5">expected: blauer Ankerstein, Lübeck-1907, A-318</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-red-500">○</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">10% (10 %)</div>
+                      <div class="text-stone-500 mt-0.5">expected: smaragdgrün, Schlüssel, Seriennummer, 7-Bravo-12</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-red-500">○</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">15% (15 %)</div>
+                      <div class="text-stone-500 mt-0.5">expected: Nordstern-Brigade, violetter</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-red-500">○</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">25% (25 %)</div>
+                      <div class="text-stone-500 mt-0.5">expected: Indigo-Quark</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-red-500">○</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">33% (33 %)</div>
+                      <div class="text-stone-500 mt-0.5">expected: Atlantis-Mira, NL-7711, 142</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-red-500">○</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">50% (50 %)</div>
+                      <div class="text-stone-500 mt-0.5">expected: Ehrenmitglied, Aluminium-Gesellschaft, Köln</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-red-500">○</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">65% (65 %)</div>
+                      <div class="text-stone-500 mt-0.5">expected: Safran-Klops Margarethe, 7 Gramm|7 g, 3 Stunden|drei Stunden</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-red-500">○</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">75% (75 %)</div>
+                      <div class="text-stone-500 mt-0.5">expected: Erbe von Onkel Walpurgis, 42-Lima</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-red-500">○</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">85% (85 %)</div>
+                      <div class="text-stone-500 mt-0.5">expected: 7f4a2e91-marlin-2026</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-red-500">○</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">90% (90 %)</div>
+                      <div class="text-stone-500 mt-0.5">expected: Coriolis-Effekt, Pendel, Memo, Dr. Kühn, 17.03.2024</div>
+                    </div>
+                  </li>
+              </ul>
+              <details class="mt-3">
+                <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Model response to the needle questions</summary>
+                <pre class="mt-2 text-xs bg-stone-50 border border-stone-200 rounded p-3 overflow-x-auto whitespace-pre-wrap"></pre>
+              </details>
+                <div class="mt-2 text-xs text-red-600">Error: questions turn: Client error &#39;400 Bad Request&#39; for url &#39;http://127.0.0.1:1234/api/v0/chat/completions&#39;
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400</div>
+            </div>
+          </div>
+
+            <div class="mt-4 bg-amber-50 border border-amber-200 rounded-lg overflow-hidden">
+              <div class="px-4 py-3 border-b border-amber-200 flex items-baseline justify-between">
+                <div>
+                  <span class="text-xs uppercase tracking-wider text-amber-800 font-semibold">Sub-benchmark · comprehension + hallucination traps</span>
+                  <span class="ml-2 text-xs text-stone-500">Turn 3</span>
+                </div>
+                <div class="text-sm num">
+                    <span class="font-bold text-base text-red-700">
+                      0%
+                    </span>
+                  <span class="ml-2 text-xs text-stone-600">
+                    Facts 0/4 ·
+                    Traps 0/2
+                  </span>
+                </div>
+              </div>
+              <ul class="px-4 py-3 bg-white space-y-3">
+                  <li class="border-l-4 border-red-400 pl-3">
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200">Factual question</span>
+                      <div class="text-sm font-medium text-stone-900 flex-1">Wie heißt der Schmied vom Blumental, bei dem Gottlieb in der Lehre ist? (Vor- und Nachname)</div>
+                    </div>
+                    <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+                  </li>
+                  <li class="border-l-4 border-red-400 pl-3">
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200">Factual question</span>
+                      <div class="text-sm font-medium text-stone-900 flex-1">Wie heißt der französische Kapitän, der Gottliebs Eltern getötet hat?</div>
+                    </div>
+                    <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+                  </li>
+                  <li class="border-l-4 border-red-400 pl-3">
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200">Factual question</span>
+                      <div class="text-sm font-medium text-stone-900 flex-1">Womit lenkte Malineken die Wachen ab, um den Schlüssel zu entwenden?</div>
+                    </div>
+                    <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+                  </li>
+                  <li class="border-l-4 border-red-400 pl-3">
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200">Factual question</span>
+                      <div class="text-sm font-medium text-stone-900 flex-1">Warum muss Gottlieb sich verborgen halten? Was würden die Franzosen sonst tun?</div>
+                    </div>
+                    <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+                  </li>
+                  <li class="border-l-4 border-red-400 pl-3">
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200">Hallucination trap</span>
+                      <div class="text-sm font-medium text-stone-900 flex-1">Wie heißt Gottliebs Onkel?</div>
+                    </div>
+                    <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+                  </li>
+                  <li class="border-l-4 border-red-400 pl-3">
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200">Hallucination trap</span>
+                      <div class="text-sm font-medium text-stone-900 flex-1">Mit welcher List überlistete Michael Lebbin Kaiser Bonaparte persönlich?</div>
+                    </div>
+                    <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+                  </li>
+              </ul>
+            </div>
+      </div>
+
+
+    <div class="mt-4 text-xs text-stone-500">
+      Artefacts:
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/zai-org_glm-4.6v-flash/niah/breakdown.json" target="_blank">Breakdown pro Kontextlänge</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/haystacks/haystack_120k.txt" target="_blank">Haystack 120k Tokens</a>
+    </div>
+</section>
+<section id="tool_use" class="mb-12 scroll-mt-24">
+  <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
+    <h2 class="text-lg font-medium tracking-tight">tool_use</h2>
+    <a href="../benchmarks/tool_use.html" class="text-xs text-stone-500 hover:text-stone-900">all models in this bench →</a>
+  </div>
+
+
+  <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+    <div class="md:col-span-1 bg-white border-2 border-emerald-500 rounded-lg p-5 flex flex-col justify-center">
+      <div class="text-xs uppercase tracking-wider text-stone-500">Score</div>
+      <div class="mt-1 text-5xl font-bold num leading-none text-emerald-700">
+86%
+      </div>
+    </div>
+    <div class="md:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">tok/s</dt>
+        <dd class="mt-1 text-xl font-semibold num">67</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Tokens</dt>
+        <dd class="mt-1 text-xl font-semibold num">5103</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Wall</dt>
+        <dd class="mt-1 text-xl font-semibold num">133.9 s</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">RAM</dt>
+        <dd class="mt-1 text-xl font-semibold num">6.6 GB</dd>
+      </div>
+    </div>
+  </div>
+
+    <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Worum geht es? Was wird getestet?
+      </summary>
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: 3 scenarios (easy/medium/hard) with mocked tools (read_file, apply_diff, get_weather, list_files). The model has to call the right tools in the right order and answer at the end. Multi-turn (tool result comes back, model can call further tools).
+
+What is tested: OpenAI-style function calling, argument correctness, ordering on multi-step tasks (read file → parse JSON → query weather).
+
+Why models fail: models without &#39;tool_use&#39; capability ignore tool schemas. Weak models pick wrong tools or malformed arguments. The hard tier (JSON-format output) often breaks during the final synthesis.</div>
+    </details>
+
+    <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Prompt
+      </summary>
+      <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">Du arbeitest in einer agentic IDE (vergleichbar mit Cursor/Claude Code). Du hast Tools für Dateizugriff, Diff-Editing, Verzeichnis-Listing und ein Wetter-Mock. Plane mehrstufig: erst aufklären, dann handeln, am Ende prüfen. Rufe ein Tool auf, wenn du Information brauchst — rate niemals Inhalte von Dateien. Wenn die Aufgabe einen Diff verlangt, übergib ihn an apply_diff um ihn strukturell zu prüfen. Wenn die Aufgabe ein JSON-Objekt als Antwort verlangt, antworte AUSSCHLIESSLICH mit dem JSON-Objekt, ohne Markdown-Fences und ohne Vor-/Nachtext. Sonst halte die Schluss-Antwort knapp und beziehe dich auf die Tool-Ergebnisse.</pre>
+          </div>
+      </div>
+    </details>
+
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div>
+            <span class="font-medium">easy_extract_todos</span>
+            <span class="ml-2 text-xs uppercase tracking-wider px-1.5 py-0.5 rounded
+bg-emerald-50 text-emerald-700 border border-emerald-200
+">leicht</span>
+          </div>
+            <div class="text-sm num">
+              <span class="font-medium text-emerald-700">100%</span>
+              <span class="text-stone-500"> · 3/3 checks</span>
+            </div>
+        </div>
+
+        <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">In notes.md stehen Sprint-Notizen. Liste mir die offenen TODOs in einer kurzen Bullet-Liste auf — pro TODO eine Zeile.</div>
+
+          <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool calls</div>
+            <ol class="space-y-2 text-sm num">
+                <li>
+                  <span class="font-medium text-stone-900">1. read_file</span>
+                  <span class="text-stone-600">({"path": "notes.md"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap"># Sprint Notes — KW 17
+
+## Erledigt
+- API-Endpoint /users mit Pagination
+- Migrations für `orders` Tabelle eingespielt
+
+## Offen
+- TODO: Caching-Layer für Produktsuche evaluieren (Redis vs in-memory)
+- TODO: Logging vereinheitlichen — momentan mischen wir loguru + logging
+- Bugfix: Datumsformat in der Rechnungs-PDF (siehe Issue #4711)
+- TODO: Stripe-Webhook-Handler braucht Idempotency-Keys
+
+## Notizen aus dem Standup
+Kunde X meldet, dass beim Login-Redirect manchmal die `next`-URL verloren geht. Reproduzierbar nur in Safari iOS. Verdacht auf Service-Worker-Cache.
+
+TODO: Safari-Repro-Setup auf </pre>
+                  </details>
+                </li>
+            </ol>
+          </div>
+
+          <ul class="px-4 py-3 border-b border-stone-100 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;read_file&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: read_file</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Arguments for &#39;read_file&#39;</div>
+<div class="text-xs text-stone-500">path=&#39;notes.md&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Response mentions 3/4 of the key terms</div>
+<div class="text-xs text-stone-500">mentioned: [&#39;Caching&#39;, &#39;Logging&#39;, &#39;Safari&#39;], missing: [&#39;Stripe&#39;]</div>                </div>
+              </li>
+          </ul>
+
+        <div class="px-4 py-3">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Final answer</div>
+          <pre class="text-sm whitespace-pre-wrap">
+{&#34;offene_TODOS&#34;: [&#34;Caching-Layer für Produktsuche evaluieren (Redis vs in-memory)&#34;, &#34;Logging vereinheitlichen — momentan mischen wir loguru + logging&#34;, &#34;Safari-Repro-Setup auf TestFlight provisionieren&#34;]}</pre>
+        </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div>
+            <span class="font-medium">easy_list_then_read</span>
+            <span class="ml-2 text-xs uppercase tracking-wider px-1.5 py-0.5 rounded
+bg-emerald-50 text-emerald-700 border border-emerald-200
+">leicht</span>
+          </div>
+            <div class="text-sm num">
+              <span class="font-medium ">0%</span>
+              <span class="text-stone-500"> · 0/4 checks</span>
+            </div>
+        </div>
+
+        <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">Ich weiß nicht mehr, welche Datei in diesem Projekt die Konfiguration enthält. Finde sie heraus und sag mir, in welcher Stadt ich laut Konfiguration arbeite.</div>
+
+
+          <ul class="px-4 py-3 border-b border-stone-100 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-red-600">✗</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;list_files&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: —</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-red-600">✗</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;read_file&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: —</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-red-600">✗</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Arguments for &#39;read_file&#39;</div>
+<div class="text-xs text-stone-500">tool not called</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-red-600">✗</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Response mentions 1/1 of the key terms</div>
+<div class="text-xs text-stone-500">mentioned: [], missing: [&#39;München&#39;]</div>                </div>
+              </li>
+          </ul>
+
+        <div class="px-4 py-3">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Final answer</div>
+          <pre class="text-sm whitespace-pre-wrap">
+Ich werde nun alle Dateien im Projektverzeichnis auflisten, um die Konfigurationsdatei zu finden.
+</pre>
+        </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div>
+            <span class="font-medium">medium_fizzbuzz_fix</span>
+            <span class="ml-2 text-xs uppercase tracking-wider px-1.5 py-0.5 rounded
+bg-amber-50 text-amber-700 border border-amber-200
+">mittel</span>
+          </div>
+            <div class="text-sm num">
+              <span class="font-medium text-emerald-700">100%</span>
+              <span class="text-stone-500"> · 6/6 checks</span>
+            </div>
+        </div>
+
+        <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">fizzbuzz.py hat einen Bug — die Funktion liefert die Werte 1..n-1 statt 1..n. Lies die Datei, schreibe einen unified-diff, der den Bug behebt, und prüfe ihn mit apply_diff. Antworte am Ende mit einer kurzen Erklärung des Fixes.</div>
+
+          <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool calls</div>
+            <ol class="space-y-2 text-sm num">
+                <li>
+                  <span class="font-medium text-stone-900">1. read_file</span>
+                  <span class="text-stone-600">({"path": "fizzbuzz.py"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">&#34;&#34;&#34;Simple FizzBuzz with a deliberate off-by-one bug.&#34;&#34;&#34;
+
+
+def fizzbuzz(n: int) -&gt; list[str]:
+    out: list[str] = []
+    # BUG: range stops at n (exclusive), but FizzBuzz from 1..=n needs n+1.
+    for i in range(1, n):
+        if i % 15 == 0:
+            out.append(&#34;FizzBuzz&#34;)
+        elif i % 3 == 0:
+            out.append(&#34;Fizz&#34;)
+        elif i % 5 == 0:
+            out.append(&#34;Buzz&#34;)
+        else:
+            out.append(str(i))
+    return out
+
+
+if __name__ == &#34;__main__&#34;:
+    print(fizzbuzz(15))
+</pre>
+                  </details>
+                </li>
+                <li>
+                  <span class="font-medium text-stone-900">2. apply_diff</span>
+                  <span class="text-stone-600">({"diff": "@@ -5,7 +5,7 @@\n     out: list[str] = []\n     # BUG: range stops at n (exclusive), but FizzBuzz from 1..=n needs n+1.\n-    for i in range(1, n):\n+    for i in range(1, n + 1):", "path": "fizzbuzz.py"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{&#34;ok&#34;: true, &#34;applied&#34;: 2, &#34;added_lines&#34;: 1, &#34;removed_lines&#34;: 1, &#34;note&#34;: &#34;structural-validation only; no real write performed&#34;}</pre>
+                  </details>
+                </li>
+            </ol>
+          </div>
+
+          <ul class="px-4 py-3 border-b border-stone-100 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;read_file&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: read_file, apply_diff</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;apply_diff&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: read_file, apply_diff</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Arguments for &#39;read_file&#39;</div>
+<div class="text-xs text-stone-500">path=&#39;fizzbuzz.py&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Arguments for &#39;apply_diff&#39;</div>
+<div class="text-xs text-stone-500">path=&#39;fizzbuzz.py&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Diff for fizzbuzz.py validates structurally</div>
+<div class="text-xs text-stone-500">applied=2, calls=1</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Diff changes ≥2 lines</div>
+<div class="text-xs text-stone-500">applied: 2</div>                </div>
+              </li>
+          </ul>
+
+        <div class="px-4 py-3">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Final answer</div>
+          <pre class="text-sm whitespace-pre-wrap">
+```json
+{&#34;fix&#34;: &#34;Der Bug wurde behoben, indem die `range`-Funktion von `range(1, n)` zu `range(1, n + 1)` geändert wurde. Dies sorgt dafür, dass die Schleife von 1 bis n (inklusiv) läuft, anstatt nur bis zu n-1.&#34;}
+```</pre>
+        </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div>
+            <span class="font-medium">medium_filter_users</span>
+            <span class="ml-2 text-xs uppercase tracking-wider px-1.5 py-0.5 rounded
+bg-amber-50 text-amber-700 border border-amber-200
+">mittel</span>
+          </div>
+            <div class="text-sm num">
+              <span class="font-medium text-emerald-700">100%</span>
+              <span class="text-stone-500"> · 6/6 checks</span>
+            </div>
+        </div>
+
+        <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">users.json enthält eine Liste aller Nutzer. Filtere die *aktiven* Nutzer mit Rolle &#39;admin&#39; oder &#39;editor&#39; und antworte AUSSCHLIESSLICH mit einem JSON-Objekt der Form {&#34;count&#34;: &lt;Zahl&gt;, &#34;users&#34;: [{&#34;id&#34;: ..., &#34;name&#34;: ..., &#34;role&#34;: ...}, ...]}. Keine Markdown-Fences, kein Vor- oder Nachtext.</div>
+
+          <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool calls</div>
+            <ol class="space-y-2 text-sm num">
+                <li>
+                  <span class="font-medium text-stone-900">1. list_files</span>
+                  <span class="text-stone-600">({})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">[&#34;config.json&#34;, &#34;fizzbuzz.py&#34;, &#34;inventory.py&#34;, &#34;notes.md&#34;, &#34;users.json&#34;]</pre>
+                  </details>
+                </li>
+                <li>
+                  <span class="font-medium text-stone-900">2. read_file</span>
+                  <span class="text-stone-600">({"path": "users.json"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{
+  &#34;exported_at&#34;: &#34;2026-04-28T08:30:00Z&#34;,
+  &#34;users&#34;: [
+    {
+      &#34;id&#34;: 1001,
+      &#34;name&#34;: &#34;Anja Sommer&#34;,
+      &#34;email&#34;: &#34;anja.sommer@example.com&#34;,
+      &#34;role&#34;: &#34;admin&#34;,
+      &#34;active&#34;: true,
+      &#34;last_login_iso&#34;: &#34;2026-04-27T11:42:18Z&#34;
+    },
+    {
+      &#34;id&#34;: 1002,
+      &#34;name&#34;: &#34;Bernd Wagner&#34;,
+      &#34;email&#34;: &#34;bernd.wagner@example.com&#34;,
+      &#34;role&#34;: &#34;viewer&#34;,
+      &#34;active&#34;: false,
+      &#34;last_login_iso&#34;: &#34;2025-11-03T07:15:02Z&#34;
+    },
+    {
+      &#34;id&#34;: 1003,
+      &#34;name&#34;: &#34;Cara Lindgren&#34;,
+      &#34;email&#34;: &#34;cara@example.com&#34;,
+      &#34;role&#34;: &#34;editor&#34;,
+      &#34;active&#34;: true,
+      &#34;last_logi</pre>
+                  </details>
+                </li>
+            </ol>
+          </div>
+
+          <ul class="px-4 py-3 border-b border-stone-100 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;read_file&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: list_files, read_file</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Arguments for &#39;read_file&#39;</div>
+<div class="text-xs text-stone-500">path=&#39;users.json&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Response contains valid JSON</div>
+                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">JSON contains fields [&#39;count&#39;, &#39;users&#39;]</div>
+<div class="text-xs text-stone-500">all fields present</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">count == 4</div>
+<div class="text-xs text-stone-500">actual=4</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">users.ids == [1001, 1003, 1004, 1006]</div>
+<div class="text-xs text-stone-500">actual=[1001, 1003, 1004, 1006]</div>                </div>
+              </li>
+          </ul>
+
+        <div class="px-4 py-3">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Final answer</div>
+          <pre class="text-sm whitespace-pre-wrap">
+{&#34;count&#34;: 4, &#34;users&#34;: [{&#34;id&#34;: 1001, &#34;name&#34;: &#34;Anja Sommer&#34;, &#34;role&#34;: &#34;admin&#34;}, {&#34;id&#34;: 1003, &#34;name&#34;: &#34;Cara Lindgren&#34;, &#34;role&#34;: &#34;editor&#34;}, {&#34;id&#34;: 1004, &#34;name&#34;: &#34;Dennis Pohl&#34;, &#34;role&#34;: &#34;editor&#34;}, {&#34;id&#34;: 1006, &#34;name&#34;: &#34;Frederik Otto&#34;, &#34;role&#34;: &#34;admin&#34;}]}
+</pre>
+        </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div>
+            <span class="font-medium">medium_weather_alert</span>
+            <span class="ml-2 text-xs uppercase tracking-wider px-1.5 py-0.5 rounded
+bg-amber-50 text-amber-700 border border-amber-200
+">mittel</span>
+          </div>
+            <div class="text-sm num">
+              <span class="font-medium text-emerald-700">100%</span>
+              <span class="text-stone-500"> · 7/7 checks</span>
+            </div>
+        </div>
+
+        <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">Lies config.json und hol das Wetter für die dort eingetragene Stadt. Antworte AUSSCHLIESSLICH mit einem JSON-Objekt {&#34;city&#34;: ..., &#34;temp_c&#34;: ..., &#34;condition&#34;: ..., &#34;alert&#34;: &lt;bool&gt;}, wobei alert genau dann true ist, wenn temp_c den Schwellwert aus config.json überschreitet.</div>
+
+          <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool calls</div>
+            <ol class="space-y-2 text-sm num">
+                <li>
+                  <span class="font-medium text-stone-900">1. read_file</span>
+                  <span class="text-stone-600">({"path": "config.json"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{
+  &#34;service&#34;: &#34;owb-test-fixture&#34;,
+  &#34;city&#34;: &#34;München&#34;,
+  &#34;language&#34;: &#34;de&#34;,
+  &#34;alert_threshold_celsius&#34;: 30
+}
+</pre>
+                  </details>
+                </li>
+                <li>
+                  <span class="font-medium text-stone-900">2. get_weather</span>
+                  <span class="text-stone-600">({"city": "M\u00fcnchen"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{&#34;city&#34;: &#34;M\u00fcnchen&#34;, &#34;temp_c&#34;: 9, &#34;condition&#34;: &#34;bew\u00f6lkt&#34;, &#34;wind_kmh&#34;: 7}</pre>
+                  </details>
+                </li>
+            </ol>
+          </div>
+
+          <ul class="px-4 py-3 border-b border-stone-100 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;read_file&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: read_file, get_weather</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;get_weather&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: read_file, get_weather</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Arguments for &#39;read_file&#39;</div>
+<div class="text-xs text-stone-500">path=&#39;config.json&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Arguments for &#39;get_weather&#39;</div>
+<div class="text-xs text-stone-500">city=&#39;München&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Response contains valid JSON</div>
+                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">JSON contains fields [&#39;city&#39;, &#39;temp_c&#39;, &#39;condition&#39;, &#39;alert&#39;]</div>
+<div class="text-xs text-stone-500">all fields present</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">alert == False</div>
+<div class="text-xs text-stone-500">actual=False</div>                </div>
+              </li>
+          </ul>
+
+        <div class="px-4 py-3">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Final answer</div>
+          <pre class="text-sm whitespace-pre-wrap">
+```json
+{
+  &#34;city&#34;: &#34;München&#34;,
+  &#34;temp_c&#34;: 9,
+  &#34;condition&#34;: &#34;bewölkt&#34;,
+  &#34;alert&#34;: false
+}
+```</pre>
+        </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div>
+            <span class="font-medium">hard_rename_function</span>
+            <span class="ml-2 text-xs uppercase tracking-wider px-1.5 py-0.5 rounded
+bg-red-50 text-red-700 border border-red-200">schwer</span>
+          </div>
+            <div class="text-sm num">
+              <span class="font-medium text-emerald-700">100%</span>
+              <span class="text-stone-500"> · 8/8 checks</span>
+            </div>
+        </div>
+
+        <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">Die Funktion calculate_total in inventory.py soll konsistent zum Projekt-Stil in compute_total umbenannt werden. Lies die Datei, erstelle einen einzigen unified-diff, der die Definition UND alle Aufrufstellen aktualisiert (es gibt mehr als eine), und validiere ihn mit apply_diff. Achte darauf, keine anderen Identifier-Vorkommen zu verändern. Antworte am Ende kurz, wie viele Stellen du geändert hast.</div>
+
+          <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool calls</div>
+            <ol class="space-y-2 text-sm num">
+                <li>
+                  <span class="font-medium text-stone-900">1. read_file</span>
+                  <span class="text-stone-600">({"path": "inventory.py"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">&#34;&#34;&#34;Mini inventory accounting module — used as fixture for diff-edit benchmark.
+
+The function calculate_total() is called from 3 different places. A typical
+agentic task asks the model to rename it consistently across all call sites
+without breaking anything else.
+&#34;&#34;&#34;
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Iterable
+
+
+@dataclass
+class LineItem:
+    sku: str
+    quantity: int
+    unit_price_cents: int
+    discount_pct: float = 0.0
+
+
+def calculate_total(items: Iterable[LineItem]) -&gt; int:
+    &#34;&#34;&#34;Return total in cents, applying per-item discount.&#34;&#34;&#34;</pre>
+                  </details>
+                </li>
+                <li>
+                  <span class="font-medium text-stone-900">2. apply_diff</span>
+                  <span class="text-stone-600">({"diff": "--- inventory.py\t2024-01-15 09:53:21.842941+01:00\n+++ inventory.py\t2024-01-15 09:53:21.842941+01:00\n@@ -20,7 +20,7 @@\n \n def calculate_total(items: Iterable[LineItem]) -\u003e int:\n     \"\"\"Return total in cents, applying per-item discount.\"\"\"\n-    total = 0\n+    total_cents = 0\n     for item in items:\n         gross = item.quantity * item.unit_price_cents\n         net = int(gross * (1.0 - item.discount_pct))\n@@ -28,7 +28,7 @@\n     return total\n \n-def format_receipt(items: list[LineItem], currency: str = \"EUR\") -\u003e str:\n+def compute_total(items: Iterable[LineItem]) -\u003e int:\n     \"\"\"Return total in cents, applying per-item discount.\"\"\"\n     total = 0\n     for item in items:\n@@ -36,7 +36,7 @@\n \n def format_receipt(items: list[LineItem], currency: str = \"EUR\") -\u003e str:\n     \"\"\"Render a receipt showing each line and the grand total.\"\"\"\n-    lines = []\n+    lines_cents = []\n     for it in items:\n         lines.append(\n             f\"{it.sku:\u003c10} x{it.quantity:\u003e3}  {it.unit_price_cents / 100:\u003e7.2f} {currency}\"\n@@ -44,7 +44,7 @@\n     grand_total = calculate_total(items)\n     lines.append(\"-\" * 40)\n-    lines.append(f\"{\u0027TOTAL\u0027:\u003c10}        {grand_total / 100:\u003e7.2f} {currency}\")\n+    lines.append(f\"{\u0027TOTAL\u0027:\u003c10}        {grand_total / 100:\u003e7.2f} {currency}\")\n     return \"\\n\".join(lines)\n \n def average_basket(baskets: list[list[LineItem]]) -\u003e float:\n@@ -52,7 +52,7 @@\n     totals = [calculate_total(b) for b in baskets]\n     return sum(totals) / len(totals) / 100.0\n \n-def basket_above_threshold(items: list[LineItem], threshold_eur: float) -\u003e bool:\n+def basket_above_threshold(items: list[LineItem], threshold_eur: float) -\u003e bool:\n     \"\"\"True if the basket total exceeds the given threshold in EUR.\"\"\"\n     return calculate_total(items) \u003e threshold_eur * 100", "path": "inventory.py"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{&#34;ok&#34;: true, &#34;applied&#34;: 10, &#34;added_lines&#34;: 5, &#34;removed_lines&#34;: 5, &#34;note&#34;: &#34;structural-validation only; no real write performed&#34;}</pre>
+                  </details>
+                </li>
+            </ol>
+          </div>
+
+          <ul class="px-4 py-3 border-b border-stone-100 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;read_file&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: read_file, apply_diff</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;apply_diff&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: read_file, apply_diff</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Arguments for &#39;read_file&#39;</div>
+<div class="text-xs text-stone-500">path=&#39;inventory.py&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Arguments for &#39;apply_diff&#39;</div>
+<div class="text-xs text-stone-500">path=&#39;inventory.py&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Diff for inventory.py validates structurally</div>
+<div class="text-xs text-stone-500">applied=10, calls=1</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Diff changes ≥8 lines</div>
+<div class="text-xs text-stone-500">applied: 10</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Diff contains &#39;compute_total&#39;</div>
+                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Diff contains &#39;calculate_total&#39;</div>
+                </div>
+              </li>
+          </ul>
+
+        <div class="px-4 py-3">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Final answer</div>
+          <pre class="text-sm whitespace-pre-wrap">
+{&#34;changed_places&#34;: 10}</pre>
+        </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div>
+            <span class="font-medium">hard_compose_report</span>
+            <span class="ml-2 text-xs uppercase tracking-wider px-1.5 py-0.5 rounded
+bg-red-50 text-red-700 border border-red-200">schwer</span>
+          </div>
+            <div class="text-sm num">
+              <span class="font-medium text-emerald-700">100%</span>
+              <span class="text-stone-500"> · 7/7 checks</span>
+            </div>
+        </div>
+
+        <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">Erstelle eine Zusammenfassung aus zwei Quellen. Lies users.json und config.json. Antworte AUSSCHLIESSLICH mit einem JSON-Objekt der Form {&#34;service&#34;: &lt;Service-Name aus config&gt;, &#34;city&#34;: &lt;Stadt aus config&gt;, &#34;active_users&#34;: &lt;Anzahl aktiver Nutzer aus users.json&gt;, &#34;admin_emails&#34;: [&lt;E-Mails aller aktiven Admins, sortiert&gt;]}. Keine Markdown-Fences.</div>
+
+          <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool calls</div>
+            <ol class="space-y-2 text-sm num">
+                <li>
+                  <span class="font-medium text-stone-900">1. list_files</span>
+                  <span class="text-stone-600">({})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">[&#34;config.json&#34;, &#34;fizzbuzz.py&#34;, &#34;inventory.py&#34;, &#34;notes.md&#34;, &#34;users.json&#34;]</pre>
+                  </details>
+                </li>
+                <li>
+                  <span class="font-medium text-stone-900">2. read_file</span>
+                  <span class="text-stone-600">({"path": "config.json"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{
+  &#34;service&#34;: &#34;owb-test-fixture&#34;,
+  &#34;city&#34;: &#34;München&#34;,
+  &#34;language&#34;: &#34;de&#34;,
+  &#34;alert_threshold_celsius&#34;: 30
+}
+</pre>
+                  </details>
+                </li>
+                <li>
+                  <span class="font-medium text-stone-900">3. read_file</span>
+                  <span class="text-stone-600">({"path": "users.json"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{
+  &#34;exported_at&#34;: &#34;2026-04-28T08:30:00Z&#34;,
+  &#34;users&#34;: [
+    {
+      &#34;id&#34;: 1001,
+      &#34;name&#34;: &#34;Anja Sommer&#34;,
+      &#34;email&#34;: &#34;anja.sommer@example.com&#34;,
+      &#34;role&#34;: &#34;admin&#34;,
+      &#34;active&#34;: true,
+      &#34;last_login_iso&#34;: &#34;2026-04-27T11:42:18Z&#34;
+    },
+    {
+      &#34;id&#34;: 1002,
+      &#34;name&#34;: &#34;Bernd Wagner&#34;,
+      &#34;email&#34;: &#34;bernd.wagner@example.com&#34;,
+      &#34;role&#34;: &#34;viewer&#34;,
+      &#34;active&#34;: false,
+      &#34;last_login_iso&#34;: &#34;2025-11-03T07:15:02Z&#34;
+    },
+    {
+      &#34;id&#34;: 1003,
+      &#34;name&#34;: &#34;Cara Lindgren&#34;,
+      &#34;email&#34;: &#34;cara@example.com&#34;,
+      &#34;role&#34;: &#34;editor&#34;,
+      &#34;active&#34;: true,
+      &#34;last_logi</pre>
+                  </details>
+                </li>
+            </ol>
+          </div>
+
+          <ul class="px-4 py-3 border-b border-stone-100 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;read_file&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: list_files, read_file, read_file</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Response contains valid JSON</div>
+                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">JSON contains fields [&#39;service&#39;, &#39;city&#39;, &#39;active_users&#39;, &#39;admin_emails&#39;]</div>
+<div class="text-xs text-stone-500">all fields present</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">service == &#39;owb-test-fixture&#39;</div>
+<div class="text-xs text-stone-500">actual=&#39;owb-test-fixture&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">city == &#39;München&#39;</div>
+<div class="text-xs text-stone-500">actual=&#39;München&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">active_users == 4</div>
+<div class="text-xs text-stone-500">actual=4</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">admin_emails == [&#39;anja.sommer@example.com&#39;, &#39;frederik.otto@example.com&#39;]</div>
+<div class="text-xs text-stone-500">actual=[&#39;anja.sommer@example.com&#39;, &#39;frederik.otto@example.com&#39;]</div>                </div>
+              </li>
+          </ul>
+
+        <div class="px-4 py-3">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Final answer</div>
+          <pre class="text-sm whitespace-pre-wrap">
+{&#34;service&#34;: &#34;owb-test-fixture&#34;, &#34;city&#34;: &#34;München&#34;, &#34;active_users&#34;: 4, &#34;admin_emails&#34;: [&#34;anja.sommer@example.com&#34;, &#34;frederik.otto@example.com&#34;]}
+</pre>
+        </div>
+      </div>
+
+
+    <div class="mt-4 text-xs text-stone-500">
+      Artefacts:
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/zai-org_glm-4.6v-flash/tool_use/scenarios.json" target="_blank">Scenarios + Tool-Call-Verlauf</a>
+    </div>
+</section>
 <section id="diagram_to_svg" class="mb-12 scroll-mt-24">
   <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
     <h2 class="text-lg font-medium tracking-tight">diagram_to_svg</h2>
@@ -417,7 +2839,7 @@ Anforderungen:
           <div class="font-medium num">diagram_eisenhower.png</div>
           <div class="text-sm">
               <span class="text-emerald-700 font-medium">✓ SVG parseable · 57 elements · 31 text nodes</span>
-<span class="ml-3 font-bold num text-emerald-700">0.92</span>          </div>
+<span class="ml-3 font-bold num text-emerald-700">92%</span>          </div>
         </div>
           <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
             <div class="p-3 bg-stone-50">
@@ -444,7 +2866,7 @@ Anforderungen:
                 <li class="border rounded px-3 py-2 border-emerald-200 bg-emerald-50">
                   <div class="flex items-baseline justify-between gap-3">
                     <span class="font-medium text-stone-900">SVG validity</span>
-                    <span class="font-bold num text-emerald-700">1.00</span>
+                    <span class="font-bold num text-emerald-700">100%</span>
                   </div>
                   <div class="mt-1 text-stone-600">
 <span class="num">57</span> elements · <span class="num">31</span> text nodes · root <span class="num">&lt;svg&gt;</span>
@@ -453,7 +2875,7 @@ Anforderungen:
                 <li class="border rounded px-3 py-2 border-emerald-200 bg-emerald-50">
                   <div class="flex items-baseline justify-between gap-3">
                     <span class="font-medium text-stone-900">Term coverage</span>
-                    <span class="font-bold num text-emerald-700">0.83</span>
+                    <span class="font-bold num text-emerald-700">83%</span>
                   </div>
                   <div class="mt-1 text-stone-600 num">20/24 matched</div>
                     <div class="mt-1 text-stone-500">
@@ -465,32 +2887,32 @@ Content-Strategie, Buzzword-Bingo, Last-Minute-Meeting, Weltag der Büroklammer 
             <div class="border-t border-stone-100 px-4 py-3 bg-amber-50">
               <div class="flex items-baseline justify-between mb-2">
                 <span class="text-xs uppercase tracking-wider text-amber-700">Qualitative · judge (openai/gpt-5.4)</span>
-                <span class="text-2xl font-bold num text-amber-700">0.68</span>
+                <span class="text-2xl font-bold num text-amber-700">68%</span>
               </div>
               <ul class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
                   <li class="text-center bg-white border border-amber-200 rounded p-2">
                     <div class="text-stone-500 capitalize">completeness</div>
-                    <div class="text-base font-bold num text-emerald-700">0.72</div>
+                    <div class="text-base font-bold num text-emerald-700">72%</div>
                   </li>
                   <li class="text-center bg-white border border-amber-200 rounded p-2">
                     <div class="text-stone-500 capitalize">labels</div>
-                    <div class="text-base font-bold num text-emerald-700">0.78</div>
+                    <div class="text-base font-bold num text-emerald-700">78%</div>
                   </li>
                   <li class="text-center bg-white border border-amber-200 rounded p-2">
                     <div class="text-stone-500 capitalize">grouping</div>
-                    <div class="text-base font-bold num text-emerald-700">0.92</div>
+                    <div class="text-base font-bold num text-emerald-700">92%</div>
                   </li>
                   <li class="text-center bg-white border border-amber-200 rounded p-2">
                     <div class="text-stone-500 capitalize">layout readability</div>
-                    <div class="text-base font-bold num text-amber-700">0.58</div>
+                    <div class="text-base font-bold num text-amber-700">58%</div>
                   </li>
                   <li class="text-center bg-white border border-amber-200 rounded p-2">
                     <div class="text-stone-500 capitalize">diagram kind match</div>
-                    <div class="text-base font-bold num text-emerald-700">0.97</div>
+                    <div class="text-base font-bold num text-emerald-700">97%</div>
                   </li>
                   <li class="text-center bg-white border border-amber-200 rounded p-2">
                     <div class="text-stone-500 capitalize">aesthetic quality</div>
-                    <div class="text-base font-bold num text-amber-700">0.38</div>
+                    <div class="text-base font-bold num text-amber-700">38%</div>
                   </li>
               </ul>
 <div class="mt-3 text-sm text-stone-700">Die 2×2-Eisenhower-Matrix mit Titel, Achsen und allen vier Quadranten ist klar übernommen; auch die meisten Listenpunkte sind vorhanden. Es fehlen jedoch mehrere prägende Bildelemente aus dem Original (z.B. Zielscheibe, Megafon, Einhorn, VIRAL-Stern), und die Rand-Notizen wurden nur bruchstückhaft bzw. fehlerhaft übernommen. Einige Labels sind leicht verfälscht oder ungünstig platziert, besonders oben rechts beim Kaffee-Hinweis, wo Text überlappt. Das Layout bleibt grundsätzlich lesbar, wirkt aber roh: dekorative Elemente erscheinen als schwarze Punkte/Artefakte, und die Komposition ist deutlich weniger sauber als im Original.</div>            </div>
@@ -500,7 +2922,7 @@ Content-Strategie, Buzzword-Bingo, Last-Minute-Meeting, Weltag der Büroklammer 
           <div class="font-medium num">diagram_service_architecture.png</div>
           <div class="text-sm">
               <span class="text-red-700 font-medium">✗ SVG not parseable</span>
-<span class="ml-3 font-bold num text-red-600">0.00</span>          </div>
+<span class="ml-3 font-bold num text-red-600">0%</span>          </div>
         </div>
           <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
             <div class="p-3 bg-stone-50">
@@ -527,7 +2949,7 @@ Content-Strategie, Buzzword-Bingo, Last-Minute-Meeting, Weltag der Büroklammer 
                 <li class="border rounded px-3 py-2 border-red-200 bg-red-50">
                   <div class="flex items-baseline justify-between gap-3">
                     <span class="font-medium text-stone-900">SVG validity</span>
-                    <span class="font-bold num text-red-600">0.00</span>
+                    <span class="font-bold num text-red-600">0%</span>
                   </div>
                   <div class="mt-1 text-stone-600">
 Parse error: <span class="num">unclosed token: line 125, column 4</span>
@@ -536,7 +2958,7 @@ Parse error: <span class="num">unclosed token: line 125, column 4</span>
                 <li class="border rounded px-3 py-2 border-red-200 bg-red-50">
                   <div class="flex items-baseline justify-between gap-3">
                     <span class="font-medium text-stone-900">Term coverage</span>
-                    <span class="font-bold num text-red-600">0.00</span>
+                    <span class="font-bold num text-red-600">0%</span>
                   </div>
                   <div class="mt-1 text-stone-600 num">0/20 matched</div>
                     <div class="mt-1 text-stone-500">
@@ -551,7 +2973,7 @@ Frontend, React, API Gateway, Kong, Auth Service, JWT …                    </d
           <div class="font-medium num">diagram_sso_sequence.png</div>
           <div class="text-sm">
               <span class="text-emerald-700 font-medium">✓ SVG parseable · 48 elements · 20 text nodes</span>
-<span class="ml-3 font-bold num text-emerald-700">0.93</span>          </div>
+<span class="ml-3 font-bold num text-emerald-700">93%</span>          </div>
         </div>
           <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
             <div class="p-3 bg-stone-50">
@@ -578,7 +3000,7 @@ Frontend, React, API Gateway, Kong, Auth Service, JWT …                    </d
                 <li class="border rounded px-3 py-2 border-emerald-200 bg-emerald-50">
                   <div class="flex items-baseline justify-between gap-3">
                     <span class="font-medium text-stone-900">SVG validity</span>
-                    <span class="font-bold num text-emerald-700">1.00</span>
+                    <span class="font-bold num text-emerald-700">100%</span>
                   </div>
                   <div class="mt-1 text-stone-600">
 <span class="num">48</span> elements · <span class="num">20</span> text nodes · root <span class="num">&lt;svg&gt;</span>
@@ -587,7 +3009,7 @@ Frontend, React, API Gateway, Kong, Auth Service, JWT …                    </d
                 <li class="border rounded px-3 py-2 border-emerald-200 bg-emerald-50">
                   <div class="flex items-baseline justify-between gap-3">
                     <span class="font-medium text-stone-900">Term coverage</span>
-                    <span class="font-bold num text-emerald-700">0.87</span>
+                    <span class="font-bold num text-emerald-700">87%</span>
                   </div>
                   <div class="mt-1 text-stone-600 num">13/15 matched</div>
                     <div class="mt-1 text-stone-500">
@@ -599,36 +3021,36 @@ Nein, Ja                    </div>
             <div class="border-t border-stone-100 px-4 py-3 bg-amber-50">
               <div class="flex items-baseline justify-between mb-2">
                 <span class="text-xs uppercase tracking-wider text-amber-700">Qualitative · judge (openai/gpt-5.4)</span>
-                <span class="text-2xl font-bold num text-amber-700">0.53</span>
+                <span class="text-2xl font-bold num text-amber-700">53%</span>
               </div>
               <ul class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
                   <li class="text-center bg-white border border-amber-200 rounded p-2">
                     <div class="text-stone-500 capitalize">completeness</div>
-                    <div class="text-base font-bold num text-emerald-700">0.90</div>
+                    <div class="text-base font-bold num text-emerald-700">90%</div>
                   </li>
                   <li class="text-center bg-white border border-amber-200 rounded p-2">
                     <div class="text-stone-500 capitalize">labels</div>
-                    <div class="text-base font-bold num text-emerald-700">0.72</div>
+                    <div class="text-base font-bold num text-emerald-700">72%</div>
                   </li>
                   <li class="text-center bg-white border border-amber-200 rounded p-2">
                     <div class="text-stone-500 capitalize">connections</div>
-                    <div class="text-base font-bold num text-amber-700">0.38</div>
+                    <div class="text-base font-bold num text-amber-700">38%</div>
                   </li>
                   <li class="text-center bg-white border border-amber-200 rounded p-2">
                     <div class="text-stone-500 capitalize">direction</div>
-                    <div class="text-base font-bold num text-amber-700">0.32</div>
+                    <div class="text-base font-bold num text-amber-700">32%</div>
                   </li>
                   <li class="text-center bg-white border border-amber-200 rounded p-2">
                     <div class="text-stone-500 capitalize">layout readability</div>
-                    <div class="text-base font-bold num text-amber-700">0.34</div>
+                    <div class="text-base font-bold num text-amber-700">34%</div>
                   </li>
                   <li class="text-center bg-white border border-amber-200 rounded p-2">
                     <div class="text-stone-500 capitalize">diagram kind match</div>
-                    <div class="text-base font-bold num text-emerald-700">0.90</div>
+                    <div class="text-base font-bold num text-emerald-700">90%</div>
                   </li>
                   <li class="text-center bg-white border border-amber-200 rounded p-2">
                     <div class="text-stone-500 capitalize">aesthetic quality</div>
-                    <div class="text-base font-bold num text-amber-700">0.36</div>
+                    <div class="text-base font-bold num text-amber-700">36%</div>
                   </li>
               </ul>
 <div class="mt-3 text-sm text-stone-700">Die Hauptknoten sind fast alle vorhanden: Benutzer, App/Service Provider, Identity Provider, Login-Seite, Entscheidung und „Zugriff gewährt“ sind erkennbar. Mehrere Beschriftungen stimmen semantisch, aber Texte überlappen stark im Bereich Login/Entscheidung; außerdem fehlen bzw. verrutschen Teile wie die klare „Ja/Nein“-Verzweigung und die Benutzereingabe ist nur chaotisch angedeutet. Die Verbindungen nach dem Login sind topologisch deutlich verfälscht: Token/Redirect/Zugriff sind an falsche Endpunkte bzw. in falscher Geometrie geführt, und mehrere Pfeilrichtungen sind uneindeutig oder gegenüber dem Original falsch. Der Render bleibt als Flowchart erkennbar, wirkt aber im rechten unteren Bereich deutlich kollidiert und visuell wenig sauber.</div>            </div>
@@ -706,7 +3128,7 @@ Why models fail: training bias toward helpfulness encourages plausible hallucina
 
     <p class="mt-5 text-sm text-stone-600">
         <span class="font-semibold text-amber-700">LLM-Judge aktiv</span>
-        <span class="num">(openai/gpt-5.4, Score 0.54)</span>
+        <span class="num">(openai/gpt-5.4, Score 54%)</span>
         · heuristische Klassifikation:
       <span class="num"><strong class="text-stone-900">4</strong> korrigiert</span>
       ·
@@ -724,7 +3146,7 @@ Why models fail: training bias toward helpfulness encourages plausible hallucina
             </div>
           </div>
           <div class="text-3xl font-bold num text-amber-700">
-            0.54
+            54%
           </div>
         </div>
       </div>

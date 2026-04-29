@@ -437,29 +437,30 @@ class NIAHTask(Task):
             )
             # Load model with enough headroom for the haystack + answer + slack
             # for tokenizer variance. Default JIT load is only ~20k.
-            client.ensure_context(model.id, target + CONTEXT_HEADROOM_TOKENS)
+            ctx_ok = client.ensure_context(model.id, target + CONTEXT_HEADROOM_TOKENS)
 
             # Turn 1: ask for a summary of the long context. This forces the
             # model to actually read & process the corpus once.
             messages = [self._build_summary_message(context)]
             summary = ""
             answer = ""
-            err = None
-            try:
-                resp_sum = client.chat(
-                    model.id,
-                    messages,
-                    max_tokens=8000,
-                    temperature=0.1,
-                    timeout_s=780.0,
-                )
-                wall_total += resp_sum.metrics.wall_seconds
-                tokens_total += resp_sum.metrics.tokens_generated
-                if resp_sum.metrics.tokens_per_second:
-                    speeds.append(resp_sum.metrics.tokens_per_second)
-                summary = resp_sum.effective_text
-            except Exception as e:  # noqa: BLE001
-                err = f"summary turn: {e}"
+            err = None if ctx_ok else f"context-load failed: model konnte nicht mit {target + CONTEXT_HEADROOM_TOKENS} Tokens geladen werden"
+            if err is None:
+                try:
+                    resp_sum = client.chat(
+                        model.id,
+                        messages,
+                        max_tokens=8000,
+                        temperature=0.1,
+                        timeout_s=1500.0,
+                    )
+                    wall_total += resp_sum.metrics.wall_seconds
+                    tokens_total += resp_sum.metrics.tokens_generated
+                    if resp_sum.metrics.tokens_per_second:
+                        speeds.append(resp_sum.metrics.tokens_per_second)
+                    summary = resp_sum.effective_text
+                except Exception as e:  # noqa: BLE001
+                    err = f"summary turn: {e}"
 
             # Turn 2: in the same chat, ask the NIAH retrieval questions. The
             # full corpus is still part of the conversation history.
@@ -473,7 +474,7 @@ class NIAHTask(Task):
                         messages,
                         max_tokens=8000,
                         temperature=0.1,
-                        timeout_s=780.0,
+                        timeout_s=1500.0,
                     )
                     wall_total += resp.metrics.wall_seconds
                     tokens_total += resp.metrics.tokens_generated
@@ -498,7 +499,7 @@ class NIAHTask(Task):
                         messages,
                         max_tokens=8000,
                         temperature=0.1,
-                        timeout_s=780.0,
+                        timeout_s=1500.0,
                     )
                     wall_total += resp_comp.metrics.wall_seconds
                     tokens_total += resp_comp.metrics.tokens_generated
