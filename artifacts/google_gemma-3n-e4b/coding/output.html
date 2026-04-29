@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VanillaJS Kanban Board</title>
+    <link href="https://cdn.jsdelivr.net/tailwindcss/latest/tailwind.css" rel="stylesheet">
+    <style>
+        /* Add subtle transitions */
+        .card {
+            transition: transform 0.2s ease-in-out;
+        }
+
+        /* Confetti animation */
+        .card.done {
+            animation: fadeOut 0.5s ease-out;
+        }
+
+        @keyframes fadeOut {
+            to { opacity: 0; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <div id="kanban-board-container" class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold text-center mb-4">Kanban Board</h1>
+
+        <!-- Columns -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div id="column-backlog" class="bg-white rounded-lg shadow-md p-4 data-testid="column-backlog">
+                <h2 class="text-xl font-semibold border-b p-2">Backlog</h2>
+                <div class="flex items-center gap-4">
+                    <button data-testid="add-card" class="bg-blue-500 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-md">Add Card</button>
+                </div>
+                <!-- Dummy cards for initial load -->
+                <div class="card data-testid="card" style="background-color: #f8f8f8;">
+                    <h3 class="text-lg font-semibold">Task 1</h3>
+                    <p>Some initial task.</p>
+                    <button data-testid="delete-card" class="bg-red-500 hover:bg-red-700 text-white px-2 py-1 rounded-sm">Delete</button>
+                </div>
+                <div class="card data-testid="card" style="background-color: #f8f8f8;">
+                    <h3 class="text-lg font-semibold">Task 2</h3>
+                    <p>Another initial task.</p>
+                    <button data-testid="delete-card" class="bg-red-500 hover:bg-red-700 text-white px-2 py-1 rounded-sm">Delete</button>
+                </div>
+            </div>
+
+            <div id="column-in-progress" class="bg-white rounded-lg shadow-md p-4 data-testid="column-in-progress">
+                <h2 class="text-xl font-semibold border-b p-2">In Progress</h2>
+                <div class="flex items-center gap-4">
+                    <button data-testid="add-card" class="bg-blue-500 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-md">Add Card</button>
+                </div>
+            </div>
+
+            <div id="column-review" class="bg-white rounded-lg shadow-md p-4 data-testid="column-review">
+                <h2 class="text-xl font-semibold border-b p-2">Review</h2>
+                <div class="flex items-center gap-4">
+                    <button data-testid="add-card" class="bg-blue-500 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-md">Add Card</button>
+                </div>
+            </div>
+
+            <div id="column-done" class="bg-white rounded-lg shadow-md p-4 data-testid="column-done">
+                <h2 class="text-xl font-semibold border-b p-2">Done</h2>
+                <div class="flex items-center gap-4">
+                    <button data-testid="add-card" class="bg-blue-500 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-md">Add Card</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card Input -->
+        <div class="mt-6">
+            <input type="text" id="new-card-title" class="border rounded-md px-4 py-2 data-testid="card-input" placeholder="Add new card...">
+            <button onclick="addCard()" class="bg-green-500 hover:bg-green-700 text-white font-bold px-4 py-2 rounded-md mt-2">Add</button>
+        </div>
+
+        <!-- Delete Confirmation -->
+        <div id="delete-confirmation" class="fixed top-full left-0 w-full bg-gray-900 text-white p-4 z-50" style="display: none;">
+            <p>Are you sure you want to delete this card?</p>
+            <button onclick="confirmDelete()" class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded-md">Delete</button>
+            <button onclick="cancelDelete()" class="bg-gray-500 hover:bg-gray-700 text-white px-4 py-2 rounded-md">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        // --- State Management (using localStorage) ---
+        const cardDataNamespace = 'kanbanApp';
+
+        // Function to load cards from localStorage
+        function loadCards() {
+            const storedCards = localStorage.getItem(cardDataNamespace);
+            if (storedCards) {
+                return JSON.parse(storedCards);
+            }
+            return [];
+        }
+
+        // Function to save cards to localStorage
+        function saveCards(cards) {
+            localStorage.setItem(cardDataNamespace, JSON.stringify(cards));
+        }
+
+        // --- Card Class ---
+        class Card {
+            constructor(id, title, content = '') {
+                this.id = id;
+                this.title = title;
+                this.content = content;
+                this.column = null; // Keep track of the column
+            }
+
+            render() {
+                return `<div class="card data-testid="card" id="${this.id}">
+                            <h3 class="text-lg font-semibold">${this.title}</h3>
+                            ${this.content}
+                            <button data-testid="delete-card" class="bg-red-500 hover:bg-red-700 text-white px-2 py-1 rounded-sm">Delete</button>
+                        </div>`;
+            }
+        }
+
+        // --- Kanban Board Logic ---
+        const columns = ['Backlog', 'In Progress', 'Review', 'Done'];
+        let cards = loadCards();
+
+        // Function to render the Kanban board
+        function renderBoard() {
+            const boardContainer = document.getElementById('kanban-board-container');
+            boardContainer.innerHTML = ''; // Clear existing content
+
+            columns.forEach(columnName => {
+                const columnElement = document.getElementById(`column-${columnName}`);
+                if (columnElement) {
+                    columnElement.innerHTML = ''; // Clear column content
+
+                    const columnHeader = document.createElement('h2');
+                    columnHeader.classList.add('text-xl', 'font-semibold', 'border-b', 'p-2');
+                    columnHeader.textContent = columnName;
+                    columnElement.appendChild(columnHeader);
+
+                    const addCardButton = document.createElement('button');
+                    addCardButton.dataset.testid = 'add-card';
+                    addCardButton.classList.add('bg-blue-500', 'hover:bg-blue-700', 'text-white', 'font-bold', 'px-4', 'py-2', 'rounded-md');
+                    addCardButton.textContent = 'Add Card';
+                    columnElement.appendChild(addCardButton);
+
+                    // Render cards in the column
+                    cards.forEach(card => {
+                        if (card.column === columnName) {
+                            const cardElement = document.createElement('div');
+                            cardElement.classList.add('card');
+                            cardElement.dataset.testid = 'card';
+                            cardElement.id = card.id; // Assign ID for delete functionality
+
+                            const cardContent = card.render();
+                            cardElement.innerHTML = cardContent;
+
+                            // Add delete button
+                            const deleteButton = document.createElement('button');
+                            deleteButton.dataset.testid = 'delete-card';
+                            deleteButton.classList.add('bg-red-500', 'hover:bg-red-700', 'text-white', 'px-2', 'py-1', 'rounded-sm');
+                            deleteButton.textContent = 'Delete';
+                            cardElement.appendChild(deleteButton);
+
+                            columnElement.appendChild(cardElement);
+                        }
+                    });
+                }
+            });
+        }
+
+        // Function to add a new card
+        function addCard(title = '') {
+            const newCard = new Card(generateUniqueId(), title);
+            cards.push(newCard);
+            saveCards(cards);
+            renderBoard();
+        }
+
+        // Function to delete a card
+        function deleteCard(cardId) {
+            const index = cards.findIndex(card => card.id === cardId);
+            if (index !== -1) {
+                const deletedCard = cards.splice(index, 1)[0]; // Remove the card
+                saveCards(cards);
+                renderBoard();
+
+                // Show delete confirmation modal
+                const deleteConfirmation = document.getElementById('delete-confirmation');
+                deleteConfirmation.style.display = 'block';
+
+                // Hide the confirmation modal when the "Delete" button is clicked
+                document.addEventListener('click', (event) => {
+                    if (event.target.dataset.testid === 'confirm-delete' && event.textContent === 'Delete') {
+                        deleteConfirmation.style.display = 'none';
+                    }
+                });
+
+                // Hide the confirmation modal when the "Cancel" button is clicked
+                document.addEventListener('click', (event) => {
+                    if (event.target.dataset.testid === 'confirm-delete' && event.textContent === 'Cancel') {
+                        deleteConfirmation.style.display = 'none';
+                    }
+                });
+            } else {
+                alert('Card not found.'); // Fallback if card is not found (using alert as requested)
+            }
+        }
+
+        // Function to generate a unique ID for new cards
+        function generateUniqueId() {
+            return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        }
+
+        // --- Event Listeners ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderBoard(); // Initial render
+
+            // Add card event listeners
+            const addCardButtons = document.querySelectorAll('[data-testid="add-card"]');
+            addCardButtons.forEach(button => {
+                button.addEventListener('click', () => addCard());
+            });
+
+            // Delete card event listeners
+            const deleteButtons = document.querySelectorAll('[data-testid="delete-card"]');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const cardId = button.closest('.card').id; // Get the ID of the card
+                    const deleteConfirmation = document.getElementById('delete-confirmation');
+                    deleteConfirmation.style.display = 'block'; // Show the confirmation modal
+
+                    // Add delete confirmation button
+                    const confirmDeleteButton = document.createElement('button');
+                    confirmDeleteButton.dataset.testid = 'confirm-delete';
+                    confirmDeleteButton.textContent = 'Delete';
+                    document.getElementById('delete-confirmation').appendChild(confirmDeleteButton);
+
+                    // Add cancel button
+                    const cancelDeleteButton = document.createElement('button');
+                    cancelDeleteButton.dataset.testid = 'confirm-delete';
+                    cancelDeleteButton.textContent = 'Cancel';
+                    document.getElementById('delete-confirmation').appendChild(cancelDeleteButton);
+
+                    // Add event listeners to the confirmation buttons
+                    confirmDeleteButton.addEventListener('click', () => deleteCard(cardId));
+                    cancelDeleteButton.addEventListener('click', () => {
+                        deleteConfirmation.style.display = 'none';
+                    });
+                });
+            });
+
+            // Card Input Event Listener (Add on Enter)
+            const newCardInput = document.getElementById('new-card-title');
+            newCardInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    addCard(newCardInput.value);
+                    newCardInput.value = ''; // Clear the input field
+                }
+            });
+
+        });
+    </script>
+
+</body>
+</html>

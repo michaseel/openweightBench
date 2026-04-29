@@ -183,11 +183,22 @@
         </div>
         <div>
           <dt class="text-stone-500">Wall total</dt>
-          <dd class="font-semibold text-stone-900 num">5.4 min</dd>
+          <dd class="font-semibold text-stone-900 num">6.2 min</dd>
         </div>
       </dl>
       <div class="mt-4 pt-3 border-t border-stone-200 text-xs uppercase tracking-wider text-stone-500">Benchmarks</div>
       <ul class="mt-2 space-y-0.5">
+          <li>
+            <a href="#coding" class="flex items-center justify-between gap-2 py-1.5 px-2 rounded hover:bg-stone-50 group">
+              <span class="text-sm text-stone-700 group-hover:text-stone-900 truncate">coding</span>
+              <span class="flex items-baseline gap-2 num shrink-0">
+                <span class="text-sm font-semibold text-amber-700">
+0.61
+                </span>
+                <span class="text-[10px] text-stone-400 w-10 text-right">48s</span>
+              </span>
+            </a>
+          </li>
           <li>
             <a href="#vision" class="flex items-center justify-between gap-2 py-1.5 px-2 rounded hover:bg-stone-50 group">
               <span class="text-sm text-stone-700 group-hover:text-stone-900 truncate">vision</span>
@@ -249,6 +260,393 @@
 
   <div class="min-w-0">
 
+<section id="coding" class="mb-12 scroll-mt-24">
+  <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
+    <h2 class="text-lg font-medium tracking-tight">coding</h2>
+    <a href="../benchmarks/coding.html" class="text-xs text-stone-500 hover:text-stone-900">all models in this bench →</a>
+  </div>
+
+
+  <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+    <div class="md:col-span-1 bg-white border-2 border-amber-400 rounded-lg p-5 flex flex-col justify-center">
+      <div class="text-xs uppercase tracking-wider text-stone-500">Score</div>
+      <div class="mt-1 text-5xl font-bold num leading-none text-amber-700">
+0.61
+      </div>
+        <div class="mt-3 grid grid-cols-3 gap-2 text-center">
+          <div class="rounded border border-stone-200 px-2 py-1.5">
+            <div class="text-[10px] uppercase tracking-wider text-stone-500">Static</div>
+            <div class="text-base font-bold num text-emerald-700">1.00</div>
+          </div>
+          <div class="rounded border border-stone-200 px-2 py-1.5">
+            <div class="text-[10px] uppercase tracking-wider text-stone-500">Functional</div>
+            <div class="text-base font-bold num text-amber-700">0.33</div>
+          </div>
+          <div class="rounded border border-stone-200 px-2 py-1.5">
+            <div class="text-[10px] uppercase tracking-wider text-stone-500">Qualitative</div>
+            <div class="text-base font-bold num text-amber-700">0.66</div>
+          </div>
+        </div>
+    </div>
+    <div class="md:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">tok/s</dt>
+        <dd class="mt-1 text-xl font-semibold num">135</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Tokens</dt>
+        <dd class="mt-1 text-xl font-semibold num">5542</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Wall</dt>
+        <dd class="mt-1 text-xl font-semibold num">47.7 s</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">RAM</dt>
+        <dd class="mt-1 text-xl font-semibold num">4.1 GB</dd>
+      </div>
+    </div>
+  </div>
+
+    <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Worum geht es? Was wird getestet?
+      </summary>
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: From a ~200-word prompt the model must generate a fully functional Kanban board as a single-file HTML with drag &amp; drop, localStorage persistence, edit/delete and a confetti animation — in a single chat without iteration. The prompt also includes a small `data-testid` contract so a Playwright test can drive the app remotely.
+
+Three signals feed into the score:
+(1) Static — a linter checks concrete constraints in the HTML (columns, Tailwind, localStorage call, no framework, no window.alert/prompt, …).
+(2) Functional — Playwright runs a small CRUD sequence: create a card, delete a card with confirmation, reload — does state persist? — and checks whether any JS console errors occur during the entire flow. Drag &amp; drop and confetti are deliberately not tested functionally (too many implementation variants).
+(3) Qualitative — LLM-as-judge rates screenshot and code (visual + code quality + render↔code consistency).
+
+Score = mean over the available signals.
+
+Why models fail: reasoning models burn their tokens in thinking instead of writing. Sliding-window models (Gemma 4) lose the constraints at the start of the prompt. Small models (&lt;3B) often fail to produce coherent HTML — or ignore the data-testid contract, which makes the functional tests fail in droves.</div>
+    </details>
+
+    <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Prompt
+      </summary>
+      <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">You are a careful front-end engineer.</pre>
+          </div>
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Developer prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">Create a fully functional Kanban board in a single HTML file using vanilla JavaScript (no frameworks like react).
+
+Requirements:
+- Columns: Backlog, In Progress, Review, Done.
+- Cards must be:
+  - draggable across columns,
+  - editable in place,
+  - persisted in localStorage (state survives reloads) - please use your own namespace,
+  - deletable with a confirmation prompt.
+- Each column provides an &#34;Add card&#34; action.
+- Style with Tailwind via CDN.
+- Add subtle CSS transitions and trigger a confetti animation when a card moves to &#34;Done&#34;.
+- Thoroughly comment the code.
+- dont use window.alert or window.prompt to add/edit/delete cards
+- if there are no cards yet, create some dummy cards
+- modern and vibrant design
+
+Stable test selectors (mandatory — these data-testid attributes are used by an automated functional test; do not omit, rename, or split them across multiple elements):
+- Column containers: data-testid=&#34;column-backlog&#34;, data-testid=&#34;column-in-progress&#34;, data-testid=&#34;column-review&#34;, data-testid=&#34;column-done&#34;.
+- Every &#34;Add card&#34; button (one per column): data-testid=&#34;add-card&#34;.
+- Every card element: data-testid=&#34;card&#34;.
+- Inside each card, the delete trigger: data-testid=&#34;delete-card&#34;.
+- The confirm button of the delete-confirmation dialog/modal: data-testid=&#34;confirm-delete&#34;.
+- The input/textarea where a new card title is typed: data-testid=&#34;card-input&#34;. Pressing Enter in this input MUST commit the new card.
+
+As answer return the plain HTML of the working application (script and styles included)</pre>
+          </div>
+      </div>
+    </details>
+
+        <a href="../assets/artifacts/google_gemma-4-e2b/coding/output.html" target="_blank"
+           class="mt-5 block bg-emerald-600 hover:bg-emerald-700 text-white text-center font-semibold text-lg rounded px-6 py-5 shadow-sm transition">
+          ▶ Open generated app in a new tab ↗
+        </a>
+        <div class="mt-4 bg-white border border-stone-200 rounded">
+          <div class="px-4 py-2 border-b border-stone-200 text-sm font-medium">Screenshot der gerenderten App</div>
+          <div class="zoom-frame">
+            <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom screenshot" title="Zoom screenshot">⛶</button>
+            <img src="../assets/artifacts/google_gemma-4-e2b/coding/screenshot.png" class="zoomable block w-full max-h-[600px] object-contain bg-stone-50 cursor-zoom-in" alt="Screenshot der gerenderten App">
+          </div>
+        </div>
+
+      <div class="mt-5 bg-amber-50 border border-amber-200 rounded">
+        <div class="px-4 py-3 border-b border-amber-200 flex items-baseline justify-between">
+          <div>
+            <span class="text-xs uppercase tracking-wider text-amber-700">Qualitative · LLM-as-judge (openai/gpt-5.4)</span>
+            <span class="ml-3 text-xs text-stone-500 num">2026-04-29T17:28:25.139982+00:00</span>
+          </div>
+          <div class="text-3xl font-bold num text-amber-700">0.66</div>
+        </div>
+        <div class="px-4 py-3 border-b border-amber-200">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Visual (screenshot)</div>
+          <ul class="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs">
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">board renders</div>
+                  <div class="text-base font-bold num text-emerald-700">1.00</div>
+                </li>
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">column completeness</div>
+                  <div class="text-base font-bold num text-emerald-700">1.00</div>
+                </li>
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">cards present</div>
+                  <div class="text-base font-bold num text-emerald-700">1.00</div>
+                </li>
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">ui affordances</div>
+                  <div class="text-base font-bold num text-emerald-700">0.70</div>
+                </li>
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">design quality</div>
+                  <div class="text-base font-bold num text-emerald-700">0.80</div>
+                </li>
+          </ul>
+<div class="mt-3 text-sm text-stone-700">Das Board rendert klar mit allen vier Spalten, drei sichtbaren Beispielkarten und gut erkennbaren Add-Card-Buttons. Optisch ist es sauber und modern, aber Drag/Edit-Affordances sind im statischen Screenshot nur teilweise erkennbar.</div>        </div>
+        <div class="px-4 py-3 border-b border-amber-200">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Code quality (HTML/JS)</div>
+          <ul class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">code structure</div>
+                  <div class="text-base font-bold num text-emerald-700">0.70</div>
+                </li>
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">dom safety</div>
+                  <div class="text-base font-bold num text-emerald-700">0.90</div>
+                </li>
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">robustness</div>
+                  <div class="text-base font-bold num text-amber-700">0.30</div>
+                </li>
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">code quality</div>
+                  <div class="text-base font-bold num text-amber-700">0.20</div>
+                </li>
+          </ul>
+<div class="mt-3 text-sm text-stone-700">Die Grundstruktur mit IIFE, Render- und Handler-Funktionen ist ordentlich, und DOM-Sicherheit ist weitgehend gut, da Texte meist über value/textContent gesetzt werden. Allerdings enthält der Code mehrere gravierende Logikfehler: uneinheitliche Statuswerte/IDs, kaputte Add-Card-Zuordnung, fehlendes try/catch für localStorage/JSON.parse und ein offensichtlicher Referenzfehler beim Delete-Handler.</div>        </div>
+          <div class="px-4 py-3">
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2 flex items-baseline justify-between">
+              <span>Render ↔ code consistency</span>
+              <span class="text-base font-bold num text-amber-700">0.20</span>
+            </div>
+<div class="text-sm text-stone-700">Screenshot und HTML-Struktur passen nur oberflächlich zusammen: Das statische Render wirkt plausibel, aber mehrere Interaktionen aus dem Code würden zur Laufzeit brechen oder inkonsistent arbeiten. Besonders Delete, Add Card und Drag/Drop verwenden Status-/ID-Schemata, die nicht sauber zusammenpassen, daher deutliche Diskrepanz zwischen versprochener Funktionalität und robustem Verhalten.</div>          </div>
+      </div>
+
+      <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+        <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+          Static · linter checks (12/12 passed)
+        </summary>
+        <div class="px-4 py-3 border-t border-stone-200 bg-white rounded-b">
+          <ul class="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Spalte &#39;Backlog&#39;</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Spalte &#39;In Progress&#39;</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Spalte &#39;Review&#39;</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Spalte &#39;Done&#39;</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">HTML5 drag &amp; drop or sortable lib</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">localStorage persistence</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Tailwind via CDN</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Confetti animation on &#39;Done&#39;</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Add card button</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Vanilla JS (no React/Vue/Angular/Svelte)</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">No window.alert/prompt for CRUD</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Editable cards (contenteditable / input)</div>
+                </div>
+              </li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+        <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+          Functional · E2E tests (2/6 passed)
+        </summary>
+        <div class="px-4 py-3 border-t border-stone-200 bg-white rounded-b">
+          <ul class="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Page loads with all 4 columns</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-red-600">✗</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Add card via button</div>
+<div class="text-xs text-stone-500 mt-0.5 font-mono break-all">card was not created (count unchanged)</div>                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-red-600">✗</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Card is added exactly 1× (no double submit)</div>
+<div class="text-xs text-stone-500 mt-0.5 font-mono break-all">no add happened, so not verifiable</div>                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-red-600">✗</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Delete card via button + confirmation</div>
+<div class="text-xs text-stone-500 mt-0.5 font-mono break-all">Page.wait_for_selector: Timeout 2000ms exceeded.
+Call log:
+  - waiting for locator(&#34;[data-testid=\&#34;confirm-delete\&#34;]&#34;) to be visible
+</div>                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Cards survive a reload</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-red-600">✗</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">No JS console errors</div>
+<div class="text-xs text-stone-500 mt-0.5 font-mono break-all">pageerror: Cannot read properties of null (reading &#39;appendChild&#39;); pageerror: Cannot read properties of null (reading &#39;appendChild&#39;); pageerror: card is not defined</div>                </div>
+              </li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+        <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+          Raw model response
+        </summary>
+        <pre class="px-4 py-3 text-xs bg-white whitespace-pre-wrap border-t border-stone-200 rounded-b overflow-x-auto">```html
+&lt;!DOCTYPE html&gt;
+&lt;html lang=&#34;en&#34;&gt;
+&lt;head&gt;
+    &lt;meta charset=&#34;UTF-8&#34;&gt;
+    &lt;meta name=&#34;viewport&#34; content=&#34;width=device-width, initial-scale=1.0&#34;&gt;
+    &lt;title&gt;Vanilla Kanban Board&lt;/title&gt;
+    &lt;!-- Load Tailwind CSS via CDN --&gt;
+    &lt;script src=&#34;https://cdn.tailwindcss.com&#34;&gt;&lt;/script&gt;
+    &lt;style&gt;
+        /* Custom styles for transitions and layout */
+        body {
+            background-color: #f4f7f9;
+        }
+        /* Ensure the drag interaction looks smooth */
+        [draggable=&#34;true&#34;]:hover {
+            cursor: grab;
+        }
+        .column-container {
+            min-height: 300px;
+            transition: background-color 0.3s ease;
+        }
+        .card {
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            user-select: none; /* Prevent text selection during drag */
+        }
+        /* Style for the editable input inside the card */
+        .card-title-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        /* Confetti Animation Styles (Simple implementation) */
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Allows clicks to pass through */
+            z-index: 1000;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body class=&#34;p-6 font-sans&#34;&gt;
+
+    &lt;!-- Confetti Container --&gt;
+    &lt;div id=&#34;confetti-container&#34; class=&#34;confetti-container&#34;&gt;&lt;/div&gt;
+
+    &lt;header class=&#34;text-center mb-8&#34;&gt;
+        &lt;h1 class=&#34;text-4xl font-extrabold text-gray-900 mb-2&#34;&gt;Kanban Board&lt;/h1&gt;
+        &lt;p class=&#34;text-gray-600&#34;&gt;Drag, Edit, and Organize your tasks.&lt;/p&gt;
+    &lt;/header&gt;
+
+    &lt;!-- Kanban Board Container --&gt;
+    &lt;div id=&#34;kanban-board&#34; class=&#34;grid grid-cols-1 md:grid-cols-4 gap-6&#34;&gt;
+
+        &lt;!-- Column: Backlog --&gt;
+        &lt;div id=&#34;column-backlog&#34; data-testid=&#34;column-backlog&#34; class=&#34;</pre>
+      </details>
+
+
+    <div class="mt-4 text-xs text-stone-500">
+      Artefacts:
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-e2b/coding/output.html" target="_blank">Generierte App</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-e2b/coding/raw_response.txt" target="_blank">Raw model response</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-e2b/coding/screenshot.png" target="_blank">Screenshot der gerenderten App</a>
+    </div>
+</section>
 <section id="vision" class="mb-12 scroll-mt-24">
   <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
     <h2 class="text-lg font-medium tracking-tight">vision</h2>
@@ -1044,7 +1442,7 @@ Answer as a numbered list 1., 2., 3. with one short sentence each.</pre>
                 </div>
               </div>
               <div class="px-4 py-3 bg-white">
-                <pre class="text-sm text-stone-800 whitespace-pre-wrap leading-relaxed">Dieser Text ist eine tiefgründige Erzählung, die das idyllische Leben im „Blumental“ mit den brutalen Realitäten des Krieges und der sozialen Ungerechtigkeit kontrastiert. Die Hauptfiguren sind Gottlieb Hermann Lasso und seine geliebte Malineken, während sie sich durch historische Ereignisse wie die französische Besetzung und die Verfolgung von Freiheit kämpfen. Im Zentrum steht das tragische Schicksal des Gottlieb, dessen Leben durch den Krieg und die daraus resultierenden Gewalt zerrissen wird. Die Geschichte endet mit einer tiefen Reflexion über Gerechtigkeit, Gottes Wille und die unentrinnbare Notwendigkeit, sich für das Gute einzusetzen.</pre>
+                <pre class="text-sm text-stone-800 whitespace-pre-wrap leading-relaxed max-h-[500px] overflow-y-auto">Dieser Text ist eine tiefgründige Erzählung, die das idyllische Leben im „Blumental“ mit den brutalen Realitäten des Krieges und der sozialen Ungerechtigkeit kontrastiert. Die Hauptfiguren sind Gottlieb Hermann Lasso und seine geliebte Malineken, während sie sich durch historische Ereignisse wie die französische Besetzung und die Verfolgung von Freiheit kämpfen. Im Zentrum steht das tragische Schicksal des Gottlieb, dessen Leben durch den Krieg und die daraus resultierenden Gewalt zerrissen wird. Die Geschichte endet mit einer tiefen Reflexion über Gerechtigkeit, Gottes Wille und die unentrinnbare Notwendigkeit, sich für das Gute einzusetzen.</pre>
                   <div class="mt-3 border border-amber-200 bg-amber-50 rounded p-3">
                     <div class="flex items-baseline justify-between gap-3">
                       <span class="text-xs uppercase tracking-wider text-amber-700">LLM judge summary (openai/gpt-5.4)</span>

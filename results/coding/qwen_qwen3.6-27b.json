@@ -15,20 +15,20 @@
     ],
     "loaded_context_length": null
   },
-  "started_at": "2026-04-28T23:08:47.554262Z",
-  "completed_at": "2026-04-28T23:15:15.672901Z",
+  "started_at": "2026-04-29T16:49:55.298213Z",
+  "completed_at": "2026-04-29T17:00:03.214733Z",
   "metrics": {
-    "wall_seconds": 388.11616999993566,
-    "tokens_generated": 7640,
-    "tokens_per_second": 21.49025392231451,
-    "time_to_first_token_ms": 1800.0,
+    "wall_seconds": 607.9343427920248,
+    "tokens_generated": 12474,
+    "tokens_per_second": 21.53155946815978,
+    "time_to_first_token_ms": 1762.0,
     "peak_rss_mb": 16669.0
   },
-  "score": 0.5,
+  "score": 1.0,
   "score_breakdown": {
     "looks_like_html": true,
-    "html_length": 25694,
-    "raw_length": 27206,
+    "html_length": 37134,
+    "raw_length": 37148,
     "lint_checks": [
       {
         "id": "col_backlog",
@@ -110,65 +110,65 @@
       {
         "id": "renders",
         "label": "Page loads with all 4 columns",
-        "passed": false,
-        "detail": "missing columns: ['backlog', 'in-progress', 'review', 'done']"
+        "passed": true,
+        "detail": ""
       },
       {
         "id": "add_card",
         "label": "Add card via button",
-        "passed": false,
-        "detail": "kein [data-testid=\"add-card\"] gefunden"
+        "passed": true,
+        "detail": ""
       },
       {
         "id": "no_double_add",
         "label": "Card is added exactly 1× (no double submit)",
-        "passed": false,
-        "detail": "skipped — add flow failed"
+        "passed": true,
+        "detail": ""
       },
       {
         "id": "delete_card",
         "label": "Delete card via button + confirmation",
-        "passed": false,
-        "detail": "no cards available to delete"
+        "passed": true,
+        "detail": ""
       },
       {
         "id": "persistence",
         "label": "Cards survive a reload",
-        "passed": false,
-        "detail": "Page.wait_for_selector: Timeout 2000ms exceeded.\nCall log:\n  - waiting for locator(\"[data-testid=\\\"column-backlog\\\"]\") to be visible\n"
+        "passed": true,
+        "detail": ""
       },
       {
         "id": "no_console_errors",
         "label": "No JS console errors",
-        "passed": false,
-        "detail": "pageerror: Invalid or unexpected token; pageerror: Invalid or unexpected token"
+        "passed": true,
+        "detail": ""
       }
     ],
-    "e2e_passed": 0,
+    "e2e_passed": 6,
     "e2e_total": 6,
-    "e2e_score": 0.0,
+    "e2e_score": 1.0,
     "judge": {
-      "scored_at": "2026-04-28T23:15:26.832277+00:00",
+      "scored_at": "2026-04-29T17:00:21.182330+00:00",
       "judge_model": "openai/gpt-5.4",
       "scores": {
-        "board_renders": 0.0,
-        "column_completeness": 0.0,
-        "cards_present": 0.0,
-        "ui_affordances": 0.5,
-        "design_quality": 0.35,
-        "code_structure": 0.82,
-        "dom_safety": 0.9,
-        "robustness": 0.62,
-        "code_quality": 0.58,
-        "render_matches_code": 0.0
+        "board_renders": 1.0,
+        "column_completeness": 1.0,
+        "cards_present": 1.0,
+        "ui_affordances": 0.7,
+        "design_quality": 0.92,
+        "code_structure": 0.9,
+        "dom_safety": 0.6,
+        "robustness": 0.7,
+        "code_quality": 0.85,
+        "render_matches_code": 1.0
       },
-      "judge_score": 0.41200000000000003,
-      "comment_visual": "Im Screenshot ist nur der Header sichtbar; das eigentliche Board mit Spalten und Karten rendert gar nicht. Die Typografie und Farbgebung des Headers sind ordentlich, aber funktional ist die UI praktisch leer.",
-      "comment_code": "Der Code ist insgesamt gut gegliedert mit klaren Render-, State- und Event-Funktionen; User-Text wird überwiegend sicher per textContent gesetzt. Allerdings steckt ein harter Syntaxfehler in createColumnElement (\"cardrop', handleDragLeave);\" statt addEventListener), wodurch das gesamte Script nicht initialisiert und das Board nie gerendert wird.",
-      "comment_consistency": "Massive Diskrepanz zwischen Anspruch und Render: Der HTML/JS-Code beschreibt ein vollständiges 4-Spalten-Kanban mit Dummy-Karten, Add/Edit/Delete, Drag-and-Drop und Confetti, im Screenshot erscheint aber nur der statische Header. Das ist ein klarer Laufzeit-/Parse-Failure, daher render_matches_code = 0."
+      "judge_score": 0.859,
+      "comment_visual": "Das Board rendert vollständig mit allen vier Spalten und mehreren gut lesbaren Karten. Add-Buttons sind sichtbar, das Layout wirkt modern, stimmig und nah an einem produktreifen Kanban-UI. Drag/Edit/Delete sind nur teilweise als Affordance erkennbar, weil Hover-Zustände im statischen Screenshot naturgemäß nicht sichtbar sind.",
+      "comment_code": "Der Code ist sauber in State, Rendering, DnD, CRUD und Init gegliedert und insgesamt gut lesbar. Positiv sind try/catch um localStorage und überwiegend sichere DOM-Erzeugung via createElement/textContent; Abzüge gibt es, weil mehrfach innerHTML für SVG-Markup genutzt wird und die Blur-/Commit-Logik bei Add/Edit fragil wirkt.",
+      "comment_consistency": "Screenshot und Code passen sehr gut zusammen: Die vier Spalten, Kartenanzahlen und Inhalte entsprechen den Default-Daten und der Renderlogik. Keine erkennbare Laufzeit-Diskrepanz zwischen versprochenem Verhalten im Code und tatsächlichem Render."
     }
   },
-  "raw_response": "\n\n```html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\" />\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n  <title>Kanban Board</title>\n  <!-- Tailwind CSS via CDN -->\n  <script src=\"https://cdn.tailwindcss.com\"></script>\n  <script>\n    // Tailwind config for custom colors and animations\n    tailwind.config = {\n      theme: {\n        extend: {\n          fontFamily: {\n            sans: ['Inter', 'system-ui', 'sans-serif'],\n          },\n        },\n      },\n    };\n  </script>\n  <style>\n    /* ---- Base & Layout ---- */\n    *, *::before, *::after { box-sizing: border-box; }\n    body {\n      margin: 0;\n      font-family: 'Inter', system-ui, sans-serif;\n      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);\n      min-height: 100vh;\n      color: #e2e8f0;\n      overflow-x: auto;\n    }\n\n    /* ---- Column Drop Zone Styling ---- */\n    .kanban-column {\n      min-height: 200px;\n      transition: background-color 0.3s ease, box-shadow 0.3s ease;\n      border: 2px dashed transparent;\n      border-radius: 1rem;\n    }\n    .kanban-column.drag-over {\n      border-color: rgba(139, 92, 246, 0.6);\n      background-color: rgba(139, 92, 246, 0.08);\n      box-shadow: 0 0 20px rgba(139, 92, 246, 0.15);\n    }\n\n    /* ---- Card Styling ---- */\n    .kanban-card {\n      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;\n      cursor: grab;\n      user-select: none;\n    }\n    .kanban-card:hover {\n      transform: translateY(-2px);\n      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);\n    }\n    .kanban-card.dragging {\n      opacity: 0.5;\n      transform: rotate(3deg) scale(1.03);\n      cursor: grabbing;\n    }\n\n    /* ---- Card Edit Mode ---- */\n    .card-edit-input {\n      background: rgba(255, 255, 255, 0.1);\n      border: 1px solid rgba(139, 92, 246, 0.5);\n      border-radius: 0.5rem;\n      color: #e2e8f0;\n      padding: 0.5rem;\n      width: 100%;\n      font-size: 0.875rem;\n      outline: none;\n      tran",
+  "raw_response": "\n\n```html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\" />\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n  <title>Kanban Board</title>\n\n  <!-- Tailwind CSS via CDN -->\n  <script src=\"https://cdn.tailwindcss.com\"></script>\n\n  <!-- Tailwind config for custom colors and animations -->\n  <script>\n    tailwind.config = {\n      theme: {\n        extend: {\n          fontFamily: {\n            sans: ['Inter', 'system-ui', 'sans-serif'],\n          },\n        },\n      },\n    };\n  </script>\n\n  <!-- Google Fonts -->\n  <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\" />\n  <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin />\n  <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap\" rel=\"stylesheet\" />\n\n  <style>\n    /* ===== GLOBAL RESET & BASE ===== */\n    * {\n      margin: 0;\n      padding: 0;\n      box-sizing: border-box;\n    }\n\n    body {\n      font-family: 'Inter', system-ui, sans-serif;\n      min-height: 100vh;\n      /* Vibrant gradient background */\n      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);\n      color: #e2e8f0;\n      overflow-x: hidden;\n    }\n\n    /* ===== SCROLLBAR STYLING ===== */\n    ::-webkit-scrollbar {\n      width: 6px;\n    }\n    ::-webkit-scrollbar-track {\n      background: transparent;\n    }\n    ::-webkit-scrollbar-thumb {\n      background: rgba(255, 255, 255, 0.15);\n      border-radius: 3px;\n    }\n    ::-webkit-scrollbar-thumb:hover {\n      background: rgba(255, 255, 255, 0.25);\n    }\n\n    /* ===== COLUMN DROP ZONE HIGHLIGHT ===== */\n    .column-drop-zone {\n      transition: background-color 0.25s ease, border-color 0.25s ease;\n      border: 2px dashed transparent;\n      border-radius: 0.75rem;\n    }\n    .column-drop-zone.drag-over {\n      background-color: rgba(255, 255, 255, 0.06);\n      border-color: rgba(139, 92, 246, 0.5);\n    }\n\n    /* ===== CARD STYLES & TRANSITIONS ===== */\n    .kanban-card {\n      tran",
   "artifacts": [
     {
       "kind": "html",

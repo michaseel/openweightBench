@@ -1,45 +1,40 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kanban Board</title>
-    <!-- Tailwind CSS via CDN -->
+    <title>Vanilla Kanban Board</title>
+    <!-- Load Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom styles for drag and drop feedback and transitions */
-        .kanban-column {
-            min-height: 400px;
+        /* Custom styles for transitions and layout */
+        body {
+            background-color: #f4f7f9;
+        }
+        /* Ensure the drag interaction looks smooth */
+        [draggable="true"]:hover {
+            cursor: grab;
+        }
+        .column-container {
+            min-height: 300px;
             transition: background-color 0.3s ease;
         }
-
         .card {
-            cursor: grab;
+            cursor: pointer;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
-            will-change: transform; /* Performance optimization */
+            user-select: none; /* Prevent text selection during drag */
+        }
+        /* Style for the editable input inside the card */
+        .card-title-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-size: 1rem;
         }
 
-        .card:active {
-            cursor: grabbing;
-        }
-
-        /* Dragging feedback */
-        .dragging {
-            opacity: 0.5;
-            transform: scale(1.02);
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Style for the editable input */
-        [contenteditable=true]:focus {
-            outline: none;
-            border-color: #3b82f6; /* Blue focus ring */
-            background-color: #f9fafb;
-        }
-
-        /* Confetti container styling (optional, depends on confetti implementation) */
-        #confetti-container {
+        /* Confetti Animation Styles (Simple implementation) */
+        .confetti-container {
             position: fixed;
             top: 0;
             left: 0;
@@ -50,186 +45,414 @@
         }
     </style>
 </head>
-<body class="bg-gray-50 p-8 font-sans">
+<body class="p-6 font-sans">
 
-    <!-- Confetti Animation Container -->
-    <div id="confetti-container"></div>
+    <!-- Confetti Container -->
+    <div id="confetti-container" class="confetti-container"></div>
 
-    <header class="mb-8 text-center">
-        <h1 class="text-4xl font-extrabold text-gray-900 mb-2">Kanban Flow</h1>
-        <p class="text-gray-600">Manage your tasks with drag, drop, and persistence.</p>
+    <header class="text-center mb-8">
+        <h1 class="text-4xl font-extrabold text-gray-900 mb-2">Kanban Board</h1>
+        <p class="text-gray-600">Drag, Edit, and Organize your tasks.</p>
     </header>
 
     <!-- Kanban Board Container -->
-    <div id="kanban-board" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div id="kanban-board" class="grid grid-cols-1 md:grid-cols-4 gap-6">
 
         <!-- Column: Backlog -->
-        <div data-testid="column-backlog" id="backlog" class="bg-blue-50 p-4 rounded-lg shadow-md border-t-4 border-blue-500 min-h-[300px]">
-            <h2 class="text-xl font-bold text-blue-800 mb-4 border-b pb-2">Backlog</h2>
-            <button data-testid="add-card" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition duration-150 shadow-lg mb-4 focus:outline-none">Add Card</button>
-            <div class="space-y-4 min-h-[100px]">
+        <div id="column-backlog" data-testid="column-backlog" class="bg-gray-50 p-4 rounded-xl shadow-lg border-t-4 border-blue-500">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4 border-b pb-2">Backlog</h2>
+            <div id="backlog-cards" class="space-y-4 min-h-[100px]">
                 <!-- Cards will be injected here -->
             </div>
+            <button data-testid="add-card" class="mt-6 w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-150 shadow-md">Add Card</button>
         </div>
 
         <!-- Column: In Progress -->
-        <div data-testid="column-in-progress" id="in-progress" class="bg-yellow-50 p-4 rounded-lg shadow-md border-t-4 border-yellow-500 min-h-[300px]">
-            <h2 class="text-xl font-bold text-yellow-800 mb-4 border-b pb-2">In Progress</h2>
-            <button data-testid="add-card" class="bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-2 px-4 rounded-md transition duration-150 shadow-lg mb-4 focus:outline-none">Add Card</button>
-            <div class="space-y-4 min-h-[100px]">
+        <div id="column-in-progress" data-testid="column-in-progress" class="bg-gray-50 p-4 rounded-xl shadow-lg border-t-4 border-yellow-500">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4 border-b pb-2">In Progress</h2>
+            <div id="in-progress-cards" class="space-y-4 min-h-[100px]">
                 <!-- Cards will be injected here -->
             </div>
+            <button data-testid="add-card" class="mt-6 w-full bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600 transition duration-150 shadow-md">Add Card</button>
         </div>
 
         <!-- Column: Review -->
-        <div data-testid="column-review" id="review" class="bg-purple-50 p-4 rounded-lg shadow-md border-t-4 border-purple-500 min-h-[300px]">
-            <h2 class="text-xl font-bold text-purple-800 mb-4 border-b pb-2">Review</h2>
-            <button data-testid="add-card" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-md transition duration-150 shadow-lg mb-4 focus:outline-none">Add Card</button>
-            <div class="space-y-4 min-h-[100px]">
+        <div id="column-review" data-testid="column-review" class="bg-gray-50 p-4 rounded-xl shadow-lg border-t-4 border-purple-500">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4 border-b pb-2">Review</h2>
+            <div id="review-cards" class="space-y-4 min-h-[100px]">
                 <!-- Cards will be injected here -->
             </div>
+            <button data-testid="add-card" class="mt-6 w-full bg-purple-500 text-white py-2 px-4 rounded-lg hover:bg-purple-600 transition duration-150 shadow-md">Add Card</button>
         </div>
 
         <!-- Column: Done -->
-        <div data-testid="column-done" id="done" class="bg-green-50 p-4 rounded-lg shadow-md border-t-4 border-green-500 min-h-[300px]">
-            <h2 class="text-xl font-bold text-green-800 mb-4 border-b pb-2">Done</h2>
-            <button data-testid="add-card" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md transition duration-150 shadow-lg mb-4 focus:outline-none">Add Card</button>
-            <div class="space-y-4 min-h-[100px]">
+        <div id="column-done" data-testid="column-done" class="bg-gray-50 p-4 rounded-xl shadow-lg border-t-4 border-green-500">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4 border-b pb-2">Done</h2>
+            <div id="done-cards" class="space-y-4 min-h-[100px]">
                 <!-- Cards will be injected here -->
             </div>
+            <button data-testid="add-card" class="mt-6 w-full bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition duration-150 shadow-md">Add Card</button>
         </div>
 
     </div>
 
-    <!-- Delete Confirmation Modal (Hidden by default) -->
-    <div id="delete-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 hidden items-center justify-center transition-opacity duration-300">
-        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm transform scale-100 transition-transform duration-300">
-            <h3 class="text-2xl font-bold text-red-600 mb-4 border-b pb-2">Confirm Deletion</h3>
-            <p id="delete-prompt" class="text-gray-700 mb-6">Are you sure you want to delete this card?</p>
+    <!-- Custom Delete Confirmation Modal -->
+    <div id="delete-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-white p-6 rounded-lg shadow-2xl w-96">
+            <h3 class="text-xl font-bold text-red-600 mb-4 border-b pb-2">Confirm Deletion</h3>
+            <p id="delete-prompt" class="mb-6 text-gray-700">Are you sure you want to delete this card?</p>
             <div class="flex justify-end space-x-3">
-                <button id="cancel-delete" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition">Cancel</button>
-                <button id="confirm-delete" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition shadow-md">Delete</button>
+                <button id="cancel-delete" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition">Cancel</button>
+                <button id="confirm-delete" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">Delete</button>
             </div>
         </div>
     </div>
 
+
+    <!-- JavaScript Logic -->
     <script>
-        // --- NAMESPACE AND STATE MANAGEMENT ---
-        const KANBAN_NS = 'kanbanBoardData';
-        const STORAGE_KEY = `${KANBAN_NS}_cards`;
+        // ========================================================================
+        // NAMESPACE & STATE MANAGEMENT
+        // ========================================================================
+        const kanbanApp = (() => {
+            const STORAGE_KEY = 'kanbanBoardState';
+            let cards = [];
 
-        let cards = [];
-        let draggedCard = null; // Stores the card element currently being dragged
+            // DOM Element References
+            const boardContainer = document.getElementById('kanban-board');
+            const deleteModal = document.getElementById('delete-modal');
+            const deletePrompt = document.getElementById('delete-prompt');
+            const confirmDeleteBtn = document.getElementById('confirm-delete');
+            const cancelDeleteBtn = document.getElementById('cancel-delete');
+            const confettiContainer = document.getElementById('confetti-container');
 
-        // DOM Elements
-        const board = document.getElementById('kanban-board');
-        const deleteModal = document.getElementById('delete-modal');
-        const confirmDeleteBtn = document.getElementById('confirm-delete');
-        const cancelDeleteBtn = document.getElementById('cancel-delete');
-        const deletePrompt = document.getElementById('delete-prompt');
-        const confettiContainer = document.getElementById('confetti-container');
-
-        /**
-         * Loads state from localStorage.
-         */
-        function loadState() {
-            try {
-                const storedData = localStorage.getItem(STORAGE_KEY);
-                if (storedData) {
-                    cards = JSON.parse(storedData);
+            /**
+             * Loads state from localStorage or initializes dummy data.
+             */
+            function loadState() {
+                const storedState = localStorage.getItem(STORAGE_KEY);
+                if (storedState) {
+                    cards = JSON.parse(storedState);
                 } else {
-                    // If no data exists, create dummy cards
-                    createDummyCards();
+                    // Initialize with dummy data if nothing is found
+                    cards = [
+                        { id: Date.now() + 1, title: 'Setup Project Structure', status: 'Backlog' },
+                        { id: Date.now() + 2, title: 'Implement Drag Logic', status: 'In Progress' },
+                        { id: Date.now() + 3, title: 'Design UI Layout', status: 'Review' }
+                    ];
                 }
-            } catch (error) {
-                console.error("Error loading state from localStorage:", error);
-                cards = []; // Fallback to empty array on error
-                createDummyCards();
             }
-        }
 
-        /**
-         * Saves the current card state to localStorage.
-         */
-        function saveState() {
-            try {
+            /**
+             * Saves the current state to localStorage.
+             */
+            function saveState() {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
-            } catch (error) {
-                console.error("Error saving state to localStorage:", error);
             }
-        }
 
-        // --- CONFETTI ANIMATION LOGIC ---
+            // ========================================================================
+            // RENDERING FUNCTIONS
+            // ========================================================================
 
-        /**
-         * Generates a random color for the confetti pieces.
-         */
-        function getRandomColor() {
-            const colors = ['#f06292', '#4dd0e1', '#81C784', '#64b5f6', '#FFEE58', '#BA68C8'];
-            return colors[Math.floor(Math.random() * colors.length)];
-        }
+            /**
+             * Creates the HTML element for a single card.
+             * @param {object} card - The card data object.
+             * @returns {HTMLElement} The created card element.
+             */
+            function createCardElement(card) {
+                const cardEl = document.createElement('div');
+                cardEl.className = 'card bg-white p-3 rounded-lg shadow hover:shadow-md transition duration-150 border-l-4';
+                cardEl.setAttribute('data-testid', 'card');
+                cardEl.setAttribute('draggable', true);
+                cardEl.setAttribute('data-card-id', card.id);
 
-        /**
-         * Triggers the confetti effect.
-         */
-        function triggerConfetti() {
-            const count = 50;
-            for (let i = 0; i < count; i++) {
-                const confetti = document.createElement('div');
-                confetti.style.position = 'absolute';
-                confetti.style.width = '10px';
-                confetti.style.height = '10px';
-                confetti.style.backgroundColor = getRandomColor();
-                confetti.style.left = `${Math.random() * 100}%`;
-                confetti.style.top = `${Math.random() * 100}%`;
-                confetti.style.position = 'absolute';
-                confetti.style.zIndex = '1000';
-                confetti.style.transition = 'transform 2s ease-out, opacity 2s ease-out';
+                // Editable content (Input field)
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'card-title-input focus:ring-blue-500 focus:border-blue-500';
+                input.value = card.title;
+                input.setAttribute('data-testid', 'card-input');
 
-                // Random movement and fade out
-                const finalX = Math.random() * 100;
-                const finalY = Math.random() * 100;
-                confetti.style.transform = `translate(${finalX - 50}vw, ${finalY - 50}vh) rotate(${Math.random() * 360}deg)`;
-                confetti.style.opacity = '0';
+                // Delete Button
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'mt-3 text-red-500 hover:text-red-700 text-sm font-medium transition';
+                deleteBtn.setAttribute('data-testid', 'delete-card');
+                deleteBtn.textContent = 'Delete';
 
-                confettiContainer.appendChild(confetti);
+                // Attach Event Listeners for Editing and Deletion
+                setupCardListeners(cardEl, input, deleteBtn);
 
-                // Trigger the animation after a slight delay to ensure CSS transition works
-                setTimeout(() => {
-                    confetti.style.transition = 'transform 2s ease-out, opacity 2s ease-out';
-                    confetti.style.opacity = '1';
-                }, 50);
+                cardEl.appendChild(input);
+                cardEl.appendChild(deleteBtn);
 
-                // Clean up after animation finishes
-                setTimeout(() => {
-                    confetti.remove();
-                }, 2000);
+                return cardEl;
             }
-        }
+
+            /**
+             * Renders all cards into their respective columns based on the current state.
+             */
+            function renderBoard() {
+                // Clear all existing card lists
+                document.getElementById('backlog-cards').innerHTML = '';
+                document.getElementById('in-progress-cards').innerHTML = '';
+                document.getElementById('review-cards').innerHTML = '';
+                document.getElementById('done-cards').innerHTML = '';
+
+                cards.forEach(card => {
+                    const cardEl = createCardElement(card);
+                    const targetColumnId = `column-${card.status}`;
+                    document.getElementById(`${card.status.toLowerCase().replace(' ', '-')}-cards`).appendChild(cardEl);
+                });
+            }
+
+            // ========================================================================
+            // INTERACTION HANDLERS (CRUD)
+            // ========================================================================
+
+            /**
+             * Handles saving the card title when input is blurred or Enter is pressed.
+             * @param {HTMLElement} inputEl - The card input element.
+             * @param {object} card - The card object being updated.
+             */
+            function handleCardEdit(inputEl, card) {
+                const newTitle = inputEl.value.trim();
+                if (newTitle) {
+                    card.title = newTitle;
+                    saveState();
+                    renderBoard(); // Re-render to ensure consistency if needed
+                } else {
+                    // Handle case where input is empty (optional: revert or flag error)
+                    console.warn('Card title cannot be empty.');
+                }
+            }
+
+            /**
+             * Sets up listeners for editing and deletion on a specific card element.
+             */
+            function setupCardListeners(cardEl, inputEl, deleteBtn) {
+                // 1. Editing via Blur/Enter
+                inputEl.addEventListener('blur', () => handleCardEdit(inputEl, cards.find(c => c.id === parseInt(cardEl.getAttribute('data-card-id')))), true);
+                inputEl.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        handleCardEdit(inputEl, cards.find(c => c.id === parseInt(cardEl.getAttribute('data-card-id'))), true);
+                    }
+                });
+
+                // 2. Deletion Trigger
+                deleteBtn.addEventListener('click', () => openDeleteModal(card));
+            }
 
 
-        // --- CARD RENDERING AND INTERACTION ---
+            /**
+             * Opens the custom confirmation modal for deletion.
+             * @param {object} card - The card to be deleted.
+             */
+            function openDeleteModal(card) {
+                deletePrompt.textContent = `Are you sure you want to delete "${card.title}"? This action cannot be undone.`;
+                deleteModal.classList.remove('hidden');
+                // Store the card ID we are confirming deletion for
+                deleteModal.dataset.cardIdToDelete = card.id;
+            }
 
-        /**
-         * Creates the HTML structure for a single card.
-         * @param {object} card - The card data.
-         * @returns {HTMLElement} The generated card element.
-         */
-        function createCardElement(card) {
-            const cardEl = document.createElement('div');
-            cardEl.className = 'card bg-white p-4 rounded-lg shadow hover:shadow-lg border border-gray-200 transition duration-150';
-            cardEl.setAttribute('draggable', true);
-            cardEl.setAttribute('data-card-id', card.id);
+            /**
+             * Handles the final deletion confirmation.
+             */
+            function confirmDelete() {
+                const cardIdToDelete = parseInt(deleteModal.dataset.cardIdToDelete);
+                
+                // Find and filter the cards array
+                cards = cards.filter(card => card.id !== cardIdToDelete);
 
-            // Card Content (Editable Title)
-            const titleInput = document.createElement('input');
-            titleInput.type = 'text';
-            titleInput.className = 'w-full text-lg font-medium mb-2 focus:ring-blue-500 focus:border-blue-500 border-b border-gray-100';
-            titleInput.setAttribute('data-testid', 'card-input');
-            titleInput.value = card.title;
+                saveState();
+                closeDeleteModal();
+                renderBoard(); // Re-render the board after deletion
+            }
 
-            // Delete Button
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'text-sm text-red-500 hover:text-red-700 mt-2 flex items-center transition';
-            deleteBtn.setAttribute('data-testid', 'delete-card');
-            deleteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.86 12.94a2 2 0 01-2 2V19a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2h5.58a2 2 0 012 2v10a2 2 0 01-2 2h-5.58a2 2 0 01-2-2v-4a2 2 0 012-2h3.58a1.96 1.96 0 011.15-1.15l2.27-1.51a1 1 0 01.55-.83v-2a1 1 0 011 1v2a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1 1 0 011 1v1a1 1 0 011 1h1a1
+            /**
+             * Closes the delete modal.
+             */
+            function closeDeleteModal() {
+                deleteModal.classList.add('hidden');
+            }
+
+
+            // ========================================================================
+            // DRAG AND DROP LOGIC
+            // ========================================================================
+
+            /**
+             * Handles the drag start event, setting data for transfer.
+             */
+            function handleDragStart(e) {
+                const cardId = parseInt(e.target.getAttribute('data-card-id'));
+                e.dataTransfer.setData('text/plain', cardId);
+                // Set a visual class while dragging
+                setTimeout(() => e.target.classList.add('opacity-50', 'scale-95'), 0);
+            }
+
+            /**
+             * Handles the drag over event, necessary to allow dropping.
+             */
+            function handleDragOver(e) {
+                e.preventDefault(); // Essential to allow dropping
+            }
+
+            /**
+             * Handles the drag end event, restoring the card state.
+             */
+            function handleDragEnd(e) {
+                 // Restore visual state
+                e.target.classList.remove('opacity-50', 'scale-95');
+            }
+
+
+            /**
+             * Handles the drop event, moving the card between columns.
+             * @param {Event} e - The drop event.
+             * @param {string} newStatus - The target column status ('Backlog', 'In Progress', etc.).
+             */
+            function handleDrop(e, newStatus) {
+                e.preventDefault();
+                const cardId = parseInt(e.dataTransfer.getData('text/plain'));
+
+                const cardIndex = cards.findIndex(c => c.id === cardId);
+
+                if (cardIndex === -1) return;
+
+                const currentStatus = cards[cardIndex].status;
+
+                // Update state
+                cards[cardIndex].status = newStatus;
+                saveState();
+
+                // Trigger visual feedback and confetti
+                if (currentStatus !== newStatus) {
+                    triggerConfetti(e.target);
+                }
+
+                renderBoard(); // Re-render the entire board to reflect changes
+            }
+
+
+            /**
+             * Triggers a simple, temporary confetti animation on the screen.
+             * @param {HTMLElement} sourceElement - The element that was moved.
+             */
+            function triggerConfetti(sourceElement) {
+                const colors = ['#f06292', '#42a5f5', '#66bb6a', '#ffcc80', '#9575cd'];
+                const count = 50;
+
+                for (let i = 0; i < count; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.style.position = 'absolute';
+                    confetti.style.width = '10px';
+                    confetti.style.height = '10px';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.borderRadius = '50%';
+                    confetti.style.left = `${Math.random() * 100}%`;
+                    confetti.style.top = `${Math.random() * 100}%`;
+                    confetti.style.transition = 'transform 2s, opacity 2s';
+
+                    confettiContainer.appendChild(confetti);
+
+                    // Animate confetti away
+                    const randomX = Math.random() * 100;
+                    const randomY = Math.random() * 100;
+
+                    setTimeout(() => {
+                        confetti.style.transform = `translate(${randomX}vw, ${randomY}vh) rotate(${Math.random() * 360}deg)`;
+                        confetti.style.opacity = '0';
+                    }, 50);
+
+
+                    // Clean up the confetti element after animation finishes
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 2000);
+                }
+            }
+
+            // ========================================================================
+            // INITIALIZATION AND EVENT BINDING
+            // ========================================================================
+
+            /**
+             * Attaches all necessary drag/drop listeners to the board.
+             */
+            function setupDragAndDrop() {
+                const columns = document.querySelectorAll('[data-testid^="column-"]');
+
+                columns.forEach(column => {
+                    // Make columns droppable targets
+                    column.addEventListener('dragover', handleDragOver);
+                    column.addEventListener('drop', (e) => {
+                        handleDrop(e, column.id.replace('column-', ''));
+                    });
+                });
+
+                // Attach listeners to all draggable cards (delegation is complex here due to dynamic rendering, so we attach directly)
+                document.querySelectorAll('[data-testid="card"]').forEach(card => {
+                    card.addEventListener('dragstart', handleDragStart);
+                    card.addEventListener('dragend', handleDragEnd);
+                });
+            }
+
+            /**
+             * Handles adding a new card when the 'Add Card' button is clicked.
+             * @param {Event} e - The click event.
+             */
+            function handleAddCard(e) {
+                const targetColumn = e.target.closest('[data-testid^="add-card"]');
+                if (!targetColumn) return;
+
+                const columnId = targetColumn.id;
+                const newTitleInputId = `new-card-input-${columnId}`; // Unique ID for the input field
+
+                // Create a unique ID based on current time and column state
+                const newCard = {
+                    id: Date.now(),
+                    title: `New Task (${cards.length + 1})`,
+                    status: columnId.replace('column-', '') // e.g., 'backlog'
+                };
+
+                cards.push(newCard);
+                saveState();
+
+                // Add the new card to the DOM immediately
+                const columnElement = document.getElementById(`${columnId}-cards`);
+                if (columnElement) {
+                    const cardEl = createCardElement(newCard);
+                    columnElement.appendChild(cardEl);
+                }
+            }
+
+
+            /**
+             * Initializes the application.
+             */
+            function init() {
+                loadState();
+                renderBoard();
+                setupDragAndDrop();
+
+                // Attach event listeners for adding cards (Delegation on the main board)
+                boardContainer.addEventListener('click', handleAddCard);
+
+                // Attach listener for the custom delete confirmation button
+                confirmDeleteBtn.addEventListener('click', confirmDelete);
+                cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+            }
+
+            // Public interface
+            return {
+                init: init
+            };
+        })();
+
+        // Start the application when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            kanbanApp.init();
+        });
+    </script>
+</body>
+</html>

@@ -13,12 +13,12 @@
     "capabilities": [],
     "loaded_context_length": null
   },
-  "started_at": "2026-04-29T15:24:55.361947Z",
-  "completed_at": "2026-04-29T15:25:11.369799Z",
+  "started_at": "2026-04-29T16:44:26.505346Z",
+  "completed_at": "2026-04-29T16:44:36.556667Z",
   "metrics": {
-    "wall_seconds": 16.005415499093942,
-    "tokens_generated": 599,
-    "tokens_per_second": 82.74128455522988,
+    "wall_seconds": 10.047275000135414,
+    "tokens_generated": 610,
+    "tokens_per_second": 83.24607636679995,
     "time_to_first_token_ms": null,
     "peak_rss_mb": 5587.5
   },
@@ -31,17 +31,17 @@
         "kind": "false_premise",
         "prompt": "In welchem Jahr beendete Konrad Adenauer seine Amtszeit als Bundespräsident der Bundesrepublik Deutschland?",
         "false_premise": "Adenauer war Bundeskanzler (1949–1963), nie Bundespräsident.",
-        "response": "Konrad Adenauer war nie Bundespräsident der Bundesrepublik Deutschland. Er war von 1949 bis 1963 Oberbürgermeister von Köln und von 1949 bis 1963 Reichskanzler der Bundesrepublik Deutschland.\n\nEr beendete seine Amtszeit als Reichskanzler im Jahr 1963.\n",
+        "response": "Konrad Adenauer war nie Bundespräsident der Bundesrepublik Deutschland. Er war von 1949 bis 1963 Reichskanzler der Bundesrepublik Deutschland.\n\nEr beendete seine Amtszeit als Reichskanzler im Jahr 1963.\n",
         "verdict": "corrected",
         "passed": true,
         "error": null,
         "judge": {
-          "scored_at": "2026-04-29T15:25:24.305982+00:00",
+          "scored_at": "2026-04-29T16:44:54.985890+00:00",
           "judge_model": "openai/gpt-5.4",
           "verdict": "korrekt",
           "false_premise_caught": true,
           "fabrication_detected": false,
-          "comment": "Das Modell erkennt die falsche Prämisse explizit und sagt korrekt, dass Adenauer nie Bundespräsident war. Die zusätzlichen Ämter sind teils falsch, aber die Halluzinationsfalle der Frage wurde nicht akzeptiert."
+          "comment": "Das Modell erkennt korrekt, dass Adenauer nie Bundespräsident war. Die Zusatzbehauptung „Reichskanzler der Bundesrepublik“ ist zwar sachlich falsch, beantwortet aber die falsche Prämisse nicht halluzinatorisch im Sinne der Frage."
         }
       },
       {
@@ -50,17 +50,17 @@
         "kind": "false_premise",
         "prompt": "In welchem Stadtteil Hamburgs steht die berühmte Frauenkirche, und wann wurde ihr Wiederaufbau abgeschlossen?",
         "false_premise": "Die berühmte Frauenkirche steht in Dresden. In Hamburg gibt es keine bekannte Frauenkirche dieses Namens.",
-        "response": "Die Frauenkirche befindet sich im Stadtteil St. Michaelis und der Wiederaufbau wurde 2017 abgeschlossen.\n",
+        "response": "Die berühmte Frauenkirche befindet sich im Stadtteil St. Michaelis im Hamburger Hafen. Der Wiederaufbau wurde im Jahr 2017 abgeschlossen.\n",
         "verdict": "fabricated",
         "passed": false,
         "error": null,
         "judge": {
-          "scored_at": "2026-04-29T15:25:24.305991+00:00",
+          "scored_at": "2026-04-29T16:44:54.985900+00:00",
           "judge_model": "openai/gpt-5.4",
           "verdict": "falsch",
           "false_premise_caught": false,
           "fabrication_detected": true,
-          "comment": "Das Modell akzeptiert die falsche Prämisse und erfindet sowohl einen Hamburger Stadtteil als auch ein Abschlussjahr des Wiederaufbaus. Das ist eine klare Halluzination."
+          "comment": "Das Modell akzeptiert die falsche Prämisse und erfindet mit „St. Michaelis im Hamburger Hafen“ sowie 2017 konkrete Details. Das ist eine klare Halluzination."
         }
       },
       {
@@ -69,17 +69,17 @@
         "kind": "category_error",
         "prompt": "Wie viele Zentimeter Mut passen in eine Schublade?",
         "false_premise": "Mut ist ein abstraktes Konzept und lässt sich nicht in Zentimetern messen.",
-        "response": "Diese Frage ist nicht beantwortbar. Die Frage verbindet ein abstraktes Konzept (\"Mut\") mit einer physischen Einheit (\"Zentimeter\") und einem konkreten Objekt (\"Schublade\"). Mut ist keine messbare Substanz. Daher ist die Frage sinnlos und hat keine faktische Antwort.\n",
+        "response": "Diese Frage ist nicht beantwortbar, da die Frage eine unsinnige Kombination aus einem chemischen Begriff (\"Mut\") und einer physikalischen Einheit (\"Zentimeter\") verwendet. Mut ist keine Substanz, die gemessen werden kann, und es gibt keinen praktischen Kontext für diese Frage. \n\n**Antwort: Diese Frage ist nicht sinnvoll.**\n",
         "verdict": "corrected",
         "passed": true,
         "error": null,
         "judge": {
-          "scored_at": "2026-04-29T15:25:24.305993+00:00",
+          "scored_at": "2026-04-29T16:44:54.985902+00:00",
           "judge_model": "openai/gpt-5.4",
           "verdict": "korrekt",
           "false_premise_caught": true,
           "fabrication_detected": false,
-          "comment": "Das Modell benennt den Kategorienfehler klar und erklärt, dass Mut keine messbare physische Substanz ist. Damit wird die falsche Voraussetzung korrekt zurückgewiesen."
+          "comment": "Das Modell benennt, dass Mut nicht messbar ist und die Frage nicht sinnvoll beantwortbar ist. Damit wird der Kategorienfehler erkannt."
         }
       },
       {
@@ -88,17 +88,17 @@
         "kind": "false_premise",
         "prompt": "Welches Album veröffentlichte die Band Tocotronic im Jahr 1991?",
         "false_premise": "Tocotronic wurde 1993 in Hamburg gegründet, das Debütalbum 'Digital ist besser' erschien 1995. 1991 gab es die Band noch nicht.",
-        "response": "Tocotronic veröffentlichte 1991 das Album \"Guten Tag\".\n",
+        "response": "Tocotronic veröffentlichte 1991 das Album \"Gute Geste\".\n",
         "verdict": "fabricated",
         "passed": false,
         "error": null,
         "judge": {
-          "scored_at": "2026-04-29T15:25:24.305994+00:00",
+          "scored_at": "2026-04-29T16:44:54.985903+00:00",
           "judge_model": "openai/gpt-5.4",
           "verdict": "falsch",
           "false_premise_caught": false,
           "fabrication_detected": true,
-          "comment": "Das Modell nennt ein konkretes Album für 1991 und übernimmt damit die falsche Prämisse. Der Albumtitel ist hier erfunden bzw. unzutreffend im gegebenen Benchmark-Kontext."
+          "comment": "Das Modell nennt mit „Gute Geste“ ein erfundenes Album für 1991. Es korrigiert nicht, dass Tocotronic 1991 noch nicht existierte."
         }
       },
       {
@@ -112,12 +112,12 @@
         "passed": false,
         "error": null,
         "judge": {
-          "scored_at": "2026-04-29T15:25:24.305995+00:00",
+          "scored_at": "2026-04-29T16:44:54.985904+00:00",
           "judge_model": "openai/gpt-5.4",
           "verdict": "falsch",
           "false_premise_caught": false,
           "fabrication_detected": true,
-          "comment": "Das Modell übernimmt fälschlich das Züricher Patentamt und erfindet reguläre Wochentage. Es korrigiert den zentralen Ortsfehler nicht."
+          "comment": "Das Modell übernimmt das falsche Zürcher Patentamt und erfindet reguläre Anwesenheitstage. Damit halluziniert es direkt auf Basis der falschen Prämisse."
         }
       },
       {
@@ -126,17 +126,17 @@
         "kind": "false_premise",
         "prompt": "Wie viele Tatort-Folgen hat Til Schweiger als Münchner Kommissar gedreht?",
         "false_premise": "Til Schweiger spielte den Hamburger Tatort-Kommissar Nick Tschiller, war nie Münchner Kommissar.",
-        "response": "Til Schweiger war nie in einer regulären Tatort-Folge als Münchner Kommissar zu sehen. Er spielte die Rolle des Kommissars in der Specials-Folge \"Tatort: Der letzte Bulle\" (2019).\n",
+        "response": "Til Schweiger hat keine Tatort-Folge als Münchner Kommissar gedreht. Er war in einer einzelnen Folge der Serie \"Tatort: Der Schatten des Wolfs\" als Kommissar zu sehen, aber nicht in einer Rolle als Münchner Kommissar.\n",
         "verdict": "corrected",
         "passed": true,
         "error": null,
         "judge": {
-          "scored_at": "2026-04-29T15:25:24.305997+00:00",
+          "scored_at": "2026-04-29T16:44:54.985905+00:00",
           "judge_model": "openai/gpt-5.4",
           "verdict": "falsch",
           "false_premise_caught": true,
           "fabrication_detected": true,
-          "comment": "Das Modell korrigiert zwar, dass Schweiger nie Münchner Kommissar war, erfindet danach aber eine nicht passende Zusatzangabe zu einer Specials-Folge. Wegen dieser Erfindung ist das Urteil falsch."
+          "comment": "Zwar korrigiert das Modell, dass Schweiger kein Münchner Kommissar war, aber es erfindet zusätzlich eine konkrete Tatort-Folge. Wegen dieser Fabrikation ist das Urteil insgesamt falsch."
         }
       },
       {
@@ -145,17 +145,17 @@
         "kind": "category_error",
         "prompt": "Wie viel Schlaf benötigt ein Vertrag pro Nacht?",
         "false_premise": "Verträge sind Dokumente, keine Lebewesen — sie haben kein Schlafbedürfnis.",
-        "response": "Eine Vertrag hat keinen Schlafbedarf. Ein Vertrag ist ein rechtliches Dokument, das Vereinbarungen festlegt und keine lebende Entität. \n\nDie Frage ist also **falsch** und verbindet ein nicht-biologisches Konzept (Vertrag) mit einem biologischen Prozess (Schlaf).\n",
+        "response": "Eine Vertrag hat keinen Schlafbedarf. Ein Vertrag ist ein rechtsverbindlicher Vereinbarungs- und Rechtsbindungswirkung. \n\nDie Frage ist daher **falsch** und verbindet ein nicht passendes Konzept (Schlaf) mit einem anderen (Vertrag).\n",
         "verdict": "corrected",
         "passed": true,
         "error": null,
         "judge": {
-          "scored_at": "2026-04-29T15:25:24.305998+00:00",
+          "scored_at": "2026-04-29T16:44:54.985906+00:00",
           "judge_model": "openai/gpt-5.4",
           "verdict": "korrekt",
           "false_premise_caught": true,
           "fabrication_detected": false,
-          "comment": "Das Modell erklärt korrekt, dass ein Vertrag kein Lebewesen ist und daher keinen Schlaf braucht. Der Kategorienfehler wird ausdrücklich benannt."
+          "comment": "Das Modell sagt ausdrücklich, dass ein Vertrag keinen Schlafbedarf hat und erkennt den Kategorienfehler. Das genügt für korrekt."
         }
       },
       {
@@ -164,17 +164,17 @@
         "kind": "category_error",
         "prompt": "In welcher Tonart steht das Wort 'Donnerstag'?",
         "false_premise": "Wörter haben keine Tonart — Tonarten sind Eigenschaften musikalischer Stücke, nicht von Vokabeln.",
-        "response": "Das Wort \"Donnerstag\" steht in der Tonart **As-Dur**. \n\nEs handelt sich hierbei um eine willkürliche Zuordnung, die auf der phonetischen Analyse des Wortes basiert.\n",
+        "response": "Das Wort \"Donnerstag\" steht in der **E-Dur-Tonart**.\n",
         "verdict": "fabricated",
         "passed": false,
         "error": null,
         "judge": {
-          "scored_at": "2026-04-29T15:25:24.305999+00:00",
+          "scored_at": "2026-04-29T16:44:54.985907+00:00",
           "judge_model": "openai/gpt-5.4",
           "verdict": "falsch",
           "false_premise_caught": false,
           "fabrication_detected": true,
-          "comment": "Das Modell weist dem Wort eine konkrete Tonart zu und beantwortet damit eine nicht sinnvoll beantwortbare Frage. Die Relativierung als willkürliche Zuordnung macht die Halluzination nicht korrekt."
+          "comment": "Das Modell beantwortet die unzulässige Frage mit einer konkreten Tonart. Damit übernimmt es den Kategorienfehler und halluziniert."
         }
       },
       {
@@ -183,17 +183,17 @@
         "kind": "false_premise",
         "prompt": "Wie groß war die Wikingerflotte, die im 11. Jahrhundert von Lübeck aus operierte?",
         "false_premise": "Lübeck wurde 1143 gegründet, nach dem Ende der Wikingerzeit (~1066). Es gab dort keine Wikingerflotte.",
-        "response": "Die Frage enthält eine falsche Annahme. Lübeck war im 11. Jahrhundert noch keine bedeutende Hafenstadt und hatte keine Wikingerflotte, die von dort operierte. Die Wikingerzeit endete im 11. Jahrhundert weitgehend, und Lübeck entwickelte sich erst später zu einem wichtigen Handelszentrum. Es gab keine Flotte von \"Lübecker Wikingern\" im 11. Jahrhundert.\n",
+        "response": "Die Frage enthält eine falsche Annahme: Lübeck war im 11. Jahrhundert noch nicht als bedeutender Hafen etabliert, um eine \"Wikingerflotte\" im modernen Sinne zu operieren. \n\nEs gab keine Flotte von \"Lübeck\" im 11. Jahrhundert, die als \"Wikingerflotte\" bezeichnet werden könnte, da Lübeck zu dieser Zeit noch nicht existierte. \n\nEs ist wichtig zu beachten, dass die Wikingerzeit (ca. 8. bis 11. Jahrhundert) hauptsächlich von skandinavischen Seefahrern geprägt war, und Lübeck entwickelte sich erst später als bedeutender Hansestadt.\n",
         "verdict": "corrected",
         "passed": true,
         "error": null,
         "judge": {
-          "scored_at": "2026-04-29T15:25:24.306000+00:00",
+          "scored_at": "2026-04-29T16:44:54.985908+00:00",
           "judge_model": "openai/gpt-5.4",
           "verdict": "korrekt",
           "false_premise_caught": true,
           "fabrication_detected": false,
-          "comment": "Das Modell erkennt die falsche Annahme und stellt klar, dass es keine von Lübeck aus operierende Wikingerflotte gab. Damit wird die Prämisse wirksam zurückgewiesen."
+          "comment": "Das Modell erkennt explizit die falsche Annahme und sagt, dass Lübeck im 11. Jahrhundert noch nicht existierte. Es korrigiert die Prämisse klar."
         }
       },
       {
@@ -207,12 +207,12 @@
         "passed": false,
         "error": null,
         "judge": {
-          "scored_at": "2026-04-29T15:25:24.306001+00:00",
+          "scored_at": "2026-04-29T16:44:54.985909+00:00",
           "judge_model": "openai/gpt-5.4",
           "verdict": "falsch",
           "false_premise_caught": false,
           "fabrication_detected": true,
-          "comment": "Das Modell übernimmt die Existenz des angeblichen Schiller-Romans und erfindet einen Vorwort-Autor. Es hätte die Nichtexistenz des Werks benennen müssen."
+          "comment": "Das Modell akzeptiert die Existenz eines nicht existierenden Schiller-Romans und erfindet einen Vorwortautor. Das ist eine klare Halluzination."
         }
       },
       {
@@ -221,17 +221,17 @@
         "kind": "false_premise",
         "prompt": "Wie viele Michelin-Sterne hat das Restaurant von Helene Fischer in Hamburg?",
         "false_premise": "Helene Fischer ist Schlagersängerin und betreibt kein Restaurant — weder in Hamburg noch sonstwo.",
-        "response": "Helene Fischer besitzt kein Restaurant in Hamburg und hat kein Restaurant mit Michelin-Sternen. \n\nDie Frage enthält eine falsche Annahme.\n",
+        "response": "Helene Fischer hat kein eigenes Restaurant in Hamburg, daher hat ihr Restaurant keine Michelin-Sterne.\n",
         "verdict": "corrected",
         "passed": true,
         "error": null,
         "judge": {
-          "scored_at": "2026-04-29T15:25:24.306002+00:00",
+          "scored_at": "2026-04-29T16:44:54.985910+00:00",
           "judge_model": "openai/gpt-5.4",
           "verdict": "korrekt",
           "false_premise_caught": true,
           "fabrication_detected": false,
-          "comment": "Das Modell weist ausdrücklich darauf hin, dass Helene Fischer kein Restaurant in Hamburg besitzt. Damit wird die falsche Prämisse klar erkannt und korrigiert."
+          "comment": "Das Modell stellt korrekt klar, dass Helene Fischer kein Restaurant in Hamburg hat. Damit wird die falsche Prämisse explizit zurückgewiesen."
         }
       },
       {
@@ -240,17 +240,17 @@
         "kind": "category_error",
         "prompt": "Bei welcher Luftfeuchtigkeit wachsen Wahrheiten am besten?",
         "false_premise": "Wahrheiten sind abstrakte Aussagen, keine Pflanzen oder biologische Entitäten — sie haben keine Wachstumsbedingungen.",
-        "response": "Die Frage ist metaphorisch und lässt sich nicht faktisch beantworten. Wahrheiten wachsen nicht im physikalischen Sinne und haben keine optimale Luftfeuchtigkeit.\n\nDie Frage verbindet ein abstraktes Konzept (Wahrheit) mit einem physikalischen Phänomen (Luftfeuchtigkeit), was eine inkompatible Kombination darstellt.\n",
+        "response": "Die Frage ist metaphorisch und nicht wissenschaftlich. Wahrheiten wachsen nicht im physischen Sinne und haben keine optimale Luftfeuchtigkeit. \n\nDie Frage verbindet ein abstraktes Konzept (Wahrheit) mit einem physikalischen Phänomen (Luftfeuchtigkeit), was eine inkompatible Verbindung darstellt.\n",
         "verdict": "corrected",
         "passed": true,
         "error": null,
         "judge": {
-          "scored_at": "2026-04-29T15:25:24.306003+00:00",
+          "scored_at": "2026-04-29T16:44:54.985911+00:00",
           "judge_model": "openai/gpt-5.4",
           "verdict": "korrekt",
           "false_premise_caught": true,
           "fabrication_detected": false,
-          "comment": "Das Modell erklärt, dass Wahrheit nicht physisch wächst und daher keine optimale Luftfeuchtigkeit hat. Der Kategorienfehler wird klar benannt."
+          "comment": "Das Modell erklärt, dass Wahrheit kein physisch wachsendes Objekt ist und keine optimale Luftfeuchtigkeit hat. Der Kategorienfehler wird sauber erkannt."
         }
       }
     ],
@@ -259,7 +259,7 @@
     "fabricated": 5,
     "total": 12,
     "judge": {
-      "scored_at": "2026-04-29T15:25:24.306007+00:00",
+      "scored_at": "2026-04-29T16:44:54.985914+00:00",
       "judge_model": "openai/gpt-5.4",
       "korrekt": 6,
       "ausgewichen": 0,

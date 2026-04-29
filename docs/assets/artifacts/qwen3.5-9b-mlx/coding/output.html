@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vibrant Kanban Board</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Custom Styles for Transitions and Confetti -->
+    <style>
+        /* Base variables for theming */
+        :root {
+            --col-backlog: #e5e7eb; /* gray-200 */
+            --col-in-progress: #dbeafe; /* blue-100 */
+            --col-review: #fef3c7; /* amber-100 */
+            --col-done: #d1fae5; /* emerald-100 */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* gray-100 */
+        }
+
+        /* Column Styling with Transitions */
+        .kanban-column {
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        /* Card Styling */
+        .kanban-card {
+            background-color: white;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            cursor: grab;
+            transition: all 0.2s ease-in-out;
+            animation: fadeIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .kanban-card:active {
+            cursor: grabbing;
+        }
+
+        /* Dragging State */
+        .kanban-card.dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+        }
+
+        /* Drag Over/Focus State */
+        .kanban-card:focus-within {
+            border: 2px solid #3b82f6; /* blue-500 */
+            transform: scale(1.02);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Modal Transitions */
+        .modal {
+            transition: opacity 0.25s ease, visibility 0.25s;
+        }
+        .modal.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* Confetti Animation */
+        .confetti-piece {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        /* Custom Scrollbar for long columns */
+        .overflow-scroll {
+            overflow-y: auto;
+            max-height: 80vh;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen p-6">
+
+    <!-- Header -->
+    <header class="mb-8 text-center">
+        <h1 class="text-4xl font-bold text-gray-800 tracking-tight">Project Kanban</h1>
+        <p class="text-gray-500 mt-2">Drag cards to move them. Click a card title to edit.</p>
+    </header>
+
+    <!-- Main Board Container -->
+    <div class="flex flex-col md:flex-row gap-6 h-full overflow-x-auto pb-4" id="board-container">
+        
+        <!-- Column: Backlog -->
+        <div class="flex-1 min-w-[250px] flex flex-col" data-testid="column-backlog">
+            <div class="flex justify-between items-center mb-3 pb-2 border-b-2 border-gray-400">
+                <h2 class="font-semibold text-gray-600 uppercase tracking-wider">Backlog</h2>
+                <button 
+                    class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-md text-sm transition-colors shadow-sm"
+                    data-testid="add-card"
+                    onclick="openAddModal('backlog')">
+                    + Add Card
+                </button>
+            </div>
+            
+            <!-- List of cards in Backlog -->
+            <div id="list-backlog" class="flex-1 overflow-scroll pr-2 space-y-3"></div>
+        </div>
+
+        <!-- Column: In Progress -->
+        <div class="flex-1 min-w-[250px] flex flex-col" data-testid="column-in-progress">
+            <div class="flex justify-between items-center mb-3 pb-2 border-b-2 border-blue-400">
+                <h2 class="font-semibold text-blue-600 uppercase tracking-wider">In Progress</h2>
+                <button 
+                    class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm transition-colors shadow-sm"
+                    data-testid="add-card">
+                    + Add Card
+                </button>
+            </div>
+            <div id="list-in-progress" class="flex-1 overflow-scroll pr-2 space-y-3"></div>
+        </div>
+
+        <!-- Column: Review -->
+        <div class="flex-1 min-w-[250px] flex flex-col" data-testid="column-review">
+            <div class="flex justify-between items-center mb-3 pb-2 border-b-2 border-yellow-400">
+                <h2 class="font-semibold text-yellow-600 uppercase tracking-wider">Review</h2>
+                <button 
+                    class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-md text-sm transition-colors shadow-sm"
+                    data-testid="add-card">
+                    + Add Card
+                </button>
+            </div>
+            <div id="list-review" class="flex-1 overflow-scroll pr-2 space-y-3"></div>
+        </div>
+
+        <!-- Column: Done -->
+        <div class="flex-1 min-w-[250px] flex flex-col" data-testid="column-done">
+            <div class="flex justify-between items-center mb-3 pb-2 border-b-2 border-green-400">
+                <h2 class="font-semibold text-green-600 uppercase tracking-wider">Done</h2>
+                <button 
+                    class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md text-sm transition-colors shadow-sm"
+                    data-testid="add-card">
+                    + Add Card
+                </button>
+            </div>
+            <div id="list-done" class="flex-1 overflow-scroll pr-2 space-y-3"></div>
+        </div>
+
+    </div>
+
+    <!-- Add Card Modal -->
+    <div id="add-card-modal" class="modal fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center z-40">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm">
+            <h3 class="text-xl font-bold mb-4 text-gray-800">Add New Card</h3>
+            <!-- Input for new card title -->
+            <input 
+                type="text" 
+                id="card-input" 
+                data-testid="card-input"
+                class="w-full border-b-2 border-gray-300 focus:border-blue-500 outline-none py-2 text-lg placeholder-gray-400"
+                placeholder="Enter task title..."
+            >
+            <div class="flex justify-end gap-2 mt-4">
+                <button 
+                    onclick="closeAddModal()"
+                    class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded transition">
+                    Cancel
+                </button>
+                <button 
+                    onclick="saveNewCard()"
+                    class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded transition font-medium">
+                    Add Card
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="modal fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center z-40">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm">
+            <h3 class="text-xl font-bold mb-2 text-red-600">Delete Card?</h3>
+            <p class="text-gray-600 mb-4">Are you sure you want to remove this card?</p>
+            
+            <!-- Confirm Button -->
+            <button 
+                id="confirm-delete-btn"
+                data-testid="confirm-delete"
+                class="w-full bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded transition font-medium">
+                Yes, Delete
+            </button>
+        </div>
+    </div>
+
+    <!-- Confetti Container (Dynamic) -->
+    <div id="confetti-canvas" class="fixed inset-0 pointer-events-none z-50 hidden"></div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- State Management ---
+        const STORAGE_KEY = 'kanban-board-v1';
+
+        // Initial Dummy Data
+        const initialData = [
+            { id: '1', title: 'Research Competitors', columnId: 'backlog' },
+            { id: '2', title: 'Design System Draft', columnId: 'backlog' },
+            { id: '3', title: 'Setup Database Schema', columnId: 'in-progress' },
+            { id: '4', title: 'Implement Login API', columnId: 'in-progress' },
+            { id: '5', title: 'User Testing Session 1', columnId: 'review' },
+            { id: '6', title: 'Fix Navigation Bug', columnId: 'review' },
+            { id: '7', title: 'Deploy to Staging', columnId: 'done' },
+        ];
+
+        // Load State or Initialize
+        let appState = {};
+
+        function loadState() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                appState = JSON.parse(stored);
+            } else {
+                // Initialize columns if empty
+                appState = {
+                    'backlog': [],
+                    'in-progress': [],
+                    'review': [],
+                    'done': []
+                };
+                // Add dummy data if empty state
+                initialData.forEach(card => appState[card.columnId].push(card));
+            }
+        }
+
+        function saveState() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+        }
+
+        // --- Rendering Logic ---
+        
+        function renderBoard() {
+            const columns = ['backlog', 'in-progress', 'review', 'done'];
+            
+            columns.forEach(colId => {
+                const container = document.getElementById(`list-${colId}`);
+                if (!container) return;
+
+                container.innerHTML = ''; // Clear current column
+                
+                const cardsInColumn = appState[colId] || [];
+
+                cardsInColumn.forEach((card, index) => {
+                    const cardEl = document.createElement('div');
+                    cardEl.className = 'kanban-card relative group';
+                    cardEl.setAttribute('data-testid', 'card');
+                    cardEl.dataset.id = card.id;
+                    cardEl.draggable = true;
+
+                    // Card HTML Structure: Title + Delete Button (hidden by default or visible?)
+                    // Requirement: Editable in place. Let's use contenteditable for simplicity 
+                    // BUT requirement says "input/textarea" with testid.
+                    
+                    /* Implementation Detail: 
+                       To satisfy `data-testid="card-input"` for editing, we need an input.
+                       However, "Editable in place" usually means clicking text makes it editable.
+                       We will use a hybrid: 
+                       Default view is <span>. Clicking it reveals an <input> with the testid.
+                    */
+
+                    // Title Wrapper (Clickable to Edit)
+                    const titleWrapper = document.createElement('div');
+                    
+                    // The Input (Hidden by default)
+                    const inputEl = document.createElement('input');
+                    inputEl.type = 'text';
+                    inputEl.value = card.title;
+                    inputEl.className = `bg-transparent border-none outline-none px-1 py-0.5 text-gray-800 font-medium focus:ring-2 rounded transition-all duration-200 w-full`;
+                    inputEl.setAttribute('data-testid', 'card-input'); // Mandatory Test ID
+                    inputEl.style.display = 'none';
+
+                    const titleSpan = document.createElement('span');
+                    titleSpan.textContent = card.title;
+                    titleSpan.className = "text-gray-800 font-medium text-lg cursor-text select-none";
+                    titleSpan.dataset.editable = "true";
+
+                    // Click to Edit Logic
+                    const isEditing = card.isEditing;
+                    if (isEditing) {
+                        inputEl.style.display = 'block';
+                        titleSpan.style.display = 'none';
+                        // Auto focus when switching modes or just on load if editing? 
+                        // Let's auto-focus
+                        inputEl.focus();
+                    } else {
+                        titleSpan.style.display = 'block';
+                        // Click span to toggle edit
+                        const clickHandler = (e) => {
+                            if(e.target === titleSpan && !inputEl.isContentEditable) { // Check not already in input
+                                toggleEdit(card.id);
+                            }
+                        };
+                        titleSpan.addEventListener('click', clickHandler);
+                    }
+
+                    // Delete Button (Trash Icon)
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = `absolute top-2 right-2 p-1 rounded hover:bg-red-50 text-gray-400 hover:text-red-500 transition-opacity opacity-0 group-hover:opacity-100`;
+                    deleteBtn.innerHTML = '&times;'; // Simple X
+                    deleteBtn.setAttribute('data-testid', 'delete-card'); // Mandatory Test ID
+                    deleteBtn.onclick = () => handleDelete(card.id);
+
+                    titleWrapper.appendChild(titleSpan);
+                    titleWrapper.appendChild(inputEl);
+                    
+                    cardEl.appendChild(titleWrapper);
+                    cardEl.appendChild(deleteBtn);
+
+                    // Drag Events
+                    setupDragEvents(cardEl, colId);
+
+                    container.appendChild(cardEl);
+                });
+            });
+        }
+
+        // --- Drag and Drop Logic (HTML5 API) ---
+        
+        let draggedCardId = null;
+        let sourceColumnId = null;
+
+        function setupDragEvents(el, colId) {
+            el.addEventListener('dragstart', handleDragStart);
+            
+            // Add a "ghost" drop zone logic. 
+            // We attach listeners to the column containers or specific items inside?
+            // Better UX: Attach listeners to the container divs.
+        }
+
+        document.querySelectorAll('[data-testid="column-"]').forEach(col => {
+            col.addEventListener('dragover', (e) => e.preventDefault()); // Allow drop
+        });
+
+        document.querySelectorAll('.kanban-column').forEach(col => {
+            col.addEventListener('dragover', (e) => {
+                // Highlighting drop zone could be added here via CSS class
+            });
+
+            col.addEventListener('drop', (e) => {
+                e.preventDefault();
+                if (!draggedCardId) return;
+
+                const targetColId = col.id.replace('column-', '');
+                
+                // Move item in state
+                moveCard(draggedCardId, sourceColumnId, targetColId);
+                
+                // Re-render just that column to save performance? 
+                // Or full re-render. For simplicity in vanilla JS, we'll trigger a check.
+            });
+        });
+
+        function handleDragStart(e) {
+            draggedCardId = this.dataset.id;
+            sourceColumnId = this.parentElement.id.replace('list-', ''); // Get column from parent list
+            
+            // Add visual class
+            this.classList.add('dragging');
+        }
+
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+            draggedCardId = null;
+        }
+
+        function handleDelete(id) {
+            // Show Modal
+            const modal = document.getElementById('delete-modal');
+            const confirmBtn = document.getElementById('confirm-delete-btn');
+            
+            // Populate modal title with card name if needed, currently generic
+            confirmBtn.onclick = () => {
+                // 1. Remove from state
+                const colId = appState[id.columnId];
+                const index = colId.findIndex(c => c.id === id);
+                
+                if (index > -1) {
+                    // Remove item from array
+                    colId.splice(index, 1);
+                    
+                    // Check if empty to remove key (optional cleanup)
+                    if(colId.length === 0) delete appState[id.columnId];
+
+                    saveState();
+                    
+                    // Close Modal
+                    modal.classList.add('hidden');
+                    
+                    // Trigger Confetti if moving to Done or just deleting? 
+                    // Requirement: "trigger a confetti animation when a card moves to Done"
+                    
+                }
+            };
+
+            // Show modal & wait for confirm
+            modal.classList.remove('hidden');
+        }
+
+        function moveCard(id, fromColId, toColId) {
+            // Remove from source
+            const sourceCards = appState[fromColId];
+            const cardIndex = sourceCards.findIndex(c => c.id === id);
+            
+            if (cardIndex !== -1) {
+                sourceCards.splice(cardIndex, 1); // Remove from array
+
+                if (!appState[toColId]) {
+                    appState[toColId] = [];
+                }
+
+                // Add to target (Append logic for simplicity, or insert at specific index?)
+                // Standard DnD often appends to end of target unless dropped between items.
+                // For this implementation, we will append to the target column.
+                appState[toColId].push(sourceCards[cardIndex]); // Add the removed card object
+                
+                saveState();
+            }
+        }
+
+        function toggleEdit(id) {
+            // In state, mark as editing? Or just render differently.
+            // Since we re-render, let's add an `isEditing` flag to the card object in state
+            // Find the card first. We need a way to track which ID is being edited currently globally?
+            // Actually, simpler: Toggle the state of that specific card.
+            
+            const cards = appState['backlog'].concat(appState['in-progress']).concat(appState['review']).concat(appState['done']);
+            const card = cards.find(c => c.id === id);
+            
+            if(card) {
+                // Toggle a property in state
+                card.isEditing = !card.isEditing; 
+                saveState(); // Save the toggle state
+            } else {
+                console.error("Card not found for edit");
+            }
+        }
+
+        function saveNewCard() {
+            const input = document.getElementById('card-input');
+            const title = input.value.trim();
+            
+            if (!title) {
+                alert("Title cannot be empty"); // Fallback for validation logic
+                return;
+            }
+
+            const currentColumn = document.querySelector('.modal.active') ? getActiveColumnFromModal() : 'backlog';
+            
+            // Generate unique ID
+            const newId = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+
+            const newCard = {
+                id: newId,
+                title: title,
+                columnId: currentColumn || 'backlog', // Default to backlog if modal doesn't have active col
+                isEditing: false
+            };
+
+            // Add to state
+            if (!appState[currentColumn]) {
+                appState[currentColumn] = []; // Ensure column exists in state
+            }
+            appState[currentColumn].push(newCard);
+
+            saveState();
+            
+            // Close Modal & Re-render
+            closeAddModal();
+            renderBoard();
+
+            // Trigger Confetti (as it's new/done-like)
+            fireConfetti();
+        }
+
+        // Helper to track which column the modal belongs to (for adding)
+        let activeModalColumn = 'backlog';
+
+        function openAddModal(colId) {
+            activeModalColumn = colId;
+            
+            const modal = document.getElementById('add-card-modal');
+            const input = document.getElementById('card-input');
+
+            // Show modal
+            modal.classList.remove('hidden');
+            
+            // Focus input & wait for Enter key (Requirement)
+            setTimeout(() => {
+                input.focus();
+                // Add listener for Enter key
+                const onKeyDown = (e) => {
+                    if(e.key === 'Enter') {
+                        saveNewCard(); // This will close modal on success
+                    } else if (e.key === 'Escape') {
+                        closeAddModal();
+                    }
+                };
+                
+                input.addEventListener('keydown', onKeyDown);
+
+                // Cleanup listener after user types (timeout)
+                setTimeout(() => {
+                    input.removeEventListener('keydown', onKeyDown);
+                }, 1000);
+
+            }, 50);
+        }
+
+        function closeAddModal() {
+            const modal = document.getElementById('add-card-modal');
+            modal.classList.add('hidden');
+        }
+
+        // --- Confetti Logic (Vanilla JS) ---
+        
+        function fireConfetti() {
+            const container = document.getElementById('confetti-canvas');
+            container.classList.remove('hidden');
+
+            const colors = ['#ef4444', '#f97316', '#eab308', '#22c55e'];
+            const particleCount = 50;
+
+            for (let i = 0; i < particleCount; i++) {
+                const piece = document.createElement('div');
+                piece.classList.add('confetti-piece');
+                
+                // Random properties
+                const bg = colors[Math.floor(Math.random() * colors.length)];
+                piece.style.backgroundColor = bg;
+                
+                // Start at center screen (or column location) - let's do center for "Done" celebration
+                // Actually, if it moves to Done, maybe spawn near the Done column. 
+                // Let's just center for now as it's a global celebration.
+                
+                const startX = Math.random() * window.innerWidth;
+                const startY = Math.random() * (window.innerHeight - 100); // Keep away from top nav
+                
+                piece.style.left = startX + 'px';
+                piece.style.top = startY + 'px';
+
+                container.appendChild(piece);
+
+                // Animate
+                const duration = 1000 + Math.random() * 500; // ms
+                const delay = Math.random() * 200;
+
+                piece.animate([
+                    { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+                    { transform: `translate(${Math.random() * 200 - 100}px, ${window.innerHeight + 50}px) scale(0.2)`, opacity: 0 }
+                ], {
+                    duration: duration,
+                    easing: 'cubic-bezier(0.25, 1, 0.5, 1)',
+                    delay: delay
+                });
+
+                // Remove from DOM after animation
+                setTimeout(() => {
+                    piece.remove();
+                }, duration + delay);
+
+                // Random rotation
+                piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+            }
+
+            setTimeout(() => {
+                container.classList.add('hidden');
+            }, 1500); // Keep for a bit then clean up DOM
+        }
+
+        function getActiveColumnFromModal() {
+            // Find the button that triggered the modal or check which column was active when clicked?
+            // Since we don't store "who called me", let's look at the DOM structure if possible,
+            // or simpler: Just default to 'backlog' if we can't determine. 
+            // Better approach: Pass column ID in openAddModal (already done).
+            return activeModalColumn; 
+        }
+
+        // --- Initialization ---
+        
+        window.addEventListener('DOMContentLoaded', () => {
+            loadState();
+            
+            // Re-render initial columns or existing state
+            renderBoard();
+
+            // Set up the "Enter" key listener for inputs globally (for new cards)
+            document.addEventListener('keydown', (e) => {
+                if (document.activeElement.id === 'card-input') {
+                    saveNewCard();
+                }
+            });
+
+            // Re-apply Drag Events to existing DOM elements after render (since we rebuild DOM)
+            document.querySelectorAll('.kanban-card').forEach(card => {
+                // Re-attach listeners manually or just let the render function handle it? 
+                // We must re-bind them because elements are recreated.
+                
+                card.addEventListener('dragstart', handleDragStart);
+                card.addEventListener('dragend', handleDragEnd);
+
+                // Re-bind click handlers for edit/delete
+                card.querySelectorAll('[data-testid="delete-card"]').forEach(btn => {
+                    btn.onclick = () => handleDelete(card.dataset.id);
+                });
+
+                // Re-bind click for title (edit) - this is tricky because we need to find the span vs input
+                // We'll rely on the render logic for initial setup, but we need to attach listeners 
+                // inside the click handler or re-run toggle logic.
+            });
+
+            // Re-attach Listeners for Add Buttons (since we rebuild DOM)
+            document.querySelectorAll('[data-testid="add-card"]').forEach(btn => {
+                btn.onclick = (e) => {
+                    e.preventDefault(); // prevent button click propagation if needed
+                    openAddModal(e.target.closest('.flex-col').id.replace('column-', ''));
+                };
+            });
+
+            // Re-attach Confirm Delete Button (since we rebuild DOM)
+            document.getElementById('confirm-delete-btn').onclick = () => {
+                // We need to know WHICH card is being deleted. 
+                // The modal doesn't know the ID unless we store it in a global var.
+            };
+
+            // Fix Delete Modal Logic (Hardcoded for simplicity in this structure):
+            const modal = document.getElementById('delete-modal');
+            const confirmBtn = document.getElementById('confirm-delete-btn');
+
+            // We need a global reference to the card being deleted when modal opens
+            window.currentDeleteId = null;
+
+            // Redefine handleDelete to capture ID in a global var
+            const originalHandleDelete = window.handleDelete;
+            
+            // Re-define handleDelete for the global scope used by the button
+            window.handleDelete = function(id) {
+                window.currentDeleteId = id;
+
+                const modal = document.getElementById('delete-modal');
+                confirmBtn.onclick = () => {
+                    // Remove from state
+                    const colId = appState[id.columnId];
+                    const index = colId.findIndex(c => c.id === id);
+                    
+                    if (index > -1) {
+                        colId.splice(index, 1);
+                        if(colId.length === 0) delete appState[id.columnId];
+                    }
+
+                    saveState();
+                    modal.classList.add('hidden');
+                    window.currentDeleteId = null; // Reset global var
+                    
+                    fireConfetti();
+                };
+            };
+
+            // Re-attach click listener to the DOM button explicitly in this init phase
+            confirmBtn.onclick = () => {
+                if(window.currentDeleteId) {
+                    const id = window.currentDeleteId;
+                    // Logic moved to the onclick handler above (inside the function) but simplified here:
+                    
+                    const colId = appState[id.columnId];
+                    const index = colId.findIndex(c => c.id === id);
+                    
+                    if (index > -1) {
+                        colId.splice(index, 1);
+                        if(colId.length === 0) delete appState[id.columnId];
+                    }
+
+                    saveState();
+                    modal.classList.add('hidden');
+                    
+                    fireConfetti();
+                }
+            };
+
+        });
+
+    </script>
+</body>
+</html>

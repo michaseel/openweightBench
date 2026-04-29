@@ -13,20 +13,20 @@
     "capabilities": [],
     "loaded_context_length": null
   },
-  "started_at": "2026-04-29T15:20:32.952888Z",
-  "completed_at": "2026-04-29T15:21:12.909420Z",
+  "started_at": "2026-04-29T16:39:09.668639Z",
+  "completed_at": "2026-04-29T16:39:39.609720Z",
   "metrics": {
-    "wall_seconds": 39.9558560840087,
-    "tokens_generated": 3538,
-    "tokens_per_second": 138.37428164080924,
-    "time_to_first_token_ms": 439.0,
+    "wall_seconds": 29.940894500003196,
+    "tokens_generated": 2673,
+    "tokens_per_second": 140.66033898615467,
+    "time_to_first_token_ms": 414.0,
     "peak_rss_mb": 2894.2
   },
-  "score": 0.8333333333333333,
+  "score": 0.5833333333333334,
   "score_breakdown": {
     "looks_like_html": true,
-    "html_length": 13252,
-    "raw_length": 13264,
+    "html_length": 8710,
+    "raw_length": 8722,
     "lint_checks": [
       {
         "id": "col_backlog",
@@ -55,8 +55,8 @@
       {
         "id": "drag_drop",
         "label": "HTML5 drag & drop or sortable lib",
-        "passed": true,
-        "detail": ""
+        "passed": false,
+        "detail": "no draggable / dragstart / sortable.js found"
       },
       {
         "id": "local_storage",
@@ -73,8 +73,8 @@
       {
         "id": "confetti",
         "label": "Confetti animation on 'Done'",
-        "passed": true,
-        "detail": ""
+        "passed": false,
+        "detail": "no 'confetti' in the code"
       },
       {
         "id": "add_card",
@@ -101,9 +101,9 @@
         "detail": ""
       }
     ],
-    "lint_passed": 12,
+    "lint_passed": 10,
     "lint_total": 12,
-    "lint_score": 1.0,
+    "lint_score": 0.8333333333333334,
     "e2e_checks": [
       {
         "id": "renders",
@@ -114,59 +114,59 @@
       {
         "id": "add_card",
         "label": "Add card via button",
-        "passed": true,
-        "detail": ""
+        "passed": false,
+        "detail": "card was not created (count unchanged)"
       },
       {
         "id": "no_double_add",
         "label": "Card is added exactly 1× (no double submit)",
-        "passed": true,
-        "detail": ""
+        "passed": false,
+        "detail": "no add happened, so not verifiable"
       },
       {
         "id": "delete_card",
         "label": "Delete card via button + confirmation",
         "passed": false,
-        "detail": "kein [data-testid=\"delete-card\"] gefunden"
+        "detail": "Locator.click: Timeout 2000ms exceeded.\nCall log:\n  - waiting for locator(\"[data-testid=\\\"delete-card\\\"]\").first\n    - locator resolved to <button data-testid=\"delete-card\" class=\"absolute top-0 right"
       },
       {
         "id": "persistence",
         "label": "Cards survive a reload",
-        "passed": false,
-        "detail": "before reload 1 Karten, nach Reload 0"
+        "passed": true,
+        "detail": ""
       },
       {
         "id": "no_console_errors",
         "label": "No JS console errors",
-        "passed": true,
-        "detail": ""
+        "passed": false,
+        "detail": "pageerror: missing ) after argument list; pageerror: addCard is not defined; pageerror: missing ) after argument list"
       }
     ],
-    "e2e_passed": 4,
+    "e2e_passed": 2,
     "e2e_total": 6,
-    "e2e_score": 0.6666666666666666,
+    "e2e_score": 0.3333333333333333,
     "judge": {
-      "scored_at": "2026-04-29T15:21:22.520114+00:00",
+      "scored_at": "2026-04-29T16:39:59.152180+00:00",
       "judge_model": "openai/gpt-5.4",
       "scores": {
-        "board_renders": 0.6,
+        "board_renders": 1.0,
         "column_completeness": 1.0,
-        "cards_present": 0.0,
+        "cards_present": 1.0,
         "ui_affordances": 0.5,
-        "design_quality": 0.3,
-        "code_structure": 0.3,
-        "dom_safety": 0.9,
-        "robustness": 0.1,
+        "design_quality": 0.64,
+        "code_structure": 0.32,
+        "dom_safety": 0.0,
+        "robustness": 0.18,
         "code_quality": 0.2,
-        "render_matches_code": 0.2
+        "render_matches_code": 0.72
       },
-      "judge_score": 0.36,
-      "comment_visual": "Das Board rendert grundsätzlich mit allen vier Spalten und sichtbaren Add-Card-Buttons, aber es sind keine Karten zu sehen. Die Gestaltung wirkt sehr roh: viel Leerraum, kaum visuelle Hierarchie und das Eingabefeld sitzt unintegriert unterhalb des Boards.",
-      "comment_code": "Der Code nutzt überwiegend sichere DOM-APIs wie createElement und textContent, ist aber logisch fehlerhaft und schlecht verbunden. Dummy-Daten werden zwar erzeugt, jedoch nie korrekt in die Spalten gerendert; zudem gibt es mehrere kaputte Referenzen und fehlendes Error-Handling bei localStorage/JSON.parse.",
-      "comment_consistency": "Deutliche Diskrepanz zwischen Anspruch und Ergebnis: Der Code verspricht Dummy-Karten, Delete-Modal und Drag/Drop-Logik, im Screenshot erscheinen jedoch nur leere Spalten mit Buttons. Das spricht für fehlerhafte Render- und Event-Initialisierung statt eines vollständig funktionierenden Kanban-Boards."
+      "judge_score": 0.52,
+      "comment_visual": "Das Board rendert vollständig mit allen vier Spalten und mehreren sichtbaren Karten. Add-Card-Buttons sind erkennbar, aber Drag-and-drop- oder Edit-Affordances fehlen; das Design ist sauber, aber eher schlicht als produktreif.",
+      "comment_code": "Der Code ist überwiegend statisch und funktional nur sehr rudimentär verdrahtet. Es gibt gravierende Probleme: rohes innerHTML mit Nutzereingaben, fehlerhafte addCard-/deleteCard-Logik, unpassende Selektoren und defekte LocalStorage-/Initialisierungslogik.",
+      "comment_consistency": "Screenshot und HTML-Grundstruktur passen im Wesentlichen zusammen: vier Spalten und fünf Karten sind sichtbar wie im Markup. Allerdings verspricht das JS Interaktivität, die im Code klar fehlerhaft implementiert ist, daher nur teilweise konsistent."
     }
   },
-  "raw_response": "```html\n<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Kanban Board</title>\n\n    <!-- Tailwind CDN -->\n    <link href=\"https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css\" rel=\"stylesheet\">\n\n    <style>\n      /* Custom Styles - for confetti and transitions */\n      body {\n        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n      }\n\n      #container {\n        width: 80%;\n        margin: 2rem auto;\n      }\n\n      .column {\n        border: 1px solid #ccc;\n        margin-bottom: 2rem;\n      }\n\n      .column-header {\n        background-color: #f0f6fa; /* Light gray */\n        padding: 1rem;\n        font-weight: bold;\n        color: #333;\n      }\n\n      .card {\n        border: 1px solid #ddd;\n        padding: 1rem;\n        margin-bottom: 0.5rem;\n        background-color: #fff;\n        position: relative; /* For absolute positioning of delete button */\n      }\n\n      .card-input {\n        width: 100%;\n        padding: 0.5rem;\n        border-radius: 5px;\n        border: 1px solid #ccc;\n        margin-bottom: 0.5rem;\n      }\n\n      .card-delete {\n        position: absolute;\n        top: 0;\n        right: 0;\n        background-color: rgba(255, 0, 0, 0.6);\n        color: white;\n        border-radius: 5px;\n        padding: 0.5rem;\n        cursor: pointer;\n      }\n\n      .card-delete:hover {\n        background-color: rgba(255, 0, 0, 0.8);\n      }\n\n      #confirmation-modal {\n        position: fixed;\n        top: 50%;\n        left: 50%;\n        transform: translate(-50%, -50%);\n        background-color: rgba(255, 255, 255, 0.8);\n        padding: 2rem;\n        border-radius: 10px;\n        z-index: 1000; /* Ensure it's on top */\n        display: none;  /* Initially hidden */\n      }\n\n      #confirmation-modal .close {\n        position: absolute;\n        top: 0.5rem;\n        right: 0.5rem;\n        cursor: pointer;\n      }\n\n      /* Transition",
+  "raw_response": "```html\n<!DOCTYPE html>\n<html lang=\"en\">\n\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Kanban Board</title>\n  <link href=\"https://cdn.jsdelivr.net/npm/tailwindcss@2.1.0/dist/tailwind.min.css\" rel=\"stylesheet\">\n  <script src=\"https://cdn.jsdelivr.net/npm/sweetalert2@11\"></script>\n</head>\n\n<body class=\"bg-gray-100 font-sans\">\n\n  <div class=\"container mx-auto py-8 px-4 max-w-screen-xl\">\n    <div class=\"flex justify-center items-stretch\">\n\n      <!-- Columns -->\n      <div data-testid=\"column-backlog\" class=\"w-full p-4 bg-gray-100 rounded-lg shadow-md\">\n        <h3 class=\"text-xl font-semibold mb-2 text-gray-800\">Backlog</h3>\n        <div class=\"p-4\">\n          <!-- Cards -->\n          <div data-testid=\"card\" class=\"bg-white rounded-lg shadow-sm p-4 mb-4 hover:shadow-md transition duration-300 ease-in-out\">\n            <div data-testid=\"card-input\" class=\"p-2 rounded-md border bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-200\">\n              Task 1\n            </div>\n            <button data-testid=\"delete-card\" class=\"absolute top-0 right-0 bg-red-500 hover:bg-red-700 text-white font-bold rounded-md py-1 px-2 transform -translate-x-full transition duration-300 ease-in-out\">\n              Delete\n            </button>\n          </div>\n\n          <div data-testid=\"card\" class=\"bg-white rounded-lg shadow-sm p-4 mb-4 hover:shadow-md transition duration-300 ease-in-out\">\n            <div data-testid=\"card-input\" class=\"p-2 rounded-md border bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-200\">\n              Task 2\n            </div>\n            <button data-testid=\"delete-card\" class=\"absolute top-0 right-0 bg-red-500 hover:bg-red-700 text-white font-bold rounded-md py-1 px-2 transform -translate-x-full transition duration-300 ease-in-out\">\n              Delete\n            </button>\n          </div>\n\n          <div data-testid=\"add-card\" class=\"inline-block bg-blue-200 hover:bg-blue-",
   "artifacts": [
     {
       "kind": "html",

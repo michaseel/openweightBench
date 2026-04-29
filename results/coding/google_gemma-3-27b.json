@@ -13,20 +13,20 @@
     "capabilities": [],
     "loaded_context_length": null
   },
-  "started_at": "2026-04-29T15:45:36.211733Z",
-  "completed_at": "2026-04-29T15:48:37.798162Z",
+  "started_at": "2026-04-29T16:46:35.814294Z",
+  "completed_at": "2026-04-29T16:49:43.274334Z",
   "metrics": {
-    "wall_seconds": 181.58752045896836,
-    "tokens_generated": 4061,
-    "tokens_per_second": 26.84020708576172,
-    "time_to_first_token_ms": 2028.0,
+    "wall_seconds": 187.46118049998768,
+    "tokens_generated": 4293,
+    "tokens_per_second": 27.113538289630164,
+    "time_to_first_token_ms": 1970.0,
     "peak_rss_mb": 16091.8
   },
   "score": 0.6666666666666666,
   "score_breakdown": {
     "looks_like_html": true,
-    "html_length": 16385,
-    "raw_length": 16397,
+    "html_length": 17252,
+    "raw_length": 17264,
     "lint_checks": [
       {
         "id": "col_backlog",
@@ -115,13 +115,13 @@
         "id": "add_card",
         "label": "Add card via button",
         "passed": false,
-        "detail": "Page.wait_for_selector: Timeout 2000ms exceeded.\nCall log:\n  - waiting for locator(\"[data-testid=\\\"card-input\\\"]\") to be visible\n"
+        "detail": "card was not created (count unchanged)"
       },
       {
         "id": "no_double_add",
         "label": "Card is added exactly 1× (no double submit)",
         "passed": false,
-        "detail": "skipped — add flow failed"
+        "detail": "no add happened, so not verifiable"
       },
       {
         "id": "delete_card",
@@ -139,34 +139,34 @@
         "id": "no_console_errors",
         "label": "No JS console errors",
         "passed": false,
-        "detail": "pageerror: Failed to execute 'add' on 'DOMTokenList': The token provided ('bg-gray-200 rounded shadow p-2 mr-2 flex items-center') contains HTML space characters, which are not valid in tokens.; pageerror: Failed to execute 'add' on 'DOMTokenList': The token provided ('bg-gray-200 rounded shadow p-2"
+        "detail": "pageerror: Failed to execute 'add' on 'DOMTokenList': The token provided ('bg-gray-200 rounded shadow p-3 flex items-center justify-between card') contains HTML space characters, which are not valid in tokens.; pageerror: Failed to execute 'add' on 'DOMTokenList': The token provided ('bg-gray-200 ro"
       }
     ],
     "e2e_passed": 2,
     "e2e_total": 6,
     "e2e_score": 0.3333333333333333,
     "judge": {
-      "scored_at": "2026-04-29T15:48:49.198155+00:00",
+      "scored_at": "2026-04-29T16:50:00.948629+00:00",
       "judge_model": "openai/gpt-5.4",
       "scores": {
         "board_renders": 0.5,
         "column_completeness": 1.0,
         "cards_present": 0.0,
         "ui_affordances": 0.5,
-        "design_quality": 0.6,
-        "code_structure": 0.5,
-        "dom_safety": 0.3,
+        "design_quality": 0.55,
+        "code_structure": 0.55,
+        "dom_safety": 0.7,
         "robustness": 0.2,
-        "code_quality": 0.3,
+        "code_quality": 0.25,
         "render_matches_code": 0.0
       },
-      "judge_score": 0.375,
-      "comment_visual": "Das Board rendert sichtbar mit allen vier korrekt beschrifteten Spalten und Add-Card-Buttons. Allerdings sind keinerlei Dummy-Karten zu sehen, obwohl der Code solche initial befüllen sollte; optisch wirkt es sauber, aber recht roh.",
-      "comment_code": "Die Struktur ist grundsätzlich in Funktionen aufgeteilt, aber die Datenmodell-Schlüssel sind inkonsistent: Das JS mischt `inProgress` mit `in-progress`, wodurch Rendern und Aktionen fehlschlagen. Zudem wird `innerHTML` zum Leeren der Container verwendet und es fehlt robustes Error-Handling für `localStorage`/`JSON.parse`; es gibt auch Logikfehler wie das Verschieben gelöschter Karten per `splice` plus anschließendem Zugriff auf denselben Index.",
-      "comment_consistency": "Starke Diskrepanz zwischen Code und Screenshot: Der Code definiert Dummy-Karten für mehrere Spalten, das Bild zeigt aber leere Listen. Das passt zu den Key-Mismatches im State (`inProgress` vs. `in-progress`), die das Initial-Rendern der Karten effektiv aushebeln."
+      "judge_score": 0.4050000000000001,
+      "comment_visual": "Das Board rendert grundsätzlich mit vier klar beschrifteten Spalten und sichtbaren Add-Buttons. Allerdings sind keinerlei Karten sichtbar, obwohl der Screen ansonsten nicht abgestürzt wirkt; dadurch bleibt die UI funktional und inhaltlich unvollständig.",
+      "comment_code": "Die Grundstruktur ist brauchbar mit getrennten Funktionen für Laden, Rendern und Interaktionen, aber die Implementierung ist fehlerhaft. Es gibt mehrere gravierende Logikbugs bei Drag-and-Drop, Delete und Datenmodell-Namen; User-Text wird bei Kartentiteln sicher per textContent gesetzt, jedoch fehlt robuste Fehlerbehandlung für localStorage/JSON.parse vollständig.",
+      "comment_consistency": "Klare Diskrepanz zwischen Code und Render: Der Code verspricht Dummy-Karten beim Initialzustand, der Screenshot zeigt aber leere Spalten. Das deutet stark auf einen Laufzeitfehler im Initial-Render hin, vermutlich wegen backlog/inProgress-Namenskonflikt oder nachgelagerter JS-Fehler."
     }
   },
-  "raw_response": "```html\n<!DOCTYPE html>\n<html lang=\"en\">\n\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Kanban Board</title>\n    <script src=\"https://cdn.tailwindcss.com\"></script>\n    <style>\n        /* Subtle transitions */\n        .card {\n            transition: background-color 0.2s ease, transform 0.15s ease;\n        }\n\n        /* Confetti animation (simplified - requires a separate library for full functionality) */\n        .confetti {\n            position: fixed;\n            top: 0;\n            left: 0;\n            width: 100%;\n            height: 100%;\n            pointer-events: none;\n        }\n\n        .confetti::before {\n            content: \"\";\n            position: absolute;\n            width: 5px;\n            height: 5px;\n            background-color: #f00; /* Red confetti */\n            animation: fall 5s linear infinite;\n        }\n\n        @keyframes fall {\n            0% {\n                transform: translateY(-10px) rotate(45deg);\n            }\n\n            100% {\n                transform: translateY(100vh) rotate(360deg);\n            }\n        }\n\n        /* Modal Styling */\n        .modal {\n            position: fixed;\n            top-0;\n            left-0;\n            width: 100%;\n            height: 100%;\n            background-color: rgba(0, 0, 0, 0.5);\n            display: none;\n        }\n\n        .modal-content {\n            position: absolute;\n            top: 50%;\n            left: 50%;\n            transform: translate(-50%, -50%);\n            background-color: white;\n            padding: 20px;\n            border-radius: 5px;\n            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);\n        }\n\n    </style>\n</head>\n\n<body class=\"bg-gray-100\">\n    <div class=\"container mx-auto p-4\">\n        <h1 class=\"text-2xl font-bold mb-4\">Kanban Board</h1>\n        <div class=\"flex space-x-4\">\n\n            <!-- Backlog Column -->\n            <div id=\"column-backlog\" class=\"w-1/4 bg-white rounded shado",
+  "raw_response": "```html\n<!DOCTYPE html>\n<html lang=\"en\">\n\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Kanban Board</title>\n    <script src=\"https://cdn.tailwindcss.com\"></script>\n    <style>\n        /* Subtle transitions */\n        .card {\n            transition: background-color 0.2s ease, transform 0.15s ease;\n        }\n\n        /* Confetti animation (basic example - consider a library for more complex effects) */\n        .confetti {\n            position: fixed;\n            top: 0;\n            left: 0;\n            width: 100%;\n            height: 100%;\n            pointer-events: none;\n        }\n\n        .confetti::before,\n        .confetti::after {\n            content: \"\";\n            position: absolute;\n            width: 10px;\n            height: 10px;\n            background-color: rgba(255, 239, 164, 0.7);\n            border-radius: 50%;\n        }\n\n        /* Add more confetti particles for a better effect */\n    </style>\n</head>\n\n<body class=\"bg-gray-100 font-sans\">\n\n    <div class=\"container mx-auto p-4\">\n        <h1 class=\"text-3xl font-bold mb-6 text-center\">Kanban Board</h1>\n\n        <div class=\"flex space-x-4\">\n            <!-- Backlog Column -->\n            <div id=\"column-backlog\" class=\"w-1/4 bg-white rounded shadow p-3 min-h-[50vh]\" data-testid=\"column-backlog\">\n                <h2 class=\"font-semibold mb-2\">Backlog</h2>\n                <div id=\"backlog-cards\" class=\"space-y-2\"></div>\n                <button class=\"bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none\"\n                    data-testid=\"add-card\">Add card</button>\n            </div>\n\n            <!-- In Progress Column -->\n            <div id=\"column-in-progress\" class=\"w-1/4 bg-white rounded shadow p-3 min-h-[50vh]\"\n                data-testid=\"column-in-progress\">\n                <h2 class=\"font-semibold mb-2\">In Progress</h2>\n                <div id=\"in-progress-cards\" class=\"space-y-2\"></d",
   "artifacts": [
     {
       "kind": "html",

@@ -4,82 +4,201 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kanban Board</title>
-    <!-- Tailwind CSS CDN -->
-    <link href="https://cdn.tailwindcss.com/2.2.19/tailwind.min.css" rel="stylesheet">
+
+    <!-- Tailwind CSS via CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
-        /* Custom styles for transitions and confetti */
-        .transition-opacity {
-            transition: opacity 0.3s ease;
+        /* Custom styles for a vibrant and modern look */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f8ff; /* Light blue background */
+            display: flex;
+            justify-content: center;
+            align-items: start;
+            padding: 20px;
         }
 
+        .container {
+            display: flex;
+            gap: 20px;
+            max-width: 1200px; /* Constrain width for better responsiveness */
+        }
+
+        .column {
+            background-color: #fff; /* White column background */
+            border-radius: 8px;
+            padding: 20px;
+            width: 300px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card {
+            background-color: #e6f7ff; /* Lighter blue card background */
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            cursor: grab; /* Indicate draggable */
+            transition: background-color 0.2s ease; /* Subtle transition */
+        }
+
+        .card:hover {
+            background-color: #d0f0ff; /* Slightly darker on hover */
+        }
+
+        .card-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .card-content {
+            font-size: 0.9em;
+        }
+
+        .add-card {
+            background-color: #4CAF50; /* Green add card button */
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            border: none;
+        }
+
+        .add-card:hover {
+            background-color: #3e8e41;
+        }
+
+        .delete-card {
+            background-color: #f44336; /* Red delete button */
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .delete-card:hover {
+            background-color: #da190b;
+        }
+
+        .edit-card {
+            border: none;
+            background: transparent;
+            color: black;
+            padding: 0px;
+        }
+
+        .edit-card:hover {
+            cursor: pointer;
+        }
+
+        /* Confetti animation styles */
         .confetti {
             position: fixed;
             top: -10px; /* Start above the viewport */
             left: 0;
             width: 100%;
-            height: 100vh; /* Full viewport height */
+            height: 100%;
             overflow: hidden;
-            pointer-events: none;
-            z-index: 1000; /* Ensure confetti is on top */
+            pointer-events: none; /* Ensure confetti doesn't block clicks */
         }
 
-        .confetti-particle {
+        .confetti-item {
             position: absolute;
-            animation: confettiMove 5s linear infinite; /* Animate the particles */
+            animation: confettiAnimation 2s linear infinite; /* Default animation */
         }
 
-        @keyframes confettiMove {
+        @keyframes confettiAnimation {
             0% {
                 transform: translateY(0);
                 opacity: 1;
             }
             100% {
-                transform: translateY(100vh); /* Move particle off-screen */
+                transform: translateY(-100vh); /* Move off-screen */
                 opacity: 0;
             }
         }
 
+        /* Simple delete confirmation styles */
+        .delete-confirmation {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 20px;
+            z-index: 1000; /* Ensure it's on top */
+            display: none; /* Hidden by default */
+        }
+
     </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
+<body>
 
-    <div class="w-full max-w-4xl bg-white shadow-lg rounded-lg overflow-auto">
-        <!-- Column containers -->
-        <div data-testid="column-backlog" class="flex flex-col p-4">
-            <h2 class="text-lg font-semibold mb-4 text-blue-600">Backlog</h2>
-            <button data-testid="add-card" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Add card</button>
+    <div class="container">
+
+        <div data-testid="column-backlog" class="column">
+            <h2>Backlog</h2>
+            <div class="card-container"></div>
+            <button data-testid="add-card" class="add-card">Add card</button>
         </div>
 
-        <div data-testid="column-in-progress" class="flex flex-col p-4">
-            <h2 class="text-lg font-semibold mb-4 text-yellow-600">In Progress</h2>
-            <button data-testid="add-card" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Add card</button>
+        <div data-testid="column-in-progress" class="column">
+            <h2>In Progress</h2>
+            <div class="card-container"></div>
+            <button data-testid="add-card" class="add-card">Add card</button>
         </div>
 
-        <div data-testid="column-review" class="flex flex-col p-4">
-            <h2 class="text-lg font-semibold mb-4 text-green-600">Review</h2>
-            <button data-testid="add-card" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Add card</button>
+        <div data-testid="column-review" class="column">
+            <h2>Review</h2>
+            <div class="card-container"></div>
+            <button data-testid="add-card" class="add-card">Add card</button>
         </div>
 
-        <div data-testid="column-done" class="flex flex-col p-4">
-            <h2 class="text-lg font-semibold mb-4 text-red-600">Done</h2>
-            <button data-testid="add-card" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Add card</button>
+        <div data-testid="column-done" class="column">
+            <h2>Done</h2>
+            <div class="card-container"></div>
+            <button data-testid="add-card" class="add-card">Add card</button>
         </div>
+
     </div>
 
-    <!-- Script -->
+    <!-- Delete confirmation dialog -->
+    <div class="delete-confirmation" id="deleteConfirmation">
+        <p>Are you sure you want to delete this card?</p>
+        <button data-testid="confirm-delete">Confirm</button>
+        <button id="cancelDelete">Cancel</button>
+    </div>
+
+    <!-- Confetti container -->
+    <div class="confetti"></div>
+
+
     <script>
-        const columns = {
-            backlog: document.getElementById('column-backlog'),
-            inProgress: document.getElementById('column-in-progress'),
-            review: document.getElementById('column-review'),
-            done: document.getElementById('column-done')
-        };
+        const columnBacklog = document.querySelector('[data-testid="column-backlog"]');
+        const columnInProgress = document.querySelector('[data-testid="column-in-progress"]');
+        const columnReview = document.querySelector('[data-testid="column-review"]');
+        const columnDone = document.querySelector('[data-testid="column-done"]');
 
-        const localStorageKey = 'kanbanBoard'; // Unique namespace to prevent conflicts
+        const cardContainerBacklog = columnBacklog.querySelector('.card-container');
+        const cardContainerInProgress = columnInProgress.querySelector('.card-container');
+        const cardContainerReview = columnReview.querySelector('.card-container');
+        const cardContainerDone = columnDone.querySelector('.card-container');
 
-        // Function to load data from localStorage
+        const deleteConfirmation = document.getElementById('deleteConfirmation');
+        const confirmDeleteButton = document.querySelector('[data-testid="confirm-delete"]');
+        const cancelDeleteButton = document.getElementById('cancelDelete');
+
+
+
+        // Local Storage Namespace (to avoid conflicts)
+        const localStorageNamespace = 'kanbanApp';
+
+        // Function to load data from local storage
         function loadData() {
-            const storedData = localStorage.getItem(localStorageKey);
+            const storedData = localStorage.getItem(localStorageNamespace);
             return storedData ? JSON.parse(storedData) : {
                 backlog: [],
                 inProgress: [],
@@ -88,208 +207,261 @@
             };
         }
 
-        // Function to save data to localStorage
+        // Function to save data to local storage
         function saveData(data) {
-            localStorage.setItem(localStorageKey, JSON.stringify(data));
+            localStorage.setItem(localStorageNamespace, JSON.stringify(data));
         }
 
-        let boardData = loadData(); // Initialize with loaded data or empty state
+        // Initial data from local storage or dummy cards if empty
+        let appData = loadData();
 
-        // Function to create a card element
-        function createCard(title) {
-            const card = document.createElement('div');
-            card.classList.add('bg-gray-200', 'rounded-lg', 'p-4', 'mb-4', 'shadow-md', 'transition-opacity');
-            card.setAttribute('data-testid', 'card');
-
-            const cardTitle = document.createElement('input');
-            cardTitle.type = 'text';
-            cardTitle.value = title;
-            cardTitle.classList.add('block', 'w-full', 'p-2', 'text-gray-800', 'border-b', 'focus:outline-none', 'focus:ring-2', 'focus:ring-blue-500');
-            cardTitle.setAttribute('data-testid', 'card-input');
-
-            const deleteButton = document.createElement('button');
-            deleteButton.classList.add('bg-red-500', 'hover:bg-red-700', 'text-white', 'font-bold', 'py-1', 'px-2', 'rounded', 'focus:outline-none', 'focus:shadow-outline');
-            deleteButton.setAttribute('data-testid', 'delete-card');
-            deleteButton.textContent = 'Delete';
-
-            card.appendChild(cardTitle);
-            card.appendChild(deleteButton);
-
-            return card;
+        // Create some dummy cards if the backlog is empty
+        if (appData.backlog.length === 0) {
+            appData.backlog = [
+                { id: '1', title: 'Design UI Mockups' },
+                { id: '2', title: 'Implement User Authentication' }
+            ];
         }
-
-
-        // Add dummy cards if none exist
-        if (Object.values(boardData).every(arr => arr.length === 0)) {
-            boardData.backlog.push({ title: "Initial Backlog Card 1" });
-            boardData.backlog.push({ title: "Initial Backlog Card 2" });
-            boardData.inProgress.push({ title: "Initial In Progress Card"});
-            saveData(boardData); // Save dummy data to localStorage
-        }
-
-
 
         // Function to render cards in a column
-        function renderColumn(column, data) {
-            column.innerHTML = ''; // Clear existing cards
+        function renderColumn(columnName, data) {
+            const container = columnName === 'backlog' ? cardContainerBacklog :
+                columnName === 'inProgress' ? cardContainerInProgress :
+                    columnName === 'review' ? cardContainerReview : cardContainerDone;
 
-            data.forEach(cardData => {
-                const cardElement = createCard(cardData.title);
+            container.innerHTML = ''; // Clear existing cards
 
-                // Add delete event listener
-                cardElement.querySelector('[data-testid="delete-card"]').addEventListener('click', (event) => {
-                    const isConfirmed = confirm("Are you sure you want to delete this card?");
-                    if (isConfirmed) {
-                        const index = data.findIndex(c => c.title === cardData.title);
-                        if (index !== -1) {
-                            data.splice(index, 1);
-                            saveData(boardData); // Save updated data to localStorage
-                            renderColumn(column, data); // Re-render the column
-                        }
+            data.forEach(card => {
+                const cardElement = document.createElement('div');
+                cardElement.classList.add('card');
+                cardElement.setAttribute('data-testid', 'card');
+                cardElement.dataset.id = card.id; // Store the ID
 
-                    }
-                });
+                cardElement.innerHTML = `
+                    <div class="card-title">${card.title}</div>
+                `;
 
-                // Add card editing event listener
-                 cardElement.querySelector('[data-testid="card-input"]').addEventListener('keydown', (event) => {
-                    if (event.key === 'Enter') {
-                        const newTitle = event.target.value;
+                const deleteButton = document.createElement('button');
+                deleteButton.classList.add('delete-card');
+                deleteButton.setAttribute('data-testid', 'delete-card');
+                deleteButton.textContent = 'Delete';
 
-                         // Update card data in boardData
-                        const index = data.findIndex(c => c.title === cardData.title);
-                         if (index !== -1) {
-                            data[index].title = newTitle;
-                         }
-
-                        saveData(boardData); // Save updated data to localStorage
-                    }
-                });
+                cardElement.appendChild(deleteButton); // Add delete button to card element
 
 
-                column.appendChild(cardElement);
+                container.appendChild(cardElement);
             });
         }
 
-        // Initial rendering of the board
-        renderColumn(columns.backlog, boardData.backlog);
-        renderColumn(columns.inProgress, boardData.inProgress);
-        renderColumn(columns.review, boardData.review);
-        renderColumn(columns.done, boardData.done);
+        // Initial render of all columns
+        renderColumn('backlog', appData.backlog);
+        renderColumn('inProgress', appData.inProgress);
+        renderColumn('review', appData.review);
+        renderColumn('done', appData.done);
+
+        // Function to create a new card
+        function createCard(columnName) {
+            const inputElement = document.createElement('textarea');
+            inputElement.setAttribute('data-testid', 'card-input');
+            inputElement.placeholder = 'Enter card title';
+
+            // Wrap the textarea in a container to position it correctly
+            const inputContainer = document.createElement('div');
+            inputContainer.style.position = 'relative';
+
+            // Add a small margin to the textarea
+            inputElement.style.margin = '5px';
+
+            inputContainer.appendChild(inputElement);
+
+
+             // Add the input to the column
+            const addCardButton = columnName === 'backlog' ? document.querySelector('[data-testid="add-card"]') :
+                columnName === 'inProgress' ? document.querySelector('[data-testid="add-card"]') :
+                    columnName === 'review' ? document.querySelector('[data-testid="add-card"]') : document.querySelector('[data-testid="add-card"]');
+
+            const column = columnName === 'backlog' ? columnBacklog :
+                columnName === 'inProgress' ? columnInProgress :
+                    columnName === 'review' ? columnReview : columnDone;
+
+            column.insertBefore(inputContainer, addCardButton);
+
+
+
+
+            // Listen for Enter key press to commit the card
+            inputElement.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    const title = inputElement.value.trim();
+
+                    if (title !== '') {
+                        const newCard = { id: generateId(), title };
+
+                        // Add card to the appropriate column's data
+                        if (columnName === 'backlog') {
+                            appData.backlog.push(newCard);
+                        } else if (columnName === 'inProgress') {
+                            appData.inProgress.push(newCard);
+                        } else if (columnName === 'review') {
+                            appData.review.push(newCard);
+                        } else if (columnName === 'done') {
+                            appData.done.push(newCard);
+                        }
+
+                        renderColumn(columnName, appData[columnName]); // Re-render the column
+                        saveData(appData);
+
+                        // Remove input and prompt for new card
+                        inputContainer.remove(); // remove the container
+
+                    }
+                }
+            });
+        }
+
+
+
+        // Function to generate a unique ID (simple implementation)
+        function generateId() {
+            return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        }
+
 
         // Add card event listeners to each column
-        Object.keys(columns).forEach(columnName => {
-            columns[columnName].querySelector('[data-testid="add-card"]').addEventListener('click', () => {
-                const newCardTitle = prompt("Enter a title for the new card:");
-
-                if (newCardTitle) {
-                    const newCard = createCard(newCardTitle);
-
-                    boardData[columnName].push({ title: newCardTitle });
-                    saveData(boardData);
-
-                    columns[columnName].appendChild(newCard);
-                }
+        document.querySelectorAll('[data-testid="add-card"]').forEach(button => {
+            button.addEventListener('click', () => {
+                const column = button.closest('.column');
+                createCard(column.dataset.testid.slice(6));  // Extract column name from data-testid
             });
         });
 
-         // Drag and drop functionality (basic) - requires more robust implementation for production use
+        // Drag and drop functionality
         let draggedCard = null;
 
-        Object.keys(columns).forEach(columnName => {
-            const column = columns[columnName];
-
-            // Drag start event listener on card elements
-            column.addEventListener('dragstart', (event) => {
-                draggedCard = event.target;
-                event.dataTransfer.effectAllowed = 'move';
+        document.querySelectorAll('.card').forEach(cardElement => {
+            cardElement.addEventListener('dragstart', (event) => {
+                draggedCard = cardElement;
+                cardElement.classList.add('dragging'); // Add class for visual feedback
             });
 
-             // Drag over event listener on column elements
-             column.addEventListener('dragover', (event) => {
-                event.preventDefault(); // Necessary to allow drop
+            cardElement.addEventListener('dragend', () => {
+                cardElement.classList.remove('dragging'); // Remove dragging class
+                draggedCard = null;
+            });
+        });
+
+        document.querySelectorAll('.column').forEach(columnElement => {
+            columnElement.addEventListener('dragover', (event) => {
+                event.preventDefault(); // Allow drop
             });
 
-            // Drop event listener on column elements
-            column.addEventListener('drop', (event) => {
-                event.preventDefault();
+            columnElement.addEventListener('drop', (event) => {
+                event.preventDefault(); // Prevent default behavior
 
                 if (draggedCard) {
-                    const fromColumn = draggedCard.parentNode;
-                    const toColumnIndex = Object.keys(columns).indexOf(columnName);
+                    const cardId = draggedCard.dataset.id;
 
-                    // Find the index of the dragged card in its original column
-                    const fromIndex = Array.from(fromColumn.children).indexOf(draggedCard);
+                    // Determine current and target columns
+                    const fromColumnName = draggedCard.closest('.column').dataset.testid.slice(6);
+                    const toColumnName = event.target.closest('.column').dataset.testid.slice(6);
 
-                    // Remove the card from its original column
-                    fromColumn.removeChild(draggedCard);
-
-                    // Add the card to the target column
-                    column.appendChild(draggedCard);
-
-                    // Update board data (simple title-based matching)
-                    const cardTitle = draggedCard.querySelector('[data-testid="card-input"]').value;
-
-                    // Update boardData
-                    let fromColumnName = "";
-                    if (fromIndex !== -1) {
-                        for(const col in boardData){
-                            if (Array.isArray(boardData[col]) && boardData[col].some(card => card.title === cardTitle)) {
-                                fromColumnName = col;
-                                break;
-                            }
-                        }
-
+                    // Remove card from the original column
+                    const index = appData[fromColumnName].findIndex(card => card.id === cardId);
+                    if (index !== -1) {
+                        appData[fromColumnName].splice(index, 1);
                     }
 
-                    if(fromColumnName){
-                         boardData[fromColumnName] = boardData[fromColumnName].filter(card => card.title !== cardTitle);
+                    // Add card to the target column
+                    appData[toColumnName].push({ ...draggedCard.dataset, title: draggedCard.querySelector('.card-title').textContent });
+
+                    // Re-render both columns
+                    renderColumn(fromColumnName, appData[fromColumnName]);
+                    renderColumn(toColumnName, appData[toColumnName]);
+
+                    saveData(appData);
+
+                    // Confetti Animation
+                    if (toColumnName === 'done') {
+                        triggerConfetti();
                     }
-
-                     for(const col in boardData){
-                         if (Array.isArray(boardData[col]) && boardData[col].some(card => card.title === cardTitle)) {
-                            boardData[col].push({ title: cardTitle });
-                             break;
-                         }
-                     }
-
-
-                    saveData(boardData);
-
-                    if (columnName === 'done') {
-                        // Trigger confetti animation when card moves to "Done" column
-                        const confettiElement = document.createElement('div');
-                        confettiElement.classList.add('confetti');
-                        document.body.appendChild(confettiElement);
-
-                         // Create confetti particles (basic example)
-                        for (let i = 0; i < 100; i++) {
-                            const particle = document.createElement('div');
-                            particle.classList.add('confetti-particle');
-                            const randomColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
-                            particle.style.backgroundColor = randomColor;
-
-                            // Random position and size
-                            particle.style.left = `${Math.random() * 100}vw`;
-                            particle.style.top = `${Math.random() * 100}vh`;
-                            particle.style.size = `${Math.random() * 5 + 1}px`;
-                            confettiElement.appendChild(particle);
-
-                        }
-
-
-                    }
-
-
 
                 }
-                draggedCard = null; // Reset dragged card after drop
             });
-
         });
 
 
+        // Delete card event listener (confirmation)
+        document.querySelectorAll('.delete-card').forEach(deleteButton => {
+            deleteButton.addEventListener('click', (event) => {
+                const cardElement = event.target.closest('.card');
+                if (cardElement) {
+
+                    const cardId = cardElement.dataset.id;
+                     // Confirm deletion with prompt
+                    deleteConfirmation.style.display = 'block'; // Show confirmation dialog
+
+                }
+            });
+        });
+
+
+         // Confirmation button click handler
+         confirmDeleteButton.addEventListener('click', () => {
+
+            const cardElement = draggedCard;
+            if(cardElement){
+                const cardId = cardElement.dataset.id;
+
+                // Determine the current column name
+                const fromColumnName = cardElement.closest('.column').dataset.testid.slice(6);
+
+                // Remove the card from the data
+                 const index = appData[fromColumnName].findIndex(card => card.id === cardId);
+                if (index !== -1) {
+                    appData[fromColumnName].splice(index, 1);
+
+                }
+                 renderColumn(fromColumnName, appData[fromColumnName]); // Re-render the column
+                saveData(appData);
+
+                draggedCard.remove(); // remove card from the DOM
+                draggedCard = null;
+
+                 deleteConfirmation.style.display = 'none'; // Hide confirmation dialog
+            }
+
+
+         });
+
+        // Cancel button click handler
+        cancelDeleteButton.addEventListener('click', () => {
+            deleteConfirmation.style.display = 'none'; // Hide confirmation dialog
+        });
+
+
+        // Confetti animation trigger function
+        function triggerConfetti() {
+            const confettiContainer = document.querySelector('.confetti');
+
+            for (let i = 0; i < 100; i++) {
+                const confettiItem = document.createElement('span');
+                confettiItem.classList.add('confetti-item');
+
+                const randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
+                confettiItem.style.color = randomColor;
+
+                const randomSize = Math.random() * 10 + 5;
+                confettiItem.style.fontSize = randomSize + 'px';
+
+                const animationDuration = Math.random() * 5 + 3;
+                confettiItem.style.animationDuration = animationDuration + 's';
+
+                confettiContainer.appendChild(confettiItem);
+            }
+        }
 
 
     </script>
+
 </body>
 </html>

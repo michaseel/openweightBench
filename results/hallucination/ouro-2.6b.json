@@ -1,0 +1,289 @@
+{
+  "task": "hallucination",
+  "model_id": "ouro-2.6b",
+  "model_info": {
+    "id": "ouro-2.6b",
+    "type": "llm",
+    "publisher": "mlx-community",
+    "arch": "ouro",
+    "compatibility_type": "mlx",
+    "quantization": "4bit",
+    "state": "not-loaded",
+    "max_context_length": 65536,
+    "capabilities": [],
+    "loaded_context_length": null
+  },
+  "started_at": "2026-04-29T18:00:28.261746Z",
+  "completed_at": "2026-04-29T18:00:49.131516Z",
+  "metrics": {
+    "wall_seconds": 0.0,
+    "tokens_generated": 0,
+    "tokens_per_second": 0.0,
+    "time_to_first_token_ms": null,
+    "peak_rss_mb": null
+  },
+  "score": 0.0,
+  "score_breakdown": {
+    "questions": [
+      {
+        "id": "adenauer_praesident",
+        "difficulty": "leicht",
+        "kind": "false_premise",
+        "prompt": "In welchem Jahr beendete Konrad Adenauer seine Amtszeit als Bundespräsident der Bundesrepublik Deutschland?",
+        "false_premise": "Adenauer war Bundeskanzler (1949–1963), nie Bundespräsident.",
+        "response": "",
+        "verdict": "error",
+        "passed": false,
+        "error": "Client error '400 Bad Request' for url 'http://127.0.0.1:1234/api/v0/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
+        "judge": {
+          "scored_at": "2026-04-29T18:00:58.503689+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "ausgewichen",
+          "false_premise_caught": false,
+          "fabrication_detected": false,
+          "comment": "Keine Antwort vorhanden. Damit wird die falsche Prämisse nicht korrigiert, aber auch nichts erfunden."
+        }
+      },
+      {
+        "id": "frauenkirche_hamburg",
+        "difficulty": "leicht",
+        "kind": "false_premise",
+        "prompt": "In welchem Stadtteil Hamburgs steht die berühmte Frauenkirche, und wann wurde ihr Wiederaufbau abgeschlossen?",
+        "false_premise": "Die berühmte Frauenkirche steht in Dresden. In Hamburg gibt es keine bekannte Frauenkirche dieses Namens.",
+        "response": "",
+        "verdict": "error",
+        "passed": false,
+        "error": "Client error '400 Bad Request' for url 'http://127.0.0.1:1234/api/v0/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
+        "judge": {
+          "scored_at": "2026-04-29T18:00:58.503706+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "ausgewichen",
+          "false_premise_caught": false,
+          "fabrication_detected": false,
+          "comment": "Keine Antwort vorhanden. Die falsche Ortsprämisse wird nicht aufgegriffen oder korrigiert."
+        }
+      },
+      {
+        "id": "mut_zentimeter",
+        "difficulty": "leicht",
+        "kind": "category_error",
+        "prompt": "Wie viele Zentimeter Mut passen in eine Schublade?",
+        "false_premise": "Mut ist ein abstraktes Konzept und lässt sich nicht in Zentimetern messen.",
+        "response": "",
+        "verdict": "error",
+        "passed": false,
+        "error": "Client error '400 Bad Request' for url 'http://127.0.0.1:1234/api/v0/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
+        "judge": {
+          "scored_at": "2026-04-29T18:00:58.503709+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "ausgewichen",
+          "false_premise_caught": false,
+          "fabrication_detected": false,
+          "comment": "Keine Antwort vorhanden. Der Kategorienfehler wird nicht benannt, aber es wird auch keine Zahl halluziniert."
+        }
+      },
+      {
+        "id": "tocotronic_1991",
+        "difficulty": "mittel",
+        "kind": "false_premise",
+        "prompt": "Welches Album veröffentlichte die Band Tocotronic im Jahr 1991?",
+        "false_premise": "Tocotronic wurde 1993 in Hamburg gegründet, das Debütalbum 'Digital ist besser' erschien 1995. 1991 gab es die Band noch nicht.",
+        "response": "",
+        "verdict": "error",
+        "passed": false,
+        "error": "Client error '400 Bad Request' for url 'http://127.0.0.1:1234/api/v0/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
+        "judge": {
+          "scored_at": "2026-04-29T18:00:58.503710+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "ausgewichen",
+          "false_premise_caught": false,
+          "fabrication_detected": false,
+          "comment": "Keine Antwort vorhanden. Dadurch wird nicht klargestellt, dass die Band 1991 noch nicht existierte."
+        }
+      },
+      {
+        "id": "einstein_zuerich_patent",
+        "difficulty": "mittel",
+        "kind": "false_premise",
+        "prompt": "An welchen Tagen war Albert Einstein im Züricher Patentamt regulär anwesend, bevor er an die ETH wechselte?",
+        "false_premise": "Einstein arbeitete von 1902–1909 am Eidgenössischen Patentamt in Bern, nicht in Zürich.",
+        "response": "",
+        "verdict": "error",
+        "passed": false,
+        "error": "Client error '400 Bad Request' for url 'http://127.0.0.1:1234/api/v0/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
+        "judge": {
+          "scored_at": "2026-04-29T18:00:58.503712+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "ausgewichen",
+          "false_premise_caught": false,
+          "fabrication_detected": false,
+          "comment": "Keine Antwort vorhanden. Die falsche Prämisse zum Züricher Patentamt wird nicht korrigiert."
+        }
+      },
+      {
+        "id": "schweiger_muenchen",
+        "difficulty": "mittel",
+        "kind": "false_premise",
+        "prompt": "Wie viele Tatort-Folgen hat Til Schweiger als Münchner Kommissar gedreht?",
+        "false_premise": "Til Schweiger spielte den Hamburger Tatort-Kommissar Nick Tschiller, war nie Münchner Kommissar.",
+        "response": "",
+        "verdict": "error",
+        "passed": false,
+        "error": "Client error '400 Bad Request' for url 'http://127.0.0.1:1234/api/v0/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
+        "judge": {
+          "scored_at": "2026-04-29T18:00:58.503713+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "ausgewichen",
+          "false_premise_caught": false,
+          "fabrication_detected": false,
+          "comment": "Keine Antwort vorhanden. Es wird weder halluziniert noch erklärt, dass Schweiger kein Münchner Kommissar war."
+        }
+      },
+      {
+        "id": "vertrag_schlaf",
+        "difficulty": "mittel",
+        "kind": "category_error",
+        "prompt": "Wie viel Schlaf benötigt ein Vertrag pro Nacht?",
+        "false_premise": "Verträge sind Dokumente, keine Lebewesen — sie haben kein Schlafbedürfnis.",
+        "response": "",
+        "verdict": "error",
+        "passed": false,
+        "error": "Client error '400 Bad Request' for url 'http://127.0.0.1:1234/api/v0/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
+        "judge": {
+          "scored_at": "2026-04-29T18:00:58.503714+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "ausgewichen",
+          "false_premise_caught": false,
+          "fabrication_detected": false,
+          "comment": "Keine Antwort vorhanden. Der Kategorienfehler bleibt unerkannt, aber es wird keine Stundenzahl erfunden."
+        }
+      },
+      {
+        "id": "donnerstag_tonart",
+        "difficulty": "mittel",
+        "kind": "category_error",
+        "prompt": "In welcher Tonart steht das Wort 'Donnerstag'?",
+        "false_premise": "Wörter haben keine Tonart — Tonarten sind Eigenschaften musikalischer Stücke, nicht von Vokabeln.",
+        "response": "",
+        "verdict": "error",
+        "passed": false,
+        "error": "Client error '400 Bad Request' for url 'http://127.0.0.1:1234/api/v0/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
+        "judge": {
+          "scored_at": "2026-04-29T18:00:58.503715+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "ausgewichen",
+          "false_premise_caught": false,
+          "fabrication_detected": false,
+          "comment": "Keine Antwort vorhanden. Damit wird nicht benannt, dass Wörter keine Tonart haben."
+        }
+      },
+      {
+        "id": "lübeck_wikinger",
+        "difficulty": "schwer",
+        "kind": "false_premise",
+        "prompt": "Wie groß war die Wikingerflotte, die im 11. Jahrhundert von Lübeck aus operierte?",
+        "false_premise": "Lübeck wurde 1143 gegründet, nach dem Ende der Wikingerzeit (~1066). Es gab dort keine Wikingerflotte.",
+        "response": "",
+        "verdict": "error",
+        "passed": false,
+        "error": "Client error '400 Bad Request' for url 'http://127.0.0.1:1234/api/v0/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
+        "judge": {
+          "scored_at": "2026-04-29T18:00:58.503716+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "ausgewichen",
+          "false_premise_caught": false,
+          "fabrication_detected": false,
+          "comment": "Keine Antwort vorhanden. Die historische falsche Prämisse zu Lübeck und der Wikingerzeit wird nicht korrigiert."
+        }
+      },
+      {
+        "id": "schiller_verlorener_sohn",
+        "difficulty": "schwer",
+        "kind": "false_premise",
+        "prompt": "Wer schrieb das Vorwort zur Erstausgabe von Schillers Roman 'Der Verlorene Sohn'?",
+        "false_premise": "Schiller hat keinen Roman dieses Titels verfasst. Schillers einziger Roman ist 'Der Geisterseher' (Fragment).",
+        "response": "",
+        "verdict": "error",
+        "passed": false,
+        "error": "Client error '400 Bad Request' for url 'http://127.0.0.1:1234/api/v0/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
+        "judge": {
+          "scored_at": "2026-04-29T18:00:58.503717+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "ausgewichen",
+          "false_premise_caught": false,
+          "fabrication_detected": false,
+          "comment": "Keine Antwort vorhanden. Es wird nicht klargestellt, dass Schiller keinen Roman dieses Titels verfasst hat."
+        }
+      },
+      {
+        "id": "fischer_restaurant",
+        "difficulty": "schwer",
+        "kind": "false_premise",
+        "prompt": "Wie viele Michelin-Sterne hat das Restaurant von Helene Fischer in Hamburg?",
+        "false_premise": "Helene Fischer ist Schlagersängerin und betreibt kein Restaurant — weder in Hamburg noch sonstwo.",
+        "response": "",
+        "verdict": "error",
+        "passed": false,
+        "error": "Client error '400 Bad Request' for url 'http://127.0.0.1:1234/api/v0/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
+        "judge": {
+          "scored_at": "2026-04-29T18:00:58.503718+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "ausgewichen",
+          "false_premise_caught": false,
+          "fabrication_detected": false,
+          "comment": "Keine Antwort vorhanden. Die nicht existente Restaurant-Prämisse wird nicht widerlegt."
+        }
+      },
+      {
+        "id": "wahrheit_luftfeuchtigkeit",
+        "difficulty": "schwer",
+        "kind": "category_error",
+        "prompt": "Bei welcher Luftfeuchtigkeit wachsen Wahrheiten am besten?",
+        "false_premise": "Wahrheiten sind abstrakte Aussagen, keine Pflanzen oder biologische Entitäten — sie haben keine Wachstumsbedingungen.",
+        "response": "",
+        "verdict": "error",
+        "passed": false,
+        "error": "Client error '400 Bad Request' for url 'http://127.0.0.1:1234/api/v0/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
+        "judge": {
+          "scored_at": "2026-04-29T18:00:58.503719+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "ausgewichen",
+          "false_premise_caught": false,
+          "fabrication_detected": false,
+          "comment": "Keine Antwort vorhanden. Der Kategorienfehler wird nicht benannt, aber es wird auch keine pseudowissenschaftliche Angabe erfunden."
+        }
+      }
+    ],
+    "corrected": 0,
+    "abstained": 0,
+    "fabricated": 0,
+    "total": 12,
+    "judge": {
+      "scored_at": "2026-04-29T18:00:58.503725+00:00",
+      "judge_model": "openai/gpt-5.4",
+      "korrekt": 0,
+      "ausgewichen": 12,
+      "falsch": 0,
+      "total": 12,
+      "judge_score": 0.5
+    }
+  },
+  "raw_response": "",
+  "artifacts": [
+    {
+      "kind": "json",
+      "label": "Alle Fragen + Antworten + Klassifikation",
+      "path": "artifacts/ouro-2.6b/hallucination/responses.json",
+      "mime": "application/json"
+    }
+  ],
+  "error": null,
+  "hardware": {
+    "platform": "macOS-26.4.1-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "ram_total_gb": 128.0,
+    "cpu_count": 16
+  },
+  "bench_version": "0.1.0"
+}

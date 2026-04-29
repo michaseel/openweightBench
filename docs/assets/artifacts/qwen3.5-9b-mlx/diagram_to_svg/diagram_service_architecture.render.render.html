@@ -1,0 +1,201 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html,body{margin:0;background:#fff;font-family:system-ui,-apple-system,sans-serif}
+  .wrap{padding:24px;display:inline-block;background:#fff}
+  /* Force a concrete render box: many model-emitted SVGs only set viewBox.
+     Without a width here, an inline-block parent collapses the SVG to its
+     intrinsic ~300x150 (or smaller) and the screenshot becomes a tiny
+     blank tile. Fixed width + auto height uses viewBox aspect-ratio. */
+  .wrap svg{display:block;width:1200px;height:auto;max-width:none}
+</style></head><body><div class="wrap"><svg viewBox="0 0 1200 850" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Arrow Marker for Sync -->
+    <marker id="arrow-sync" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 5, 0 10" fill="#333" />
+    </marker>
+    
+    <!-- Arrow Marker for Async -->
+    <marker id="arrow-async" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 5, 0 10" fill="#666" />
+    </marker>
+
+    <!-- Arrow Marker for External (Red) -->
+    <marker id="arrow-external" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 5, 0 10" fill="#d9534f" />
+    </marker>
+
+    <!-- Cylinder Shape for DBs -->
+    <defs>
+      <g id="cylinder">
+        <rect x="0" y="0" width="60" height="40" rx="5" ry="5" fill="#f9f9f9" stroke="#333" stroke-width="1"/>
+        <ellipse cx="30" cy="-20" rx="35" ry="10" fill="#f9f9f9" stroke="#333" stroke-width="1"/>
+        <ellipse cx="30" cy="40" rx="35" ry="10" fill="#f9f9f9" stroke="#333" stroke-width="1"/>
+      </g>
+    </defs>
+  </defs>
+
+  <!-- Title -->
+  <text x="250" y="60" font-family="Arial, sans-serif" font-size="24" fill="#333" font-weight="bold">System Architecture</text>
+
+  <!-- Legend -->
+  <g id="legend" transform="translate(900, 60)">
+    <line x1="0" y1="0" x2="40" y2="0" stroke="#333" stroke-width="2"/>
+    <text x="50" y="10" font-family="Arial, sans-serif" font-size="14">Sync</text>
+    
+    <line x1="0" y1="25" x2="40" y2="25" stroke="#666" stroke-width="2" stroke-dasharray="4, 4"/>
+    <text x="50" y="35" font-family="Arial, sans-serif" font-size="14">Async</text>
+    
+    <rect x="0" y="50" width="40" height="10" fill="none" stroke="#d9534f" stroke-width="2"/>
+    <text x="50" y="65" font-family="Arial, sans-serif" font-size="14">External</text>
+  </g>
+
+  <!-- Goals -->
+  <g id="goals" transform="translate(150, 140)">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="18" fill="#333" font-weight="bold">Goals:</text>
+    <line x1="0" y1="25" x2="300" y2="25" stroke="#333" stroke-width="1"/>
+    <text x="0" y="45" font-family="Arial, sans-serif" font-size="16">- Scalability</text>
+    <text x="0" y="75" font-family="Arial, sans-serif" font-size="16">- Reliability</text>
+    <text x="0" y="105" font-family="Arial, sans-serif" font-size="16">- Security</text>
+    <text x="0" y="135" font-family="Arial, sans-serif" font-size="16">- Maintainability</text>
+  </g>
+
+  <!-- Notes -->
+  <g id="notes" transform="translate(150, 380)">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="18" fill="#2e7d32" font-weight="bold">Notes:</text>
+    <line x1="0" y1="25" x2="300" y2="25" stroke="#2e7d32" stroke-width="1"/>
+    <text x="0" y="45" font-family="Arial, sans-serif" font-size="16">- Use Docker for</text>
+    <text x="0" y="75" font-family="Arial, sans-serif" font-size="16">all services</text>
+    <text x="0" y="105" font-family="Arial, sans-serif" font-size="16">- CI/CD with GitHub</text>
+    <text x="0" y="135" font-family="Arial, sans-serif" font-size="16">Actions</text>
+    <text x="0" y="165" font-family="Arial, sans-serif" font-size="16">- Logs → ELK Stack</text>
+  </g>
+
+  <!-- Main Architecture Diagram -->
+  
+  <!-- Frontend Box -->
+  <rect id="frontend" x="300" y="200" width="140" height="60" fill="#fff" stroke="#333" stroke-width="2"/>
+  <text id="frontend-text" x="370" y="245" font-family="Arial, sans-serif" font-size="16" text-anchor="middle">Frontend</text>
+  <text id="frontend-tech" x="370" y="265" font-family="Arial, sans-serif" font-size="14" text-anchor="middle">(React)</text>
+
+  <!-- API Gateway Box -->
+  <rect id="apigateway" x="450" y="230" width="140" height="60" fill="#fff" stroke="#333" stroke-width="2"/>
+  <text id="apigateway-text" x="520" y="275" font-family="Arial, sans-serif" font-size="16" text-anchor="middle">API Gateway</text>
+  <text id="apigateway-tech" x="520" y="295" font-family="Arial, sans-serif" font-size="14" text-anchor="middle">(Kong)</text>
+
+  <!-- Auth Service Box -->
+  <rect id="authservice" x="600" y="140" width="140" height="60" fill="#fff" stroke="#333" stroke-width="2"/>
+  <text id="authservice-text" x="670" y="185" font-family="Arial, sans-serif" font-size="16" text-anchor="middle">Auth Service</text>
+  <text id="authservice-tech" x="670" y="205" font-family="Arial, sans-serif" font-size="14" text-anchor="middle">(JWT)</text>
+
+  <!-- User DB Cylinder -->
+  <g id="userdb" transform="translate(750, 140)">
+    <use href="#cylinder" />
+    <text x="30" y="-15" font-family="Arial, sans-serif" font-size="14" text-anchor="middle">User DB</text>
+    <text x="30" y="15" font-family="Arial, sans-serif" font-size="14" text-anchor="middle">(PostgreSQL)</text>
+  </g>
+
+  <!-- Backend Box -->
+  <rect id="backend" x="600" y="270" width="140" height="60" fill="#fff" stroke="#333" stroke-width="2"/>
+  <text id="backend-text" x="670" y="315" font-family="Arial, sans-serif" font-size="16" text-anchor="middle">Backend</text>
+  <text id="backend-tech" x="670" y="335" font-family="Arial, sans-serif" font-size="14" text-anchor="middle">(Python/FastAPI)</text>
+
+  <!-- Database Cylinder -->
+  <g id="database" transform="translate(750, 300)">
+    <use href="#cylinder" />
+    <text x="30" y="-15" font-family="Arial, sans-serif" font-size="14" text-anchor="middle">Database</text>
+    <text x="30" y="15" font-family="Arial, sans-serif" font-size="14" text-anchor="middle">(PostgreSQL)</text>
+  </g>
+
+  <!-- External API Box (Red) -->
+  <rect id="externalapi" x="300" y="420" width="140" height="60" fill="#fff" stroke="#d9534f" stroke-width="2"/>
+  <text id="externalapi-text" x="370" y="465" font-family="Arial, sans-serif" font-size="16" text-anchor="middle">External API</text>
+  <text id="externalapi-tech" x="370" y="485" font-family="Arial, sans-serif" font-size="14" text-anchor="middle">(Payment Provider)</text>
+
+  <!-- Message Queue Box (Green) -->
+  <rect id="messagequeue" x="450" y="420" width="140" height="60" fill="#fff" stroke="#5cb85c" stroke-width="2"/>
+  <text id="messagequeue-text" x="520" y="465" font-family="Arial, sans-serif" font-size="16" text-anchor="middle">Message Queue</text>
+  <text id="messagequeue-tech" x="520" y="485" font-family="Arial, sans-serif" font-size="14" text-anchor="middle">(RabbitMQ)</text>
+
+  <!-- Worker Service Box (Blue) -->
+  <rect id="workerservice" x="650" y="450" width="140" height="60" fill="#fff" stroke="#5bc0de" stroke-width="2"/>
+  <text id="workerservice-text" x="720" y="495" font-family="Arial, sans-serif" font-size="16" text-anchor="middle">Worker Service</text>
+  <text id="workerservice-tech" x="720" y="515" font-family="Arial, sans-serif" font-size="14" text-anchor="middle">(Python)</text>
+
+  <!-- File Storage Cylinder -->
+  <g id="filestorage" transform="translate(850, 460)">
+    <use href="#cylinder" />
+    <text x="30" y="-15" font-family="Arial, sans-serif" font-size="14" text-anchor="middle">File Storage</text>
+    <text x="30" y="15" font-family="Arial, sans-serif" font-size="14" text-anchor="middle">(S3)</text>
+  </g>
+
+  <!-- Monitoring Box (Blue) -->
+  <rect id="monitoring" x="450" y="520" width="140" height="60" fill="#fff" stroke="#5bc0de" stroke-width="2"/>
+  <text id="monitoring-text" x="520" y="565" font-family="Arial, sans-serif" font-size="16" text-anchor="middle">Monitoring</text>
+  <text id="monitoring-tech" x="520" y="585" font-family="Arial, sans-serif" font-size="14" text-anchor="middle">(Prometheus + Grafana)</text>
+
+  <!-- Connections -->
+  
+  <!-- Frontend to API Gateway (HTTPS) -->
+  <line id="conn-frontend-gateway" x1="440" y1="260" x2="490" y2="260" stroke="#333" stroke-width="2"/>
+  <text id="conn-frontend-gateway-label" x="465" y="250" font-family="Arial, sans-serif" font-size="14" fill="#333">HTTPS</text>
+  <line id="conn-frontend-gateway-arrow" x1="490" y1="260" x2="530" y2="260" stroke="#333" stroke-width="2"/>
+  <use href="#arrow-sync" x1="530" y1="260" width="10" height="10"/>
+
+  <!-- API Gateway to Auth Service -->
+  <line id="conn-gateway-auth" x1="530" y1="290" x2="600" y2="185" stroke="#333" stroke-width="2"/>
+  <line id="conn-gateway-auth-arrow" x1="600" y1="185" x2="640" y2="185" stroke="#333" stroke-width="2"/>
+  <use href="#arrow-sync" x1="640" y1="185" width="10" height="10"/>
+
+  <!-- API Gateway to Backend -->
+  <line id="conn-gateway-backend" x1="530" y1="290" x2="640" y2="315" stroke="#333" stroke-width="2"/>
+  <line id="conn-gateway-backend-arrow" x1="640" y1="315" x2="680" y2="315" stroke="#333" stroke-width="2"/>
+  <use href="#arrow-sync" x1="680" y1="315" width="10" height="10"/>
+
+  <!-- API Gateway to Message Queue -->
+  <line id="conn-gateway-queue" x1="530" y1="290" x2="490" y2="450" stroke="#333" stroke-width="2"/>
+  <line id="conn-gateway-queue-arrow" x1="490" y1="450" x2="530" y2="480" stroke="#333" stroke-width="2"/>
+  <use href="#arrow-sync" x1="530" y1="480" width="10" height="10"/>
+
+  <!-- API Gateway to External API (Async/Dashed) -->
+  <line id="conn-gateway-external" x1="530" y1="290" x2="460" y2="450" stroke="#666" stroke-width="1.5" stroke-dasharray="4, 4"/>
+  <line id="conn-gateway-external-arrow" x1="360" y1="480" x2="300" y2="465" stroke="#666" stroke-width="1.5"/>
+  <use href="#arrow-async" x1="300" y1="465" width="10" height="10"/>
+
+  <!-- Auth Service to User DB -->
+  <line id="conn-auth-db" x1="740" y1="200" x2="780" y2="155" stroke="#333" stroke-width="2"/>
+  <line id="conn-auth-db-arrow" x1="780" y1="155" x2="740" y2="160" stroke="#333" stroke-width="2"/>
+  <use href="#arrow-sync" x1="740" y1="200" width="10" height="10"/>
+
+  <!-- Backend to Database -->
+  <line id="conn-backend-db" x1="740" y1="330" x2="780" y2="345" stroke="#333" stroke-width="2"/>
+  <line id="conn-backend-db-arrow-back" x1="780" y1="345" x2="740" y2="330" stroke="#333" stroke-width="2"/>
+  <use href="#arrow-sync" x1="740" y1="330" width="10" height="10"/>
+  <use href="#arrow-sync" x1="780" y1="345" width="10" height="10"/>
+
+  <!-- Backend to Message Queue -->
+  <line id="conn-backend-queue" x1="640" y1="375" x2="590" y2="480" stroke="#333" stroke-width="2"/>
+  <line id="conn-backend-queue-arrow" x1="590" y1="480" x2="530" y2="480" stroke="#333" stroke-width="2"/>
+  <use href="#arrow-sync" x1="590" y1="480" width="10" height="10"/>
+
+  <!-- Message Queue to Worker Service (Async/Dashed) -->
+  <line id="conn-queue-worker" x1="690" y1="480" x2="750" y2="510" stroke="#666" stroke-width="1.5" stroke-dasharray="4, 4"/>
+  <line id="conn-queue-worker-arrow" x1="750" y1="510" x2="810" y2="510" stroke="#666" stroke-width="1.5"/>
+  <use href="#arrow-async" x1="810" y1="510" width="10" height="10"/>
+
+  <!-- Worker Service to File Storage -->
+  <line id="conn-worker-storage" x1="790" y1="510" x2="850" y2="460" stroke="#333" stroke-width="2"/>
+  <line id="conn-worker-storage-arrow" x1="850" y1="460" x2="790" y2="485" stroke="#333" stroke-width="2"/>
+  <use href="#arrow-sync" x1="790" y1="510" width="10" height="10"/>
+
+  <!-- Message Queue to Monitoring -->
+  <line id="conn-queue-monitoring" x1="590" y1="540" x2="530" y2="580" stroke="#333" stroke-width="2"/>
+  <line id="conn-queue-monitoring-arrow" x1="530" y1="580" x2="490" y2="630" stroke="#333" stroke-width="2"/>
+  <use href="#arrow-sync" x1="530" y1="630" width="10" height="10"/>
+
+  <!-- Worker Service to Monitoring (Async/Dashed) -->
+  <line id="conn-worker-monitoring" x1="690" y1="570" x2="530" y2="630" stroke="#666" stroke-width="1.5" stroke-dasharray="4, 4"/>
+  <line id="conn-worker-monitoring-arrow" x1="530" y1="630" x2="490" y2="630" stroke="#666" stroke-width="1.5"/>
+  <use href="#arrow-async" x1="490" y1="630" width="10" height="10"/>
+
+</svg></div></body></html>

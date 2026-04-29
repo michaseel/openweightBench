@@ -1,0 +1,67 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html,body{margin:0;background:#fff;font-family:system-ui,-apple-system,sans-serif}
+  .wrap{padding:24px;display:inline-block;background:#fff}
+  /* Force a concrete render box: many model-emitted SVGs only set viewBox.
+     Without a width here, an inline-block parent collapses the SVG to its
+     intrinsic ~300x150 (or smaller) and the screenshot becomes a tiny
+     blank tile. Fixed width + auto height uses viewBox aspect-ratio. */
+  .wrap svg{display:block;width:1200px;height:auto;max-width:none}
+</style></head><body><div class="wrap"><svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .box {
+      fill: #333;
+      stroke: white;
+      stroke-width: 2px;
+    }
+
+    .arrow {
+      fill: none;
+      stroke: black;
+      stroke-width: 3px;
+    }
+
+    .marker {
+      fill: white;
+    }
+  </style>
+
+  <g id="diagramm">
+    <rect class="box" x="50" y="100" width="200" height="60" />
+    <text x="130" y="150" font-size="14">Benutzer</text>
+    <rect class="box" x="350" y="100" width="200" height="60" />
+    <text x="370" y="150" font-size="14">Zugriff zu App</text>
+    <rect class="box" x="650" y="100" width="200" height="60" />
+    <text x="670" y="150" font-size="14">Service Provider</text>
+    <line class="arrow" x1="50" y1="100" x2="350" y2="100" />
+    <line class="arrow" x1="350" y1="100" x2="650" y2="100" />
+    <line class="arrow" x1="650" y1="100" x2="850" y2="100" />
+    <line class="arrow" x1="850" y1="100" x2="1000" y2="100" />
+    <line class="arrow" x1="1000" y1="100" x2="1190" y2="100" />
+    <rect class="box" x="850" y="100" width="200" height="60" />
+    <text x="870" y="150" font-size="14">Login-Seite</text>
+    <line class="arrow" x1="850" y1="100" x2="1000" y2="100" />
+    <rect class="box" x="1000" y="100" width="200" height="60" />
+    <text x="1020" y="150" font-size="14">Authentisierung</text>
+    <line class="arrow" x1="1000" y1="100" x2="1190" y2="100" />
+    <rect class="box" x="1190" y="100" width="200" height="60" />
+    <text x="1210" y="150" font-size="14">Login-Daten</text>
+    <line class="arrow" x1="1190" y1="100" x2="1200" y2="100" />
+    <rect class="box" x="1200" y="100" width="200" height="60" />
+    <text x="1220" y="150" font-size="14">Zugriff gewährt</text>
+    <line class="arrow" x1="1200" y1="100" x2="1200" y2="100" />
+    <rect class="box" x="50" y="350" width="200" height="60" />
+    <text x="130" y="370" font-size="14">Identitätsanbieter</text>
+    <line class="arrow" x1="50" y1="350" x2="850" y2="350" />
+    <rect class="box" x="850" y="350" width="200" height="60" />
+    <text x="870" y="370" font-size="14">Token / Assertion</text>
+    <line class="arrow" x1="850" y1="350" x2="1000" y2="350" />
+    <rect class="box" x="1000" y="350" width="200" height="60" />
+    <text x="1020" y="370" font-size="14">Ja</text>
+    <line class="arrow" x1="1000" y1="350" x2="1190" y2="350" />
+    <rect class="box" x="1190" y="350" width="200" height="60" />
+    <text x="1210" y="370" font-size="14">Nein</text>
+    <line class="arrow" x1="1190" y1="350" x2="1200" y2="350" />
+  </g>
+</svg></div></body></html>

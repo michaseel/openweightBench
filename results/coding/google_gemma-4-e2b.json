@@ -1,0 +1,201 @@
+{
+  "task": "coding",
+  "model_id": "google/gemma-4-e2b",
+  "model_info": {
+    "id": "google/gemma-4-e2b",
+    "type": "vlm",
+    "publisher": "google",
+    "arch": "gemma4",
+    "compatibility_type": "gguf",
+    "quantization": "Q4_K_M",
+    "state": "not-loaded",
+    "max_context_length": 131072,
+    "capabilities": [
+      "tool_use"
+    ],
+    "loaded_context_length": null
+  },
+  "started_at": "2026-04-29T17:26:15.869489Z",
+  "completed_at": "2026-04-29T17:27:03.582495Z",
+  "metrics": {
+    "wall_seconds": 47.71167516591959,
+    "tokens_generated": 5542,
+    "tokens_per_second": 135.44255831490102,
+    "time_to_first_token_ms": 183.0,
+    "peak_rss_mb": 4210.3
+  },
+  "score": 0.6666666666666666,
+  "score_breakdown": {
+    "looks_like_html": true,
+    "html_length": 19760,
+    "raw_length": 19772,
+    "lint_checks": [
+      {
+        "id": "col_backlog",
+        "label": "Spalte 'Backlog'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_in_progress",
+        "label": "Spalte 'In Progress'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_review",
+        "label": "Spalte 'Review'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_done",
+        "label": "Spalte 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "drag_drop",
+        "label": "HTML5 drag & drop or sortable lib",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "local_storage",
+        "label": "localStorage persistence",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "tailwind_cdn",
+        "label": "Tailwind via CDN",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "confetti",
+        "label": "Confetti animation on 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Add card button",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "vanilla_js",
+        "label": "Vanilla JS (no React/Vue/Angular/Svelte)",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_alert_prompt",
+        "label": "No window.alert/prompt for CRUD",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "editable_cards",
+        "label": "Editable cards (contenteditable / input)",
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "lint_passed": 12,
+    "lint_total": 12,
+    "lint_score": 1.0,
+    "e2e_checks": [
+      {
+        "id": "renders",
+        "label": "Page loads with all 4 columns",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Add card via button",
+        "passed": false,
+        "detail": "card was not created (count unchanged)"
+      },
+      {
+        "id": "no_double_add",
+        "label": "Card is added exactly 1× (no double submit)",
+        "passed": false,
+        "detail": "no add happened, so not verifiable"
+      },
+      {
+        "id": "delete_card",
+        "label": "Delete card via button + confirmation",
+        "passed": false,
+        "detail": "Page.wait_for_selector: Timeout 2000ms exceeded.\nCall log:\n  - waiting for locator(\"[data-testid=\\\"confirm-delete\\\"]\") to be visible\n"
+      },
+      {
+        "id": "persistence",
+        "label": "Cards survive a reload",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_console_errors",
+        "label": "No JS console errors",
+        "passed": false,
+        "detail": "pageerror: Cannot read properties of null (reading 'appendChild'); pageerror: Cannot read properties of null (reading 'appendChild'); pageerror: card is not defined"
+      }
+    ],
+    "e2e_passed": 2,
+    "e2e_total": 6,
+    "e2e_score": 0.3333333333333333,
+    "judge": {
+      "scored_at": "2026-04-29T17:28:25.139982+00:00",
+      "judge_model": "openai/gpt-5.4",
+      "scores": {
+        "board_renders": 1.0,
+        "column_completeness": 1.0,
+        "cards_present": 1.0,
+        "ui_affordances": 0.7,
+        "design_quality": 0.8,
+        "code_structure": 0.7,
+        "dom_safety": 0.9,
+        "robustness": 0.3,
+        "code_quality": 0.2,
+        "render_matches_code": 0.2
+      },
+      "judge_score": 0.6600000000000001,
+      "comment_visual": "Das Board rendert klar mit allen vier Spalten, drei sichtbaren Beispielkarten und gut erkennbaren Add-Card-Buttons. Optisch ist es sauber und modern, aber Drag/Edit-Affordances sind im statischen Screenshot nur teilweise erkennbar.",
+      "comment_code": "Die Grundstruktur mit IIFE, Render- und Handler-Funktionen ist ordentlich, und DOM-Sicherheit ist weitgehend gut, da Texte meist über value/textContent gesetzt werden. Allerdings enthält der Code mehrere gravierende Logikfehler: uneinheitliche Statuswerte/IDs, kaputte Add-Card-Zuordnung, fehlendes try/catch für localStorage/JSON.parse und ein offensichtlicher Referenzfehler beim Delete-Handler.",
+      "comment_consistency": "Screenshot und HTML-Struktur passen nur oberflächlich zusammen: Das statische Render wirkt plausibel, aber mehrere Interaktionen aus dem Code würden zur Laufzeit brechen oder inkonsistent arbeiten. Besonders Delete, Add Card und Drag/Drop verwenden Status-/ID-Schemata, die nicht sauber zusammenpassen, daher deutliche Diskrepanz zwischen versprochener Funktionalität und robustem Verhalten."
+    }
+  },
+  "raw_response": "```html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Vanilla Kanban Board</title>\n    <!-- Load Tailwind CSS via CDN -->\n    <script src=\"https://cdn.tailwindcss.com\"></script>\n    <style>\n        /* Custom styles for transitions and layout */\n        body {\n            background-color: #f4f7f9;\n        }\n        /* Ensure the drag interaction looks smooth */\n        [draggable=\"true\"]:hover {\n            cursor: grab;\n        }\n        .column-container {\n            min-height: 300px;\n            transition: background-color 0.3s ease;\n        }\n        .card {\n            cursor: pointer;\n            transition: transform 0.2s ease, box-shadow 0.2s ease;\n            user-select: none; /* Prevent text selection during drag */\n        }\n        /* Style for the editable input inside the card */\n        .card-title-input {\n            width: 100%;\n            padding: 8px;\n            border: 1px solid #cbd5e1;\n            border-radius: 4px;\n            font-size: 1rem;\n        }\n\n        /* Confetti Animation Styles (Simple implementation) */\n        .confetti-container {\n            position: fixed;\n            top: 0;\n            left: 0;\n            width: 100%;\n            height: 100%;\n            pointer-events: none; /* Allows clicks to pass through */\n            z-index: 1000;\n        }\n    </style>\n</head>\n<body class=\"p-6 font-sans\">\n\n    <!-- Confetti Container -->\n    <div id=\"confetti-container\" class=\"confetti-container\"></div>\n\n    <header class=\"text-center mb-8\">\n        <h1 class=\"text-4xl font-extrabold text-gray-900 mb-2\">Kanban Board</h1>\n        <p class=\"text-gray-600\">Drag, Edit, and Organize your tasks.</p>\n    </header>\n\n    <!-- Kanban Board Container -->\n    <div id=\"kanban-board\" class=\"grid grid-cols-1 md:grid-cols-4 gap-6\">\n\n        <!-- Column: Backlog -->\n        <div id=\"column-backlog\" data-testid=\"column-backlog\" class=\"",
+  "artifacts": [
+    {
+      "kind": "html",
+      "label": "Generierte App",
+      "path": "artifacts/google_gemma-4-e2b/coding/output.html",
+      "mime": "text/html"
+    },
+    {
+      "kind": "text",
+      "label": "Raw model response",
+      "path": "artifacts/google_gemma-4-e2b/coding/raw_response.txt",
+      "mime": "text/plain"
+    },
+    {
+      "kind": "image",
+      "label": "Screenshot der gerenderten App",
+      "path": "artifacts/google_gemma-4-e2b/coding/screenshot.png",
+      "mime": "image/png"
+    }
+  ],
+  "error": null,
+  "hardware": {
+    "platform": "macOS-26.4.1-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "ram_total_gb": 128.0,
+    "cpu_count": 16
+  },
+  "bench_version": "0.1.0"
+}

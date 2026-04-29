@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vanilla Kanban Board</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Confetti animation */
+    @keyframes confetti {
+      0% { opacity: 1; }
+      50% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    .confetti {
+      animation: confetti 0.5s ease-in-out;
+    }
+    .card {
+      transition: transform 0.2s, opacity 0.3s;
+    }
+    .card:hover { transform: scale(1.05); opacity: 0.9; }
+    .card-edit {
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid #e0e0e0;
+      padding: 0.5rem;
+      border-radius: 8px;
+    }
+    .card-edit:focus { outline: none; }
+    .confirm-delete {
+      background: #ffd700;
+      border: 1px solid #ffd700;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .confirm-delete:hover { background: #ffd700; }
+    .card-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .card-text {
+      font-size: 1rem;
+      color: #333;
+    }
+    .column-backlog, .column-in-progress, .column-review, .column-done {
+      padding: 2rem;
+      margin: 1.5rem 0;
+      border-radius: 8px;
+      background: #f8f9fa;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .column-backlog a {
+      display: block;
+      padding: 0.8rem;
+      border-bottom: 1px solid #e0e0e0;
+      transition: background 0.2s;
+    }
+    .column-backlog a:hover { background: #e9ecef; }
+    .column-in-progress a {
+      background: #d1ecf1;
+    }
+    .column-review a {
+      background: #c8e6c9;
+    }
+    .column-review a:hover { background: #a5d6a7; }
+    .column-done a {
+      background: #d1ecf1;
+      color: #2e7d32;
+    }
+    .card-add {
+      margin-top: 1rem;
+      padding: 0.8rem 2rem;
+      background: #f8f9fa;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .card-add:hover { background: #e9ecef; }
+    .card-title {
+      font-size: 1.2rem;
+      color: #2e7d32;
+    }
+    .card-text {
+      color: #333;
+    }
+    /* Drag & Drop functionality */
+    .column-backlog div[data-testid="card"] {
+      margin: 0.5rem 0;
+    }
+    .column-in-progress div[data-testid="card"] {
+      margin: 0.5rem 0;
+    }
+    .column-review div[data-testid="card"] {
+      margin: 0.5rem 0;
+    }
+    .column-done div[data-testid="card"] {
+      background: #d1ecf1;
+      border-left: 4px solid #2e7d32;
+      padding-left: 1rem;
+    }
+    /* Confetti container */
+    .confetti-container {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: linear-gradient(45deg, #ff6b6b, #ff8c00);
+      animation: confetti 0.5s ease-in-out;
+    }
+    @keyframes confetti {
+      0% { opacity: 1; }
+      50% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    /* Drag state */
+    .column-backlog div[data-testid="card"] {
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .column-in-progress div[data-testid="card"] {
+      opacity: 1;
+    }
+    .column-review div[data-testid="card"] {
+      opacity: 1;
+    }
+    /* Drag enter animation */
+    .column-backlog div[data-testid="add-card"] {
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .column-in-progress div[data-testid="add-card"] {
+      opacity: 1;
+    }
+    .column-review div[data-testid="add-card"] {
+      opacity: 1;
+    }
+    /* Edit mode */
+    .card-edit:focus {
+      outline: 2px solid #2e7d32;
+    }
+    /* Delete confirmation modal */
+    .confirm-delete {
+      display: none;
+    }
+    .card.delete-confirm {
+      background: #ffd700;
+      border: none;
+      padding: 0.3rem 0.8rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .card.delete-confirm:hover { background: #ffd700; color: #000; }
+  </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+  <!-- Column containers -->
+  <div class="column-backlog data-testid="column-backlog">
+    <h2 class="text-xl font-bold text-gray-800 mb-4">Backlog</h2>
+    <div class="flex space-x-4">
+      <!-- Add card button -->
+      <button class="card add-card" data-testid="add-card">Add Card</button>
+      <!-- Cards -->
+      <div class="relative">
+        <div class="absolute inset-0 bg-black opacity-0"></div>
+        <div class="relative group">
+          <div class="bg-white rounded-lg shadow-lg p-4">
+            <div class="text-lg font-semibold">New Task</div>
+            <input type="text" class="card-input" id="card-input" placeholder="Enter card title" />
+            <button class="confirm-delete" data-testid="confirm-delete">Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Columns -->
+  <div class="column-in-progress data-testid="column-in-progress">
+    <h2 class="text-xl font-bold text-gray-800 mb-4">In Progress</h2>
+    <div class="flex space-x-4">
+      <!-- Add card button -->
+      <button class="card add-card" data-testid="add-card">Add Card</button>
+      <!-- Cards -->
+      <div class="relative">
+        <div class="absolute inset-0 bg-black opacity-0"></div>
+        <div class="bg-white rounded-lg shadow-lg p-4">
+          <div class="text-lg font-semibold">Task 1</div>
+          <input type="text" class="card-input" id="card-input-ip" placeholder="Enter task title" />
+          <button class="confirm-delete" data-testid="confirm-delete">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="column-review data-testid="column-review">
+    <h2 class="text-xl font-bold text-gray-800 mb-4">Review</h2>
+    <div class="flex space-x-4">
+      <!-- Add card button -->
+      <button class="card add-card" data-testid="add-card">Add Card</button>
+      <!-- Cards -->
+      <div class="relative">
+        <div class="absolute inset-0 bg-black opacity-0"></div>
+        <div class="bg-white rounded-lg shadow-lg p-4">
+          <div class="text-lg font-semibold">Task 2</div>
+          <input type="text" class="card-input" id="card-input-rev" placeholder="Enter review task" />
+          <button class="confirm-delete" data-testid="confirm-delete">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="column-done data-testid="column-done">
+    <h2 class="text-xl font-bold text-gray-800 mb-4">Done</h2>
+    <div class="confetti-container" id="confettiContainer"></div>
+  </div>
+
+  <script>
+    // === Configuration ===
+    const COLUMNS = {
+      backlog: 'column-backlog',
+      inProgress: 'column-in-progress',
+      review: 'column-review',
+      done: 'column-done'
+    };
+    const COLUMNS_TITLES = ['Backlog', 'In Progress', 'Review', 'Done'];
+    const COLUMNS_IDS = COLUMNS;
+    const CARD_TEXT = 'card-title';
+    const CARD_INPUT = 'card-input';
+    const ADD_CARD_BUTTONS = COLUMNS;
+    let cards = [];
+    let nextId = 1;
+
+    // === Helper: Generate dummy cards on load ===
+    function createDummyCards() {
+      COLUMNS.map(col => {
+        for (let i = 0; i < 5; i++) {
+          const card = document.createElement('div');
+          card.className = `card ${col}`;
+          card.dataset.testid = col;
+          card.innerHTML = `
+            <div class="card-edit">
+              <input type="text" value="${i}" class="card-input" />
+            </div>
+            <button class="confirm-delete" data-testid="${col}-delete-card">Delete</button>
+          `;
+          cards.push(card);
+        }
+      });
+    }
+
+    // === Persistence: localStorage -->
+    function saveState() {
+      localStorage.setItem('kanbanState', JSON.stringify(cards));
+    }
+
+    function loadState() {
+      const saved = localStorage.getItem('kanbanState');
+      if (saved) cards = JSON.parse(saved);
+      return cards;
+    }
+
+    // === Load on init ===
+    window.addEventListener('DOMContentLoaded', () => {
+      loadState();
+
+      // Initialize cards
+      cards = loadState();
+      populateColumns();
+
+      // Drag & Drop: drag card between columns
+      document.querySelectorAll('.column-backlog div[data-testid="card"]')
+        .forEach(card => {
+          card.addEventListener('dragstart', dragStart);
+          card.addEventListener('dragover', dragOver);
+          card.addEventListener('drop', drop);
+        });
+
+      // Drag enter animation
+      document.querySelectorAll('.column-in-progress div[data-testid="card"]')
+        .forEach(card => {
+          card.addEventListener('dragenter', () => {
+            card.classList.add('opacity-100');
+          });
+          card.addEventListener('dragleave', () => {
+            card.classList.remove('opacity-100');
+          });
+          card.addEventListener('drop', () => {
+            card.classList.remove('opacity-100');
+            if (confirm('Are you sure you want to move this card to Done?')) {
+              moveCard(card, COLUMNS[COLUMNS_TITLES[cards.length - 1]]);
+            }
+          });
+        });
+
+      // Edit mode: focus on card
+      document.querySelectorAll('.card-edit').forEach(card => {
+        card.addEventListener('focus', () => {
+          const input = card.querySelector('.card-input');
+          input.value = card.dataset.title;
+        });
+      });
+
+      // Delete confirmation
+      document.querySelectorAll('.confirm-delete').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const col = btn.dataset.col;
+          const idx = cards.findIndex(c => c.dataset.testid === col);
+          if (idx !== -1) {
+            cards.splice(idx, 1);
+            saveState();
+          }
+        });
+      });
+
+      // Add card button click
+      ADD_CARD_BUTTONS.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const col = btn.dataset.col;
+          const title = btn.dataset.title;
+          if (title) {
+            cards.push({ title, id: nextId++ });
+            saveState();
+          }
+        });
+      });
+
+      // Confirm delete
+      document.querySelectorAll('.confirm-delete').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const col = btn.dataset.col;
+          const idx = cards.findIndex(c => c.dataset.testid === col);
+          if (idx !== -1) {
+            cards.splice(idx, 1);
+            saveState();
+          }
+        });
+      });
+
+      // Drag enter to edit
+      document.querySelectorAll('.column-in-progress div[data-testid="card"]').forEach(card => {
+        card.addEventListener('dragenter', () => {
+          card.classList.add('edit-active');
+        });
+        card.addEventListener('dragleave', () => {
+          card.classList.remove('edit-active');
+        });
+        card.addEventListener('drop', () => {
+          if (confirm('Edit card?')) {
+            const col = card.dataset.col;
+            const idx = cards.findIndex(c => c.dataset.testid === col);
+            if (idx !== -1) {
+              cards[idx].title = card.dataset.title;
+              saveState();
+            }
+          }
+        });
+      });
+
+      // Confirm delete modal
+      document.querySelectorAll('.confirm-delete').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const col = btn.dataset.col;
+          const idx = cards.findIndex(c => c.dataset.testid === col);
+          if (idx !== -1) {
+            cards.splice(idx, 1);
+            saveState();
+          }
+        });
+      });
+
+      // Initial drag setup
+      document.querySelectorAll('.column-backlog div[data-testid="add-card"]').forEach(btn => {
+        btn.addEventListener('dragenter', () => {
+          btn.classList.add('hover');
+        });
+        btn.addEventListener('dragleave', () => {
+          btn.classList.remove('hover');
+        });
+      });
+
+      // Add card on button click
+      ADD_CARD_BUTTONS.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const col = btn.dataset.col;
+          const title = btn.dataset.title;
+          if (title) {
+            cards.push({ title, id: nextId++ });
+            saveState();
+          }
+        });
+      });
+    };
+
+    // === Drag & Drop Logic ===
+    function dragStart(e) {
+      e.dataTransfer.setData('text/plain', e.target.dataset.col);
+      e.dataTransfer.effectAllowed = 'move';
+    }
+
+    function dragOver(e) {
+      e.preventDefault();
+    }
+
+    function drop(e) {
+      e.preventDefault();
+      const col = e.dataTransfer.getData('text/plain');
+      const card = document.querySelector(`.column-backlog div[data-testid="${col}"]`);
+      if (card) {
+        card.classList.remove('opacity-100');
+        card.classList.add('opacity-100');
+        card.style.transition = 'opacity 0.3s';
+      }
+      const newCol = card.dataset.col;
+      if (confirm(`Move ${card.title} to ${newCol}?`)) {
+        moveCard(card, newCol);
+      }
+    }
+
+    function moveCard(card, targetCol) {
+      const fromCol = card.dataset.col;
+      const fromIdx = cards.findIndex(c => c.dataset.testid === fromCol);
+      const toIdx = cards.findIndex(c => c.dataset.testid === targetCol);
+      cards.splice(fromIdx, 1);
+      cards.splice(toIdx, 0, card);
+      saveState();
+    }
+
+    // === Confetti Animation ===
+    function showConfetti() {
+      const confetti = document.getElementById('confettiContainer');
+      confetti.style.display = 'block';
+      setTimeout(() => {
+        confetti.style.opacity = 0;
+      }, 300);
+    }
+
+    // === Confirm Delete Dialog ===
+    function showConfirmDelete(col) {
+      const modal = document.createElement('div');
+      modal.className = 'absolute inset-0 flex items-center justify-center bg-black bg-opacity-90';
+      modal.innerHTML = `
+        <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+          <h3 class="text-xl font-bold mb-4">Delete</h3>
+          <p class="text-gray-600">Are you sure you want to delete "${cards[cards.length - 1].title}"?</p>
+          <button class="confirm-delete" data-testid="${col}-delete-card">Confirm</button>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      modal.dialog = true;
+      modal.style.display = 'flex';
+    }
+
+    function hideConfirmDelete() {
+      modal.style.display = 'none';
+    }
+
+    // === Add Card Functionality ===
+    function addCard(col, title) {
+      const card = document.createElement('div');
+      card.className = `card ${col}`;
+      card.dataset.testid = col;
+      card.innerHTML = `
+        <div class="card-edit">
+          <input type="text" value="${title}" class="card-input" />
+        </div>
+        <button class="confirm-delete" data-testid="${col}-delete-card">Delete</button>
+      `;
+      document.querySelectorAll('.column-backlog div[data-testid="add-card"]').forEach(btn => btn.remove());
+      cards.push({ title, id: nextId++ });
+      saveState();
+    }
+
+    // === Edit Card Functionality ===
+    function editCard(idx, newTitle) {
+      const card = cards[idx];
+      card.dataset.title = newTitle;
+      saveState();
+    }
+
+    // === Initialize ===
+    function init() {
+      createDummyCards();
+      loadState();
+      populateColumns();
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>

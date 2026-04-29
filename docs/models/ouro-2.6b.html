@@ -1,0 +1,988 @@
+<!doctype html>
+<html lang="en" class="bg-stone-50 text-stone-900 antialiased">
+<head>
+<meta charset="utf-8">
+<title>ouro-2.6b — Open Weight Bench</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+<script type="module">
+  // Lazy-load mermaid.js only if a .mermaid block is present on the page.
+  if (document.querySelector('.mermaid')) {
+    const m = await import('https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs');
+    m.default.initialize({ startOnLoad: false, theme: 'neutral', securityLevel: 'loose' });
+    const escapeHtml = (value) => value
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+    for (const [i, el] of [...document.querySelectorAll('.mermaid')].entries()) {
+      const code = el.textContent.trim();
+      try {
+        const { svg } = await m.default.render(`owb-mermaid-${Date.now()}-${i}`, code);
+        el.innerHTML = svg;
+      } catch (err) {
+        el.classList.add('text-red-700', 'bg-red-50', 'border-red-200');
+        el.innerHTML = `
+          <div class="text-xs font-semibold uppercase tracking-wider">Mermaid syntax error</div>
+          <div class="mt-1 text-xs">${escapeHtml(err?.message || String(err))}</div>
+          <pre class="mt-3 text-xs whitespace-pre-wrap text-stone-800">${escapeHtml(code)}</pre>
+        `;
+      }
+    }
+  }
+</script>
+<style>
+  body { font-feature-settings: "ss01","cv11"; }
+  .num { font-variant-numeric: tabular-nums; }
+  .row-link:hover { background: rgb(245 245 244 / 1); }
+  .preview-pop {
+    position: fixed; pointer-events: none; z-index: 50;
+    transform: translate(16px, 16px);
+    background: white; border: 1px solid rgb(231 229 228); border-radius: 8px;
+    box-shadow: 0 12px 30px -10px rgb(0 0 0 / 0.25);
+    overflow: hidden; max-width: 480px;
+  }
+  .preview-pop img { display: block; max-width: 480px; max-height: 320px; }
+  .text-pop {
+    position: fixed; pointer-events: none; z-index: 60;
+    transform: translate(12px, 12px);
+    max-width: 360px; white-space: normal;
+    background: rgb(28 25 23); color: rgb(250 250 249);
+    border: 1px solid rgb(87 83 78); border-radius: 6px;
+    box-shadow: 0 12px 30px -10px rgb(0 0 0 / 0.35);
+    padding: 0.5rem 0.625rem; font-size: 0.75rem; line-height: 1.35;
+  }
+  /* Lightbox for click-to-zoom on screenshots/diagrams */
+  .lightbox-overlay {
+    position: fixed; inset: 0; background: rgb(0 0 0 / 0.45);
+    display: none; align-items: center; justify-content: center;
+    z-index: 100; padding: 2rem;
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='rgba(28,25,23,0.85)' stroke='white' stroke-width='2'/><path d='M11 11 L21 21 M21 11 L11 21' stroke='white' stroke-width='2.5' stroke-linecap='round' fill='none'/></svg>") 16 16, pointer;
+  }
+  .lightbox-overlay.active { display: flex; }
+  .lightbox-panel {
+    max-width: 96vw; max-height: 94vh; overflow: auto;
+    background: white; border-radius: 6px;
+    box-shadow: 0 24px 70px -20px rgb(0 0 0 / 0.7);
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='rgba(28,25,23,0.85)' stroke='white' stroke-width='2'/><path d='M11 11 L21 21 M21 11 L11 21' stroke='white' stroke-width='2.5' stroke-linecap='round' fill='none'/></svg>") 16 16, pointer;
+  }
+  .lightbox-panel img {
+    display: block; max-width: none; width: auto; height: auto;
+    min-width: min(90vw, 900px); max-height: none;
+  }
+  .lightbox-panel .mermaid-zoom-content {
+    padding: 1.5rem; min-width: min(92vw, 1100px);
+  }
+  .lightbox-panel .mermaid-zoom-content svg {
+    display: block; width: max-content; min-width: 100%;
+    max-width: none; height: auto;
+  }
+  .zoomable, .zoomable-mermaid {
+    cursor: zoom-in;
+  }
+  .zoom-frame {
+    position: relative;
+  }
+  .zoom-button {
+    position: absolute; top: 0.5rem; right: 0.5rem; z-index: 5;
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 2rem; height: 2rem; border-radius: 0.375rem;
+    background: rgb(255 255 255 / 0.92);
+    border: 1px solid rgb(214 211 209);
+    color: rgb(41 37 36);
+    box-shadow: 0 4px 14px -8px rgb(0 0 0 / 0.45);
+    cursor: zoom-in; font-size: 1rem; line-height: 1;
+  }
+  .zoom-button:hover {
+    background: white; border-color: rgb(120 113 108);
+  }
+</style>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="border-b border-stone-200 bg-white">
+    <div class="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
+      <a href="../index.html" class="flex items-baseline gap-3">
+        <span class="text-xl font-semibold tracking-tight">Open Weight Bench</span>
+        <span class="text-xs text-stone-500 hidden sm:inline">Local LLMs on Apple Silicon</span>
+      </a>
+      <nav class="text-sm text-stone-500 flex items-center gap-4">
+        <a class="hover:text-stone-900" href="https://michaelseel.com" target="_blank" rel="noopener">michaelseel.com</a>
+        <a class="hover:text-stone-900" href="https://github.com/michaseel/openweightBench" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+    </div>
+    <div class="max-w-6xl mx-auto px-6">
+      <nav class="-mb-px flex gap-6 overflow-x-auto text-sm">
+        <a href="../index.html"
+           class="py-3 border-b-2 border-stone-900 text-stone-900 font-medium">
+          Overview
+        </a>
+          <a href="../benchmarks/coding.html"
+             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
+            Coding
+          </a>
+          <a href="../benchmarks/vision.html"
+             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
+            Vision
+          </a>
+          <a href="../benchmarks/niah.html"
+             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
+            Needle in a Haystack
+          </a>
+          <a href="../benchmarks/tool_use.html"
+             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
+            Tool Use
+          </a>
+          <a href="../benchmarks/diagram_to_svg.html"
+             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
+            Diagram → SVG
+          </a>
+          <a href="../benchmarks/hallucination.html"
+             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
+            Hallucination
+          </a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-7xl mx-auto w-full px-6 py-8">
+
+<section class="mb-8">
+  <div class="text-xs text-stone-500"><a href="../index.html" class="hover:text-stone-900">← Overview</a></div>
+  <h1 class="mt-2 text-2xl font-semibold tracking-tight num">ouro-2.6b</h1>
+  <div class="mt-2 flex flex-wrap gap-2 text-xs">
+    <span class="px-2 py-1 rounded border"
+          style="background-color: #475569; color: #fff; border-color: #475569;"
+          data-tooltip="Vendor / publisher of the model. Colour indicates the model family.">mlx-community</span>
+      <span class="px-2 py-1 rounded bg-stone-100 border border-stone-200 num"
+            data-tooltip="Dense model: 2.6B parameters — all active per token.">
+        2.6B
+· dense      </span>
+    <span class="px-2 py-1 rounded bg-stone-100 border border-stone-200 num"
+          data-tooltip="File format and quantisation of the weights (e.g. Q8_0 = 8-bit, MXFP4 = 4-bit mixed precision). Lower bit width = lower RAM, potentially slightly reduced quality.">mlx / 4bit</span>
+    <span class="px-2 py-1 rounded bg-stone-100 border border-stone-200 num"
+          data-tooltip="Maximum context length of the model in tokens (k = 1024). Inputs beyond this are truncated by the backend.">ctx 64k</span>
+      <span class="px-2 py-1 rounded bg-stone-100 border border-stone-200 num"
+            data-tooltip="Release date from the HuggingFace model card (createdAt).">released 2025-11-09</span>
+  </div>
+</section>
+
+<div class="lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-8 lg:items-start">
+  <aside class="hidden lg:block sticky top-4 self-start">
+    <nav class="bg-white border border-stone-200 rounded-lg p-4 max-h-[calc(100vh-2rem)] overflow-y-auto">
+      <div class="text-xs uppercase tracking-wider text-stone-500">Model</div>
+      <div class="mt-1 text-sm font-semibold text-stone-900 break-all leading-snug num">ouro-2.6b</div>
+      <dl class="mt-3 grid grid-cols-2 gap-2 text-xs">
+        <div>
+          <dt class="text-stone-500">Peak RAM</dt>
+          <dd class="font-semibold text-stone-900 num">—</dd>
+        </div>
+        <div>
+          <dt class="text-stone-500">Wall total</dt>
+          <dd class="font-semibold text-stone-900 num">15.0 min</dd>
+        </div>
+      </dl>
+      <div class="mt-4 pt-3 border-t border-stone-200 text-xs uppercase tracking-wider text-stone-500">Benchmarks</div>
+      <ul class="mt-2 space-y-0.5">
+          <li>
+            <a href="#coding" class="flex items-center justify-between gap-2 py-1.5 px-2 rounded hover:bg-stone-50 group">
+              <span class="text-sm text-stone-700 group-hover:text-stone-900 truncate">coding</span>
+              <span class="flex items-baseline gap-2 num shrink-0">
+                <span class="text-sm font-semibold text-red-500">
+!
+                </span>
+                <span class="text-[10px] text-stone-400 w-10 text-right">15m</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="#niah" class="flex items-center justify-between gap-2 py-1.5 px-2 rounded hover:bg-stone-50 group">
+              <span class="text-sm text-stone-700 group-hover:text-stone-900 truncate">niah</span>
+              <span class="flex items-baseline gap-2 num shrink-0">
+                <span class="text-sm font-semibold text-stone-400">
+—                </span>
+                <span class="text-[10px] text-stone-400 w-10 text-right">0s</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="#hallucination" class="flex items-center justify-between gap-2 py-1.5 px-2 rounded hover:bg-stone-50 group">
+              <span class="text-sm text-stone-700 group-hover:text-stone-900 truncate">hallucination</span>
+              <span class="flex items-baseline gap-2 num shrink-0">
+                <span class="text-sm font-semibold text-amber-700">
+0.50
+                </span>
+                <span class="text-[10px] text-stone-400 w-10 text-right">0s</span>
+              </span>
+            </a>
+          </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <div class="min-w-0">
+
+<section id="coding" class="mb-12 scroll-mt-24">
+  <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
+    <h2 class="text-lg font-medium tracking-tight">coding</h2>
+    <a href="../benchmarks/coding.html" class="text-xs text-stone-500 hover:text-stone-900">all models in this bench →</a>
+  </div>
+
+    <div class="mt-3 px-4 py-3 rounded bg-red-50 border border-red-200 text-red-700 text-sm">
+      <strong>Error:</strong> Client error &#39;400 Bad Request&#39; for url &#39;http://127.0.0.1:1234/api/v0/chat/completions&#39;
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400
+    </div>
+
+  <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+    <div class="md:col-span-1 bg-white border-2 border-stone-300 rounded-lg p-5 flex flex-col justify-center">
+      <div class="text-xs uppercase tracking-wider text-stone-500">Score</div>
+      <div class="mt-1 text-5xl font-bold num leading-none text-stone-400">
+error
+      </div>
+    </div>
+    <div class="md:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">tok/s</dt>
+        <dd class="mt-1 text-xl font-semibold num">0</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Tokens</dt>
+        <dd class="mt-1 text-xl font-semibold num">—</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Wall</dt>
+        <dd class="mt-1 text-xl font-semibold num">900.0 s</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">RAM</dt>
+        <dd class="mt-1 text-xl font-semibold num">—</dd>
+      </div>
+    </div>
+  </div>
+
+    <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Worum geht es? Was wird getestet?
+      </summary>
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: From a ~200-word prompt the model must generate a fully functional Kanban board as a single-file HTML with drag &amp; drop, localStorage persistence, edit/delete and a confetti animation — in a single chat without iteration. The prompt also includes a small `data-testid` contract so a Playwright test can drive the app remotely.
+
+Three signals feed into the score:
+(1) Static — a linter checks concrete constraints in the HTML (columns, Tailwind, localStorage call, no framework, no window.alert/prompt, …).
+(2) Functional — Playwright runs a small CRUD sequence: create a card, delete a card with confirmation, reload — does state persist? — and checks whether any JS console errors occur during the entire flow. Drag &amp; drop and confetti are deliberately not tested functionally (too many implementation variants).
+(3) Qualitative — LLM-as-judge rates screenshot and code (visual + code quality + render↔code consistency).
+
+Score = mean over the available signals.
+
+Why models fail: reasoning models burn their tokens in thinking instead of writing. Sliding-window models (Gemma 4) lose the constraints at the start of the prompt. Small models (&lt;3B) often fail to produce coherent HTML — or ignore the data-testid contract, which makes the functional tests fail in droves.</div>
+    </details>
+
+    <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Prompt
+      </summary>
+      <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">You are a careful front-end engineer.</pre>
+          </div>
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Developer prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">Create a fully functional Kanban board in a single HTML file using vanilla JavaScript (no frameworks like react).
+
+Requirements:
+- Columns: Backlog, In Progress, Review, Done.
+- Cards must be:
+  - draggable across columns,
+  - editable in place,
+  - persisted in localStorage (state survives reloads) - please use your own namespace,
+  - deletable with a confirmation prompt.
+- Each column provides an &#34;Add card&#34; action.
+- Style with Tailwind via CDN.
+- Add subtle CSS transitions and trigger a confetti animation when a card moves to &#34;Done&#34;.
+- Thoroughly comment the code.
+- dont use window.alert or window.prompt to add/edit/delete cards
+- if there are no cards yet, create some dummy cards
+- modern and vibrant design
+
+Stable test selectors (mandatory — these data-testid attributes are used by an automated functional test; do not omit, rename, or split them across multiple elements):
+- Column containers: data-testid=&#34;column-backlog&#34;, data-testid=&#34;column-in-progress&#34;, data-testid=&#34;column-review&#34;, data-testid=&#34;column-done&#34;.
+- Every &#34;Add card&#34; button (one per column): data-testid=&#34;add-card&#34;.
+- Every card element: data-testid=&#34;card&#34;.
+- Inside each card, the delete trigger: data-testid=&#34;delete-card&#34;.
+- The confirm button of the delete-confirmation dialog/modal: data-testid=&#34;confirm-delete&#34;.
+- The input/textarea where a new card title is typed: data-testid=&#34;card-input&#34;. Pressing Enter in this input MUST commit the new card.
+
+As answer return the plain HTML of the working application (script and styles included)</pre>
+          </div>
+      </div>
+    </details>
+
+        <a href="../assets/artifacts/ouro-2.6b/coding/output.html" target="_blank"
+           class="mt-5 block bg-emerald-600 hover:bg-emerald-700 text-white text-center font-semibold text-lg rounded px-6 py-5 shadow-sm transition">
+          ▶ Open generated app in a new tab ↗
+        </a>
+
+
+
+
+
+
+    <div class="mt-4 text-xs text-stone-500">
+      Artefacts:
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/ouro-2.6b/coding/output.html" target="_blank">Generierte App</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/ouro-2.6b/coding/raw_response.txt" target="_blank">Raw model response</a>
+    </div>
+</section>
+<section id="niah" class="mb-12 scroll-mt-24">
+  <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
+    <h2 class="text-lg font-medium tracking-tight">niah</h2>
+    <a href="../benchmarks/niah.html" class="text-xs text-stone-500 hover:text-stone-900">all models in this bench →</a>
+  </div>
+
+
+  <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+    <div class="md:col-span-1 bg-white border-2 border-stone-300 rounded-lg p-5 flex flex-col justify-center">
+      <div class="text-xs uppercase tracking-wider text-stone-500">Score</div>
+      <div class="mt-1 text-5xl font-bold num leading-none text-stone-400">
+—      </div>
+    </div>
+    <div class="md:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">tok/s</dt>
+        <dd class="mt-1 text-xl font-semibold num">0</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Tokens</dt>
+        <dd class="mt-1 text-xl font-semibold num">—</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Wall</dt>
+        <dd class="mt-1 text-xl font-semibold num">0.0 s</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">RAM</dt>
+        <dd class="mt-1 text-xl font-semibold num">—</dd>
+      </div>
+    </div>
+  </div>
+
+    <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Worum geht es? Was wird getestet?
+      </summary>
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: In a German book corpus (with embedded source code) 10 synthetic facts are hidden at evenly distributed depths (5% – 95%). The model must retrieve all of them.
+
+Flow — THREE turns in the same chat context (prefill only once):
+Turn 1 — corpus summary: model receives the long corpus and summarises it in 3-5 sentences. Forces real processing of the text.
+Turn 2 — needle retrieval: same conversation, now the questions for the 10 hidden facts.
+Turn 3 — comprehension + hallucination traps: 4 factual questions about the book content + 3 hallucination traps (model should recognise that the question is NOT answered in the text).
+
+Default mode runs ONE uniform stage for all models: 120k tokens. Models without sufficient max_context are skipped at this stage. `niah_deep` additionally runs 32k / 64k / 200k for a full heatmap.
+
+Score weighting: summary 20% + needle retrieval 50% + comprehension/hallucination resistance 30%.
+
+Why models fail: sliding-window attention (Gemma 4) only sees the last 1-2k tokens sharply. Reasoning models hit the token limit before answering. Q4 KV cache measurably degrades recall at long contexts. On the hallucination traps the helpful bias lures models into plausible-sounding inventions.</div>
+    </details>
+
+    <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Prompt
+      </summary>
+      <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Developer prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">TURN 1 (User):
+The following section contains a longer mixed text of German narrative and source code.
+
+===== TEXT BEGIN =====
+&lt;corpus with embedded needles, 32k–128k tokens depending on stage&gt;
+===== TEXT END =====
+
+Summarise the text in 3-5 sentences. Mention the main characters, setting and key themes.
+
+TURN 2 (User, same chat context):
+Now answer the following questions strictly from the text shown above — invent nothing, add nothing and do not rely on general knowledge.
+
+Questions:
+1. &lt;question for needle 1&gt;
+2. &lt;question for needle 2&gt;
+...
+
+Answer as a numbered list 1., 2., 3. with one short sentence each.</pre>
+          </div>
+      </div>
+    </details>
+
+    <p class="mt-5 text-sm text-stone-600">
+      For each context length 10 needles are distributed across the corpus. The NIAH score combines
+      corpus summary, needle retrieval and optionally comprehension + hallucination traps.
+      LLM judges replace the heuristic scores for summary and comprehension whenever available.
+    </p>
+
+      <div class="mt-6">
+        <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">
+          Stage: <span class="num font-semibold text-stone-700">32k tokens</span>
+        </div>
+
+
+          <div class="mt-4 bg-white border border-stone-200 rounded-lg overflow-hidden">
+            <div class="px-4 py-3 border-b border-stone-200 flex items-baseline justify-between">
+              <div>
+                <span class="text-xs uppercase tracking-wider text-stone-700 font-semibold">Sub-benchmark · needle retrieval</span>
+                <span class="ml-2 text-xs text-stone-500">Turn 2</span>
+              </div>
+              <div class="text-sm num">
+                <span class="font-bold text-base text-red-700">
+                  0/10
+                </span>
+                <span class="text-stone-500">hits</span>
+              </div>
+            </div>
+            <div class="px-4 py-3">
+              <ul class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-red-500">○</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">5% (5 %)</div>
+                      <div class="text-stone-500 mt-0.5">expected: blauer Ankerstein, Lübeck-1907, A-318</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-red-500">○</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">10% (10 %)</div>
+                      <div class="text-stone-500 mt-0.5">expected: smaragdgrün, Schlüssel, Seriennummer, 7-Bravo-12</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-red-500">○</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">15% (15 %)</div>
+                      <div class="text-stone-500 mt-0.5">expected: Nordstern-Brigade, violetter</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-red-500">○</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">25% (25 %)</div>
+                      <div class="text-stone-500 mt-0.5">expected: Indigo-Quark</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-red-500">○</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">33% (33 %)</div>
+                      <div class="text-stone-500 mt-0.5">expected: Atlantis-Mira, NL-7711, 142</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-red-500">○</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">50% (50 %)</div>
+                      <div class="text-stone-500 mt-0.5">expected: Ehrenmitglied, Aluminium-Gesellschaft, Köln</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-red-500">○</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">65% (65 %)</div>
+                      <div class="text-stone-500 mt-0.5">expected: Safran-Klops Margarethe, 7 Gramm|7 g, 3 Stunden|drei Stunden</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-red-500">○</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">75% (75 %)</div>
+                      <div class="text-stone-500 mt-0.5">expected: Erbe von Onkel Walpurgis, 42-Lima</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-red-500">○</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">85% (85 %)</div>
+                      <div class="text-stone-500 mt-0.5">expected: 7f4a2e91-marlin-2026</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-red-500">○</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">90% (90 %)</div>
+                      <div class="text-stone-500 mt-0.5">expected: Coriolis-Effekt, Pendel, Memo, Dr. Kühn, 17.03.2024</div>
+                    </div>
+                  </li>
+              </ul>
+              <details class="mt-3">
+                <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Model response to the needle questions</summary>
+                <pre class="mt-2 text-xs bg-stone-50 border border-stone-200 rounded p-3 overflow-x-auto whitespace-pre-wrap"></pre>
+              </details>
+                <div class="mt-2 text-xs text-red-600">Error: summary turn: Client error &#39;400 Bad Request&#39; for url &#39;http://127.0.0.1:1234/api/v0/chat/completions&#39;
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400</div>
+            </div>
+          </div>
+
+            <div class="mt-4 bg-amber-50 border border-amber-200 rounded-lg overflow-hidden">
+              <div class="px-4 py-3 border-b border-amber-200 flex items-baseline justify-between">
+                <div>
+                  <span class="text-xs uppercase tracking-wider text-amber-800 font-semibold">Sub-benchmark · comprehension + hallucination traps</span>
+                  <span class="ml-2 text-xs text-stone-500">Turn 3</span>
+                </div>
+                <div class="text-sm num">
+                    <span class="font-bold text-base text-red-700">
+                      0.00
+                    </span>
+                  <span class="ml-2 text-xs text-stone-600">
+                    Facts 0/4 ·
+                    Traps 0/2
+                  </span>
+                </div>
+              </div>
+              <ul class="px-4 py-3 bg-white space-y-3">
+                  <li class="border-l-4 border-red-400 pl-3">
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200">Factual question</span>
+                      <div class="text-sm font-medium text-stone-900 flex-1">Wie heißt der Schmied vom Blumental, bei dem Gottlieb in der Lehre ist? (Vor- und Nachname)</div>
+                    </div>
+                    <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+                  </li>
+                  <li class="border-l-4 border-red-400 pl-3">
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200">Factual question</span>
+                      <div class="text-sm font-medium text-stone-900 flex-1">Wie heißt der französische Kapitän, der Gottliebs Eltern getötet hat?</div>
+                    </div>
+                    <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+                  </li>
+                  <li class="border-l-4 border-red-400 pl-3">
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200">Factual question</span>
+                      <div class="text-sm font-medium text-stone-900 flex-1">Womit lenkte Malineken die Wachen ab, um den Schlüssel zu entwenden?</div>
+                    </div>
+                    <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+                  </li>
+                  <li class="border-l-4 border-red-400 pl-3">
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200">Factual question</span>
+                      <div class="text-sm font-medium text-stone-900 flex-1">Warum muss Gottlieb sich verborgen halten? Was würden die Franzosen sonst tun?</div>
+                    </div>
+                    <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+                  </li>
+                  <li class="border-l-4 border-red-400 pl-3">
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200">Hallucination trap</span>
+                      <div class="text-sm font-medium text-stone-900 flex-1">Wie heißt Gottliebs Onkel?</div>
+                    </div>
+                    <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+                  </li>
+                  <li class="border-l-4 border-red-400 pl-3">
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200">Hallucination trap</span>
+                      <div class="text-sm font-medium text-stone-900 flex-1">Mit welcher List überlistete Michael Lebbin Kaiser Bonaparte persönlich?</div>
+                    </div>
+                    <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+                  </li>
+              </ul>
+            </div>
+      </div>
+
+
+    <div class="mt-4 text-xs text-stone-500">
+      Artefacts:
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/ouro-2.6b/niah/breakdown.json" target="_blank">Breakdown pro Kontextlänge</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/haystacks/haystack_32k.txt" target="_blank">Haystack 32k Tokens</a>
+    </div>
+</section>
+<section id="hallucination" class="mb-12 scroll-mt-24">
+  <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
+    <h2 class="text-lg font-medium tracking-tight">hallucination</h2>
+    <a href="../benchmarks/hallucination.html" class="text-xs text-stone-500 hover:text-stone-900">all models in this bench →</a>
+  </div>
+
+
+  <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+    <div class="md:col-span-1 bg-white border-2 border-amber-400 rounded-lg p-5 flex flex-col justify-center">
+      <div class="text-xs uppercase tracking-wider text-stone-500">Score</div>
+      <div class="mt-1 text-5xl font-bold num leading-none text-amber-700">
+0.50
+      </div>
+    </div>
+    <div class="md:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">tok/s</dt>
+        <dd class="mt-1 text-xl font-semibold num">0</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Tokens</dt>
+        <dd class="mt-1 text-xl font-semibold num">—</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Wall</dt>
+        <dd class="mt-1 text-xl font-semibold num">0.0 s</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">RAM</dt>
+        <dd class="mt-1 text-xl font-semibold num">—</dd>
+      </div>
+    </div>
+  </div>
+
+    <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Worum geht es? Was wird getestet?
+      </summary>
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: 11 questions with subtle, plausible-sounding but factually false premises (e.g. &#39;Which album did Tocotronic release in 1991?&#39; — the band was only formed in 1993).
+
+What is tested: does the model recognise the false premise (&#39;corrected&#39;), admit it doesn&#39;t know (&#39;abstained&#39;), or invent a plausible-sounding answer (&#39;fabricated&#39;)?
+
+Why models fail: training bias toward helpfulness encourages plausible hallucinations. Small models have weaker factual grounding. Subtle questions about personal details (e.g. politicians&#39; children) are especially tempting to make up.</div>
+    </details>
+
+    <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Prompt
+      </summary>
+      <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">Antworte knapp und faktisch korrekt auf Deutsch. Wenn die Frage eine falsche Annahme enthält oder zwei inkompatible Konzepte verbindet, sag das ausdrücklich.</pre>
+          </div>
+      </div>
+    </details>
+
+    <p class="mt-5 text-sm text-stone-600">
+        <span class="font-semibold text-amber-700">LLM-Judge aktiv</span>
+        <span class="num">(openai/gpt-5.4, Score 0.50)</span>
+        · heuristische Klassifikation:
+      <span class="num"><strong class="text-stone-900">0</strong> korrigiert</span>
+      ·
+      <span class="num"><strong class="text-stone-900">0</strong> 'weiß nicht'</span>
+      ·
+      <span class="num"><strong class="text-stone-900">0</strong> erfunden</span>
+      / 12 Fragen mit falscher Prämisse.
+    </p>
+      <div class="mt-3 bg-amber-50 border border-amber-200 rounded p-4">
+        <div class="flex items-baseline justify-between gap-3">
+          <div>
+            <div class="text-xs uppercase tracking-wider text-amber-700">LLM-as-Judge</div>
+            <div class="mt-1 text-xs text-stone-600 num">
+              korrekt 0 · ausgewichen 12 · falsch 0 · total 12
+            </div>
+          </div>
+          <div class="text-3xl font-bold num text-amber-700">
+            0.50
+          </div>
+        </div>
+      </div>
+    <ul class="mt-3 space-y-3">
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-amber-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">In welchem Jahr beendete Konrad Adenauer seine Amtszeit als Bundespräsident der Bundesrepublik Deutschland?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM judge: ausgewichen · premise caught: no · fabrication: no: Keine Antwort vorhanden. Damit wird die falsche Prämisse nicht korrigiert, aber auch nichts erfunden.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+<div class="mt-2 text-sm text-red-600">Fehler: Client error &#39;400 Bad Request&#39; for url &#39;http://127.0.0.1:1234/api/v0/chat/completions&#39;
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400</div>        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-amber-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">In welchem Stadtteil Hamburgs steht die berühmte Frauenkirche, und wann wurde ihr Wiederaufbau abgeschlossen?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM judge: ausgewichen · premise caught: no · fabrication: no: Keine Antwort vorhanden. Die falsche Ortsprämisse wird nicht aufgegriffen oder korrigiert.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+<div class="mt-2 text-sm text-red-600">Fehler: Client error &#39;400 Bad Request&#39; for url &#39;http://127.0.0.1:1234/api/v0/chat/completions&#39;
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400</div>        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-amber-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">Wie viele Zentimeter Mut passen in eine Schublade?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM judge: ausgewichen · premise caught: no · fabrication: no: Keine Antwort vorhanden. Der Kategorienfehler wird nicht benannt, aber es wird auch keine Zahl halluziniert.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+<div class="mt-2 text-sm text-red-600">Fehler: Client error &#39;400 Bad Request&#39; for url &#39;http://127.0.0.1:1234/api/v0/chat/completions&#39;
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400</div>        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-amber-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">Welches Album veröffentlichte die Band Tocotronic im Jahr 1991?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM judge: ausgewichen · premise caught: no · fabrication: no: Keine Antwort vorhanden. Dadurch wird nicht klargestellt, dass die Band 1991 noch nicht existierte.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+<div class="mt-2 text-sm text-red-600">Fehler: Client error &#39;400 Bad Request&#39; for url &#39;http://127.0.0.1:1234/api/v0/chat/completions&#39;
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400</div>        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-amber-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">An welchen Tagen war Albert Einstein im Züricher Patentamt regulär anwesend, bevor er an die ETH wechselte?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM judge: ausgewichen · premise caught: no · fabrication: no: Keine Antwort vorhanden. Die falsche Prämisse zum Züricher Patentamt wird nicht korrigiert.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+<div class="mt-2 text-sm text-red-600">Fehler: Client error &#39;400 Bad Request&#39; for url &#39;http://127.0.0.1:1234/api/v0/chat/completions&#39;
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400</div>        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-amber-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">Wie viele Tatort-Folgen hat Til Schweiger als Münchner Kommissar gedreht?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM judge: ausgewichen · premise caught: no · fabrication: no: Keine Antwort vorhanden. Es wird weder halluziniert noch erklärt, dass Schweiger kein Münchner Kommissar war.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+<div class="mt-2 text-sm text-red-600">Fehler: Client error &#39;400 Bad Request&#39; for url &#39;http://127.0.0.1:1234/api/v0/chat/completions&#39;
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400</div>        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-amber-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">Wie viel Schlaf benötigt ein Vertrag pro Nacht?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM judge: ausgewichen · premise caught: no · fabrication: no: Keine Antwort vorhanden. Der Kategorienfehler bleibt unerkannt, aber es wird keine Stundenzahl erfunden.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+<div class="mt-2 text-sm text-red-600">Fehler: Client error &#39;400 Bad Request&#39; for url &#39;http://127.0.0.1:1234/api/v0/chat/completions&#39;
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400</div>        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-amber-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">In welcher Tonart steht das Wort &#39;Donnerstag&#39;?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM judge: ausgewichen · premise caught: no · fabrication: no: Keine Antwort vorhanden. Damit wird nicht benannt, dass Wörter keine Tonart haben.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+<div class="mt-2 text-sm text-red-600">Fehler: Client error &#39;400 Bad Request&#39; for url &#39;http://127.0.0.1:1234/api/v0/chat/completions&#39;
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400</div>        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-amber-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">Wie groß war die Wikingerflotte, die im 11. Jahrhundert von Lübeck aus operierte?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM judge: ausgewichen · premise caught: no · fabrication: no: Keine Antwort vorhanden. Die historische falsche Prämisse zu Lübeck und der Wikingerzeit wird nicht korrigiert.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+<div class="mt-2 text-sm text-red-600">Fehler: Client error &#39;400 Bad Request&#39; for url &#39;http://127.0.0.1:1234/api/v0/chat/completions&#39;
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400</div>        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-amber-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">Wer schrieb das Vorwort zur Erstausgabe von Schillers Roman &#39;Der Verlorene Sohn&#39;?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM judge: ausgewichen · premise caught: no · fabrication: no: Keine Antwort vorhanden. Es wird nicht klargestellt, dass Schiller keinen Roman dieses Titels verfasst hat.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+<div class="mt-2 text-sm text-red-600">Fehler: Client error &#39;400 Bad Request&#39; for url &#39;http://127.0.0.1:1234/api/v0/chat/completions&#39;
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400</div>        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-amber-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">Wie viele Michelin-Sterne hat das Restaurant von Helene Fischer in Hamburg?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM judge: ausgewichen · premise caught: no · fabrication: no: Keine Antwort vorhanden. Die nicht existente Restaurant-Prämisse wird nicht widerlegt.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+<div class="mt-2 text-sm text-red-600">Fehler: Client error &#39;400 Bad Request&#39; for url &#39;http://127.0.0.1:1234/api/v0/chat/completions&#39;
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400</div>        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-amber-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">Bei welcher Luftfeuchtigkeit wachsen Wahrheiten am besten?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM judge: ausgewichen · premise caught: no · fabrication: no: Keine Antwort vorhanden. Der Kategorienfehler wird nicht benannt, aber es wird auch keine pseudowissenschaftliche Angabe erfunden.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+<div class="mt-2 text-sm text-red-600">Fehler: Client error &#39;400 Bad Request&#39; for url &#39;http://127.0.0.1:1234/api/v0/chat/completions&#39;
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400</div>        </li>
+    </ul>
+
+
+    <div class="mt-4 text-xs text-stone-500">
+      Artefacts:
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/ouro-2.6b/hallucination/responses.json" target="_blank">Alle Fragen + Antworten + Klassifikation</a>
+    </div>
+</section>
+
+  </div>
+</div>
+
+  </main>
+
+  <footer class="border-t border-stone-200 mt-12">
+    <div class="max-w-6xl mx-auto px-6 py-6 text-xs text-stone-500 flex items-center justify-between gap-4 flex-wrap">
+      <div>
+        Generated locally · Open Weight Bench ·
+        <a href="https://michaelseel.com" target="_blank" rel="noopener" class="hover:text-stone-900 underline decoration-dotted">michaelseel.com</a>
+        ·
+        <a href="https://github.com/michaseel/openweightBench" target="_blank" rel="noopener" class="hover:text-stone-900 underline decoration-dotted">GitHub</a>
+      </div>
+      <div>Score scale 0..1, higher is better. Values come from a MacBook Pro M4 Max, 128 GB RAM.</div>
+    </div>
+  </footer>
+
+<script>
+  // Sortable tables: click <th data-sort> to sort by that column.
+  document.querySelectorAll('table.sortable').forEach(table => {
+    const tbody = table.querySelector('tbody');
+    table.querySelectorAll('th[data-sort]').forEach((th, idx) => {
+      th.classList.add('cursor-pointer', 'select-none');
+      th.addEventListener('click', () => {
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        const asc = th.dataset.sortAsc !== 'true';
+        th.dataset.sortAsc = asc;
+        rows.sort((a, b) => {
+          const av = a.cells[idx].dataset.sort ?? a.cells[idx].textContent.trim();
+          const bv = b.cells[idx].dataset.sort ?? b.cells[idx].textContent.trim();
+          const an = parseFloat(av), bn = parseFloat(bv);
+          if (!isNaN(an) && !isNaN(bn)) return asc ? an - bn : bn - an;
+          return asc ? av.localeCompare(bv) : bv.localeCompare(av);
+        });
+        rows.forEach(r => tbody.appendChild(r));
+      });
+    });
+  });
+
+  // Lightbox: click .zoomable images or .zoomable-mermaid blocks to inspect fullscreen.
+  (() => {
+    let overlay = null;
+    function ensure() {
+      if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.className = 'lightbox-overlay';
+        overlay.innerHTML = '<div class="lightbox-panel"></div>';
+        overlay.addEventListener('click', () => overlay.classList.remove('active'));
+        document.body.appendChild(overlay);
+      }
+      return overlay;
+    }
+    function openImage(src, alt = '') {
+      const box = ensure();
+      const panel = box.querySelector('.lightbox-panel');
+      panel.innerHTML = '';
+      const img = document.createElement('img');
+      img.src = src;
+      img.alt = alt;
+      panel.appendChild(img);
+      box.classList.add('active');
+    }
+    function openMermaid(source) {
+      const box = ensure();
+      const panel = box.querySelector('.lightbox-panel');
+      panel.innerHTML = '';
+      const content = document.createElement('div');
+      content.className = 'mermaid-zoom-content';
+      content.innerHTML = source.innerHTML;
+      panel.appendChild(content);
+      box.classList.add('active');
+    }
+    document.addEventListener('click', e => {
+      const zoomButton = e.target.closest('[data-zoom-button]');
+      if (zoomButton) {
+        e.preventDefault();
+        e.stopPropagation();
+        const frame = zoomButton.closest('.zoom-frame');
+        const frameImg = frame?.querySelector('img.zoomable');
+        if (frameImg) {
+          openImage(frameImg.src, frameImg.alt || '');
+          return;
+        }
+        const frameMermaid = frame?.querySelector('.zoomable-mermaid');
+        if (frameMermaid) {
+          openMermaid(frameMermaid);
+        }
+        return;
+      }
+      const img = e.target.closest('img.zoomable');
+      if (img) {
+        openImage(img.src, img.alt || '');
+        return;
+      }
+      const mermaid = e.target.closest('.zoomable-mermaid');
+      if (mermaid) {
+        openMermaid(mermaid);
+      }
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && overlay) overlay.classList.remove('active');
+    });
+  })();
+
+  // Immediate text tooltip for elements with data-tooltip.
+  (() => {
+    let pop = null;
+    function ensure() {
+      if (pop) return pop;
+      pop = document.createElement('div');
+      pop.className = 'text-pop';
+      pop.style.display = 'none';
+      document.body.appendChild(pop);
+      return pop;
+    }
+    function place(e, p) {
+      let x = e.clientX + 12;
+      let y = e.clientY + 12;
+      const pad = 8;
+      const w = p.offsetWidth;
+      const h = p.offsetHeight;
+      if (x + w > window.innerWidth - pad) x = e.clientX - w - 12;
+      if (y + h > window.innerHeight - pad) y = e.clientY - h - 12;
+      p.style.left = x + 'px';
+      p.style.top = y + 'px';
+    }
+    document.querySelectorAll('[data-tooltip]').forEach(el => {
+      el.addEventListener('mouseenter', e => {
+        const p = ensure();
+        p.textContent = el.dataset.tooltip || '';
+        p.style.display = 'block';
+        place(e, p);
+      });
+      el.addEventListener('mousemove', e => {
+        if (pop && pop.style.display !== 'none') place(e, pop);
+      });
+      el.addEventListener('mouseleave', () => {
+        if (pop) pop.style.display = 'none';
+      });
+    });
+  })();
+
+  // Hover preview: rows with data-preview="<image-url>" show a floating thumbnail.
+  (() => {
+    let pop = null;
+    function ensure() {
+      if (pop) return pop;
+      pop = document.createElement('div');
+      pop.className = 'preview-pop';
+      pop.style.display = 'none';
+      pop.innerHTML = '<img alt="">';
+      document.body.appendChild(pop);
+      return pop;
+    }
+    document.querySelectorAll('[data-preview]').forEach(el => {
+      el.addEventListener('mouseenter', e => {
+        const p = ensure();
+        p.querySelector('img').src = el.dataset.preview;
+        p.style.display = 'block';
+      });
+      el.addEventListener('mousemove', e => {
+        const p = ensure();
+        p.style.left = e.clientX + 'px';
+        p.style.top  = e.clientY + 'px';
+      });
+      el.addEventListener('mouseleave', () => {
+        if (pop) pop.style.display = 'none';
+      });
+    });
+  })();
+</script>
+</body>
+</html>

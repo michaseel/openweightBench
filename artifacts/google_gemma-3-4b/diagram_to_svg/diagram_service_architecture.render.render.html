@@ -1,0 +1,63 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html,body{margin:0;background:#fff;font-family:system-ui,-apple-system,sans-serif}
+  .wrap{padding:24px;display:inline-block;background:#fff}
+  /* Force a concrete render box: many model-emitted SVGs only set viewBox.
+     Without a width here, an inline-block parent collapses the SVG to its
+     intrinsic ~300x150 (or smaller) and the screenshot becomes a tiny
+     blank tile. Fixed width + auto height uses viewBox aspect-ratio. */
+  .wrap svg{display:block;width:1200px;height:auto;max-width:none}
+</style></head><body><div class="wrap"><svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <g id="diagram-root">
+    <rect x="100" y="150" width="300" height="250" stroke="black" fill="white" />
+    <text x="150" y="200" font-size="14">System Architecture</text>
+    <rect x="650" y="150" width="300" height="250" stroke="black" fill="white" />
+    <text x="680" y="200" font-size="14">Goals:</text>
+    <text x="680" y="250" font-size="14">- Scalability</text>
+    <text x="680" y="300" font-size="14">- Reliability</text>
+    <text x="680" y="350" font-size="14">- Security</text>
+    <text x="680" y="400" font-size="14">- Maintainability</text>
+    <rect x="20" y="500" width="100" height="100" stroke="black" fill="white" />
+    <text x="40" y="550" font-size="14">Frontend (React)</text>
+    <rect x="500" y="500" width="100" height="100" stroke="black" fill="white" />
+    <text x="540" y="550" font-size="14">API Gateway (Kong)</text>
+    <rect x="20" y="350" width="100" height="100" stroke="black" fill="white" />
+    <text x="40" y="380" font-size="14">Auth Service</text>
+    <rect x="500" y="350" width="100" height="100" stroke="black" fill="white" />
+    <text x="540" y="380" font-size="14">Backend</text>
+    <rect x="20" y="150" width="100" height="100" stroke="black" fill="white" />
+    <text x="40" y="180" font-size="14">External API</text>
+    <rect x="500" y="150" width="100" height="100" stroke="black" fill="white" />
+    <text x="540" y="180" font-size="14">Payment Provider</text>
+    <rect x="20" y="50" width="100" height="100" stroke="black" fill="white" />
+    <text x="40" y="70" font-size="14">Worker Service (Python)</text>
+    <rect x="500" y="50" width="100" height="100" stroke="black" fill="white" />
+    <text x="540" y="70" font-size="14">Database (PostgreSQL)</text>
+    <rect x="20" y="700" width="100" height="100" stroke="black" fill="white" />
+    <text x="40" y="730" font-size="14">Monitoring</text>
+    <rect x="500" y="700" width="100" height="100" stroke="black" fill="white" />
+    <text x="540" y="730" font-size="14">Prometheus + Grafana</text>
+    <rect x="300" y="250" width="100" height="100" stroke="black" fill="white" />
+    <text x="350" y="280" font-size="14">Logs -> ELK Stack</text>
+    <rect x="600" y="250" width="100" height="100" stroke="black" fill="white" />
+    <text x="650" y="280" font-size="14">CI/CD with GitHub Actions</text>
+    <line x1="100" y1="150" x2="300" y2="250" stroke="black" stroke-width="2"/>
+    <line x1="300" y1="250" x2="600" y2="350" stroke="black" stroke-width="2"/>
+    <line x1="600" y1="350" x2="500" y2="700" stroke="black" stroke-width="2"/>
+    <line x1="500" y1="700" x2="20" y2="150" stroke="black" stroke-width="2"/>
+    <line x1="500" y1="700" x2="20" y2="350" stroke="black" stroke-width="2"/>
+    <line x1="20" y1="150" x2="20" y2="500" stroke="black" stroke-width="2"/>
+    <line x1="500" y1="350" x2="500" y2="700" stroke="black" stroke-width="2"/>
+    <line x1="500" y1="500" x2="600" y2="700" stroke="black" stroke-width="2"/>
+    <line x1="650" y1="150" x2="650" y2="350" stroke="black" stroke-width="2"/>
+    <line x1="650" y1="350" x2="500" y2="700" stroke="black" stroke-width="2"/>
+    <line x1="540" y1="380" x2="540" y2="700" stroke="black" stroke-width="2"/>
+    <line x1="540" y1="700" x2="600" y2="700" stroke="black" stroke-width="2"/>
+    <line x1="650" y1="150" x2="650" y2="500" stroke="black" stroke-width="2"/>
+    <line x1="650" y1="500" x2="500" y2="700" stroke="black" stroke-width="2"/>
+    <line x1="540" y1="180" x2="540" y2="700" stroke="black" stroke-width="2"/>
+    <line x1="540" y1="700" x2="600" y2="700" stroke="black" stroke-width="2"/>
+    <line x1="540" y1="730" x2="600" y2="700" stroke="black" stroke-width="2"/>
+  </g>
+</svg></div></body></html>

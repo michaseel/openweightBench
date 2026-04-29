@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kanban Board</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.0/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body class="bg-gray-100 font-sans">
+
+  <div class="container mx-auto py-8 px-4 max-w-screen-xl">
+    <div class="flex justify-center items-stretch">
+
+      <!-- Columns -->
+      <div data-testid="column-backlog" class="w-full p-4 bg-gray-100 rounded-lg shadow-md">
+        <h3 class="text-xl font-semibold mb-2 text-gray-800">Backlog</h3>
+        <div class="p-4">
+          <!-- Cards -->
+          <div data-testid="card" class="bg-white rounded-lg shadow-sm p-4 mb-4 hover:shadow-md transition duration-300 ease-in-out">
+            <div data-testid="card-input" class="p-2 rounded-md border bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-200">
+              Task 1
+            </div>
+            <button data-testid="delete-card" class="absolute top-0 right-0 bg-red-500 hover:bg-red-700 text-white font-bold rounded-md py-1 px-2 transform -translate-x-full transition duration-300 ease-in-out">
+              Delete
+            </button>
+          </div>
+
+          <div data-testid="card" class="bg-white rounded-lg shadow-sm p-4 mb-4 hover:shadow-md transition duration-300 ease-in-out">
+            <div data-testid="card-input" class="p-2 rounded-md border bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-200">
+              Task 2
+            </div>
+            <button data-testid="delete-card" class="absolute top-0 right-0 bg-red-500 hover:bg-red-700 text-white font-bold rounded-md py-1 px-2 transform -translate-x-full transition duration-300 ease-in-out">
+              Delete
+            </button>
+          </div>
+
+          <div data-testid="add-card" class="inline-block bg-blue-200 hover:bg-blue-300 text-gray-800 font-bold py-2 px-4 rounded mt-2"
+               onclick="addCard()">Add card</div>
+
+        </div>
+      </div>
+
+      <div data-testid="column-in-progress" class="w-full p-4 bg-gray-100 rounded-lg shadow-md ml-4">
+        <h3 class="text-xl font-semibold mb-2 text-gray-800">In Progress</h3>
+        <div class="p-4">
+          <!-- Cards -->
+          <div data-testid="card" class="bg-white rounded-lg shadow-sm p-4 mb-4 hover:shadow-md transition duration-300 ease-in-out">
+            <div data-testid="card-input" class="p-2 rounded-md border bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-200">
+              Task 3
+            </div>
+            <button data-testid="delete-card" class="absolute top-0 right-0 bg-red-500 hover:bg-red-700 text-white font-bold rounded-md py-1 px-2 transform -translate-x-full transition duration-300 ease-in-out">
+              Delete
+            </button>
+          </div>
+
+          <div data-testid="add-card" class="inline-block bg-blue-200 hover:bg-blue-300 text-gray-800 font-bold py-2 px-4 rounded mt-2"
+               onclick="addCard()">Add card</div>
+        </div>
+      </div>
+
+      <div data-testid="column-review" class="w-full p-4 bg-gray-100 rounded-lg shadow-md ml-4">
+        <h3 class="text-xl font-semibold mb-2 text-gray-800">Review</h3>
+        <div class="p-4">
+          <!-- Cards -->
+          <div data-testid="card" class="bg-white rounded-lg shadow-sm p-4 mb-4 hover:shadow-md transition duration-300 ease-in-out">
+            <div data-testid="card-input" class="p-2 rounded-md border bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-200">
+              Task 4
+            </div>
+            <button data-testid="delete-card" class="absolute top-0 right-0 bg-red-500 hover:bg-red-700 text-white font-bold rounded-md py-1 px-2 transform -translate-x-full transition duration-300 ease-in-out">
+              Delete
+            </button>
+          </div>
+
+          <div data-testid="add-card" class="inline-block bg-blue-200 hover:bg-blue-300 text-gray-800 font-bold py-2 px-4 rounded mt-2"
+               onclick="addCard()">Add card</div>
+        </div>
+      </div>
+
+      <div data-testid="column-done" class="w-full p-4 bg-gray-100 rounded-lg shadow-md ml-4">
+        <h3 class="text-xl font-semibold mb-2 text-gray-800">Done</h3>
+        <div class="p-4">
+          <!-- Cards -->
+          <div data-testid="card" class="bg-white rounded-lg shadow-sm p-4 mb-4 hover:shadow-md transition duration-300 ease-in-out">
+            <div data-testid="card-input" class="p-2 rounded-md border bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-200">
+              Task 5
+            </div>
+            <button data-testid="delete-card" class="absolute top-0 right-0 bg-red-500 hover:bg-red-700 text-white font-bold rounded-md py-1 px-2 transform -translate-x-full transition duration-300 ease-in-out">
+              Delete
+            </button>
+          </div>
+
+          <div data-testid="add-card" class="inline-block bg-blue-200 hover:bg-blue-300 text-gray-800 font-bold py-2 px-4 rounded mt-2"
+               onclick="addCard()">Add card</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <script>
+    const cardInputs = document.querySelectorAll("[data-testid='card-input']");
+
+    function addCard() {
+      const cardInput = document.querySelector("[data-testid='card-input']");
+      if (!cardInput.value) return;
+
+      const column = document.querySelector("[data-testid='add-card'].active");
+      if (!column) return;
+
+      const cardElement = document.createElement("div");
+      cardElement.classList.add("bg-white", "rounded-lg", "shadow-sm", "p-4", "mb-4");
+      cardElement.innerHTML = `
+        <div data-testid="card-input" class="p-2 rounded-md border bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-200">
+          ${cardInput.value}
+        </div>
+        <button data-testid="delete-card" class="absolute top-0 right-0 bg-red-500 hover:bg-red-700 text-white font-bold rounded-md py-1 px-2 transform -translate-x-full transition duration-300 ease-in-out">
+          Delete
+        </button>
+      `;
+
+      column.prepend(cardElement);
+      cardInput.value = ""; // Clear input after adding
+
+    }
+
+
+    function deleteCard(event) {
+      event.preventDefault(); // Prevent default button behavior
+
+      const card = event.target.closest("[data-testid='card']");
+      if (!card) return;
+
+      const confirmation = window.confirm("Are you sure you want to delete this card?");
+      if (confirmation) {
+        card.remove();
+
+        // Persist data - simple localStorage implementation
+        let cards = JSON.parse(localStorage.getItem("kanbanCards") || "[]");
+        cards = cards.filter(card => !card.id === card.querySelector("[data-testid='card-input'].value");
+        localStorage.setItem("kanbanCards", JSON.stringify(cards));
+
+      }
+    }
+
+
+    // Initialize with dummy data if no cards are in localStorage
+    if (!localStorage.getItem("kanbanCards")) {
+      const initialCards = [
+        { id: 1, title: "Task 1" },
+        { id: 2, title: "Task 2" },
+        { id: 3, title: "Task 3" }
+      ];
+
+      initialCards.forEach(card => {
+        const column = document.querySelector(`[data-testid="column-${card.status}"]`);
+
+        if (column) {
+          const cardElement = document.createElement("div");
+          cardElement.classList.add("bg-white", "rounded-lg", "shadow-sm", "p-4", "mb-4");
+          cardElement.innerHTML = `
+            <div data-testid="card-input" class="p-2 rounded-md border bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-200">${card.title}</div>
+            <button data-testid="delete-card" class="absolute top-0 right-0 bg-red-500 hover:bg-red-700 text-white font-bold rounded-md py-1 px-2 transform -translate-x-full transition duration-300 ease-in-out">
+              Delete
+            </button>
+          `;
+          column.prepend(cardElement);
+        }
+
+      });
+    }
+
+
+
+    // Add Enter key event listener to card input for auto-add
+    cardInputs.forEach(input => {
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          addCard();
+        }
+      });
+    });
+
+    // Add class "active" to column when clicked
+    document.querySelectorAll("[data-testid='column-container']").forEach(column => {
+      column.addEventListener("click", (event) => {
+        if (event.target === column) {
+          column.querySelector("[data-testid='add-card']").classList.add("active");
+        } else {
+          column.querySelector("[data-testid='add-card']").classList.remove("active");
+        }
+      });
+    });
+
+
+  </script>
+
+</body>
+
+</html>
