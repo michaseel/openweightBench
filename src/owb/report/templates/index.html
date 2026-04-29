@@ -6,11 +6,11 @@
 {% block content %}
 
 <section class="mb-10">
-  <h1 class="text-3xl font-semibold tracking-tight">Open-Weight LLMs im Praxistest</h1>
+  <h1 class="text-3xl font-semibold tracking-tight">Open-weight LLMs put to the test</h1>
   <p class="mt-3 text-stone-600 max-w-3xl">
-    Lokale Benchmarks für Modelle, die in <span class="font-medium">LM Studio</span>
-    auf einem MacBook Pro M4 Max (128 GB) laufen. Sechs Kategorien, jede mit
-    sichtbaren Ergebnissen — keine reinen Zahlen.
+    Local benchmarks for models running in <span class="font-medium">LM Studio</span>
+    on a MacBook Pro M4 Max (128 GB). Six categories, each with visible
+    results — not just numbers.
   </p>
 </section>
 
@@ -20,30 +20,30 @@
        class="group block bg-white border border-stone-200 rounded-lg p-5 hover:border-stone-400 transition-colors">
       <div class="flex items-baseline justify-between">
         <h2 class="text-lg font-medium tracking-tight">{{ c.label }}</h2>
-        <span class="text-xs text-stone-500">{{ c.model_count }} Modelle</span>
+        <span class="text-xs text-stone-500">{{ c.model_count }} models</span>
       </div>
       <p class="mt-2 text-sm text-stone-600">{{ c.description }}</p>
       <div class="mt-4 flex items-center gap-6 text-xs text-stone-500">
         {% if c.best_score is not none %}
-          <span>Top-Score <span class="font-mono num text-stone-900">{{ "%.2f"|format(c.best_score) }}</span></span>
+          <span>Top score <span class="font-mono num text-stone-900">{{ "%.2f"|format(c.best_score) }}</span></span>
         {% endif %}
         {% if c.median_speed is not none %}
           <span>Median <span class="font-mono num text-stone-900">{{ "%.0f"|format(c.median_speed) }}</span> tok/s</span>
         {% endif %}
-        <span class="ml-auto text-stone-400 group-hover:text-stone-700">öffnen →</span>
+        <span class="ml-auto text-stone-400 group-hover:text-stone-700">open →</span>
       </div>
     </a>
   {% else %}
-    <div class="text-stone-500">Noch keine Ergebnisse — <code>owb bench</code> ausführen.</div>
+    <div class="text-stone-500">No results yet — run <code>owb bench</code>.</div>
   {% endfor %}
 </section>
 
 
 {% if overall_rows %}
 <section class="mt-12">
-  <h2 class="text-lg font-medium tracking-tight">Gesamtübersicht aller Modelle</h2>
+  <h2 class="text-lg font-medium tracking-tight">Overall summary across all models</h2>
   <p class="mt-1 text-sm text-stone-600">
-    Score 0–1 pro Benchmark. Gesamt = gewichteter Mittelwert: Coding zählt doppelt, Tool Use halb. RAM = vom Modell auf Disk belegt (Q4-Datei). Wall = kumulierte Bench-Zeit aller Tasks.
+    Score 0–1 per benchmark. Overall = weighted mean: Coding counts double, Tool Use half. RAM = on-disk size of the model (Q4 file). Wall = cumulative bench time across all tasks.
   </p>
 
   {% if overall_scatter_rows %}
@@ -61,17 +61,17 @@
     {% if sp_max_wall < 300 %}{% set sp_max_wall = 300 %}{% endif %}
 
     <style>
-      /* RAM-Filter: ausgegraut statt versteckt — Vergleich bleibt sichtbar. */
+      /* RAM filter: greyed out rather than hidden — comparison stays visible. */
       #overall-scatter .os-dot.os-filtered circle { fill-opacity: 0.12; stroke: #a8a29e; stroke-width: 0.8; }
       #overall-scatter .os-dot.os-filtered text { opacity: 0.25; }
     </style>
     <div class="mt-4 bg-white border border-stone-200 rounded-lg p-4 relative" id="overall-scatter">
       <div class="flex items-baseline justify-between gap-3 flex-wrap mb-2">
-        <h3 class="text-sm font-semibold tracking-tight text-stone-800 uppercase">Kumulierte Wall-Time vs. Gesamtscore</h3>
+        <h3 class="text-sm font-semibold tracking-tight text-stone-800 uppercase">Cumulative wall-time vs. overall score</h3>
         <div class="flex items-center gap-2 text-sm">
           <label for="os-ram-filter" class="text-stone-600">Max RAM</label>
           <select id="os-ram-filter" class="bg-white border border-stone-300 rounded px-2 py-1 num">
-            <option value="0">alle</option>
+            <option value="0">all</option>
             <option value="16">16 GB</option>
             <option value="32">32 GB</option>
             <option value="48">48 GB</option>
@@ -81,7 +81,7 @@
         </div>
       </div>
       <div class="text-xs text-stone-500 flex flex-wrap items-center gap-x-3 gap-y-1 mb-2">
-        <span>Farbe = Hersteller · Zahl = Gesamt-Params (Mrd) · RAM-Schätzung für 64k Ctx</span>
+        <span>Colour = vendor · Number = total params (B) · RAM estimate for 64k ctx</span>
         <span class="inline-flex items-center gap-1.5">
           <svg width="14" height="14"><circle cx="7" cy="7" r="5.5" fill="#475569" fill-opacity="0.78" stroke="#475569" stroke-width="2"/></svg>
           dense
@@ -90,7 +90,7 @@
           <svg width="14" height="14"><circle cx="7" cy="7" r="5.5" fill="#475569" fill-opacity="0.78" stroke="#475569" stroke-width="2" stroke-dasharray="3,2"/></svg>
           MoE
         </span>
-        <span><span id="os-count">{{ overall_scatter_rows|length }}</span>/{{ overall_scatter_rows|length }} sichtbar</span>
+        <span><span id="os-count">{{ overall_scatter_rows|length }}</span>/{{ overall_scatter_rows|length }} visible</span>
       </div>
       <svg viewBox="0 0 {{ sp_w }} {{ sp_h }}" class="w-full num" style="height:340px" preserveAspectRatio="xMidYMid meet">
         <line x1="{{ sp_pad_l }}" y1="{{ sp_pad_t + sp_inner_h }}" x2="{{ sp_pad_l + sp_inner_w }}" y2="{{ sp_pad_t + sp_inner_h }}" stroke="#d6d3d1" stroke-width="1"/>
@@ -105,8 +105,8 @@
           <line x1="{{ x }}" y1="{{ sp_pad_t }}" x2="{{ x }}" y2="{{ sp_pad_t + sp_inner_h }}" stroke="#f5f5f4" stroke-width="1" stroke-dasharray="2,3"/>
           <text x="{{ x }}" y="{{ sp_pad_t + sp_inner_h + 16 }}" font-size="10" fill="#78716c" text-anchor="middle">{{ "%.0f"|format(sp_max_wall * tick_pct / 100) }}s</text>
         {% endfor %}
-        <text x="{{ sp_pad_l + sp_inner_w / 2 }}" y="{{ sp_h - 5 }}" font-size="10" fill="#57534e" text-anchor="middle">Kumulierte Wall-Time (s) →</text>
-        <text x="{{ sp_pad_l - 38 }}" y="{{ sp_pad_t + sp_inner_h / 2 }}" font-size="10" fill="#57534e" text-anchor="middle" transform="rotate(-90 {{ sp_pad_l - 38 }} {{ sp_pad_t + sp_inner_h / 2 }})">Gesamtscore</text>
+        <text x="{{ sp_pad_l + sp_inner_w / 2 }}" y="{{ sp_h - 5 }}" font-size="10" fill="#57534e" text-anchor="middle">Cumulative wall-time (s) →</text>
+        <text x="{{ sp_pad_l - 38 }}" y="{{ sp_pad_t + sp_inner_h / 2 }}" font-size="10" fill="#57534e" text-anchor="middle" transform="rotate(-90 {{ sp_pad_l - 38 }} {{ sp_pad_t + sp_inner_h / 2 }})">Overall score</text>
 
         {% for m in overall_scatter_rows %}
           {% set x = sp_pad_l + (sp_inner_w * m.wall_s / sp_max_wall) %}
@@ -118,7 +118,7 @@
                     stroke="{{ m.color }}" stroke-width="1.75"
                     {% if m.is_moe %}stroke-dasharray="2.5,1.5"{% endif %}
                     style="cursor:pointer"
-                    data-tooltip="{{ m.short_id }} · Score {{ "%.2f"|format(m.score) }} · Wall {{ "%.0f"|format(m.wall_s) }}s{% if m.total_ram_gb %} · ~{{ "%.0f"|format(m.total_ram_gb) }} GB RAM (64k)" {% elif m.ram_gb %} · RAM {{ "%.1f"|format(m.ram_gb) }} GB"{% else %}"{% endif %}/>
+                    data-tooltip="{{ m.short_id }} · Score {{ "%.2f"|format(m.score) }} · Wall {{ "%.0f"|format(m.wall_s) }}s{% if m.total_ram_gb %} · ~{{ "%.0f"|format(m.total_ram_gb) }} GB RAM (64k)"{% elif m.ram_gb %} · RAM {{ "%.1f"|format(m.ram_gb) }} GB"{% else %}"{% endif %}/>
             {% if lbl %}
               <text x="{{ x }}" y="{{ y }}" text-anchor="middle" dominant-baseline="central"
                     font-size="{{ lbl_size }}" font-weight="700" fill="{{ m.label_color }}"
@@ -136,7 +136,7 @@
       const dots = document.querySelectorAll('#overall-scatter .os-dot');
       const countEl = document.getElementById('os-count');
 
-      // Optionen ausgrauen, für die kein Modell qualifiziert.
+      // Grey out options for which no model qualifies.
       Array.from(sel.options).forEach(opt => {
         const cap = parseFloat(opt.value);
         if (!cap) return;
@@ -146,7 +146,7 @@
         });
         if (!matches) {
           opt.disabled = true;
-          opt.textContent = opt.textContent + ' — keine Modelle';
+          opt.textContent = opt.textContent + ' — no models';
         }
       });
 
@@ -171,9 +171,9 @@
     <table class="sortable w-full text-sm">
       <thead class="bg-stone-50 border-b border-stone-200 text-left text-stone-600">
         <tr>
-          <th data-sort class="px-3 py-2 font-medium">Modell</th>
+          <th data-sort class="px-3 py-2 font-medium">Model</th>
           <th data-sort class="px-3 py-2 font-medium">Quant</th>
-          <th data-sort class="px-3 py-2 font-medium text-right">Gesamt</th>
+          <th data-sort class="px-3 py-2 font-medium text-right">Overall</th>
           <th data-sort class="px-3 py-2 font-medium text-right">RAM</th>
           <th data-sort class="px-3 py-2 font-medium text-right">Wall total</th>
           {% for name, label in tabs %}
@@ -203,7 +203,7 @@
                     <span class="text-red-600 text-xs" title="{{ c.error }}">{% if 'timeout' in (c.error|lower) %}timeout{% else %}error{% endif %}</span>
                   </td>
                 {% elif c.preliminary %}
-                  <td class="px-3 py-2 text-right num font-bold text-stone-400" data-sort="{{ c.score }}" title="Judge noch nicht ausgeführt — Wert ist nur Linter-Score">
+                  <td class="px-3 py-2 text-right num font-bold text-stone-400" data-sort="{{ c.score }}" title="Judge not yet run — value is the linter score only">
                     {{ "%.2f"|format(c.score) }}<span class="block text-[9px] uppercase tracking-wider text-stone-400">prelim.</span>
                   </td>
                 {% elif c.score is not none %}
@@ -222,7 +222,7 @@
       </tbody>
     </table>
   </div>
-  <p class="mt-2 text-xs text-stone-500">Klick auf Zeile öffnet die Modell-Detailseite. Spalten klickbar zum Sortieren.</p>
+  <p class="mt-2 text-xs text-stone-500">Click a row to open the model detail page. Columns are sortable.</p>
 </section>
 {% endif %}
 

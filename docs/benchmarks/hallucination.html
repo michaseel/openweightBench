@@ -2,7 +2,7 @@
 <html lang="en" class="bg-stone-50 text-stone-900 antialiased">
 <head>
 <meta charset="utf-8">
-<title>Halluzination — Open Weight Bench</title>
+<title>Hallucination — Open Weight Bench</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
 <script type="module">
@@ -139,15 +139,7 @@
           </a>
           <a href="hallucination.html"
              class="py-3 border-b-2 whitespace-nowrap border-stone-900 text-stone-900 font-medium">
-            Halluzination
-          </a>
-          <a href="nonsense.html"
-             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
-            Nonsense
-          </a>
-          <a href="instruction_following.html"
-             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
-            Instruction Following
+            Hallucination
           </a>
       </nav>
     </div>
@@ -156,23 +148,23 @@
   <main class="flex-1 max-w-6xl mx-auto w-full px-6 py-8">
 
 <style>
-  /* RAM-Filter: Modelle, die nicht in den Cap passen, werden ausgegraut
-     statt versteckt — der Vergleich bleibt dadurch sichtbar. */
+  /* RAM filter: models that don't fit the cap are greyed out instead of
+     hidden — keeps the comparison visible. */
   #sp-list .sp-row.sp-filtered { opacity: 0.4; filter: saturate(0.3); }
   #sp-list .sp-row.sp-filtered:hover { opacity: 0.85; }
 </style>
 
 <section class="mb-6">
-  <h1 class="text-2xl font-semibold tracking-tight">Halluzination</h1>
-<p class="mt-2 text-stone-600 max-w-3xl">Fragen mit erfundenen Prämissen. Erfindet das Modell eine Antwort, sagt es &#39;weiß ich nicht&#39;, oder korrigiert es die Prämisse?</p>    <details class="mt-3 bg-stone-50 border border-stone-200 rounded">
+  <h1 class="text-2xl font-semibold tracking-tight">Hallucination</h1>
+<p class="mt-2 text-stone-600 max-w-3xl">Questions with fabricated premises. Does the model invent an answer, say &#39;I don&#39;t know&#39;, or correct the premise?</p>    <details class="mt-3 bg-stone-50 border border-stone-200 rounded">
       <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
-        Aufgabe & Test-Logik im Detail
+        Task & test logic in detail
       </summary>
-      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Aufgabe: 11 Fragen mit subtilen, plausibel klingenden, aber faktisch falschen Prämissen (z.B. &#39;Welches Album veröffentlichte Tocotronic 1991?&#39; — Band wurde erst 1993 gegründet).
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: 11 questions with subtle, plausible-sounding but factually false premises (e.g. &#39;Which album did Tocotronic release in 1991?&#39; — the band was only formed in 1993).
 
-Was getestet wird: Erkennt das Modell die falsche Prämisse (&#39;corrected&#39;), gibt es zu, etwas nicht zu wissen (&#39;abstained&#39;), oder erfindet es eine plausibel klingende Antwort (&#39;fabricated&#39;)?
+What is tested: does the model recognise the false premise (&#39;corrected&#39;), admit it doesn&#39;t know (&#39;abstained&#39;), or invent a plausible-sounding answer (&#39;fabricated&#39;)?
 
-Warum Modelle scheitern: Trainings-Bias zur Hilfsbereitschaft verleitet zu plausiblen Halluzinationen. Kleine Modelle haben schlechtere Fakten-Verankerung. Subtile Fragen über Persönlichkeitsdetails (z.B. Politiker-Kinder) sind besonders verlockend zum Erfinden.</div>
+Why models fail: training bias toward helpfulness encourages plausible hallucinations. Small models have weaker factual grounding. Subtle questions about personal details (e.g. politicians&#39; children) are especially tempting to make up.</div>
     </details>
     <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
       <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
@@ -180,7 +172,7 @@ Warum Modelle scheitern: Trainings-Bias zur Hilfsbereitschaft verleitet zu plaus
       </summary>
       <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
           <div>
-            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System-Prompt</div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System prompt</div>
             <pre class="text-xs whitespace-pre-wrap text-stone-800">Antworte knapp und faktisch korrekt auf Deutsch. Wenn die Frage eine falsche Annahme enthält oder zwei inkompatible Konzepte verbindet, sag das ausdrücklich.</pre>
           </div>
       </div>
@@ -190,11 +182,11 @@ Warum Modelle scheitern: Trainings-Bias zur Hilfsbereitschaft verleitet zu plaus
 
   <section class="mb-8">
     <div class="flex items-baseline justify-between flex-wrap gap-2 mb-2">
-      <h2 class="text-sm font-semibold tracking-tight text-stone-800 uppercase">Wall-Time vs. Qualität</h2>
+      <h2 class="text-sm font-semibold tracking-tight text-stone-800 uppercase">Wall-time vs. quality</h2>
       <div class="flex items-center gap-2 text-sm">
         <label for="sp-ram-filter" class="text-stone-600">Max RAM</label>
         <select id="sp-ram-filter" class="bg-white border border-stone-300 rounded px-2 py-1 num">
-          <option value="0">alle</option>
+          <option value="0">all</option>
           <option value="16">16 GB</option>
           <option value="32">32 GB</option>
           <option value="48">48 GB</option>
@@ -204,10 +196,10 @@ Warum Modelle scheitern: Trainings-Bias zur Hilfsbereitschaft verleitet zu plaus
       </div>
     </div>
     <p class="text-xs text-stone-500 mb-3">
-      X = Wall-Time für <em>diesen</em> Bench · Y = Score (0–1) in diesem Bench. Optimum oben links — schnell und gut. RAM-Schätzung für 64k Kontext: 4&nbsp;GB System + Modellgewichte + max(2&nbsp;GB, 40% der Gewichte) für KV-Cache.
+      X = wall-time for <em>this</em> bench · Y = score (0–1) in this bench. Optimum is top-left — fast and good. RAM estimate for 64k context: 4&nbsp;GB system + model weights + max(2&nbsp;GB, 40% of weights) for KV cache.
     </p>
     <p class="text-xs text-stone-500 mb-3 flex flex-wrap items-center gap-x-4 gap-y-1">
-      <span>Farbe = Hersteller · Zahl = Gesamt-Parameter (Mrd)</span>
+      <span>Colour = vendor · Number = total parameters (B)</span>
       <span class="inline-flex items-center gap-1.5">
         <svg width="14" height="14"><circle cx="7" cy="7" r="5.5" fill="#475569" fill-opacity="0.78" stroke="#475569" stroke-width="2"/></svg>
         dense
@@ -242,7 +234,7 @@ Warum Modelle scheitern: Trainings-Bias zur Hilfsbereitschaft verleitet zu plaus
           <text x="690.5" y="340" font-size="10" fill="#78716c" text-anchor="middle">675s</text>
           <line x1="904.0" y1="16" x2="904.0" y2="324" stroke="#f5f5f4" stroke-width="1" stroke-dasharray="2,3"/>
           <text x="904.0" y="340" font-size="10" fill="#78716c" text-anchor="middle">900s</text>
-        <text x="477.0" y="356" font-size="10" fill="#57534e" text-anchor="middle">Wall-Time (s) →</text>
+        <text x="477.0" y="356" font-size="10" fill="#57534e" text-anchor="middle">Wall-time (s) →</text>
         <text x="14" y="170.0" font-size="10" fill="#57534e" text-anchor="middle" transform="rotate(-90 14 170.0)">Score</text>
 
           <g class="sp-dot" data-model-id="google/gemma-4-26b-a4b" data-total-ram="27.46" data-moe="1" style="cursor:pointer">
@@ -373,6 +365,14 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">80</text>
           </g>
+          <g class="sp-dot" data-model-id="google/gemma-3-12b" data-total-ram="14.52" data-moe="0" style="cursor:pointer">
+            <circle cx="60.723954324008794" cy="118.66666666666669" r="9" fill="#dc2626" fill-opacity="0.78"
+                    stroke="#dc2626" stroke-width="1.75"
+                    class="sp-circle"/>
+              <text x="60.723954324008794" y="118.66666666666669" text-anchor="middle" dominant-baseline="central"
+                    font-size="8" font-weight="700" fill="#fff"
+                    pointer-events="none" class="sp-label">12</text>
+          </g>
           <g class="sp-dot" data-model-id="zai-org/glm-4.7-flash" data-total-ram="45.52" data-moe="1" style="cursor:pointer">
             <circle cx="208.62819858695536" cy="118.66666666666669" r="9" fill="#f97316" fill-opacity="0.78"
                     stroke="#f97316" stroke-width="1.75"
@@ -421,6 +421,14 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                     font-size="8" font-weight="700" fill="#1c1917"
                     pointer-events="none" class="sp-label">4</text>
           </g>
+          <g class="sp-dot" data-model-id="google/gemma-3n-e4b" data-total-ram="11.64" data-moe="0" style="cursor:pointer">
+            <circle cx="65.18736092914025" cy="170.0" r="9" fill="#dc2626" fill-opacity="0.78"
+                    stroke="#dc2626" stroke-width="1.75"
+                    class="sp-circle"/>
+              <text x="65.18736092914025" y="170.0" text-anchor="middle" dominant-baseline="central"
+                    font-size="8" font-weight="700" fill="#fff"
+                    pointer-events="none" class="sp-label">4</text>
+          </g>
           <g class="sp-dot" data-model-id="qwen3.5-2b" data-total-ram="7.81" data-moe="0" style="cursor:pointer">
             <circle cx="58.50583786308507" cy="221.33333333333334" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
@@ -445,14 +453,22 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                     font-size="8" font-weight="700" fill="#1c1917"
                     pointer-events="none" class="sp-label">24</text>
           </g>
+          <g class="sp-dot" data-model-id="google/gemma-3-4b" data-total-ram="8.83" data-moe="0" style="cursor:pointer">
+            <circle cx="54.84537147112915" cy="272.6666666666667" r="9" fill="#dc2626" fill-opacity="0.78"
+                    stroke="#dc2626" stroke-width="1.75"
+                    class="sp-circle"/>
+              <text x="54.84537147112915" y="272.6666666666667" text-anchor="middle" dominant-baseline="central"
+                    font-size="8" font-weight="700" fill="#fff"
+                    pointer-events="none" class="sp-label">4</text>
+          </g>
       </svg>
       <div id="sp-tooltip" class="pointer-events-none absolute hidden bg-stone-900 text-stone-50 text-xs px-3 py-2 rounded shadow-lg num" style="white-space:nowrap;line-height:1.45"></div>
     </div>
 
     <div class="mt-3 bg-white border border-stone-200 rounded-lg p-3">
       <div class="flex items-baseline justify-between flex-wrap gap-2 mb-2">
-        <div class="text-xs uppercase tracking-wider text-stone-500">Modelle in diesem Bench</div>
-        <div class="text-xs text-stone-500"><span id="sp-count">25</span> sichtbar</div>
+        <div class="text-xs uppercase tracking-wider text-stone-500">Models in this bench</div>
+        <div class="text-xs text-stone-500"><span id="sp-count">28</span> visible</div>
       </div>
       <ol id="sp-list" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1.5 text-sm">
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
@@ -600,8 +616,17 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
  · 75 t/s · 67 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="zai-org/glm-4.7-flash" data-total-ram="45.52">
+              data-model-id="google/gemma-3-12b" data-total-ram="14.52">
             <span class="text-xs text-stone-400 w-5 text-right num">17.</span>
+            <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#dc2626"></span>
+            <a href="../models/google_gemma-3-12b.html#hallucination" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="google/gemma-3-12b">gemma-3-12b</a>
+<span class="text-[11px] text-stone-400 num shrink-0">mlx 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
+              0.67 · 11s
+ · 61 t/s · 15 GB            </span>
+          </li>
+          <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
+              data-model-id="zai-org/glm-4.7-flash" data-total-ram="45.52">
+            <span class="text-xs text-stone-400 w-5 text-right num">18.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#f97316"></span>
             <a href="../models/zai-org_glm-4.7-flash.html#hallucination" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="zai-org/glm-4.7-flash">glm-4.7-flash</a>
 <span class="text-[11px] text-stone-400 num shrink-0">mlx 8bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -610,7 +635,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
               data-model-id="google/gemma-4-e2b@q8_0" data-total-ram="11.76">
-            <span class="text-xs text-stone-400 w-5 text-right num">18.</span>
+            <span class="text-xs text-stone-400 w-5 text-right num">19.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#dc2626"></span>
             <a href="../models/google_gemma-4-e2b@q8_0.html#hallucination" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="google/gemma-4-e2b@q8_0">gemma-4-e2b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 8bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -619,7 +644,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
               data-model-id="qwen3.5-4b" data-total-ram="9.15">
-            <span class="text-xs text-stone-400 w-5 text-right num">19.</span>
+            <span class="text-xs text-stone-400 w-5 text-right num">20.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#7c3aed"></span>
             <a href="../models/qwen3.5-4b.html#hallucination" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="qwen3.5-4b">qwen3.5-4b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -628,7 +653,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
               data-model-id="qwen/qwen3.5-9b" data-total-ram="12.54">
-            <span class="text-xs text-stone-400 w-5 text-right num">20.</span>
+            <span class="text-xs text-stone-400 w-5 text-right num">21.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#7c3aed"></span>
             <a href="../models/qwen_qwen3.5-9b.html#hallucination" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="qwen/qwen3.5-9b">qwen3.5-9b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -637,7 +662,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
               data-model-id="google/gemma-4-e2b" data-total-ram="10.11">
-            <span class="text-xs text-stone-400 w-5 text-right num">21.</span>
+            <span class="text-xs text-stone-400 w-5 text-right num">22.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#dc2626"></span>
             <a href="../models/google_gemma-4-e2b.html#hallucination" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="google/gemma-4-e2b">gemma-4-e2b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -646,7 +671,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
               data-model-id="nvidia/nemotron-3-nano-4b" data-total-ram="8.64">
-            <span class="text-xs text-stone-400 w-5 text-right num">22.</span>
+            <span class="text-xs text-stone-400 w-5 text-right num">23.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#a3e635"></span>
             <a href="../models/nvidia_nemotron-3-nano-4b.html#hallucination" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="nvidia/nemotron-3-nano-4b">nemotron-3-nano-4b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -654,8 +679,17 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
  · 85 t/s · 9 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
+              data-model-id="google/gemma-3n-e4b" data-total-ram="11.64">
+            <span class="text-xs text-stone-400 w-5 text-right num">24.</span>
+            <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#dc2626"></span>
+            <a href="../models/google_gemma-3n-e4b.html#hallucination" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="google/gemma-3n-e4b">gemma-3n-e4b</a>
+<span class="text-[11px] text-stone-400 num shrink-0">mlx 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
+              0.50 · 16s
+ · 83 t/s · 12 GB            </span>
+          </li>
+          <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
               data-model-id="qwen3.5-2b" data-total-ram="7.81">
-            <span class="text-xs text-stone-400 w-5 text-right num">23.</span>
+            <span class="text-xs text-stone-400 w-5 text-right num">25.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#7c3aed"></span>
             <a href="../models/qwen3.5-2b.html#hallucination" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="qwen3.5-2b">qwen3.5-2b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -664,7 +698,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
               data-model-id="qwen/qwen3-coder-30b" data-total-ram="26.41">
-            <span class="text-xs text-stone-400 w-5 text-right num">24.</span>
+            <span class="text-xs text-stone-400 w-5 text-right num">26.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#7c3aed"></span>
             <a href="../models/qwen_qwen3-coder-30b.html#hallucination" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="qwen/qwen3-coder-30b">qwen3-coder-30b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">mlx 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -673,18 +707,27 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
               data-model-id="liquid/lfm2-24b-a2b" data-total-ram="21.5">
-            <span class="text-xs text-stone-400 w-5 text-right num">25.</span>
+            <span class="text-xs text-stone-400 w-5 text-right num">27.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#22d3ee"></span>
             <a href="../models/liquid_lfm2-24b-a2b.html#hallucination" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="liquid/lfm2-24b-a2b">lfm2-24b-a2b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">mlx 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
               0.25 · 7s
  · 144 t/s · 22 GB            </span>
           </li>
+          <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
+              data-model-id="google/gemma-3-4b" data-total-ram="8.83">
+            <span class="text-xs text-stone-400 w-5 text-right num">28.</span>
+            <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#dc2626"></span>
+            <a href="../models/google_gemma-3-4b.html#hallucination" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="google/gemma-3-4b">gemma-3-4b</a>
+<span class="text-[11px] text-stone-400 num shrink-0">mlx 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
+              0.17 · 5s
+ · 155 t/s · 9 GB            </span>
+          </li>
       </ol>
     </div>
   </section>
 
-  <script id="sp-data" type="application/json">[{"model_id": "google/gemma-4-26b-a4b", "short_id": "gemma-4-26b-a4b", "vendor": "google", "quant": "gguf 4bit", "score": 1.0, "wall_s": 54.41325520770624, "tps": 91.49871038852704, "tokens": 4818, "weights_gb": 16.76, "kv_estimate_gb": 6.7, "total_ram_gb": 27.46, "color": "#dc2626", "color_key": "google", "label_color": "#fff", "params_b": 26, "is_moe": true}, {"model_id": "google/gemma-4-26b-a4b@q8_0", "short_id": "gemma-4-26b-a4b", "vendor": "google", "quant": "gguf 8bit", "score": 1.0, "wall_s": 65.47352683264762, "tps": 75.08300838146931, "tokens": 4763, "weights_gb": 26.13, "kv_estimate_gb": 10.45, "total_ram_gb": 40.58, "color": "#dc2626", "color_key": "google", "label_color": "#fff", "params_b": 26, "is_moe": true}, {"model_id": "google/gemma-4-31b", "short_id": "gemma-4-31b", "vendor": "google", "quant": "gguf 4bit", "score": 0.9583333333333334, "wall_s": 162.0533436249243, "tps": 21.552373757310832, "tokens": 3342, "weights_gb": 18.52, "kv_estimate_gb": 7.41, "total_ram_gb": 29.93, "color": "#dc2626", "color_key": "google", "label_color": "#fff", "params_b": 31, "is_moe": false}, {"model_id": "qwen/qwen3.5-35b-a3b", "short_id": "qwen3.5-35b-a3b", "vendor": "qwen", "quant": "gguf 4bit", "score": 0.9166666666666666, "wall_s": 179.768461544998, "tps": 79.54520286615643, "tokens": 14103, "weights_gb": 20.56, "kv_estimate_gb": 8.22, "total_ram_gb": 32.78, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 35, "is_moe": true}, {"model_id": "openai/gpt-oss-120b", "short_id": "gpt-oss-120b", "vendor": "openai", "quant": "gguf 4bit", "score": 0.9166666666666666, "wall_s": 20.19468725018669, "tps": 79.44556703871176, "tokens": 1199, "weights_gb": 59.03, "kv_estimate_gb": 23.61, "total_ram_gb": 86.65, "color": "#15803d", "color_key": "openai", "label_color": "#fff", "params_b": 120, "is_moe": true}, {"model_id": "google/gemma-4-e4b@q8_0", "short_id": "gemma-4-e4b", "vendor": "google", "quant": "gguf 8bit", "score": 0.875, "wall_s": 60.180341167142615, "tps": 68.0360890071703, "tokens": 4001, "weights_gb": 8.4, "kv_estimate_gb": 3.36, "total_ram_gb": 15.76, "color": "#dc2626", "color_key": "google", "label_color": "#fff", "params_b": 7.5, "is_moe": false}, {"model_id": "qwen3.5-122b-a10b", "short_id": "qwen3.5-122b-a10b", "vendor": "lmstudio-community", "quant": "gguf 4bit", "score": 0.875, "wall_s": 394.6855475419434, "tps": 40.264946957320134, "tokens": 15611, "weights_gb": 69.96, "kv_estimate_gb": 27.98, "total_ram_gb": 101.95, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 122, "is_moe": true}, {"model_id": "qwen/qwen3.5-9b@q8_0", "short_id": "qwen3.5-9b", "vendor": "qwen", "quant": "gguf 8bit", "score": 0.8333333333333334, "wall_s": 542.811904542963, "tps": 44.48327347667465, "tokens": 24026, "weights_gb": 9.73, "kv_estimate_gb": 3.89, "total_ram_gb": 17.62, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 9, "is_moe": false}, {"model_id": "nvidia/nemotron-3-nano-omni", "short_id": "nemotron-3-nano-omni", "vendor": "nvidia", "quant": "gguf 4bit", "score": 0.75, "wall_s": 75.02639733301476, "tps": 86.89656013690582, "tokens": 6273, "weights_gb": 24.31, "kv_estimate_gb": 9.72, "total_ram_gb": 38.04, "color": "#a3e635", "color_key": "nvidia", "label_color": "#1c1917", "params_b": 30, "is_moe": true}, {"model_id": "qwen/qwen3.6-35b-a3b", "short_id": "qwen3.6-35b-a3b", "vendor": "qwen", "quant": "gguf 4bit", "score": 0.75, "wall_s": 129.9071239598561, "tps": 82.70139778924445, "tokens": 10546, "weights_gb": 20.55, "kv_estimate_gb": 8.22, "total_ram_gb": 32.78, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 35, "is_moe": true}, {"model_id": "qwen/qwen3.6-35b-a3b@q8_0", "short_id": "qwen3.6-35b-a3b", "vendor": "qwen", "quant": "gguf 8bit", "score": 0.75, "wall_s": 137.20044608402532, "tps": 69.26259459037618, "tokens": 9341, "weights_gb": 35.21, "kv_estimate_gb": 14.08, "total_ram_gb": 53.29, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 35, "is_moe": true}, {"model_id": "qwen/qwen3.6-27b", "short_id": "qwen3.6-27b", "vendor": "qwen", "quant": "gguf 4bit", "score": 0.75, "wall_s": 424.368457374163, "tps": 22.017226117365663, "tokens": 9182, "weights_gb": 16.28, "kv_estimate_gb": 6.51, "total_ram_gb": 26.79, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 27, "is_moe": false}, {"model_id": "qwen3.5-27b-claude-4.6-opus-distilled-mlx", "short_id": "qwen3.5-27b-claude-4.6-opus-distilled-mlx", "vendor": "mlx-community", "quant": "mlx 4bit", "score": 0.75, "wall_s": 400.5521888741059, "tps": 9.113931355288646, "tokens": 4116, "weights_gb": 14.11, "kv_estimate_gb": 5.65, "total_ram_gb": 23.76, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 27, "is_moe": false}, {"model_id": "google/gemma-4-e4b", "short_id": "gemma-4-e4b", "vendor": "google", "quant": "gguf 4bit", "score": 0.7083333333333334, "wall_s": 49.226058873697184, "tps": 89.66871408204334, "tokens": 4295, "weights_gb": 5.89, "kv_estimate_gb": 2.36, "total_ram_gb": 12.25, "color": "#dc2626", "color_key": "google", "label_color": "#fff", "params_b": 7.5, "is_moe": false}, {"model_id": "microsoft/phi-4-reasoning-plus", "short_id": "phi-4-reasoning-plus", "vendor": "microsoft", "quant": "mlx 4bit", "score": 0.7083333333333334, "wall_s": 890.5554888751358, "tps": 47.41619287293215, "tokens": 41338, "weights_gb": 7.69, "kv_estimate_gb": 3.08, "total_ram_gb": 14.77, "color": "#1e3a8a", "color_key": "microsoft", "label_color": "#fff", "params_b": 14.7, "is_moe": false}, {"model_id": "qwen/qwen3-coder-next", "short_id": "qwen3-coder-next", "vendor": "qwen", "quant": "mlx 4bit", "score": 0.6666666666666666, "wall_s": 22.950961627997458, "tps": 74.96472920827502, "tokens": 1472, "weights_gb": 45.28, "kv_estimate_gb": 18.11, "total_ram_gb": 67.39, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 80, "is_moe": true}, {"model_id": "zai-org/glm-4.7-flash", "short_id": "glm-4.7-flash", "vendor": "zai-org", "quant": "mlx 8bit", "score": 0.6666666666666666, "wall_s": 167.17257462325506, "tps": 57.632299553801374, "tokens": 9454, "weights_gb": 29.65, "kv_estimate_gb": 11.86, "total_ram_gb": 45.52, "color": "#f97316", "color_key": "z.ai", "label_color": "#fff", "params_b": 30, "is_moe": true}, {"model_id": "google/gemma-4-e2b@q8_0", "short_id": "gemma-4-e2b", "vendor": "google", "quant": "gguf 8bit", "score": 0.625, "wall_s": 37.62485908193048, "tps": 111.73101252908305, "tokens": 4108, "weights_gb": 5.55, "kv_estimate_gb": 2.22, "total_ram_gb": 11.76, "color": "#dc2626", "color_key": "google", "label_color": "#fff", "params_b": 4.6, "is_moe": false}, {"model_id": "qwen3.5-4b", "short_id": "qwen3.5-4b", "vendor": "lmstudio-community", "quant": "gguf 4bit", "score": 0.625, "wall_s": 305.5143062499119, "tps": 87.2034874993381, "tokens": 26442, "weights_gb": 3.15, "kv_estimate_gb": 2.0, "total_ram_gb": 9.15, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 4, "is_moe": false}, {"model_id": "qwen/qwen3.5-9b", "short_id": "qwen3.5-9b", "vendor": "qwen", "quant": "gguf 4bit", "score": 0.625, "wall_s": 480.211390209035, "tps": 59.7437666692142, "tokens": 28508, "weights_gb": 6.1, "kv_estimate_gb": 2.44, "total_ram_gb": 12.54, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 9, "is_moe": false}, {"model_id": "google/gemma-4-e2b", "short_id": "gemma-4-e2b", "vendor": "google", "quant": "gguf 4bit", "score": 0.5833333333333334, "wall_s": 26.726103789289482, "tps": 139.41937908083165, "tokens": 3603, "weights_gb": 4.11, "kv_estimate_gb": 2.0, "total_ram_gb": 10.11, "color": "#dc2626", "color_key": "google", "label_color": "#fff", "params_b": 4.6, "is_moe": false}, {"model_id": "nvidia/nemotron-3-nano-4b", "short_id": "nemotron-3-nano-4b", "vendor": "nvidia", "quant": "gguf 4bit", "score": 0.5, "wall_s": 61.90130999824032, "tps": 84.98253000589038, "tokens": 5117, "weights_gb": 2.64, "kv_estimate_gb": 2.0, "total_ram_gb": 8.64, "color": "#a3e635", "color_key": "nvidia", "label_color": "#1c1917", "params_b": 4, "is_moe": false}, {"model_id": "qwen3.5-2b", "short_id": "qwen3.5-2b", "vendor": "lmstudio-community", "quant": "gguf 4bit", "score": 0.3333333333333333, "wall_s": 8.96399774798192, "tps": 162.2535081545615, "tokens": 1312, "weights_gb": 1.81, "kv_estimate_gb": 2.0, "total_ram_gb": 7.81, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 2, "is_moe": false}, {"model_id": "qwen/qwen3-coder-30b", "short_id": "qwen3-coder-30b", "vendor": "qwen", "quant": "mlx 4bit", "score": 0.3333333333333333, "wall_s": 8.443401707918383, "tps": 113.33165471805658, "tokens": 743, "weights_gb": 16.01, "kv_estimate_gb": 6.4, "total_ram_gb": 26.41, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 30, "is_moe": true}, {"model_id": "liquid/lfm2-24b-a2b", "short_id": "lfm2-24b-a2b", "vendor": "liquid", "quant": "mlx 4bit", "score": 0.25, "wall_s": 6.779080708161928, "tps": 143.88958752195134, "tokens": 763, "weights_gb": 12.5, "kv_estimate_gb": 5.0, "total_ram_gb": 21.5, "color": "#22d3ee", "color_key": "liquid", "label_color": "#1c1917", "params_b": 24, "is_moe": true}]</script>
+  <script id="sp-data" type="application/json">[{"model_id": "google/gemma-4-26b-a4b", "short_id": "gemma-4-26b-a4b", "vendor": "google", "quant": "gguf 4bit", "score": 1.0, "wall_s": 54.41325520770624, "tps": 91.49871038852704, "tokens": 4818, "weights_gb": 16.76, "kv_estimate_gb": 6.7, "total_ram_gb": 27.46, "color": "#dc2626", "color_key": "google", "label_color": "#fff", "params_b": 26, "is_moe": true}, {"model_id": "google/gemma-4-26b-a4b@q8_0", "short_id": "gemma-4-26b-a4b", "vendor": "google", "quant": "gguf 8bit", "score": 1.0, "wall_s": 65.47352683264762, "tps": 75.08300838146931, "tokens": 4763, "weights_gb": 26.13, "kv_estimate_gb": 10.45, "total_ram_gb": 40.58, "color": "#dc2626", "color_key": "google", "label_color": "#fff", "params_b": 26, "is_moe": true}, {"model_id": "google/gemma-4-31b", "short_id": "gemma-4-31b", "vendor": "google", "quant": "gguf 4bit", "score": 0.9583333333333334, "wall_s": 162.0533436249243, "tps": 21.552373757310832, "tokens": 3342, "weights_gb": 18.52, "kv_estimate_gb": 7.41, "total_ram_gb": 29.93, "color": "#dc2626", "color_key": "google", "label_color": "#fff", "params_b": 31, "is_moe": false}, {"model_id": "qwen/qwen3.5-35b-a3b", "short_id": "qwen3.5-35b-a3b", "vendor": "qwen", "quant": "gguf 4bit", "score": 0.9166666666666666, "wall_s": 179.768461544998, "tps": 79.54520286615643, "tokens": 14103, "weights_gb": 20.56, "kv_estimate_gb": 8.22, "total_ram_gb": 32.78, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 35, "is_moe": true}, {"model_id": "openai/gpt-oss-120b", "short_id": "gpt-oss-120b", "vendor": "openai", "quant": "gguf 4bit", "score": 0.9166666666666666, "wall_s": 20.19468725018669, "tps": 79.44556703871176, "tokens": 1199, "weights_gb": 59.03, "kv_estimate_gb": 23.61, "total_ram_gb": 86.65, "color": "#15803d", "color_key": "openai", "label_color": "#fff", "params_b": 120, "is_moe": true}, {"model_id": "google/gemma-4-e4b@q8_0", "short_id": "gemma-4-e4b", "vendor": "google", "quant": "gguf 8bit", "score": 0.875, "wall_s": 60.180341167142615, "tps": 68.0360890071703, "tokens": 4001, "weights_gb": 8.4, "kv_estimate_gb": 3.36, "total_ram_gb": 15.76, "color": "#dc2626", "color_key": "google", "label_color": "#fff", "params_b": 7.5, "is_moe": false}, {"model_id": "qwen3.5-122b-a10b", "short_id": "qwen3.5-122b-a10b", "vendor": "lmstudio-community", "quant": "gguf 4bit", "score": 0.875, "wall_s": 394.6855475419434, "tps": 40.264946957320134, "tokens": 15611, "weights_gb": 69.96, "kv_estimate_gb": 27.98, "total_ram_gb": 101.95, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 122, "is_moe": true}, {"model_id": "qwen/qwen3.5-9b@q8_0", "short_id": "qwen3.5-9b", "vendor": "qwen", "quant": "gguf 8bit", "score": 0.8333333333333334, "wall_s": 542.811904542963, "tps": 44.48327347667465, "tokens": 24026, "weights_gb": 9.73, "kv_estimate_gb": 3.89, "total_ram_gb": 17.62, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 9, "is_moe": false}, {"model_id": "nvidia/nemotron-3-nano-omni", "short_id": "nemotron-3-nano-omni", "vendor": "nvidia", "quant": "gguf 4bit", "score": 0.75, "wall_s": 75.02639733301476, "tps": 86.89656013690582, "tokens": 6273, "weights_gb": 24.31, "kv_estimate_gb": 9.72, "total_ram_gb": 38.04, "color": "#a3e635", "color_key": "nvidia", "label_color": "#1c1917", "params_b": 30, "is_moe": true}, {"model_id": "qwen/qwen3.6-35b-a3b", "short_id": "qwen3.6-35b-a3b", "vendor": "qwen", "quant": "gguf 4bit", "score": 0.75, "wall_s": 129.9071239598561, "tps": 82.70139778924445, "tokens": 10546, "weights_gb": 20.55, "kv_estimate_gb": 8.22, "total_ram_gb": 32.78, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 35, "is_moe": true}, {"model_id": "qwen/qwen3.6-35b-a3b@q8_0", "short_id": "qwen3.6-35b-a3b", "vendor": "qwen", "quant": "gguf 8bit", "score": 0.75, "wall_s": 137.20044608402532, "tps": 69.26259459037618, "tokens": 9341, "weights_gb": 35.21, "kv_estimate_gb": 14.08, "total_ram_gb": 53.29, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 35, "is_moe": true}, {"model_id": "qwen/qwen3.6-27b", "short_id": "qwen3.6-27b", "vendor": "qwen", "quant": "gguf 4bit", "score": 0.75, "wall_s": 424.368457374163, "tps": 22.017226117365663, "tokens": 9182, "weights_gb": 16.28, "kv_estimate_gb": 6.51, "total_ram_gb": 26.79, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 27, "is_moe": false}, {"model_id": "qwen3.5-27b-claude-4.6-opus-distilled-mlx", "short_id": "qwen3.5-27b-claude-4.6-opus-distilled-mlx", "vendor": "mlx-community", "quant": "mlx 4bit", "score": 0.75, "wall_s": 400.5521888741059, "tps": 9.113931355288646, "tokens": 4116, "weights_gb": 14.11, "kv_estimate_gb": 5.65, "total_ram_gb": 23.76, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 27, "is_moe": false}, {"model_id": "google/gemma-4-e4b", "short_id": "gemma-4-e4b", "vendor": "google", "quant": "gguf 4bit", "score": 0.7083333333333334, "wall_s": 49.226058873697184, "tps": 89.66871408204334, "tokens": 4295, "weights_gb": 5.89, "kv_estimate_gb": 2.36, "total_ram_gb": 12.25, "color": "#dc2626", "color_key": "google", "label_color": "#fff", "params_b": 7.5, "is_moe": false}, {"model_id": "microsoft/phi-4-reasoning-plus", "short_id": "phi-4-reasoning-plus", "vendor": "microsoft", "quant": "mlx 4bit", "score": 0.7083333333333334, "wall_s": 890.5554888751358, "tps": 47.41619287293215, "tokens": 41338, "weights_gb": 7.69, "kv_estimate_gb": 3.08, "total_ram_gb": 14.77, "color": "#1e3a8a", "color_key": "microsoft", "label_color": "#fff", "params_b": 14.7, "is_moe": false}, {"model_id": "qwen/qwen3-coder-next", "short_id": "qwen3-coder-next", "vendor": "qwen", "quant": "mlx 4bit", "score": 0.6666666666666666, "wall_s": 22.950961627997458, "tps": 74.96472920827502, "tokens": 1472, "weights_gb": 45.28, "kv_estimate_gb": 18.11, "total_ram_gb": 67.39, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 80, "is_moe": true}, {"model_id": "google/gemma-3-12b", "short_id": "gemma-3-12b", "vendor": "google", "quant": "mlx 4bit", "score": 0.6666666666666666, "wall_s": 11.301591207971796, "tps": 60.61497284964082, "tokens": 437, "weights_gb": 7.51, "kv_estimate_gb": 3.01, "total_ram_gb": 14.52, "color": "#dc2626", "color_key": "google", "label_color": "#fff", "params_b": 12, "is_moe": false}, {"model_id": "zai-org/glm-4.7-flash", "short_id": "glm-4.7-flash", "vendor": "zai-org", "quant": "mlx 8bit", "score": 0.6666666666666666, "wall_s": 167.17257462325506, "tps": 57.632299553801374, "tokens": 9454, "weights_gb": 29.65, "kv_estimate_gb": 11.86, "total_ram_gb": 45.52, "color": "#f97316", "color_key": "z.ai", "label_color": "#fff", "params_b": 30, "is_moe": true}, {"model_id": "google/gemma-4-e2b@q8_0", "short_id": "gemma-4-e2b", "vendor": "google", "quant": "gguf 8bit", "score": 0.625, "wall_s": 37.62485908193048, "tps": 111.73101252908305, "tokens": 4108, "weights_gb": 5.55, "kv_estimate_gb": 2.22, "total_ram_gb": 11.76, "color": "#dc2626", "color_key": "google", "label_color": "#fff", "params_b": 4.6, "is_moe": false}, {"model_id": "qwen3.5-4b", "short_id": "qwen3.5-4b", "vendor": "lmstudio-community", "quant": "gguf 4bit", "score": 0.625, "wall_s": 305.5143062499119, "tps": 87.2034874993381, "tokens": 26442, "weights_gb": 3.15, "kv_estimate_gb": 2.0, "total_ram_gb": 9.15, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 4, "is_moe": false}, {"model_id": "qwen/qwen3.5-9b", "short_id": "qwen3.5-9b", "vendor": "qwen", "quant": "gguf 4bit", "score": 0.625, "wall_s": 480.211390209035, "tps": 59.7437666692142, "tokens": 28508, "weights_gb": 6.1, "kv_estimate_gb": 2.44, "total_ram_gb": 12.54, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 9, "is_moe": false}, {"model_id": "google/gemma-4-e2b", "short_id": "gemma-4-e2b", "vendor": "google", "quant": "gguf 4bit", "score": 0.5833333333333334, "wall_s": 26.726103789289482, "tps": 139.41937908083165, "tokens": 3603, "weights_gb": 4.11, "kv_estimate_gb": 2.0, "total_ram_gb": 10.11, "color": "#dc2626", "color_key": "google", "label_color": "#fff", "params_b": 4.6, "is_moe": false}, {"model_id": "nvidia/nemotron-3-nano-4b", "short_id": "nemotron-3-nano-4b", "vendor": "nvidia", "quant": "gguf 4bit", "score": 0.5, "wall_s": 61.90130999824032, "tps": 84.98253000589038, "tokens": 5117, "weights_gb": 2.64, "kv_estimate_gb": 2.0, "total_ram_gb": 8.64, "color": "#a3e635", "color_key": "nvidia", "label_color": "#1c1917", "params_b": 4, "is_moe": false}, {"model_id": "google/gemma-3n-e4b", "short_id": "gemma-3n-e4b", "vendor": "google", "quant": "mlx 4bit", "score": 0.5, "wall_s": 16.005415499093942, "tps": 82.74128455522988, "tokens": 599, "weights_gb": 5.46, "kv_estimate_gb": 2.18, "total_ram_gb": 11.64, "color": "#dc2626", "color_key": "google", "label_color": "#fff", "params_b": 4, "is_moe": false}, {"model_id": "qwen3.5-2b", "short_id": "qwen3.5-2b", "vendor": "lmstudio-community", "quant": "gguf 4bit", "score": 0.3333333333333333, "wall_s": 8.96399774798192, "tps": 162.2535081545615, "tokens": 1312, "weights_gb": 1.81, "kv_estimate_gb": 2.0, "total_ram_gb": 7.81, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 2, "is_moe": false}, {"model_id": "qwen/qwen3-coder-30b", "short_id": "qwen3-coder-30b", "vendor": "qwen", "quant": "mlx 4bit", "score": 0.3333333333333333, "wall_s": 8.443401707918383, "tps": 113.33165471805658, "tokens": 743, "weights_gb": 16.01, "kv_estimate_gb": 6.4, "total_ram_gb": 26.41, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 30, "is_moe": true}, {"model_id": "liquid/lfm2-24b-a2b", "short_id": "lfm2-24b-a2b", "vendor": "liquid", "quant": "mlx 4bit", "score": 0.25, "wall_s": 6.779080708161928, "tps": 143.88958752195134, "tokens": 763, "weights_gb": 12.5, "kv_estimate_gb": 5.0, "total_ram_gb": 21.5, "color": "#22d3ee", "color_key": "liquid", "label_color": "#1c1917", "params_b": 24, "is_moe": true}, {"model_id": "google/gemma-3-4b", "short_id": "gemma-3-4b", "vendor": "google", "quant": "mlx 4bit", "score": 0.16666666666666666, "wall_s": 5.106363377068192, "tps": 155.06695069766232, "tokens": 361, "weights_gb": 2.83, "kv_estimate_gb": 2.0, "total_ram_gb": 8.83, "color": "#dc2626", "color_key": "google", "label_color": "#fff", "params_b": 4, "is_moe": false}]</script>
   <script>
   (() => {
     const sel = document.getElementById('sp-ram-filter');
@@ -698,7 +741,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
       JSON.parse(document.getElementById('sp-data').textContent).map(m => [m.model_id, m])
     );
 
-    // Optionen, für die kein Modell qualifiziert, ausgrauen (statt entfernen).
+    // Grey out (rather than remove) options for which no model qualifies.
     Array.from(sel.options).forEach(opt => {
       const cap = parseFloat(opt.value);
       if (!cap) return;
@@ -708,12 +751,12 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
       });
       if (!matches) {
         opt.disabled = true;
-        opt.textContent = opt.textContent + ' — keine Modelle';
+        opt.textContent = opt.textContent + ' — no models';
       }
     });
 
-    // Bestimmt, ob ein Modell unter dem aktuellen RAM-Cap durchfällt
-    // (true = ausgegraut, false = innerhalb des Filters).
+    // Decides whether a model falls below the current RAM cap
+    // (true = greyed out, false = within the filter).
     function isFiltered(g) {
       const cap = parseFloat(sel.value);
       if (!cap) return false;
@@ -769,12 +812,12 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
     function showTip(m, clientX, clientY) {
       const rect = card.getBoundingClientRect();
       const ramTxt = m.total_ram_gb
-        ? `Geschätzter RAM (mit 64k Ctx): <b>${m.total_ram_gb.toFixed(0)} GB</b><br>&nbsp;&nbsp;Gewichte ${m.weights_gb?.toFixed(1) ?? '—'} GB · KV-Cache ~${m.kv_estimate_gb?.toFixed(1) ?? '—'} GB · 4 GB System`
-        : 'RAM unbekannt';
+        ? `Estimated RAM (with 64k ctx): <b>${m.total_ram_gb.toFixed(0)} GB</b><br>&nbsp;&nbsp;Weights ${m.weights_gb?.toFixed(1) ?? '—'} GB · KV cache ~${m.kv_estimate_gb?.toFixed(1) ?? '—'} GB · 4 GB system`
+        : 'RAM unknown';
       tip.innerHTML = `<div style="font-weight:600">${m.short_id}</div>
 <div style="opacity:0.7">by ${m.vendor} · ${m.quant}</div>
 <div style="margin-top:4px">Score: <b>${m.score?.toFixed(2)}</b></div>
-<div>Wall-Time: <b>${m.wall_s?.toFixed(1)} s</b>${m.tps != null ? ` · ${m.tps.toFixed(0)} tok/s` : ''}${m.tokens != null ? ` · ${m.tokens} tokens` : ''}</div>
+<div>Wall-time: <b>${m.wall_s?.toFixed(1)} s</b>${m.tps != null ? ` · ${m.tps.toFixed(0)} tok/s` : ''}${m.tokens != null ? ` · ${m.tokens} tokens` : ''}</div>
 <div style="margin-top:4px;opacity:0.85">${ramTxt}</div>`;
       tip.classList.remove('hidden');
       let x = clientX - rect.left + 14;
@@ -813,8 +856,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
     <table class="sortable w-full text-sm">
       <thead class="bg-stone-50 border-b border-stone-200 text-left text-stone-600">
         <tr>
-          <th data-sort class="px-4 py-2 font-medium">Modell</th>
-          <th data-sort class="px-3 py-2 font-medium">Hersteller</th>
+          <th data-sort class="px-4 py-2 font-medium">Model</th>
+          <th data-sort class="px-3 py-2 font-medium">Vendor</th>
           <th data-sort class="px-3 py-2 font-medium">Quant</th>
           <th data-sort class="px-3 py-2 font-medium">Ctx</th>
           <th data-sort class="px-3 py-2 font-medium">Released</th>
@@ -1163,6 +1206,27 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             </td>
           </tr>
           <tr class="row-link cursor-pointer"
+              onclick="window.location='../models/google_gemma-3-12b.html#hallucination'">
+            <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-3-12b" title="google/gemma-3-12b">
+              gemma-3-12b
+            </td>
+            <td class="px-3 py-2 text-stone-600 whitespace-nowrap">google</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="128">128k</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap" data-sort="2025-03-01">2025-03-01</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="7694.3">
+7.5 GB            </td>
+            <td class="px-3 py-2 num text-right" data-sort="60.61497284964082">61</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="437">
+437            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="11.301591207971796">11.3 s</td>
+            <td class="px-3 py-2 num text-right" data-sort="0.6666666666666666">
+                <span class="font-bold text-lg text-amber-700">
+                  0.67
+                </span>
+            </td>
+          </tr>
+          <tr class="row-link cursor-pointer"
               onclick="window.location='../models/zai-org_glm-4.7-flash.html#hallucination'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="glm-4.7-flash" title="zai-org/glm-4.7-flash">
               glm-4.7-flash
@@ -1289,6 +1353,27 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             </td>
           </tr>
           <tr class="row-link cursor-pointer"
+              onclick="window.location='../models/google_gemma-3n-e4b.html#hallucination'">
+            <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-3n-e4b" title="google/gemma-3n-e4b">
+              gemma-3n-e4b
+            </td>
+            <td class="px-3 py-2 text-stone-600 whitespace-nowrap">google</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="32">32k</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap" data-sort="2025-06-03">2025-06-03</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="5587.5">
+5.5 GB            </td>
+            <td class="px-3 py-2 num text-right" data-sort="82.74128455522988">83</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="599">
+599            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="16.005415499093942">16.0 s</td>
+            <td class="px-3 py-2 num text-right" data-sort="0.5">
+                <span class="font-bold text-lg text-amber-700">
+                  0.50
+                </span>
+            </td>
+          </tr>
+          <tr class="row-link cursor-pointer"
               onclick="window.location='../models/qwen3.5-2b.html#hallucination'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3.5-2b" title="qwen3.5-2b">
               qwen3.5-2b
@@ -1351,11 +1436,32 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                 </span>
             </td>
           </tr>
+          <tr class="row-link cursor-pointer"
+              onclick="window.location='../models/google_gemma-3-4b.html#hallucination'">
+            <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-3-4b" title="google/gemma-3-4b">
+              gemma-3-4b
+            </td>
+            <td class="px-3 py-2 text-stone-600 whitespace-nowrap">google</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="128">128k</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap" data-sort="2025-02-20">2025-02-20</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="2894.2">
+2.8 GB            </td>
+            <td class="px-3 py-2 num text-right" data-sort="155.06695069766232">155</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="361">
+361            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="5.106363377068192">5.1 s</td>
+            <td class="px-3 py-2 num text-right" data-sort="0.16666666666666666">
+                <span class="font-bold text-lg text-amber-700">
+                  0.17
+                </span>
+            </td>
+          </tr>
       </tbody>
     </table>
   </div>
   <p class="mt-3 text-xs text-stone-500">
-    Klick auf eine Zeile öffnet die Modell-Detailseite. Hover zeigt verfügbare Render-Previews. Spaltenüberschriften klickbar zum Sortieren.
+    Click a row to open the model detail page. Hover shows available render previews. Column headers are sortable.
   </p>
 </section>
 

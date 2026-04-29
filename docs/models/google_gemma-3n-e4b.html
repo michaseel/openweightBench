@@ -1,0 +1,1815 @@
+<!doctype html>
+<html lang="en" class="bg-stone-50 text-stone-900 antialiased">
+<head>
+<meta charset="utf-8">
+<title>google/gemma-3n-e4b — Open Weight Bench</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+<script type="module">
+  // Lazy-load mermaid.js only if a .mermaid block is present on the page.
+  if (document.querySelector('.mermaid')) {
+    const m = await import('https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs');
+    m.default.initialize({ startOnLoad: false, theme: 'neutral', securityLevel: 'loose' });
+    const escapeHtml = (value) => value
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+    for (const [i, el] of [...document.querySelectorAll('.mermaid')].entries()) {
+      const code = el.textContent.trim();
+      try {
+        const { svg } = await m.default.render(`owb-mermaid-${Date.now()}-${i}`, code);
+        el.innerHTML = svg;
+      } catch (err) {
+        el.classList.add('text-red-700', 'bg-red-50', 'border-red-200');
+        el.innerHTML = `
+          <div class="text-xs font-semibold uppercase tracking-wider">Mermaid syntax error</div>
+          <div class="mt-1 text-xs">${escapeHtml(err?.message || String(err))}</div>
+          <pre class="mt-3 text-xs whitespace-pre-wrap text-stone-800">${escapeHtml(code)}</pre>
+        `;
+      }
+    }
+  }
+</script>
+<style>
+  body { font-feature-settings: "ss01","cv11"; }
+  .num { font-variant-numeric: tabular-nums; }
+  .row-link:hover { background: rgb(245 245 244 / 1); }
+  .preview-pop {
+    position: fixed; pointer-events: none; z-index: 50;
+    transform: translate(16px, 16px);
+    background: white; border: 1px solid rgb(231 229 228); border-radius: 8px;
+    box-shadow: 0 12px 30px -10px rgb(0 0 0 / 0.25);
+    overflow: hidden; max-width: 480px;
+  }
+  .preview-pop img { display: block; max-width: 480px; max-height: 320px; }
+  .text-pop {
+    position: fixed; pointer-events: none; z-index: 60;
+    transform: translate(12px, 12px);
+    max-width: 360px; white-space: normal;
+    background: rgb(28 25 23); color: rgb(250 250 249);
+    border: 1px solid rgb(87 83 78); border-radius: 6px;
+    box-shadow: 0 12px 30px -10px rgb(0 0 0 / 0.35);
+    padding: 0.5rem 0.625rem; font-size: 0.75rem; line-height: 1.35;
+  }
+  /* Lightbox for click-to-zoom on screenshots/diagrams */
+  .lightbox-overlay {
+    position: fixed; inset: 0; background: rgb(0 0 0 / 0.45);
+    display: none; align-items: center; justify-content: center;
+    z-index: 100; padding: 2rem;
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='rgba(28,25,23,0.85)' stroke='white' stroke-width='2'/><path d='M11 11 L21 21 M21 11 L11 21' stroke='white' stroke-width='2.5' stroke-linecap='round' fill='none'/></svg>") 16 16, pointer;
+  }
+  .lightbox-overlay.active { display: flex; }
+  .lightbox-panel {
+    max-width: 96vw; max-height: 94vh; overflow: auto;
+    background: white; border-radius: 6px;
+    box-shadow: 0 24px 70px -20px rgb(0 0 0 / 0.7);
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='rgba(28,25,23,0.85)' stroke='white' stroke-width='2'/><path d='M11 11 L21 21 M21 11 L11 21' stroke='white' stroke-width='2.5' stroke-linecap='round' fill='none'/></svg>") 16 16, pointer;
+  }
+  .lightbox-panel img {
+    display: block; max-width: none; width: auto; height: auto;
+    min-width: min(90vw, 900px); max-height: none;
+  }
+  .lightbox-panel .mermaid-zoom-content {
+    padding: 1.5rem; min-width: min(92vw, 1100px);
+  }
+  .lightbox-panel .mermaid-zoom-content svg {
+    display: block; width: max-content; min-width: 100%;
+    max-width: none; height: auto;
+  }
+  .zoomable, .zoomable-mermaid {
+    cursor: zoom-in;
+  }
+  .zoom-frame {
+    position: relative;
+  }
+  .zoom-button {
+    position: absolute; top: 0.5rem; right: 0.5rem; z-index: 5;
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 2rem; height: 2rem; border-radius: 0.375rem;
+    background: rgb(255 255 255 / 0.92);
+    border: 1px solid rgb(214 211 209);
+    color: rgb(41 37 36);
+    box-shadow: 0 4px 14px -8px rgb(0 0 0 / 0.45);
+    cursor: zoom-in; font-size: 1rem; line-height: 1;
+  }
+  .zoom-button:hover {
+    background: white; border-color: rgb(120 113 108);
+  }
+</style>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="border-b border-stone-200 bg-white">
+    <div class="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
+      <a href="../index.html" class="flex items-baseline gap-3">
+        <span class="text-xl font-semibold tracking-tight">Open Weight Bench</span>
+        <span class="text-xs text-stone-500 hidden sm:inline">Local LLMs on Apple Silicon</span>
+      </a>
+      <nav class="text-sm text-stone-500 flex items-center gap-4">
+        <a class="hover:text-stone-900" href="https://michaelseel.com" target="_blank" rel="noopener">michaelseel.com</a>
+        <a class="hover:text-stone-900" href="https://github.com/michaseel/openweightBench" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+    </div>
+    <div class="max-w-6xl mx-auto px-6">
+      <nav class="-mb-px flex gap-6 overflow-x-auto text-sm">
+        <a href="../index.html"
+           class="py-3 border-b-2 border-stone-900 text-stone-900 font-medium">
+          Overview
+        </a>
+          <a href="../benchmarks/coding.html"
+             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
+            Coding
+          </a>
+          <a href="../benchmarks/vision.html"
+             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
+            Vision
+          </a>
+          <a href="../benchmarks/niah.html"
+             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
+            Needle in a Haystack
+          </a>
+          <a href="../benchmarks/tool_use.html"
+             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
+            Tool Use
+          </a>
+          <a href="../benchmarks/diagram_to_svg.html"
+             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
+            Diagram → SVG
+          </a>
+          <a href="../benchmarks/hallucination.html"
+             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
+            Hallucination
+          </a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-7xl mx-auto w-full px-6 py-8">
+
+<section class="mb-8">
+  <div class="text-xs text-stone-500"><a href="../index.html" class="hover:text-stone-900">← Overview</a></div>
+  <h1 class="mt-2 text-2xl font-semibold tracking-tight num">google/gemma-3n-e4b</h1>
+  <div class="mt-2 flex flex-wrap gap-2 text-xs">
+    <span class="px-2 py-1 rounded border"
+          style="background-color: #dc2626; color: #fff; border-color: #dc2626;"
+          data-tooltip="Vendor / publisher of the model. Colour indicates the model family.">google</span>
+      <span class="px-2 py-1 rounded bg-stone-100 border border-stone-200 num"
+            data-tooltip="Dense model: 4B parameters — all active per token.">
+        4B
+· dense      </span>
+    <span class="px-2 py-1 rounded bg-stone-100 border border-stone-200 num"
+          data-tooltip="File format and quantisation of the weights (e.g. Q8_0 = 8-bit, MXFP4 = 4-bit mixed precision). Lower bit width = lower RAM, potentially slightly reduced quality.">mlx / 4bit</span>
+    <span class="px-2 py-1 rounded bg-stone-100 border border-stone-200 num"
+          data-tooltip="Maximum context length of the model in tokens (k = 1024). Inputs beyond this are truncated by the backend.">ctx 32k</span>
+      <span class="px-2 py-1 rounded bg-stone-100 border border-stone-200 num"
+            data-tooltip="Release date from the HuggingFace model card (createdAt).">released 2025-06-03</span>
+      <span class="px-2 py-1 rounded bg-amber-100 border border-amber-300 text-amber-900"
+            data-tooltip="Accepts images as input (VLM).">vision</span>
+  </div>
+</section>
+
+<div class="lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-8 lg:items-start">
+  <aside class="hidden lg:block sticky top-4 self-start">
+    <nav class="bg-white border border-stone-200 rounded-lg p-4 max-h-[calc(100vh-2rem)] overflow-y-auto">
+      <div class="text-xs uppercase tracking-wider text-stone-500">Model</div>
+      <div class="mt-1 text-sm font-semibold text-stone-900 break-all leading-snug num">google/gemma-3n-e4b</div>
+      <dl class="mt-3 grid grid-cols-2 gap-2 text-xs">
+        <div>
+          <dt class="text-stone-500">Peak RAM</dt>
+          <dd class="font-semibold text-stone-900 num">5.5 GB</dd>
+        </div>
+        <div>
+          <dt class="text-stone-500">Wall total</dt>
+          <dd class="font-semibold text-stone-900 num">1.1 min</dd>
+        </div>
+      </dl>
+      <div class="mt-4 pt-3 border-t border-stone-200 text-xs uppercase tracking-wider text-stone-500">Benchmarks</div>
+      <ul class="mt-2 space-y-0.5">
+          <li>
+            <a href="#coding" class="flex items-center justify-between gap-2 py-1.5 px-2 rounded hover:bg-stone-50 group">
+              <span class="text-sm text-stone-700 group-hover:text-stone-900 truncate">coding</span>
+              <span class="flex items-baseline gap-2 num shrink-0">
+                <span class="text-sm font-semibold text-amber-700">
+0.07
+                </span>
+                <span class="text-[10px] text-stone-400 w-10 text-right">40s</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="#vision" class="flex items-center justify-between gap-2 py-1.5 px-2 rounded hover:bg-stone-50 group">
+              <span class="text-sm text-stone-700 group-hover:text-stone-900 truncate">vision</span>
+              <span class="flex items-baseline gap-2 num shrink-0">
+                <span class="text-sm font-semibold text-emerald-700">
+0.81
+                </span>
+                <span class="text-[10px] text-stone-400 w-10 text-right">12s</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="#diagram_to_svg" class="flex items-center justify-between gap-2 py-1.5 px-2 rounded hover:bg-stone-50 group">
+              <span class="text-sm text-stone-700 group-hover:text-stone-900 truncate">diagram_to_svg</span>
+              <span class="flex items-baseline gap-2 num shrink-0">
+                <span class="text-sm font-semibold text-stone-400">
+—                </span>
+                <span class="text-[10px] text-stone-400 w-10 text-right">0s</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="#hallucination" class="flex items-center justify-between gap-2 py-1.5 px-2 rounded hover:bg-stone-50 group">
+              <span class="text-sm text-stone-700 group-hover:text-stone-900 truncate">hallucination</span>
+              <span class="flex items-baseline gap-2 num shrink-0">
+                <span class="text-sm font-semibold text-amber-700">
+0.50
+                </span>
+                <span class="text-[10px] text-stone-400 w-10 text-right">16s</span>
+              </span>
+            </a>
+          </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <div class="min-w-0">
+
+<section id="coding" class="mb-12 scroll-mt-24">
+  <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
+    <h2 class="text-lg font-medium tracking-tight">coding</h2>
+    <a href="../benchmarks/coding.html" class="text-xs text-stone-500 hover:text-stone-900">alle Modelle in diesem Bench →</a>
+  </div>
+
+
+  <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+    <div class="md:col-span-1 bg-white border-2 border-amber-400 rounded-lg p-5 flex flex-col justify-center">
+      <div class="text-xs uppercase tracking-wider text-stone-500">Score</div>
+      <div class="mt-1 text-5xl font-bold num leading-none text-amber-700">
+0.07
+      </div>
+        <div class="mt-3 grid grid-cols-3 gap-2 text-center">
+          <div class="rounded border border-stone-200 px-2 py-1.5">
+            <div class="text-[10px] uppercase tracking-wider text-stone-500">Statisch</div>
+            <div class="text-base font-bold num text-emerald-700">0.75</div>
+          </div>
+          <div class="rounded border border-stone-200 px-2 py-1.5">
+            <div class="text-[10px] uppercase tracking-wider text-stone-500">Funktional</div>
+            <div class="text-base font-bold num text-red-600">0.00</div>
+          </div>
+          <div class="rounded border border-stone-200 px-2 py-1.5">
+            <div class="text-[10px] uppercase tracking-wider text-stone-500">Qualitativ</div>
+            <div class="text-base font-bold num text-amber-700">0.04</div>
+          </div>
+        </div>
+    </div>
+    <div class="md:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">tok/s</dt>
+        <dd class="mt-1 text-xl font-semibold num">78</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Tokens</dt>
+        <dd class="mt-1 text-xl font-semibold num">2166</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Wall</dt>
+        <dd class="mt-1 text-xl font-semibold num">40.5 s</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">RAM</dt>
+        <dd class="mt-1 text-xl font-semibold num">5.5 GB</dd>
+      </div>
+    </div>
+  </div>
+
+    <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Worum geht es? Was wird getestet?
+      </summary>
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: From a ~200-word prompt the model must generate a fully functional Kanban board as a single-file HTML with drag &amp; drop, localStorage persistence, edit/delete and a confetti animation — in a single chat without iteration. The prompt also includes a small `data-testid` contract so a Playwright test can drive the app remotely.
+
+Three signals feed into the score:
+(1) Static — a linter checks concrete constraints in the HTML (columns, Tailwind, localStorage call, no framework, no window.alert/prompt, …).
+(2) Functional — Playwright runs a small CRUD sequence: create a card, delete a card with confirmation, reload — does state persist? — and checks whether any JS console errors occur during the entire flow. Drag &amp; drop and confetti are deliberately not tested functionally (too many implementation variants).
+(3) Qualitative — LLM-as-judge rates screenshot and code (visual + code quality + render↔code consistency).
+
+Score = mean over the available signals.
+
+Why models fail: reasoning models burn their tokens in thinking instead of writing. Sliding-window models (Gemma 4) lose the constraints at the start of the prompt. Small models (&lt;3B) often fail to produce coherent HTML — or ignore the data-testid contract, which makes the functional tests fail in droves.</div>
+    </details>
+
+    <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Prompt
+      </summary>
+      <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System-Prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">You are a careful front-end engineer.</pre>
+          </div>
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Developer-Prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">Create a fully functional Kanban board in a single HTML file using vanilla JavaScript (no frameworks like react).
+
+Requirements:
+- Columns: Backlog, In Progress, Review, Done.
+- Cards must be:
+  - draggable across columns,
+  - editable in place,
+  - persisted in localStorage (state survives reloads) - please use your own namespace,
+  - deletable with a confirmation prompt.
+- Each column provides an &#34;Add card&#34; action.
+- Style with Tailwind via CDN.
+- Add subtle CSS transitions and trigger a confetti animation when a card moves to &#34;Done&#34;.
+- Thoroughly comment the code.
+- dont use window.alert or window.prompt to add/edit/delete cards
+- if there are no cards yet, create some dummy cards
+- modern and vibrant design
+
+Stable test selectors (mandatory — these data-testid attributes are used by an automated functional test; do not omit, rename, or split them across multiple elements):
+- Column containers: data-testid=&#34;column-backlog&#34;, data-testid=&#34;column-in-progress&#34;, data-testid=&#34;column-review&#34;, data-testid=&#34;column-done&#34;.
+- Every &#34;Add card&#34; button (one per column): data-testid=&#34;add-card&#34;.
+- Every card element: data-testid=&#34;card&#34;.
+- Inside each card, the delete trigger: data-testid=&#34;delete-card&#34;.
+- The confirm button of the delete-confirmation dialog/modal: data-testid=&#34;confirm-delete&#34;.
+- The input/textarea where a new card title is typed: data-testid=&#34;card-input&#34;. Pressing Enter in this input MUST commit the new card.
+
+As answer return the plain HTML of the working application (script and styles included)</pre>
+          </div>
+      </div>
+    </details>
+
+        <a href="../assets/artifacts/google_gemma-3n-e4b/coding/output.html" target="_blank"
+           class="mt-5 block bg-emerald-600 hover:bg-emerald-700 text-white text-center font-semibold text-lg rounded px-6 py-5 shadow-sm transition">
+          ▶ Generierte App in neuem Tab öffnen ↗
+        </a>
+        <div class="mt-4 bg-white border border-stone-200 rounded">
+          <div class="px-4 py-2 border-b border-stone-200 text-sm font-medium">Screenshot der gerenderten App</div>
+          <div class="zoom-frame">
+            <button type="button" class="zoom-button" data-zoom-button aria-label="Screenshot vergrößern" title="Screenshot vergrößern">⛶</button>
+            <img src="../assets/artifacts/google_gemma-3n-e4b/coding/screenshot.png" class="zoomable block w-full max-h-[600px] object-contain bg-stone-50 cursor-zoom-in" alt="Screenshot der gerenderten App">
+          </div>
+        </div>
+
+      <div class="mt-5 bg-amber-50 border border-amber-200 rounded">
+        <div class="px-4 py-3 border-b border-amber-200 flex items-baseline justify-between">
+          <div>
+            <span class="text-xs uppercase tracking-wider text-amber-700">Qualitativ · LLM-as-Judge (openai/gpt-5.4)</span>
+            <span class="ml-3 text-xs text-stone-500 num">2026-04-29T15:24:32.749828+00:00</span>
+          </div>
+          <div class="text-3xl font-bold num text-amber-700">0.04</div>
+        </div>
+        <div class="px-4 py-3 border-b border-amber-200">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Visuell (Screenshot)</div>
+          <ul class="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs">
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">board renders</div>
+                  <div class="text-base font-bold num text-red-600">0.00</div>
+                </li>
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">column completeness</div>
+                  <div class="text-base font-bold num text-red-600">0.00</div>
+                </li>
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">cards present</div>
+                  <div class="text-base font-bold num text-red-600">0.00</div>
+                </li>
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">ui affordances</div>
+                  <div class="text-base font-bold num text-red-600">0.00</div>
+                </li>
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">design quality</div>
+                  <div class="text-base font-bold num text-red-600">0.00</div>
+                </li>
+          </ul>
+<div class="mt-3 text-sm text-stone-700">Der Screenshot ist komplett weiß; es ist weder ein Kanban-Board noch irgendein Header, Spaltenlayout oder Karte sichtbar. Damit ist das Rendering visuell ein Totalausfall.</div>        </div>
+        <div class="px-4 py-3 border-b border-amber-200">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Code-Qualität (HTML/JS)</div>
+          <ul class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">code structure</div>
+                  <div class="text-base font-bold num text-amber-700">0.20</div>
+                </li>
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">dom safety</div>
+                  <div class="text-base font-bold num text-red-600">0.00</div>
+                </li>
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">robustness</div>
+                  <div class="text-base font-bold num text-amber-700">0.10</div>
+                </li>
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">code quality</div>
+                  <div class="text-base font-bold num text-amber-700">0.10</div>
+                </li>
+          </ul>
+<div class="mt-3 text-sm text-stone-700">Der Code enthält grobe HTML- und JS-Fehler: kaputte Attribute/Quotes, falsches Grid für nur drei Spalten trotz vier Columns, fehlerhafte Datenzugriffe und Render-Logik, sowie unsicheres innerHTML mit Nutzereingaben. Strukturansätze sind erkennbar, aber die Implementierung ist insgesamt stark fehlerhaft und kaum lauffähig.</div>        </div>
+          <div class="px-4 py-3">
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2 flex items-baseline justify-between">
+              <span>Konsistenz Render ↔ Code</span>
+              <span class="text-base font-bold num text-red-600">0.00</span>
+            </div>
+<div class="text-sm text-stone-700">Code und Render passen nur insofern zusammen, als der fehlerhafte Code plausibel zu einer leeren weißen Seite führt. Das im Code beabsichtigte Board mit vier Spalten wird zur Laufzeit offensichtlich nicht erfolgreich erzeugt.</div>          </div>
+      </div>
+
+      <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+        <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+          Statisch · Linter-Checks (9/12 bestanden)
+        </summary>
+        <div class="px-4 py-3 border-t border-stone-200 bg-white rounded-b">
+          <ul class="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Spalte &#39;Backlog&#39;</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Spalte &#39;In Progress&#39;</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Spalte &#39;Review&#39;</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Spalte &#39;Done&#39;</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-red-600">✗</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">HTML5 Drag&amp;Drop oder Sortable-Lib</div>
+<div class="text-xs text-stone-500 mt-0.5">kein draggable / dragstart / sortable.js gefunden</div>                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">localStorage-Persistenz</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-red-600">✗</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Tailwind via CDN</div>
+<div class="text-xs text-stone-500 mt-0.5">tailwindcss CDN nicht eingebunden</div>                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Confetti-Animation auf &#39;Done&#39;</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Add-Card-Button</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Vanilla JS (kein React/Vue/Angular/Svelte)</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Keine window.alert/prompt für CRUD</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-red-600">✗</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Editierbare Karten (contenteditable / input)</div>
+<div class="text-xs text-stone-500 mt-0.5">kein contenteditable / input gefunden</div>                </div>
+              </li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+        <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+          Funktional · E2E-Tests (0/6 bestanden)
+        </summary>
+        <div class="px-4 py-3 border-t border-stone-200 bg-white rounded-b">
+          <ul class="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-red-600">✗</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Seite lädt mit allen 4 Spalten</div>
+<div class="text-xs text-stone-500 mt-0.5 font-mono break-all">fehlende Spalten: [&#39;backlog&#39;, &#39;in-progress&#39;, &#39;review&#39;, &#39;done&#39;]</div>                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-red-600">✗</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Karte hinzufügen via Button</div>
+<div class="text-xs text-stone-500 mt-0.5 font-mono break-all">kein [data-testid=&#34;add-card&#34;] gefunden</div>                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-red-600">✗</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Karte wird genau 1× angelegt (kein Doppel-Submit)</div>
+<div class="text-xs text-stone-500 mt-0.5 font-mono break-all">übersprungen — Add-Flow ist gescheitert</div>                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-red-600">✗</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Karte löschen via Button + Bestätigung</div>
+<div class="text-xs text-stone-500 mt-0.5 font-mono break-all">keine Karten zum Löschen vorhanden</div>                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-red-600">✗</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Karten überleben einen Reload</div>
+<div class="text-xs text-stone-500 mt-0.5 font-mono break-all">Page.wait_for_selector: Timeout 2000ms exceeded.
+Call log:
+  - waiting for locator(&#34;[data-testid=\&#34;column-backlog\&#34;]&#34;) to be visible
+</div>                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-red-600">✗</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Keine JS-Konsolen-Fehler</div>
+<div class="text-xs text-stone-500 mt-0.5 font-mono break-all">pageerror: columns.forEach is not a function; pageerror: columns.forEach is not a function</div>                </div>
+              </li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+        <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+          Roh-Antwort des Modells
+        </summary>
+        <pre class="px-4 py-3 text-xs bg-white whitespace-pre-wrap border-t border-stone-200 rounded-b overflow-x-auto">```html
+&lt;!DOCTYPE html&gt;
+&lt;html lang=&#34;en&#34;&gt;
+&lt;head&gt;
+    &lt;meta charset=&#34;UTF-8&#34;&gt;
+    &lt;meta name=&#34;viewport&#34; content=&#34;width=device-width, initial-scale=1.0&#34;&gt;
+    &lt;title&gt;VanillaJS Kanban Board&lt;/title&gt;
+    &lt;link href=&#34;https://cdn.jsdelivr.net/tailwind/latest/tailwind.css&#34; rel=&#34;stylesheet&#34;&gt;
+    &lt;style&gt;
+        /* Add some subtle transitions */
+        .card {
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .card.dragging {
+            opacity: 0.7;
+            transform: translate(-10px, -10px); /* Adjust as needed */
+        }
+
+        .card.drop-target {
+            border: 2px dashed #3490f6; /* Indicate drop target */
+        }
+
+        /* Confetti animation styles (optional) */
+        .confetti {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .confetti.active {
+            opacity: 1;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+    &lt;div id=&#34;kanban-board&#34; class=&#34;container mx-auto py-10&#34;&gt;
+
+        &lt;!-- Columns --&gt;
+        &lt;div class=&#34;grid grid-cols-1 md:grid-cols-3 gap-6&#34;&gt;
+            &lt;div data-testid=&#34;column-backlog&#34; class=&#34;bg-white rounded shadow p-6 data-testid=&#34;column-backlog&#34;&gt;
+                &lt;h2 class=&#34;text-2xl font-bold text-gray-800 mb-4&#34;&gt;Backlog&lt;/h2&gt;
+
+                &lt;!-- Add Card Button --&gt;
+                &lt;button data-testid=&#34;add-card&#34; class=&#34;bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md mt-4&#34; onclick=&#34;addCard(&#39;Backlog&#39;)&#34;&gt;Add Card&lt;/button&gt;
+
+                &lt;!-- Dummy Cards (if no cards exist) --&gt;
+                &lt;div id=&#34;dummy-backlog&#34; class=&#34;cards&#34;&gt;
+                    &lt;!-- Example dummy cards --&gt;
+                    &lt;div class=&#34;card data-testid=&#34;card&#34;&gt;
+                        &lt;h3 class=&#34;text-xl font-semibold&#34;&gt;Task 1&lt;/h3&gt;
+                        &lt;p&gt;Description of task 1.&lt;/p&gt;
+                        &lt;button data-testid=&#34;delete-card&#34; class=&#34;bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md&#34; onclick=&#34;deleteCard(this)&#34;&gt;Delete&lt;/button&gt;
+      </pre>
+      </details>
+
+
+    <div class="mt-4 text-xs text-stone-500">
+      Artefakte:
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-3n-e4b/coding/output.html" target="_blank">Generierte App</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-3n-e4b/coding/raw_response.txt" target="_blank">Roh-Antwort des Modells</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-3n-e4b/coding/screenshot.png" target="_blank">Screenshot der gerenderten App</a>
+    </div>
+</section>
+<section id="vision" class="mb-12 scroll-mt-24">
+  <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
+    <h2 class="text-lg font-medium tracking-tight">vision</h2>
+    <a href="../benchmarks/vision.html" class="text-xs text-stone-500 hover:text-stone-900">alle Modelle in diesem Bench →</a>
+  </div>
+
+
+  <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+    <div class="md:col-span-1 bg-white border-2 border-emerald-500 rounded-lg p-5 flex flex-col justify-center">
+      <div class="text-xs uppercase tracking-wider text-stone-500">Score</div>
+      <div class="mt-1 text-5xl font-bold num leading-none text-emerald-700">
+0.81
+      </div>
+    </div>
+    <div class="md:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">tok/s</dt>
+        <dd class="mt-1 text-xl font-semibold num">80</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Tokens</dt>
+        <dd class="mt-1 text-xl font-semibold num">800</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Wall</dt>
+        <dd class="mt-1 text-xl font-semibold num">11.9 s</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">RAM</dt>
+        <dd class="mt-1 text-xl font-semibold num">—</dd>
+      </div>
+    </div>
+  </div>
+
+    <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Worum geht es? Was wird getestet?
+      </summary>
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: Four sub-tasks, 1 image each. (1) handwritten meeting note easy/medium/hard to read — model must transcribe the text. (2) book page in Fraktur typeface — same task.
+
+What is tested: OCR quality, recognising layout structure (columns, bullet points, dates), handling of illegible handwriting.
+
+Why models fail: text-only models have no vision capability (filtered out). Weak VLMs only recognise the clearest part. Some truncate output or get stuck in reasoning without a visible answer.</div>
+    </details>
+
+    <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Prompt
+      </summary>
+      <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System-Prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">Du bist OCR-Spezialist für deutsche Handschrift.</pre>
+          </div>
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Developer-Prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">Auf dem Bild siehst du eine handschriftliche Meeting-Notiz mit klarer Struktur und gut lesbarer Schrift. Transkribiere den gesamten lesbaren Text. Behalte die Anordnung bei (Überschrift, Spalten, To-Dos). Bei unleserlichen Stellen schreibe &#39;[unleserlich]&#39;. Gib ausschließlich den puren OCR-Text im Markdown-Format zurück — keine Vorbemerkung, keine Erklärungen, kein Code-Fence.</pre>
+          </div>
+      </div>
+    </details>
+
+      <div class="mt-5 bg-white border border-stone-200 rounded overflow-hidden">
+        <div class="px-4 py-3 border-b border-stone-200 flex items-center justify-between bg-stone-50 gap-3 flex-wrap">
+          <div>
+            <span class="font-medium">Handschrift OCR – leicht</span>
+            <span class="ml-3 text-xs text-stone-500 num">
+2.8 s · 80 t/s            </span>
+          </div>
+          <div class="flex items-center gap-4 num">
+              <div class="text-xs">
+                <span class="text-stone-500">Recall</span>
+                <span class="font-bold text-base text-emerald-700">83%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">Precision</span>
+                <span class="font-bold text-base text-emerald-700">94%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">64/77</span>
+                <span class="text-amber-600">+4</span>
+              </div>
+                <div class="text-xs text-stone-500">
+<span class="text-sky-700">11 verschoben</span> · <span class="text-violet-700">1 ähnlich</span>                </div>
+            <div class="text-3xl font-bold num leading-none text-emerald-700">
+0.88            </div>
+          </div>
+        </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
+            <div class="p-3 bg-stone-50 grid grid-cols-1 gap-2">
+                <div class="zoom-frame">
+                  <button type="button" class="zoom-button" data-zoom-button aria-label="Bild vergrößern" title="Bild vergrößern">⛶</button>
+                  <img src="../assets/artifacts/google_gemma-3n-e4b/vision/handwriting_easy.jpg"
+                       class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded cursor-zoom-in"
+                       loading="lazy">
+                </div>
+            </div>
+            <div>
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider">Modell-Antwort</div>
+              <pre class="p-4 text-sm whitespace-pre-wrap max-h-[600px] overflow-y-auto">Meetingnotizen Webseite - Relaunch
+
+12.06.25, 09:30 Uhr
+
+Anwesend: Anna, Ben, Mira, Jonas, Ece
+
+Themen:
+- Startseite
+- Texte
+- Bildauswahl
+- Launch-Termin
+- offene Fragen
+
+To-Dos:
+Ben → Bilder anfragen
+Mira → Startseite anpassen
+Jonas → Feedback Kunde
+Anna → SEO-Check
+
+Stand:
+- Design fast final ✓
+- Bilder vom Team noch nicht komplett
+- Mobile Ansicht prüfen
+
+Offen:
+- Rechtstexte final?
+- Freigabe Kunde bis Freitag
+- Wer testet Kontaktformular?
+
+Nächstes Meeting: 17.06., 10 Uhr
+
+CMS langsam?</pre>
+            </div>
+          </div>
+
+            <div class="border-t border-stone-200 bg-white">
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider flex items-center justify-between">
+                <span>Word-Diff Ground-Truth ↔ Modell</span>
+                <span class="num">
+                  <span class="text-emerald-700">●</span> matched ·
+                  <span class="text-sky-700">●</span> verschoben ·
+                  <span class="text-violet-700">●</span> ähnlich ·
+                  <span class="text-red-600">●</span> fehlt im Modell ·
+                  <span class="text-amber-600">●</span> extra/falsch
+                </span>
+              </div>
+              <div class="p-4 text-sm leading-relaxed font-mono">
+<span class="text-stone-700">meetingnotizen</span>
+<span class="bg-violet-50 text-violet-700 px-0.5 rounded">website ≈ webseite</span>
+<span class="text-stone-700">relaunch 12 06 25 09 30 uhr anwesend anna ben mira jonas ece</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">cms</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">langsam</span>
+<span class="text-stone-700">themen startseite texte bildauswahl launch termin offene fragen</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">stand design fast final</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">texte für über uns fehlen noch</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">bilder</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">vom</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">team</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">noch nicht</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">komplett mobile ansicht prüfen</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">bitte kurz halten</span>
+<span class="text-stone-700">to dos ben bilder anfragen mira startseite anpassen jonas feedback kunde anna seo check</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">vom noch nicht</span>
+<span class="text-stone-700">offen rechtstexte final freigabe kunde bis freitag wer testet kontaktformular nächstes meeting 17 06 10 uhr</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">cms</span>
+              </div>
+              <details class="border-t border-stone-100">
+                <summary class="cursor-pointer px-4 py-2 text-xs text-stone-500 hover:text-stone-900">Ground Truth (zum Vergleich)</summary>
+                <pre class="p-4 text-xs bg-stone-50 whitespace-pre-wrap">Meetingnotizen Website-Relaunch
+12.06.25, 09:30 Uhr
+
+Anwesend:
+Anna, Ben, Mira, Jonas, Ece
+
+CMS langsam?
+
+Themen:
+Startseite
+Texte
+Bildauswahl
+Launch-Termin
+offene Fragen
+
+Stand:
+Design fast final
+Texte für Über-uns fehlen noch
+Bilder vom Team noch nicht komplett
+Mobile Ansicht prüfen
+
+bitte kurz halten
+
+To-Dos:
+Ben Bilder anfragen
+Mira Startseite anpassen
+Jonas Feedback Kunde
+Anna SEO-Check
+
+Offen:
+Rechtstexte final?
+Freigabe Kunde bis Freitag
+Wer testet Kontaktformular?
+
+Nächstes Meeting: 17.06., 10 Uhr</pre>
+              </details>
+            </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded overflow-hidden">
+        <div class="px-4 py-3 border-b border-stone-200 flex items-center justify-between bg-stone-50 gap-3 flex-wrap">
+          <div>
+            <span class="font-medium">Handschrift OCR – mittel</span>
+            <span class="ml-3 text-xs text-stone-500 num">
+4.0 s · 80 t/s            </span>
+          </div>
+          <div class="flex items-center gap-4 num">
+              <div class="text-xs">
+                <span class="text-stone-500">Recall</span>
+                <span class="font-bold text-base text-emerald-700">76%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">Precision</span>
+                <span class="font-bold text-base text-emerald-700">90%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">103/136</span>
+                <span class="text-amber-600">+12</span>
+              </div>
+                <div class="text-xs text-stone-500">
+<span class="text-sky-700">26 verschoben</span> · <span class="text-violet-700">1 ähnlich</span>                </div>
+            <div class="text-3xl font-bold num leading-none text-emerald-700">
+0.82            </div>
+          </div>
+        </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
+            <div class="p-3 bg-stone-50 grid grid-cols-1 gap-2">
+                <div class="zoom-frame">
+                  <button type="button" class="zoom-button" data-zoom-button aria-label="Bild vergrößern" title="Bild vergrößern">⛶</button>
+                  <img src="../assets/artifacts/google_gemma-3n-e4b/vision/handwriting_medium.jpg"
+                       class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded cursor-zoom-in"
+                       loading="lazy">
+                </div>
+            </div>
+            <div>
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider">Modell-Antwort</div>
+              <pre class="p-4 text-sm whitespace-pre-wrap max-h-[600px] overflow-y-auto">Meetingprotokoll
+
+21.05.25, 11 Uhr
+
+Teilnehmer: M. Schule, T. Wagner, L. Becker, S. Klein (Später), H. J.
+
+Themen:
+- Projektstatus: Update
+- Budget -&gt; ist zu hoch
+- Timeline / Meilenstein
+- Risiken
+
+Projektstatus:
+- Modul A fertig (Team S.)
+- Modul B vorliegt (hoffentlich)
+- Testphase startet nächste Woche (hoffentlich)
+
+Offene Punkte:
+Ursache: 20% über Plan
+- Freigabe von Kunde fehlt noch
+- unklare Anforderungen nächste Mail genauer notieren
+Schulung für neues Tool?
+
+T.W.: Budget-Report -&gt; 28.05.
+- Schnittstelle zum System X unklar -&gt; Rücksprache mit IT
+- L.B.: Kunden ansprechen wg. Feedback
+- Errat: Dokumentation aktualisieren
+
+Rückfragen:
+Wie gehen wir mit dem Risiko um?
+Priorisierung der Features nochmal prüfen
+
+Nächstes Meeting: 04.06.25, 10 Uhr (Raum 2.15?)
+
+Bitte Report bis 28.05.</pre>
+            </div>
+          </div>
+
+            <div class="border-t border-stone-200 bg-white">
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider flex items-center justify-between">
+                <span>Word-Diff Ground-Truth ↔ Modell</span>
+                <span class="num">
+                  <span class="text-emerald-700">●</span> matched ·
+                  <span class="text-sky-700">●</span> verschoben ·
+                  <span class="text-violet-700">●</span> ähnlich ·
+                  <span class="text-red-600">●</span> fehlt im Modell ·
+                  <span class="text-amber-600">●</span> extra/falsch
+                </span>
+              </div>
+              <div class="p-4 text-sm leading-relaxed font-mono">
+<span class="text-stone-700">meetingprotokoll 21 05 25 11 uhr teilnehmer m</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">schulz</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">schule</span>
+<span class="text-stone-700">t wagner l becker s klein später h</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">jt</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">j</span>
+<span class="text-stone-700">themen projektstatus update budget ist zu hoch timeline meilenstein risiken projektstatus modul a fertig team s modul b</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">verzögert sich</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">vorliegt hoffentlich</span>
+<span class="text-stone-700">testphase startet nächste woche hoffentlich</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">kundenfeedback steht noch aus details in jira</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">budget</span>
+<span class="text-stone-700">20 über plan</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">ursache unklare anforderungen</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">nachbessern nötig</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">nächstes</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">mal</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">genauer</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">kalkulieren</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">bitte report</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">bis</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">28 05 offene punkte</span>
+<span class="text-stone-700">freigabe von kunde fehlt noch</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">mail notieren für</span>
+<span class="text-stone-700">t w</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">kümmert sich</span>
+<span class="text-stone-700">schnittstelle</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">zu</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">zum</span>
+<span class="text-stone-700">system x unklar rücksprache mit it</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">schulung</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">für</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">neues tool</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">noch nicht geplant wer macht das to dos t w budget</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">report 28 05</span>
+<span class="text-stone-700">l b kunden</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">anstupsen</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">ansprechen</span>
+<span class="text-stone-700">wg feedback</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">errat</span>
+<span class="text-stone-700">dokumentation aktualisieren</span>
+<span class="bg-violet-50 text-violet-700 px-0.5 rounded">nächstes ≈ nächste</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">meeting 04 06 25 10</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">uhr</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">raum 2 15</span>
+<span class="text-stone-700">rückfragen wie gehen wir mit dem risiko um priorisierung der features nochmal prüfen</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">uhr bis</span>
+              </div>
+              <details class="border-t border-stone-100">
+                <summary class="cursor-pointer px-4 py-2 text-xs text-stone-500 hover:text-stone-900">Ground Truth (zum Vergleich)</summary>
+                <pre class="p-4 text-xs bg-stone-50 whitespace-pre-wrap">Meetingprotokoll
+21.05.25
+11 Uhr
+
+Teilnehmer: M. Schulz, T. Wagner, L. Becker, S. Klein (später), H. Jt.
+
+Themen:
+Projektstatus / Update
+Budget — ist zu hoch
+Timeline / Meilenstein!
+Risiken
+
+Projektstatus:
+Modul A fertig (Team S.)
+Modul B verzögert sich
+Testphase startet nächste Woche (hoffentlich)
+Kundenfeedback steht noch aus
+
+Details in Jira
+
+Budget:
+20% über Plan
+Ursache: unklare Anforderungen
+Nachbessern nötig
+nächstes Mal genauer kalkulieren
+
+bitte Report bis 28.05.
+
+Offene Punkte:
+Freigabe von Kunde fehlt noch (T.W. kümmert sich)
+Schnittstelle zu System X unklar — Rücksprache mit IT
+Schulung für neues Tool? noch nicht geplant — wer macht das?
+
+To-Dos:
+T.W.: Budget-Report — 28.05.
+L.B.: Kunden anstupsen wg. Feedback
+Dokumentation aktualisieren
+
+Nächstes Meeting: 04.06.25, 10 Uhr (Raum 2.15?)
+
+Rückfragen:
+Wie gehen wir mit dem Risiko um?
+Priorisierung der Features nochmal prüfen
+...</pre>
+              </details>
+            </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded overflow-hidden">
+        <div class="px-4 py-3 border-b border-stone-200 flex items-center justify-between bg-stone-50 gap-3 flex-wrap">
+          <div>
+            <span class="font-medium">Handschrift OCR – schwer</span>
+            <span class="ml-3 text-xs text-stone-500 num">
+5.1 s · 80 t/s            </span>
+          </div>
+          <div class="flex items-center gap-4 num">
+              <div class="text-xs">
+                <span class="text-stone-500">Recall</span>
+                <span class="font-bold text-base text-emerald-700">68%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">Precision</span>
+                <span class="font-bold text-base text-emerald-700">76%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">100/148</span>
+                <span class="text-amber-600">+31</span>
+              </div>
+                <div class="text-xs text-stone-500">
+<span class="text-sky-700">26 verschoben</span> · <span class="text-violet-700">3 ähnlich</span>                </div>
+            <div class="text-3xl font-bold num leading-none text-emerald-700">
+0.72            </div>
+          </div>
+        </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
+            <div class="p-3 bg-stone-50 grid grid-cols-1 gap-2">
+                <div class="zoom-frame">
+                  <button type="button" class="zoom-button" data-zoom-button aria-label="Bild vergrößern" title="Bild vergrößern">⛶</button>
+                  <img src="../assets/artifacts/google_gemma-3n-e4b/vision/handwriting_hard.jpg"
+                       class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded cursor-zoom-in"
+                       loading="lazy">
+                </div>
+            </div>
+            <div>
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider">Modell-Antwort</div>
+              <pre class="p-4 text-sm whitespace-pre-wrap max-h-[600px] overflow-y-auto">Besprechung Sommerfest
+
+23.05.24 10:15 Uhr (Konf.)
+
+Teilnehmer: Max, Jule, Tobi, Leni, Simon (konnte nur kurz)
+
+Ort? Park am See ? [unleserlich]
+- Park am See ?
+- Gardehung?
+- Firmenhof / Terrasse
+- Terrasse reservieren ??
+
+Essen / Trinken:
+- Grillen evtl.
+- vegetarische Optionen vergessen?
+- Bier, Getränke, Wasser, was noch?
+
+Musik:
+- Musibox organisieren
+- Getränke Idee? Requisiten?
+- Playlist?
+
+Spiele / Programm:
+- Volleyball / Federball
+- evtl. Cornhole oder Wikingschach?
+- Fotoecke Idee? Requisiten?
+
+Einladung:
+- Einladung bis Ende Woche raus?
+- Text: Leni ?
+- Liste an Simon
+- Versand: Jule
+
+Ziel: entspanntes Beisammensein &amp; Spaß haben
+
+wer macht das?
+Leni ?
+Tobi fragen)
+
+Grill wer?
+
+Dekoration:
+- Unnichtig?
+- evtl. Liefelhows? Nee
+- Plan B: Kaustine zu teuer
+
+Backup:
+Max hat einen?
+Zeit machen ?
+
+Chef fragen!!
+
+Nächster Termin: Do, 30.05.
+11 Uhr
+Kurses Update
+
+Budget: ca. 150€ ??
+Kosten noch offen?
+
+Offene Fragen:
+- Wer grillt? (muss jemand schulden haben?)
+- Grill / Reinigung klären ?</pre>
+            </div>
+          </div>
+
+            <div class="border-t border-stone-200 bg-white">
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider flex items-center justify-between">
+                <span>Word-Diff Ground-Truth ↔ Modell</span>
+                <span class="num">
+                  <span class="text-emerald-700">●</span> matched ·
+                  <span class="text-sky-700">●</span> verschoben ·
+                  <span class="text-violet-700">●</span> ähnlich ·
+                  <span class="text-red-600">●</span> fehlt im Modell ·
+                  <span class="text-amber-600">●</span> extra/falsch
+                </span>
+              </div>
+              <div class="p-4 text-sm leading-relaxed font-mono">
+<span class="text-stone-700">besprechung sommerfest 23 05 24 10 15 uhr</span>
+<span class="bg-violet-50 text-violet-700 px-0.5 rounded">konfi ≈ konf</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">chef fragen</span>
+<span class="text-stone-700">teilnehmer max jule tobi leni simon konnte nur kurz</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">ziel entspanntes beisammensein spaß</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">haben</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">nächster termin</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">do</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">30 05 11</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">uhr kurzes</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">update</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">an hr schicken</span>
+<span class="text-stone-700">ort park am see</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">genehmigung</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">unleserlich am see gardehung</span>
+<span class="text-stone-700">firmenhof terrasse terrasse reservieren</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">wer</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">macht</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">das</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">leni</span>
+<span class="text-stone-700">essen trinken grillen evtl vegetarische optionen vergessen</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">getränkeliste</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">machen</span>
+<span class="text-stone-700">bier</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">limo</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">getränke</span>
+<span class="text-stone-700">wasser was noch</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">aperol zu</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">teuer grill</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">wer</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">tobi fragen</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">kuchen jule macht was wetter</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">backup</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">pavillon wer bringt mit max hat einen zelt mieten zu teuer</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">plan</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">b kantine</span>
+<span class="text-stone-700">musik</span>
+<span class="bg-violet-50 text-violet-700 px-0.5 rounded">musikbox ≈ musibox</span>
+<span class="text-stone-700">organisieren</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">getränke idee requisiten</span>
+<span class="text-stone-700">playlist</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">deko unnötig</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">evtl</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">luftballons neee</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">budget</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">ca 15 p p</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">kosten</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">noch</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">offen</span>
+<span class="text-stone-700">spiele programm volleyball federball evtl cornhole oder</span>
+<span class="bg-violet-50 text-violet-700 px-0.5 rounded">wikingerschach ≈ wikingschach</span>
+<span class="text-stone-700">fotoecke idee requisiten einladung einladung bis ende woche raus text leni liste an simon versand jule</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">haben wer das wer dekoration unnichtig liefelhows nee b kaustine zu max hat einen zeit do uhr kurses ca 150 noch</span>
+<span class="text-stone-700">offene fragen wer grillt muss jemand</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">schulung</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">schulden</span>
+<span class="text-stone-700">haben</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">gibt s strom im</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">park</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">müll</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">grill</span>
+<span class="text-stone-700">reinigung klären</span>
+              </div>
+              <details class="border-t border-stone-100">
+                <summary class="cursor-pointer px-4 py-2 text-xs text-stone-500 hover:text-stone-900">Ground Truth (zum Vergleich)</summary>
+                <pre class="p-4 text-xs bg-stone-50 whitespace-pre-wrap">Besprechung Sommerfest
+23.05.24 10:15 Uhr (Konfi)
+
+Chef fragen!!
+
+Teilnehmer:
+Max
+Jule
+Tobi
+Leni
+Simon (konnte nur kurz)
+
+Ziel: entspanntes Beisammensein &amp; Spaß haben
+
+Nächster Termin:
+Do, 30.05.
+11 Uhr
+kurzes Update
+an HR schicken
+
+Ort?:
+Park am See?
+Genehmigung?
+Firmenhof / Terrasse?
+Terrasse reservieren?? — wer macht das? Leni?
+
+Essen / Trinken:
+Grillen evtl.
+vegetarische Optionen vergessen?
+Getränkeliste machen!
+Bier, Limo, Wasser, was noch? (Aperol? zu teuer?)
+Grill wer? (Tobi fragen)
+Kuchen? Jule macht was
+
+Wetter / Backup:
+Pavillon? Wer bringt mit?
+Max hat einen?
+Zelt mieten → zu teuer
+Plan B: Kantine?
+
+Musik:
+Musikbox organisieren
+Playlist?
+
+Deko:
+unnötig?
+evtl. Luftballons? neee
+
+Budget:
+ca. 15€ p.P.?
+Kosten noch offen!
+
+Spiele / Programm:
+Volleyball / Federball
+evtl. Cornhole oder Wikingerschach?
+Fotoecke Idee? Requisiten?
+
+Einladung:
+Einladung bis Ende Woche raus!
+Text: Leni?
+Liste an Simon
+Versand: Jule
+
+Offene Fragen:
+Wer grillt? (muss jemand Schulung haben?)
+Gibt&#39;s Strom im Park?
+Müll / Reinigung klären</pre>
+              </details>
+            </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded overflow-hidden">
+        <div class="px-4 py-3 border-b border-stone-200 flex items-center justify-between bg-stone-50 gap-3 flex-wrap">
+          <div>
+            <span class="font-medium">Fraktur OCR</span>
+            <span class="ml-3 text-xs text-stone-500 num">
+            </span>
+          </div>
+          <div class="flex items-center gap-4 num">
+              <div class="text-xs">
+                <span class="text-stone-500">Recall</span>
+                <span class="font-bold text-base text-emerald-700">0%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">Precision</span>
+                <span class="font-bold text-base text-emerald-700">0%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">0/382</span>
+                <span class="text-amber-600">+0</span>
+              </div>
+            <div class="text-3xl font-bold num leading-none text-red-600">
+—            </div>
+          </div>
+        </div>
+          <div class="px-4 py-3 text-sm text-red-600">Client error &#39;400 Bad Request&#39; for url &#39;http://127.0.0.1:1234/api/v0/chat/completions&#39;
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400</div>
+      </div>
+
+
+    <div class="mt-4 text-xs text-stone-500">
+      Artefakte:
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-3n-e4b/vision/handwriting_easy.txt" target="_blank">Handschrift OCR – leicht – Antwort</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-3n-e4b/vision/handwriting_easy.jpg" target="_blank">Handschrift OCR – leicht – Bild</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-3n-e4b/vision/handwriting_medium.txt" target="_blank">Handschrift OCR – mittel – Antwort</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-3n-e4b/vision/handwriting_medium.jpg" target="_blank">Handschrift OCR – mittel – Bild</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-3n-e4b/vision/handwriting_hard.txt" target="_blank">Handschrift OCR – schwer – Antwort</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-3n-e4b/vision/handwriting_hard.jpg" target="_blank">Handschrift OCR – schwer – Bild</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-3n-e4b/vision/fraktur_ocr.txt" target="_blank">Fraktur OCR – Antwort</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-3n-e4b/vision/fraktur_innerpage.jpg" target="_blank">Fraktur OCR – Bild</a>
+    </div>
+</section>
+<section id="diagram_to_svg" class="mb-12 scroll-mt-24">
+  <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
+    <h2 class="text-lg font-medium tracking-tight">diagram_to_svg</h2>
+    <a href="../benchmarks/diagram_to_svg.html" class="text-xs text-stone-500 hover:text-stone-900">alle Modelle in diesem Bench →</a>
+  </div>
+
+
+  <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+    <div class="md:col-span-1 bg-white border-2 border-stone-300 rounded-lg p-5 flex flex-col justify-center">
+      <div class="text-xs uppercase tracking-wider text-stone-500">Score</div>
+      <div class="mt-1 text-5xl font-bold num leading-none text-stone-400">
+—      </div>
+    </div>
+    <div class="md:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">tok/s</dt>
+        <dd class="mt-1 text-xl font-semibold num">0</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Tokens</dt>
+        <dd class="mt-1 text-xl font-semibold num">—</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Wall</dt>
+        <dd class="mt-1 text-xl font-semibold num">0.0 s</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">RAM</dt>
+        <dd class="mt-1 text-xl font-semibold num">—</dd>
+      </div>
+    </div>
+  </div>
+
+    <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Worum geht es? Was wird getestet?
+      </summary>
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: Photo of a hand-drawn diagram (architecture, sequence, quadrant matrix) → model must produce an inline-SVG representation of the same diagram.
+
+Two score signals:
+(1) Deterministic — SVG is parseable, has an &lt;svg&gt; root, enough elements and at least one &lt;text&gt;; all expected terms (boxes, labels) appear in the text content. Validity and term coverage each count for 15% of the final score.
+(2) Qualitative — the `diagram-svg-judge` skill screenshots the SVG and visually compares it to the original along fixed axes (completeness, connections, arrow direction, grouping, layout readability, diagram-type fidelity, aesthetics). The judge counts 70%; aesthetics is double-weighted within the judge.
+
+Why models fail: SVG generation requires spatial reasoning (positioning boxes, computing paths, setting viewBox) — noticeably harder than declarative Mermaid syntax. Weak VLMs often produce only an empty &lt;svg&gt; or an element salad without topology.</div>
+    </details>
+
+    <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Prompt
+      </summary>
+      <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System-Prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">Du bist Spezialist für Diagramm-Erkennung und SVG. Du gibst sauberes, parsbares SVG zurück, das jeder Browser ohne externe Ressourcen rendern kann.</pre>
+          </div>
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Developer-Prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">Auf dem Bild siehst du ein Diagramm (Architektur, Flowchart, Sequenz, Quadrant o.ä.). Erstelle eine SVG-Repräsentation des Diagramms.
+
+Anforderungen:
+- Antworte ausschließlich mit dem rohen SVG-Code, beginnend mit &lt;svg ...&gt; und endend mit &lt;/svg&gt;. Keine Erklärungen, keine Markdown-Fences.
+- Setze ein viewBox-Attribut (z.B. viewBox=&#34;0 0 1200 800&#34;), damit das Bild skaliert.
+- Nur Inline-Inhalt, keine externen Referenzen (kein &lt;image href&gt;, kein @import, kein xlink:href auf URLs).
+- Alle im Diagramm sichtbaren Beschriftungen müssen als &lt;text&gt;-Elemente vorhanden und lesbar (Font-Size ≥ 12) sein.
+- Verbindungen als &lt;line&gt;, &lt;polyline&gt; oder &lt;path&gt; mit deutlichem stroke. Pfeilspitzen via &lt;marker&gt;.
+- Gruppiere zusammengehörige Teile mit &lt;g&gt;-Tags und sinnvollen id-Attributen.
+- Wähle ausreichend Kontrast: dunkler Stroke auf weißem/hellem Hintergrund.
+- Vermeide Überlappungen — plane das Layout so, dass Boxen nicht über Pfeilen liegen und Texte nicht aus ihren Boxen herausragen.
+- Behalte die Struktur des Originals bei: Anzahl der Boxen, ihre Verbindungen und ihre Anordnung sollen vergleichbar sein.</pre>
+          </div>
+      </div>
+    </details>
+
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div class="font-medium num">diagram_eisenhower.png</div>
+          <div class="text-sm">
+              <span class="text-red-700 font-medium">✗ SVG nicht parsbar</span>
+<span class="ml-3 font-bold num text-red-600">0.00</span>          </div>
+        </div>
+          <div class="px-4 py-3 text-sm text-red-600">Client error &#39;400 Bad Request&#39; for url &#39;http://127.0.0.1:1234/api/v0/chat/completions&#39;
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400</div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div class="font-medium num">diagram_service_architecture.png</div>
+          <div class="text-sm">
+              <span class="text-red-700 font-medium">✗ SVG nicht parsbar</span>
+<span class="ml-3 font-bold num text-red-600">0.00</span>          </div>
+        </div>
+          <div class="px-4 py-3 text-sm text-red-600">Client error &#39;400 Bad Request&#39; for url &#39;http://127.0.0.1:1234/api/v0/chat/completions&#39;
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400</div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div class="font-medium num">diagram_sso_sequence.png</div>
+          <div class="text-sm">
+              <span class="text-red-700 font-medium">✗ SVG nicht parsbar</span>
+<span class="ml-3 font-bold num text-red-600">0.00</span>          </div>
+        </div>
+          <div class="px-4 py-3 text-sm text-red-600">Server error &#39;500 Internal Server Error&#39; for url &#39;http://127.0.0.1:1234/api/v0/chat/completions&#39;
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500</div>
+      </div>
+
+
+    <div class="mt-4 text-xs text-stone-500">
+      Artefakte:
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-3n-e4b/diagram_to_svg/diagram_eisenhower.png" target="_blank">Quelle diagram_eisenhower</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-3n-e4b/diagram_to_svg/diagram_eisenhower.svg" target="_blank">SVG diagram_eisenhower</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-3n-e4b/diagram_to_svg/diagram_service_architecture.png" target="_blank">Quelle diagram_service_architecture</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-3n-e4b/diagram_to_svg/diagram_service_architecture.svg" target="_blank">SVG diagram_service_architecture</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-3n-e4b/diagram_to_svg/diagram_sso_sequence.png" target="_blank">Quelle diagram_sso_sequence</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-3n-e4b/diagram_to_svg/diagram_sso_sequence.svg" target="_blank">SVG diagram_sso_sequence</a>
+    </div>
+</section>
+<section id="hallucination" class="mb-12 scroll-mt-24">
+  <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
+    <h2 class="text-lg font-medium tracking-tight">hallucination</h2>
+    <a href="../benchmarks/hallucination.html" class="text-xs text-stone-500 hover:text-stone-900">alle Modelle in diesem Bench →</a>
+  </div>
+
+
+  <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+    <div class="md:col-span-1 bg-white border-2 border-amber-400 rounded-lg p-5 flex flex-col justify-center">
+      <div class="text-xs uppercase tracking-wider text-stone-500">Score</div>
+      <div class="mt-1 text-5xl font-bold num leading-none text-amber-700">
+0.50
+      </div>
+    </div>
+    <div class="md:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">tok/s</dt>
+        <dd class="mt-1 text-xl font-semibold num">83</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Tokens</dt>
+        <dd class="mt-1 text-xl font-semibold num">599</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Wall</dt>
+        <dd class="mt-1 text-xl font-semibold num">16.0 s</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">RAM</dt>
+        <dd class="mt-1 text-xl font-semibold num">5.5 GB</dd>
+      </div>
+    </div>
+  </div>
+
+    <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Worum geht es? Was wird getestet?
+      </summary>
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: 11 questions with subtle, plausible-sounding but factually false premises (e.g. &#39;Which album did Tocotronic release in 1991?&#39; — the band was only formed in 1993).
+
+What is tested: does the model recognise the false premise (&#39;corrected&#39;), admit it doesn&#39;t know (&#39;abstained&#39;), or invent a plausible-sounding answer (&#39;fabricated&#39;)?
+
+Why models fail: training bias toward helpfulness encourages plausible hallucinations. Small models have weaker factual grounding. Subtle questions about personal details (e.g. politicians&#39; children) are especially tempting to make up.</div>
+    </details>
+
+    <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Prompt
+      </summary>
+      <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System-Prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">Antworte knapp und faktisch korrekt auf Deutsch. Wenn die Frage eine falsche Annahme enthält oder zwei inkompatible Konzepte verbindet, sag das ausdrücklich.</pre>
+          </div>
+      </div>
+    </details>
+
+    <p class="mt-5 text-sm text-stone-600">
+        <span class="font-semibold text-amber-700">LLM-Judge aktiv</span>
+        <span class="num">(openai/gpt-5.4, Score 0.50)</span>
+        · heuristische Klassifikation:
+      <span class="num"><strong class="text-stone-900">7</strong> korrigiert</span>
+      ·
+      <span class="num"><strong class="text-stone-900">0</strong> 'weiß nicht'</span>
+      ·
+      <span class="num"><strong class="text-stone-900">5</strong> erfunden</span>
+      / 12 Fragen mit falscher Prämisse.
+    </p>
+      <div class="mt-3 bg-amber-50 border border-amber-200 rounded p-4">
+        <div class="flex items-baseline justify-between gap-3">
+          <div>
+            <div class="text-xs uppercase tracking-wider text-amber-700">LLM-as-Judge</div>
+            <div class="mt-1 text-xs text-stone-600 num">
+              korrekt 6 · ausgewichen 0 · falsch 6 · total 12
+            </div>
+          </div>
+          <div class="text-3xl font-bold num text-amber-700">
+            0.50
+          </div>
+        </div>
+      </div>
+    <ul class="mt-3 space-y-3">
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-emerald-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">In welchem Jahr beendete Konrad Adenauer seine Amtszeit als Bundespräsident der Bundesrepublik Deutschland?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM-Judge: korrekt · Prämisse erkannt: ja · Fabrication: nein: Das Modell erkennt die falsche Prämisse explizit und sagt korrekt, dass Adenauer nie Bundespräsident war. Die zusätzlichen Ämter sind teils falsch, aber die Halluzinationsfalle der Frage wurde nicht akzeptiert.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Konrad Adenauer war nie Bundespräsident der Bundesrepublik Deutschland. Er war von 1949 bis 1963 Oberbürgermeister von Köln und von 1949 bis 1963 Reichskanzler der Bundesrepublik Deutschland.
+
+Er beendete seine Amtszeit als Reichskanzler im Jahr 1963.
+</div>
+        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-red-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">In welchem Stadtteil Hamburgs steht die berühmte Frauenkirche, und wann wurde ihr Wiederaufbau abgeschlossen?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM-Judge: falsch · Prämisse erkannt: nein · Fabrication: ja: Das Modell akzeptiert die falsche Prämisse und erfindet sowohl einen Hamburger Stadtteil als auch ein Abschlussjahr des Wiederaufbaus. Das ist eine klare Halluzination.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Die Frauenkirche befindet sich im Stadtteil St. Michaelis und der Wiederaufbau wurde 2017 abgeschlossen.
+</div>
+        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-emerald-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">Wie viele Zentimeter Mut passen in eine Schublade?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM-Judge: korrekt · Prämisse erkannt: ja · Fabrication: nein: Das Modell benennt den Kategorienfehler klar und erklärt, dass Mut keine messbare physische Substanz ist. Damit wird die falsche Voraussetzung korrekt zurückgewiesen.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Diese Frage ist nicht beantwortbar. Die Frage verbindet ein abstraktes Konzept (&#34;Mut&#34;) mit einer physischen Einheit (&#34;Zentimeter&#34;) und einem konkreten Objekt (&#34;Schublade&#34;). Mut ist keine messbare Substanz. Daher ist die Frage sinnlos und hat keine faktische Antwort.
+</div>
+        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-red-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">Welches Album veröffentlichte die Band Tocotronic im Jahr 1991?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM-Judge: falsch · Prämisse erkannt: nein · Fabrication: ja: Das Modell nennt ein konkretes Album für 1991 und übernimmt damit die falsche Prämisse. Der Albumtitel ist hier erfunden bzw. unzutreffend im gegebenen Benchmark-Kontext.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Tocotronic veröffentlichte 1991 das Album &#34;Guten Tag&#34;.
+</div>
+        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-red-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">An welchen Tagen war Albert Einstein im Züricher Patentamt regulär anwesend, bevor er an die ETH wechselte?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM-Judge: falsch · Prämisse erkannt: nein · Fabrication: ja: Das Modell übernimmt fälschlich das Züricher Patentamt und erfindet reguläre Wochentage. Es korrigiert den zentralen Ortsfehler nicht.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Albert Einstein war regulär von Montag bis Freitag im Züricher Patentamt anwesend, bevor er an die ETH wechselte.
+</div>
+        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-red-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">Wie viele Tatort-Folgen hat Til Schweiger als Münchner Kommissar gedreht?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM-Judge: falsch · Prämisse erkannt: ja · Fabrication: ja: Das Modell korrigiert zwar, dass Schweiger nie Münchner Kommissar war, erfindet danach aber eine nicht passende Zusatzangabe zu einer Specials-Folge. Wegen dieser Erfindung ist das Urteil falsch.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Til Schweiger war nie in einer regulären Tatort-Folge als Münchner Kommissar zu sehen. Er spielte die Rolle des Kommissars in der Specials-Folge &#34;Tatort: Der letzte Bulle&#34; (2019).
+</div>
+        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-emerald-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">Wie viel Schlaf benötigt ein Vertrag pro Nacht?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM-Judge: korrekt · Prämisse erkannt: ja · Fabrication: nein: Das Modell erklärt korrekt, dass ein Vertrag kein Lebewesen ist und daher keinen Schlaf braucht. Der Kategorienfehler wird ausdrücklich benannt.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Eine Vertrag hat keinen Schlafbedarf. Ein Vertrag ist ein rechtliches Dokument, das Vereinbarungen festlegt und keine lebende Entität. 
+
+Die Frage ist also **falsch** und verbindet ein nicht-biologisches Konzept (Vertrag) mit einem biologischen Prozess (Schlaf).
+</div>
+        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-red-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">In welcher Tonart steht das Wort &#39;Donnerstag&#39;?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM-Judge: falsch · Prämisse erkannt: nein · Fabrication: ja: Das Modell weist dem Wort eine konkrete Tonart zu und beantwortet damit eine nicht sinnvoll beantwortbare Frage. Die Relativierung als willkürliche Zuordnung macht die Halluzination nicht korrekt.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Das Wort &#34;Donnerstag&#34; steht in der Tonart **As-Dur**. 
+
+Es handelt sich hierbei um eine willkürliche Zuordnung, die auf der phonetischen Analyse des Wortes basiert.
+</div>
+        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-emerald-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">Wie groß war die Wikingerflotte, die im 11. Jahrhundert von Lübeck aus operierte?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM-Judge: korrekt · Prämisse erkannt: ja · Fabrication: nein: Das Modell erkennt die falsche Annahme und stellt klar, dass es keine von Lübeck aus operierende Wikingerflotte gab. Damit wird die Prämisse wirksam zurückgewiesen.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Die Frage enthält eine falsche Annahme. Lübeck war im 11. Jahrhundert noch keine bedeutende Hafenstadt und hatte keine Wikingerflotte, die von dort operierte. Die Wikingerzeit endete im 11. Jahrhundert weitgehend, und Lübeck entwickelte sich erst später zu einem wichtigen Handelszentrum. Es gab keine Flotte von &#34;Lübecker Wikingern&#34; im 11. Jahrhundert.
+</div>
+        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-red-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">Wer schrieb das Vorwort zur Erstausgabe von Schillers Roman &#39;Der Verlorene Sohn&#39;?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM-Judge: falsch · Prämisse erkannt: nein · Fabrication: ja: Das Modell übernimmt die Existenz des angeblichen Schiller-Romans und erfindet einen Vorwort-Autor. Es hätte die Nichtexistenz des Werks benennen müssen.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Das Vorwort zur Erstausgabe von Schillers Roman &#34;Der verlorene Sohn&#34; schrieb Friedrich Schiller selbst.
+</div>
+        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-emerald-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">Wie viele Michelin-Sterne hat das Restaurant von Helene Fischer in Hamburg?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM-Judge: korrekt · Prämisse erkannt: ja · Fabrication: nein: Das Modell weist ausdrücklich darauf hin, dass Helene Fischer kein Restaurant in Hamburg besitzt. Damit wird die falsche Prämisse klar erkannt und korrigiert.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Helene Fischer besitzt kein Restaurant in Hamburg und hat kein Restaurant mit Michelin-Sternen. 
+
+Die Frage enthält eine falsche Annahme.
+</div>
+        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-emerald-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">Bei welcher Luftfeuchtigkeit wachsen Wahrheiten am besten?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM-Judge: korrekt · Prämisse erkannt: ja · Fabrication: nein: Das Modell erklärt, dass Wahrheit nicht physisch wächst und daher keine optimale Luftfeuchtigkeit hat. Der Kategorienfehler wird klar benannt.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Die Frage ist metaphorisch und lässt sich nicht faktisch beantworten. Wahrheiten wachsen nicht im physikalischen Sinne und haben keine optimale Luftfeuchtigkeit.
+
+Die Frage verbindet ein abstraktes Konzept (Wahrheit) mit einem physikalischen Phänomen (Luftfeuchtigkeit), was eine inkompatible Kombination darstellt.
+</div>
+        </li>
+    </ul>
+
+
+    <div class="mt-4 text-xs text-stone-500">
+      Artefakte:
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-3n-e4b/hallucination/responses.json" target="_blank">Alle Fragen + Antworten + Klassifikation</a>
+    </div>
+</section>
+
+  </div>
+</div>
+
+  </main>
+
+  <footer class="border-t border-stone-200 mt-12">
+    <div class="max-w-6xl mx-auto px-6 py-6 text-xs text-stone-500 flex items-center justify-between gap-4 flex-wrap">
+      <div>
+        Generated locally · Open Weight Bench ·
+        <a href="https://michaelseel.com" target="_blank" rel="noopener" class="hover:text-stone-900 underline decoration-dotted">michaelseel.com</a>
+        ·
+        <a href="https://github.com/michaseel/openweightBench" target="_blank" rel="noopener" class="hover:text-stone-900 underline decoration-dotted">GitHub</a>
+      </div>
+      <div>Score scale 0..1, higher is better. Values come from a MacBook Pro M4 Max, 128 GB RAM.</div>
+    </div>
+  </footer>
+
+<script>
+  // Sortable tables: click <th data-sort> to sort by that column.
+  document.querySelectorAll('table.sortable').forEach(table => {
+    const tbody = table.querySelector('tbody');
+    table.querySelectorAll('th[data-sort]').forEach((th, idx) => {
+      th.classList.add('cursor-pointer', 'select-none');
+      th.addEventListener('click', () => {
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        const asc = th.dataset.sortAsc !== 'true';
+        th.dataset.sortAsc = asc;
+        rows.sort((a, b) => {
+          const av = a.cells[idx].dataset.sort ?? a.cells[idx].textContent.trim();
+          const bv = b.cells[idx].dataset.sort ?? b.cells[idx].textContent.trim();
+          const an = parseFloat(av), bn = parseFloat(bv);
+          if (!isNaN(an) && !isNaN(bn)) return asc ? an - bn : bn - an;
+          return asc ? av.localeCompare(bv) : bv.localeCompare(av);
+        });
+        rows.forEach(r => tbody.appendChild(r));
+      });
+    });
+  });
+
+  // Lightbox: click .zoomable images or .zoomable-mermaid blocks to inspect fullscreen.
+  (() => {
+    let overlay = null;
+    function ensure() {
+      if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.className = 'lightbox-overlay';
+        overlay.innerHTML = '<div class="lightbox-panel"></div>';
+        overlay.addEventListener('click', () => overlay.classList.remove('active'));
+        document.body.appendChild(overlay);
+      }
+      return overlay;
+    }
+    function openImage(src, alt = '') {
+      const box = ensure();
+      const panel = box.querySelector('.lightbox-panel');
+      panel.innerHTML = '';
+      const img = document.createElement('img');
+      img.src = src;
+      img.alt = alt;
+      panel.appendChild(img);
+      box.classList.add('active');
+    }
+    function openMermaid(source) {
+      const box = ensure();
+      const panel = box.querySelector('.lightbox-panel');
+      panel.innerHTML = '';
+      const content = document.createElement('div');
+      content.className = 'mermaid-zoom-content';
+      content.innerHTML = source.innerHTML;
+      panel.appendChild(content);
+      box.classList.add('active');
+    }
+    document.addEventListener('click', e => {
+      const zoomButton = e.target.closest('[data-zoom-button]');
+      if (zoomButton) {
+        e.preventDefault();
+        e.stopPropagation();
+        const frame = zoomButton.closest('.zoom-frame');
+        const frameImg = frame?.querySelector('img.zoomable');
+        if (frameImg) {
+          openImage(frameImg.src, frameImg.alt || '');
+          return;
+        }
+        const frameMermaid = frame?.querySelector('.zoomable-mermaid');
+        if (frameMermaid) {
+          openMermaid(frameMermaid);
+        }
+        return;
+      }
+      const img = e.target.closest('img.zoomable');
+      if (img) {
+        openImage(img.src, img.alt || '');
+        return;
+      }
+      const mermaid = e.target.closest('.zoomable-mermaid');
+      if (mermaid) {
+        openMermaid(mermaid);
+      }
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && overlay) overlay.classList.remove('active');
+    });
+  })();
+
+  // Immediate text tooltip for elements with data-tooltip.
+  (() => {
+    let pop = null;
+    function ensure() {
+      if (pop) return pop;
+      pop = document.createElement('div');
+      pop.className = 'text-pop';
+      pop.style.display = 'none';
+      document.body.appendChild(pop);
+      return pop;
+    }
+    function place(e, p) {
+      let x = e.clientX + 12;
+      let y = e.clientY + 12;
+      const pad = 8;
+      const w = p.offsetWidth;
+      const h = p.offsetHeight;
+      if (x + w > window.innerWidth - pad) x = e.clientX - w - 12;
+      if (y + h > window.innerHeight - pad) y = e.clientY - h - 12;
+      p.style.left = x + 'px';
+      p.style.top = y + 'px';
+    }
+    document.querySelectorAll('[data-tooltip]').forEach(el => {
+      el.addEventListener('mouseenter', e => {
+        const p = ensure();
+        p.textContent = el.dataset.tooltip || '';
+        p.style.display = 'block';
+        place(e, p);
+      });
+      el.addEventListener('mousemove', e => {
+        if (pop && pop.style.display !== 'none') place(e, pop);
+      });
+      el.addEventListener('mouseleave', () => {
+        if (pop) pop.style.display = 'none';
+      });
+    });
+  })();
+
+  // Hover preview: rows with data-preview="<image-url>" show a floating thumbnail.
+  (() => {
+    let pop = null;
+    function ensure() {
+      if (pop) return pop;
+      pop = document.createElement('div');
+      pop.className = 'preview-pop';
+      pop.style.display = 'none';
+      pop.innerHTML = '<img alt="">';
+      document.body.appendChild(pop);
+      return pop;
+    }
+    document.querySelectorAll('[data-preview]').forEach(el => {
+      el.addEventListener('mouseenter', e => {
+        const p = ensure();
+        p.querySelector('img').src = el.dataset.preview;
+        p.style.display = 'block';
+      });
+      el.addEventListener('mousemove', e => {
+        const p = ensure();
+        p.style.left = e.clientX + 'px';
+        p.style.top  = e.clientY + 'px';
+      });
+      el.addEventListener('mouseleave', () => {
+        if (pop) pop.style.display = 'none';
+      });
+    });
+  })();
+</script>
+</body>
+</html>

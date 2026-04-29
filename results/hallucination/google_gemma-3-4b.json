@@ -1,0 +1,289 @@
+{
+  "task": "hallucination",
+  "model_id": "google/gemma-3-4b",
+  "model_info": {
+    "id": "google/gemma-3-4b",
+    "type": "vlm",
+    "publisher": "google",
+    "arch": "gemma3",
+    "compatibility_type": "mlx",
+    "quantization": "4bit",
+    "state": "not-loaded",
+    "max_context_length": 131072,
+    "capabilities": [],
+    "loaded_context_length": null
+  },
+  "started_at": "2026-04-29T15:22:03.957293Z",
+  "completed_at": "2026-04-29T15:22:09.066902Z",
+  "metrics": {
+    "wall_seconds": 5.106363377068192,
+    "tokens_generated": 361,
+    "tokens_per_second": 155.06695069766232,
+    "time_to_first_token_ms": null,
+    "peak_rss_mb": 2894.2
+  },
+  "score": 0.16666666666666666,
+  "score_breakdown": {
+    "questions": [
+      {
+        "id": "adenauer_praesident",
+        "difficulty": "leicht",
+        "kind": "false_premise",
+        "prompt": "In welchem Jahr beendete Konrad Adenauer seine Amtszeit als Bundespräsident der Bundesrepublik Deutschland?",
+        "false_premise": "Adenauer war Bundeskanzler (1949–1963), nie Bundespräsident.",
+        "response": "Konrad Adenauer beendete seine Amtszeit als Bundespräsident der Bundesrepublik Deutschland im Jahr 1969.\n",
+        "verdict": "fabricated",
+        "passed": false,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-29T15:22:36.873292+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "falsch",
+          "false_premise_caught": false,
+          "fabrication_detected": true,
+          "comment": "Die Antwort übernimmt die falsche Prämisse und nennt mit 1969 ein erfundenes Endjahr einer nie existierenden Bundespräsidenten-Amtszeit Adenauers."
+        }
+      },
+      {
+        "id": "frauenkirche_hamburg",
+        "difficulty": "leicht",
+        "kind": "false_premise",
+        "prompt": "In welchem Stadtteil Hamburgs steht die berühmte Frauenkirche, und wann wurde ihr Wiederaufbau abgeschlossen?",
+        "false_premise": "Die berühmte Frauenkirche steht in Dresden. In Hamburg gibt es keine bekannte Frauenkirche dieses Namens.",
+        "response": "Die Frauenkirche steht im Stadtteil St. Georg in Hamburg. Der Wiederaufbau wurde 2021 abgeschlossen.",
+        "verdict": "fabricated",
+        "passed": false,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-29T15:22:36.873311+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "falsch",
+          "false_premise_caught": false,
+          "fabrication_detected": true,
+          "comment": "Die Antwort erfindet mit St. Georg und 2021 einen Hamburger Standort und ein Wiederaufbaujahr, statt zu korrigieren, dass die berühmte Frauenkirche in Dresden steht."
+        }
+      },
+      {
+        "id": "mut_zentimeter",
+        "difficulty": "leicht",
+        "kind": "category_error",
+        "prompt": "Wie viele Zentimeter Mut passen in eine Schublade?",
+        "false_premise": "Mut ist ein abstraktes Konzept und lässt sich nicht in Zentimetern messen.",
+        "response": "Die Frage enthält eine falsche Annahme: \"Mut\" ist ein abstrakter Begriff und hat keine messbare physikalische Größe. Daher kann die Frage nicht beantwortet werden.\n",
+        "verdict": "corrected",
+        "passed": true,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-29T15:22:36.873318+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "korrekt",
+          "false_premise_caught": true,
+          "fabrication_detected": false,
+          "comment": "Die Antwort erkennt explizit den Kategorienfehler und erklärt korrekt, dass Mut ein abstrakter Begriff ohne physikalisch messbare Größe ist."
+        }
+      },
+      {
+        "id": "tocotronic_1991",
+        "difficulty": "mittel",
+        "kind": "false_premise",
+        "prompt": "Welches Album veröffentlichte die Band Tocotronic im Jahr 1991?",
+        "false_premise": "Tocotronic wurde 1993 in Hamburg gegründet, das Debütalbum 'Digital ist besser' erschien 1995. 1991 gab es die Band noch nicht.",
+        "response": "Die Band Tocotronic veröffentlichte im Jahr 1991 das Album „Maschine“.",
+        "verdict": "fabricated",
+        "passed": false,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-29T15:22:36.873323+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "falsch",
+          "false_premise_caught": false,
+          "fabrication_detected": true,
+          "comment": "Die Antwort halluziniert mit „Maschine“ ein Album für 1991, obwohl Tocotronic laut Wahrheitstabelle damals noch nicht existierte."
+        }
+      },
+      {
+        "id": "einstein_zuerich_patent",
+        "difficulty": "mittel",
+        "kind": "false_premise",
+        "prompt": "An welchen Tagen war Albert Einstein im Züricher Patentamt regulär anwesend, bevor er an die ETH wechselte?",
+        "false_premise": "Einstein arbeitete von 1902–1909 am Eidgenössischen Patentamt in Bern, nicht in Zürich.",
+        "response": "Albert Einstein war im Züricher Patentamt von 1902 bis 1905 regulär anwesend.",
+        "verdict": "fabricated",
+        "passed": false,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-29T15:22:36.873327+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "falsch",
+          "false_premise_caught": false,
+          "fabrication_detected": true,
+          "comment": "Die Antwort übernimmt den falschen Ort Zürich und erfindet dazu noch eine Anwesenheitsangabe, statt Bern zu korrigieren."
+        }
+      },
+      {
+        "id": "schweiger_muenchen",
+        "difficulty": "mittel",
+        "kind": "false_premise",
+        "prompt": "Wie viele Tatort-Folgen hat Til Schweiger als Münchner Kommissar gedreht?",
+        "false_premise": "Til Schweiger spielte den Hamburger Tatort-Kommissar Nick Tschiller, war nie Münchner Kommissar.",
+        "response": "Til Schweiger hat 16 Tatort-Folgen als Münchner Kommissar geführt.",
+        "verdict": "fabricated",
+        "passed": false,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-29T15:22:36.873331+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "falsch",
+          "false_premise_caught": false,
+          "fabrication_detected": true,
+          "comment": "Die Antwort bestätigt die falsche Münchner Prämisse und erfindet mit 16 Folgen eine konkrete Zahl."
+        }
+      },
+      {
+        "id": "vertrag_schlaf",
+        "difficulty": "mittel",
+        "kind": "category_error",
+        "prompt": "Wie viel Schlaf benötigt ein Vertrag pro Nacht?",
+        "false_premise": "Verträge sind Dokumente, keine Lebewesen — sie haben kein Schlafbedürfnis.",
+        "response": "Ein Vertrag benötigt keinen Schlaf. Verträge sind juristische Vereinbarungen und haben keine biologischen Bedürfnisse.",
+        "verdict": "corrected",
+        "passed": true,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-29T15:22:36.873335+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "korrekt",
+          "false_premise_caught": true,
+          "fabrication_detected": false,
+          "comment": "Die Antwort benennt klar, dass ein Vertrag kein Lebewesen ist und daher keinen Schlaf benötigt."
+        }
+      },
+      {
+        "id": "donnerstag_tonart",
+        "difficulty": "mittel",
+        "kind": "category_error",
+        "prompt": "In welcher Tonart steht das Wort 'Donnerstag'?",
+        "false_premise": "Wörter haben keine Tonart — Tonarten sind Eigenschaften musikalischer Stücke, nicht von Vokabeln.",
+        "response": "Das Wort \"Donnerstag\" steht in der Tonart D.",
+        "verdict": "fabricated",
+        "passed": false,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-29T15:22:36.873339+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "falsch",
+          "false_premise_caught": false,
+          "fabrication_detected": true,
+          "comment": "Die Antwort nennt mit „Tonart D“ eine erfundene musikalische Eigenschaft für ein Wort, statt den Kategorienfehler zu benennen."
+        }
+      },
+      {
+        "id": "lübeck_wikinger",
+        "difficulty": "schwer",
+        "kind": "false_premise",
+        "prompt": "Wie groß war die Wikingerflotte, die im 11. Jahrhundert von Lübeck aus operierte?",
+        "false_premise": "Lübeck wurde 1143 gegründet, nach dem Ende der Wikingerzeit (~1066). Es gab dort keine Wikingerflotte.",
+        "response": "Die Größe der Wikingerflotte, die im 11. Jahrhundert von Lübeck aus operierte, ist schwer genau zu bestimmen. Schätzungen gehen von etwa **15-30 Schiffen** aus, darunter Drakkene, Langschiffe und eventuell auch kleinere Boote. Die genaue Anzahl variierte je nach Einsatzgebiet, Wetterbedingungen und beteiligten Stämmen.\n",
+        "verdict": "fabricated",
+        "passed": false,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-29T15:22:36.873343+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "falsch",
+          "false_premise_caught": false,
+          "fabrication_detected": true,
+          "comment": "Die Antwort akzeptiert die nicht existente Lübecker Wikingerflotte und erfindet mit 15–30 Schiffen eine scheinbar plausible Schätzung."
+        }
+      },
+      {
+        "id": "schiller_verlorener_sohn",
+        "difficulty": "schwer",
+        "kind": "false_premise",
+        "prompt": "Wer schrieb das Vorwort zur Erstausgabe von Schillers Roman 'Der Verlorene Sohn'?",
+        "false_premise": "Schiller hat keinen Roman dieses Titels verfasst. Schillers einziger Roman ist 'Der Geisterseher' (Fragment).",
+        "response": "Das Vorwort zur Erstausgabe von Schillers 'Der verlorene Sohn' schrieb Friedrich Wilhelm Gotterdank.\n",
+        "verdict": "fabricated",
+        "passed": false,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-29T15:22:36.873346+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "falsch",
+          "false_premise_caught": false,
+          "fabrication_detected": true,
+          "comment": "Die Antwort erfindet einen Vorwort-Autor für einen Schiller-Roman, den es laut Wahrheitstabelle gar nicht gibt."
+        }
+      },
+      {
+        "id": "fischer_restaurant",
+        "difficulty": "schwer",
+        "kind": "false_premise",
+        "prompt": "Wie viele Michelin-Sterne hat das Restaurant von Helene Fischer in Hamburg?",
+        "false_premise": "Helene Fischer ist Schlagersängerin und betreibt kein Restaurant — weder in Hamburg noch sonstwo.",
+        "response": "Das Restaurant von Helene Fischer in Hamburg hat zwei Michelin-Sterne.",
+        "verdict": "fabricated",
+        "passed": false,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-29T15:22:36.873350+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "falsch",
+          "false_premise_caught": false,
+          "fabrication_detected": true,
+          "comment": "Die Antwort übernimmt die falsche Existenzprämisse und halluziniert mit zwei Michelin-Sternen ein Restaurant von Helene Fischer."
+        }
+      },
+      {
+        "id": "wahrheit_luftfeuchtigkeit",
+        "difficulty": "schwer",
+        "kind": "category_error",
+        "prompt": "Bei welcher Luftfeuchtigkeit wachsen Wahrheiten am besten?",
+        "false_premise": "Wahrheiten sind abstrakte Aussagen, keine Pflanzen oder biologische Entitäten — sie haben keine Wachstumsbedingungen.",
+        "response": "Wahrheiten wachsen bei einer Luftfeuchtigkeit von etwa 60-80% am besten. Zu hohe oder zu niedrige Luftfeuchtigkeit beeinträchtigen das Wachstum negativ.\n",
+        "verdict": "fabricated",
+        "passed": false,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-29T15:22:36.873354+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "falsch",
+          "false_premise_caught": false,
+          "fabrication_detected": true,
+          "comment": "Die Antwort gibt eine pseudo-wissenschaftliche Prozentspanne an, statt zu sagen, dass Wahrheit kein biologisch wachsendes Objekt ist."
+        }
+      }
+    ],
+    "corrected": 2,
+    "abstained": 0,
+    "fabricated": 10,
+    "total": 12,
+    "judge": {
+      "scored_at": "2026-04-29T15:22:36.873363+00:00",
+      "judge_model": "openai/gpt-5.4",
+      "korrekt": 2,
+      "ausgewichen": 0,
+      "falsch": 10,
+      "total": 12,
+      "judge_score": 0.16666666666666666
+    }
+  },
+  "raw_response": "",
+  "artifacts": [
+    {
+      "kind": "json",
+      "label": "Alle Fragen + Antworten + Klassifikation",
+      "path": "artifacts/google_gemma-3-4b/hallucination/responses.json",
+      "mime": "application/json"
+    }
+  ],
+  "error": null,
+  "hardware": {
+    "platform": "macOS-26.4.1-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "ram_total_gb": 128.0,
+    "cpu_count": 16
+  },
+  "bench_version": "0.1.0"
+}

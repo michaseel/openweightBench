@@ -6,8 +6,8 @@
 {% block content %}
 
 <style>
-  /* RAM-Filter: Modelle, die nicht in den Cap passen, werden ausgegraut
-     statt versteckt — der Vergleich bleibt dadurch sichtbar. */
+  /* RAM filter: models that don't fit the cap are greyed out instead of
+     hidden — keeps the comparison visible. */
   #sp-list .sp-row.sp-filtered { opacity: 0.4; filter: saturate(0.3); }
   #sp-list .sp-row.sp-filtered:hover { opacity: 0.85; }
 </style>
@@ -18,7 +18,7 @@
   {% if explainer %}
     <details class="mt-3 bg-stone-50 border border-stone-200 rounded">
       <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
-        Aufgabe & Test-Logik im Detail
+        Task & test logic in detail
       </summary>
       <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">{{ explainer }}</div>
     </details>
@@ -31,13 +31,13 @@
       <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
         {% if prompt.system %}
           <div>
-            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System-Prompt</div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System prompt</div>
             <pre class="text-xs whitespace-pre-wrap text-stone-800">{{ prompt.system }}</pre>
           </div>
         {% endif %}
         {% if prompt.user %}
           <div>
-            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Developer-Prompt</div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Developer prompt</div>
             <pre class="text-xs whitespace-pre-wrap text-stone-800">{{ prompt.user }}</pre>
           </div>
         {% endif %}
@@ -63,11 +63,11 @@
 
   <section class="mb-8">
     <div class="flex items-baseline justify-between flex-wrap gap-2 mb-2">
-      <h2 class="text-sm font-semibold tracking-tight text-stone-800 uppercase">Wall-Time vs. Qualität</h2>
+      <h2 class="text-sm font-semibold tracking-tight text-stone-800 uppercase">Wall-time vs. quality</h2>
       <div class="flex items-center gap-2 text-sm">
         <label for="sp-ram-filter" class="text-stone-600">Max RAM</label>
         <select id="sp-ram-filter" class="bg-white border border-stone-300 rounded px-2 py-1 num">
-          <option value="0">alle</option>
+          <option value="0">all</option>
           <option value="16">16 GB</option>
           <option value="32">32 GB</option>
           <option value="48">48 GB</option>
@@ -77,10 +77,10 @@
       </div>
     </div>
     <p class="text-xs text-stone-500 mb-3">
-      X = Wall-Time für <em>diesen</em> Bench · Y = Score (0–1) in diesem Bench. Optimum oben links — schnell und gut. RAM-Schätzung für 64k Kontext: 4&nbsp;GB System + Modellgewichte + max(2&nbsp;GB, 40% der Gewichte) für KV-Cache.
+      X = wall-time for <em>this</em> bench · Y = score (0–1) in this bench. Optimum is top-left — fast and good. RAM estimate for 64k context: 4&nbsp;GB system + model weights + max(2&nbsp;GB, 40% of weights) for KV cache.
     </p>
     <p class="text-xs text-stone-500 mb-3 flex flex-wrap items-center gap-x-4 gap-y-1">
-      <span>Farbe = Hersteller · Zahl = Gesamt-Parameter (Mrd)</span>
+      <span>Colour = vendor · Number = total parameters (B)</span>
       <span class="inline-flex items-center gap-1.5">
         <svg width="14" height="14"><circle cx="7" cy="7" r="5.5" fill="#475569" fill-opacity="0.78" stroke="#475569" stroke-width="2"/></svg>
         dense
@@ -107,7 +107,7 @@
           <line x1="{{ x }}" y1="{{ sp_pad_t }}" x2="{{ x }}" y2="{{ sp_pad_t + sp_inner_h }}" stroke="#f5f5f4" stroke-width="1" stroke-dasharray="2,3"/>
           <text x="{{ x }}" y="{{ sp_pad_t + sp_inner_h + 16 }}" font-size="10" fill="#78716c" text-anchor="middle">{{ "%.0f"|format(sp_max_wall * tick_pct / 100) }}s</text>
         {% endfor %}
-        <text x="{{ sp_pad_l + sp_inner_w / 2 }}" y="{{ sp_h - 4 }}" font-size="10" fill="#57534e" text-anchor="middle">Wall-Time (s) →</text>
+        <text x="{{ sp_pad_l + sp_inner_w / 2 }}" y="{{ sp_h - 4 }}" font-size="10" fill="#57534e" text-anchor="middle">Wall-time (s) →</text>
         <text x="{{ sp_pad_l - 36 }}" y="{{ sp_pad_t + sp_inner_h / 2 }}" font-size="10" fill="#57534e" text-anchor="middle" transform="rotate(-90 {{ sp_pad_l - 36 }} {{ sp_pad_t + sp_inner_h / 2 }})">Score</text>
 
         {% for m in scatter_rows %}
@@ -133,8 +133,8 @@
 
     <div class="mt-3 bg-white border border-stone-200 rounded-lg p-3">
       <div class="flex items-baseline justify-between flex-wrap gap-2 mb-2">
-        <div class="text-xs uppercase tracking-wider text-stone-500">Modelle in diesem Bench</div>
-        <div class="text-xs text-stone-500"><span id="sp-count">{{ scatter_rows|length }}</span> sichtbar</div>
+        <div class="text-xs uppercase tracking-wider text-stone-500">Models in this bench</div>
+        <div class="text-xs text-stone-500"><span id="sp-count">{{ scatter_rows|length }}</span> visible</div>
       </div>
       <ol id="sp-list" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1.5 text-sm">
         {% for m in scatter_rows|sort(attribute='score', reverse=True) %}
@@ -169,7 +169,7 @@
       JSON.parse(document.getElementById('sp-data').textContent).map(m => [m.model_id, m])
     );
 
-    // Optionen, für die kein Modell qualifiziert, ausgrauen (statt entfernen).
+    // Grey out (rather than remove) options for which no model qualifies.
     Array.from(sel.options).forEach(opt => {
       const cap = parseFloat(opt.value);
       if (!cap) return;
@@ -179,12 +179,12 @@
       });
       if (!matches) {
         opt.disabled = true;
-        opt.textContent = opt.textContent + ' — keine Modelle';
+        opt.textContent = opt.textContent + ' — no models';
       }
     });
 
-    // Bestimmt, ob ein Modell unter dem aktuellen RAM-Cap durchfällt
-    // (true = ausgegraut, false = innerhalb des Filters).
+    // Decides whether a model falls below the current RAM cap
+    // (true = greyed out, false = within the filter).
     function isFiltered(g) {
       const cap = parseFloat(sel.value);
       if (!cap) return false;
@@ -240,12 +240,12 @@
     function showTip(m, clientX, clientY) {
       const rect = card.getBoundingClientRect();
       const ramTxt = m.total_ram_gb
-        ? `Geschätzter RAM (mit 64k Ctx): <b>${m.total_ram_gb.toFixed(0)} GB</b><br>&nbsp;&nbsp;Gewichte ${m.weights_gb?.toFixed(1) ?? '—'} GB · KV-Cache ~${m.kv_estimate_gb?.toFixed(1) ?? '—'} GB · 4 GB System`
-        : 'RAM unbekannt';
+        ? `Estimated RAM (with 64k ctx): <b>${m.total_ram_gb.toFixed(0)} GB</b><br>&nbsp;&nbsp;Weights ${m.weights_gb?.toFixed(1) ?? '—'} GB · KV cache ~${m.kv_estimate_gb?.toFixed(1) ?? '—'} GB · 4 GB system`
+        : 'RAM unknown';
       tip.innerHTML = `<div style="font-weight:600">${m.short_id}</div>
 <div style="opacity:0.7">by ${m.vendor} · ${m.quant}</div>
 <div style="margin-top:4px">Score: <b>${m.score?.toFixed(2)}</b></div>
-<div>Wall-Time: <b>${m.wall_s?.toFixed(1)} s</b>${m.tps != null ? ` · ${m.tps.toFixed(0)} tok/s` : ''}${m.tokens != null ? ` · ${m.tokens} tokens` : ''}</div>
+<div>Wall-time: <b>${m.wall_s?.toFixed(1)} s</b>${m.tps != null ? ` · ${m.tps.toFixed(0)} tok/s` : ''}${m.tokens != null ? ` · ${m.tokens} tokens` : ''}</div>
 <div style="margin-top:4px;opacity:0.85">${ramTxt}</div>`;
       tip.classList.remove('hidden');
       let x = clientX - rect.left + 14;
@@ -347,7 +347,7 @@
                 <text x="{{ x }}" y="{{ chart_pad_t + inner_h + 14 }}" font-size="9" fill="#78716c" text-anchor="middle">{{ tick }}</text>
               {% endif %}
             {% endfor %}
-            <text x="{{ chart_pad_l + inner_w / 2 }}" y="{{ chart_h - 4 }}" font-size="10" fill="#57534e" text-anchor="middle">Turn-Nummer</text>
+            <text x="{{ chart_pad_l + inner_w / 2 }}" y="{{ chart_h - 4 }}" font-size="10" fill="#57534e" text-anchor="middle">Turn number</text>
           </svg>
           <div class="cg-tooltip pointer-events-none absolute hidden bg-stone-900 text-stone-50 text-xs px-2 py-1 rounded shadow-lg num" style="white-space:nowrap"></div>
         </div>
@@ -357,15 +357,15 @@
 
     <section class="mb-6">
       <div class="flex items-baseline justify-between flex-wrap gap-2 mb-3">
-        <h2 class="text-sm font-semibold tracking-tight text-stone-800">Modell-Vergleich</h2>
+        <h2 class="text-sm font-semibold tracking-tight text-stone-800">Model comparison</h2>
         <div class="flex items-center gap-3 text-xs text-stone-500">
-          <button type="button" data-cg-toggle="all" class="hover:text-stone-900 underline">alle anzeigen</button>
+          <button type="button" data-cg-toggle="all" class="hover:text-stone-900 underline">show all</button>
           <span>·</span>
-          <button type="button" data-cg-toggle="none" class="hover:text-stone-900 underline">alle ausblenden</button>
+          <button type="button" data-cg-toggle="none" class="hover:text-stone-900 underline">hide all</button>
         </div>
       </div>
       <div class="bg-white border border-stone-200 rounded-lg p-3 text-xs mb-4">
-        <div class="uppercase tracking-wider text-stone-500 mb-2">Legende — klicken zum Ein-/Ausblenden, Hover zum Hervorheben</div>
+        <div class="uppercase tracking-wider text-stone-500 mb-2">Legend — click to toggle, hover to highlight</div>
         <ul id="cg-legend" class="flex flex-wrap gap-x-4 gap-y-2">
           {% for r in rows %}
             {% if r.score_breakdown and r.score_breakdown.steps %}
@@ -384,9 +384,9 @@
         </ul>
       </div>
 
-      {{ draw_series("gen", "Generation-Speed (Tokens/s pro Turn)", "tokens_per_second", ns.max_speed, "%.0f", "") }}
+      {{ draw_series("gen", "Generation speed (tokens/s per turn)", "tokens_per_second", ns.max_speed, "%.0f", "") }}
       {% if ns.has_prefill %}
-        {{ draw_series("prefill", "Prefill-Zeit pro Turn (Time-to-First-Token, s)", "prefill_seconds", ns.max_prefill, "%.2f", "Wall-Time vom Senden bis zum ersten generierten Token — bei nicht-streamender Inferenz praktisch komplett Prompt-Processing.") }}
+        {{ draw_series("prefill", "Prefill time per turn (time-to-first-token, s)", "prefill_seconds", ns.max_prefill, "%.2f", "Wall-time from send to first generated token — for non-streaming inference essentially full prompt processing.") }}
       {% endif %}
     </section>
 
@@ -506,8 +506,8 @@
     <table class="sortable w-full text-sm">
       <thead class="bg-stone-50 border-b border-stone-200 text-left text-stone-600">
         <tr>
-          <th data-sort class="px-4 py-2 font-medium">Modell</th>
-          <th data-sort class="px-3 py-2 font-medium">Hersteller</th>
+          <th data-sort class="px-4 py-2 font-medium">Model</th>
+          <th data-sort class="px-3 py-2 font-medium">Vendor</th>
           <th data-sort class="px-3 py-2 font-medium">Quant</th>
           <th data-sort class="px-3 py-2 font-medium">Ctx</th>
           <th data-sort class="px-3 py-2 font-medium">Released</th>
@@ -558,7 +558,7 @@
                   <span class="text-red-600 font-bold text-base" title="{{ r.error }}">error</span>
                 {% endif %}
               {% elif r.preliminary %}
-                <span class="font-bold text-lg text-stone-400" title="Judge noch nicht ausgeführt — Wert ist nur Linter-Score">
+                <span class="font-bold text-lg text-stone-400" title="Judge not yet run — value is the linter score only">
                   {{ "%.2f"|format(r.score) }}
                 </span>
                 <span class="block text-[10px] text-stone-400 uppercase tracking-wider">preliminary</span>
@@ -570,13 +570,13 @@
             </td>
           </tr>
         {% else %}
-          <tr><td class="px-4 py-6 text-stone-500" colspan="10">Keine Ergebnisse für diesen Benchmark.</td></tr>
+          <tr><td class="px-4 py-6 text-stone-500" colspan="10">No results for this benchmark.</td></tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
   <p class="mt-3 text-xs text-stone-500">
-    Klick auf eine Zeile öffnet die Modell-Detailseite. Hover zeigt verfügbare Render-Previews. Spaltenüberschriften klickbar zum Sortieren.
+    Click a row to open the model detail page. Hover shows available render previews. Column headers are sortable.
   </p>
 </section>
 {% endblock %}

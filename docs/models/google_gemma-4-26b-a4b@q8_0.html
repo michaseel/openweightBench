@@ -139,15 +139,7 @@
           </a>
           <a href="../benchmarks/hallucination.html"
              class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
-            Halluzination
-          </a>
-          <a href="../benchmarks/nonsense.html"
-             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
-            Nonsense
-          </a>
-          <a href="../benchmarks/instruction_following.html"
-             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
-            Instruction Following
+            Hallucination
           </a>
       </nav>
     </div>
@@ -156,37 +148,37 @@
   <main class="flex-1 max-w-7xl mx-auto w-full px-6 py-8">
 
 <section class="mb-8">
-  <div class="text-xs text-stone-500"><a href="../index.html" class="hover:text-stone-900">← Übersicht</a></div>
+  <div class="text-xs text-stone-500"><a href="../index.html" class="hover:text-stone-900">← Overview</a></div>
   <h1 class="mt-2 text-2xl font-semibold tracking-tight num">google/gemma-4-26b-a4b@q8_0</h1>
   <div class="mt-2 flex flex-wrap gap-2 text-xs">
     <span class="px-2 py-1 rounded border"
           style="background-color: #dc2626; color: #fff; border-color: #dc2626;"
-          data-tooltip="Hersteller bzw. Publisher des Modells. Farbe zeigt die Modellfamilie.">google</span>
+          data-tooltip="Vendor / publisher of the model. Colour indicates the model family.">google</span>
       <span class="px-2 py-1 rounded bg-stone-100 border border-stone-200 num"
-            data-tooltip="Mixture-of-Experts: 26 Mrd. Gesamtparameter, davon 4 Mrd. aktiv pro Token.">
+            data-tooltip="Mixture of Experts: 26B total parameters, 4B active per token.">
         26B
-· 4B aktiv      </span>
+· 4B active      </span>
     <span class="px-2 py-1 rounded bg-stone-100 border border-stone-200 num"
-          data-tooltip="Datei-Format und Quantisierung der Gewichte (z. B. Q8_0 = 8-bit, MXFP4 = 4-bit Mixed Precision). Niedrigere Bit-Werte = kleinerer RAM-Bedarf, potenziell etwas geringere Qualität.">gguf / q8_0</span>
+          data-tooltip="File format and quantisation of the weights (e.g. Q8_0 = 8-bit, MXFP4 = 4-bit mixed precision). Lower bit width = lower RAM, potentially slightly reduced quality.">gguf / q8_0</span>
     <span class="px-2 py-1 rounded bg-stone-100 border border-stone-200 num"
-          data-tooltip="Maximale Kontextlänge des Modells in Tokens (k = 1024). Inputs jenseits dieser Grenze werden vom Backend abgeschnitten.">ctx 256k</span>
+          data-tooltip="Maximum context length of the model in tokens (k = 1024). Inputs beyond this are truncated by the backend.">ctx 256k</span>
       <span class="px-2 py-1 rounded bg-stone-100 border border-stone-200 num"
-            data-tooltip="Veröffentlichungsdatum gemäß HuggingFace-Modellkarte (createdAt).">released 2026-03-12</span>
+            data-tooltip="Release date from the HuggingFace model card (createdAt).">released 2026-03-12</span>
       <span class="px-2 py-1 rounded bg-amber-100 border border-amber-300 text-amber-900"
-            data-tooltip="Akzeptiert Bilder als Input (VLM).">vision</span>
+            data-tooltip="Accepts images as input (VLM).">vision</span>
       <span class="px-2 py-1 rounded bg-emerald-50 border border-emerald-200 text-emerald-700"
-            data-tooltip="Trainiert für Tool / Function Calling — kann externe Tools aufrufen.">tool_use</span>
+            data-tooltip="Trained for tool / function calling — can invoke external tools.">tool_use</span>
   </div>
 </section>
 
 <div class="lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-8 lg:items-start">
   <aside class="hidden lg:block sticky top-4 self-start">
     <nav class="bg-white border border-stone-200 rounded-lg p-4 max-h-[calc(100vh-2rem)] overflow-y-auto">
-      <div class="text-xs uppercase tracking-wider text-stone-500">Modell</div>
+      <div class="text-xs uppercase tracking-wider text-stone-500">Model</div>
       <div class="mt-1 text-sm font-semibold text-stone-900 break-all leading-snug num">google/gemma-4-26b-a4b@q8_0</div>
       <dl class="mt-3 grid grid-cols-2 gap-2 text-xs">
         <div>
-          <dt class="text-stone-500">Peak-RAM</dt>
+          <dt class="text-stone-500">Peak RAM</dt>
           <dd class="font-semibold text-stone-900 num">26.1 GB</dd>
         </div>
         <div>
@@ -319,16 +311,16 @@
       <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
         Worum geht es? Was wird getestet?
       </summary>
-      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Aufgabe: Aus einem ~200-Wörter-Prompt soll das Modell ein voll funktionales Kanban-Board als single-file HTML mit Drag &amp; Drop, localStorage-Persistenz, Edit/Delete und Confetti-Animation generieren — in einem einzigen Chat ohne Iteration. Der Prompt enthält zusätzlich einen kleinen `data-testid`-Vertrag, damit ein Playwright-Test die App ferngesteuert bedienen kann.
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: From a ~200-word prompt the model must generate a fully functional Kanban board as a single-file HTML with drag &amp; drop, localStorage persistence, edit/delete and a confetti animation — in a single chat without iteration. The prompt also includes a small `data-testid` contract so a Playwright test can drive the app remotely.
 
-Drei Signale fließen in den Score ein:
-(1) Statisch — Linter prüft konkrete Constraints im HTML (Spalten, Tailwind, localStorage-Aufruf, kein Framework, kein window.alert/prompt, …).
-(2) Funktional — Playwright fährt eine kleine CRUD-Sequenz: Karte anlegen, Karte löschen mit Bestätigung, Reload — bleibt der Zustand erhalten? — und prüft, ob während des gesamten Flows JS-Konsolen-Fehler auftreten. Drag &amp; Drop und Confetti werden bewusst nicht funktional getestet (zu viele Implementierungsvarianten).
-(3) Qualitativ — LLM-as-Judge bewertet Screenshot und Code (Visual + Codequalität + Konsistenz Render↔Code).
+Three signals feed into the score:
+(1) Static — a linter checks concrete constraints in the HTML (columns, Tailwind, localStorage call, no framework, no window.alert/prompt, …).
+(2) Functional — Playwright runs a small CRUD sequence: create a card, delete a card with confirmation, reload — does state persist? — and checks whether any JS console errors occur during the entire flow. Drag &amp; drop and confetti are deliberately not tested functionally (too many implementation variants).
+(3) Qualitative — LLM-as-judge rates screenshot and code (visual + code quality + render↔code consistency).
 
-Score = Mittelwert über die vorhandenen Signale.
+Score = mean over the available signals.
 
-Warum Modelle scheitern: Reasoning-Modelle verbrauchen ihre Token im Denken statt im Schreiben. Sliding-Window-Modelle (Gemma 4) verlieren Constraints am Anfang des Prompts. Kleine Modelle (&lt;3B) produzieren oft kein zusammenhängendes HTML — oder ignorieren den data-testid-Vertrag, was die funktionalen Tests reihenweise rot färbt.</div>
+Why models fail: reasoning models burn their tokens in thinking instead of writing. Sliding-window models (Gemma 4) lose the constraints at the start of the prompt. Small models (&lt;3B) often fail to produce coherent HTML — or ignore the data-testid contract, which makes the functional tests fail in droves.</div>
     </details>
 
     <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
@@ -677,11 +669,11 @@ As answer return the plain HTML of the working application (script and styles in
       <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
         Worum geht es? Was wird getestet?
       </summary>
-      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Aufgabe: Vier Sub-Tasks, je 1 Bild. (1) handgeschriebene Meeting-Notiz leicht/mittel/schwer lesbar — Modell soll Text transkribieren. (2) Buchseite in Frakturschrift — gleiche Aufgabe.
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: Four sub-tasks, 1 image each. (1) handwritten meeting note easy/medium/hard to read — model must transcribe the text. (2) book page in Fraktur typeface — same task.
 
-Was getestet wird: OCR-Qualität, Erkennen von Layout-Strukturen (Spalten, Bullet-Punkte, Datumsangaben), Umgang mit unleserlicher Schrift.
+What is tested: OCR quality, recognising layout structure (columns, bullet points, dates), handling of illegible handwriting.
 
-Warum Modelle scheitern: Reine Text-Modelle haben keine Vision-Fähigkeit (werden gefiltert). Schwache VLMs erkennen nur den deutlichsten Teil. Manche bricht der Output ab oder geht ins Reasoning ohne sichtbare Antwort.</div>
+Why models fail: text-only models have no vision capability (filtered out). Weak VLMs only recognise the clearest part. Some truncate output or get stuck in reasoning without a visible answer.</div>
     </details>
 
     <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
@@ -1683,18 +1675,18 @@ Der Kahn war mittlerweile der Insel ganz nahe gekommen; die Kinder landeten an e
       <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
         Worum geht es? Was wird getestet?
       </summary>
-      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Aufgabe: In einem deutschen Buch-Korpus (mit eingestreutem Quellcode) werden 10 künstliche Fakten an gleichmäßig verteilten Tiefen (5% – 95%) versteckt. Das Modell muss alle wiederfinden.
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: In a German book corpus (with embedded source code) 10 synthetic facts are hidden at evenly distributed depths (5% – 95%). The model must retrieve all of them.
 
-Ablauf — DREI Turns im selben Chat-Kontext (Prefill nur einmal):
-Turn 1 — Korpus-Zusammenfassung: Modell bekommt den langen Korpus und soll ihn in 3-5 Sätzen zusammenfassen. Erzwingt eine echte Verarbeitung des Textes.
-Turn 2 — Needle-Retrieval: gleiche Konversation, jetzt die Bedürfnisfragen für die 10 versteckten Fakten.
-Turn 3 — Verstehen + Halluzinations-Fallen: 4 Faktenfragen zum Buchinhalt + 3 Halluzinations-Fallen (Modell soll erkennen, dass die Frage im Text NICHT beantwortet wird).
+Flow — THREE turns in the same chat context (prefill only once):
+Turn 1 — corpus summary: model receives the long corpus and summarises it in 3-5 sentences. Forces real processing of the text.
+Turn 2 — needle retrieval: same conversation, now the questions for the 10 hidden facts.
+Turn 3 — comprehension + hallucination traps: 4 factual questions about the book content + 3 hallucination traps (model should recognise that the question is NOT answered in the text).
 
-Default-Modus läuft EINE einheitliche Stufe für alle Modelle: 120k Tokens. Modelle ohne ausreichendes max_context werden in dieser Stufe nicht ausgeführt. `niah_deep` läuft zusätzlich 32k / 64k / 200k für eine vollständige Heatmap.
+Default mode runs ONE uniform stage for all models: 120k tokens. Models without sufficient max_context are skipped at this stage. `niah_deep` additionally runs 32k / 64k / 200k for a full heatmap.
 
-Score-Gewichtung: Zusammenfassung 20% + Needle-Retrieval 50% + Verstehen/Halluzinations-Resistenz 30%.
+Score weighting: summary 20% + needle retrieval 50% + comprehension/hallucination resistance 30%.
 
-Warum Modelle scheitern: Sliding-Window-Attention (Gemma 4) sieht nur die letzten 1-2k Tokens scharf. Reasoning-Modelle laufen auf Token-Limit, bevor sie antworten. Q4-KV-Cache verfälscht Recall messbar bei langen Kontexten. Bei den Halluzinations-Fallen verleitet der Helpful-Bias zu plausibel klingenden Erfindungen.</div>
+Why models fail: sliding-window attention (Gemma 4) only sees the last 1-2k tokens sharply. Reasoning models hit the token limit before answering. Q4 KV cache measurably degrades recall at long contexts. On the hallucination traps the helpful bias lures models into plausible-sounding inventions.</div>
     </details>
 
     <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
@@ -1705,23 +1697,23 @@ Warum Modelle scheitern: Sliding-Window-Attention (Gemma 4) sieht nur die letzte
           <div>
             <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Developer-Prompt</div>
             <pre class="text-xs whitespace-pre-wrap text-stone-800">TURN 1 (User):
-Im folgenden Abschnitt befindet sich ein längerer Mischtext aus deutschsprachiger Erzählung und Quellcode.
+The following section contains a longer mixed text of German narrative and source code.
 
-===== TEXT BEGINN =====
-&lt;korpus mit eingestreuten needles, je nach stage 32k–128k tokens&gt;
-===== TEXT ENDE =====
+===== TEXT BEGIN =====
+&lt;corpus with embedded needles, 32k–128k tokens depending on stage&gt;
+===== TEXT END =====
 
-Fasse den Inhalt des Textes in 3-5 Sätzen zusammen. Nenne Hauptfiguren, Schauplatz und die wichtigsten Themen.
+Summarise the text in 3-5 sentences. Mention the main characters, setting and key themes.
 
-TURN 2 (User, im selben Chat-Kontext):
-Beantworte jetzt die folgenden Fragen ausschließlich anhand des oben gezeigten Textes — erfinde nichts, ergänze nichts und übernehme keine Allgemeinwissen-Annahmen.
+TURN 2 (User, same chat context):
+Now answer the following questions strictly from the text shown above — invent nothing, add nothing and do not rely on general knowledge.
 
-Fragen:
-1. &lt;frage zu needle 1&gt;
-2. &lt;frage zu needle 2&gt;
+Questions:
+1. &lt;question for needle 1&gt;
+2. &lt;question for needle 2&gt;
 ...
 
-Antworte als nummerierte Liste 1., 2., 3. mit jeweils einem kurzen Satz.</pre>
+Answer as a numbered list 1., 2., 3. with one short sentence each.</pre>
           </div>
       </div>
     </details>
@@ -1941,11 +1933,11 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
       <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
         Worum geht es? Was wird getestet?
       </summary>
-      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Aufgabe: 3 Szenarien (leicht/mittel/schwer) mit gemockten Tools (read_file, apply_diff, get_weather, list_files). Modell muss die richtigen Tools in der richtigen Reihenfolge aufrufen und abschließend antworten. Multi-Turn (Tool-Result kommt zurück, Modell kann weitere Tools aufrufen).
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: 3 scenarios (easy/medium/hard) with mocked tools (read_file, apply_diff, get_weather, list_files). The model has to call the right tools in the right order and answer at the end. Multi-turn (tool result comes back, model can call further tools).
 
-Was getestet wird: OpenAI-style function calling, Argument-Korrektheit, Reihenfolge bei Multi-Step-Aufgaben (Datei lesen → JSON parsen → Wetter abfragen).
+What is tested: OpenAI-style function calling, argument correctness, ordering on multi-step tasks (read file → parse JSON → query weather).
 
-Warum Modelle scheitern: Modelle ohne &#39;tool_use&#39;-Capability ignorieren Tool-Schemas. Schwache Modelle wählen falsche Tools oder fehlerhafte Argumente. Hard-Tier (JSON-Format-Output) bricht oft bei der Gesamt-Synthese.</div>
+Why models fail: models without &#39;tool_use&#39; capability ignore tool schemas. Weak models pick wrong tools or malformed arguments. The hard tier (JSON-format output) often breaks during the final synthesis.</div>
     </details>
 
     <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
@@ -2740,13 +2732,13 @@ bg-red-50 text-red-700 border border-red-200">schwer</span>
       <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
         Worum geht es? Was wird getestet?
       </summary>
-      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Aufgabe: Foto eines handgezeichneten Diagramms (Architektur, Sequenz, Quadrant-Matrix) → Modell soll eine inline-SVG-Repräsentation desselben Diagramms erzeugen.
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: Photo of a hand-drawn diagram (architecture, sequence, quadrant matrix) → model must produce an inline-SVG representation of the same diagram.
 
-Zwei Score-Signale:
-(1) Deterministisch — SVG ist parsbar, hat &lt;svg&gt;-Wurzel, ausreichend Elemente und mindestens ein &lt;text&gt;; alle erwarteten Begriffe (Boxen, Beschriftungen) tauchen im Text-Content auf. Im Endscore zählen Validität und Begriffs-Abdeckung jeweils 15%.
-(2) Qualitativ — der `diagram-svg-judge`-Skill screenshottet die SVG und vergleicht sie visuell mit dem Original entlang fester Achsen (Vollständigkeit, Verbindungen, Pfeilrichtung, Gruppierung, Layout-Lesbarkeit, Diagrammtyp-Treue, Schönheit). Der Judge zählt 70%; Schönheit zählt im Judge doppelt.
+Two score signals:
+(1) Deterministic — SVG is parseable, has an &lt;svg&gt; root, enough elements and at least one &lt;text&gt;; all expected terms (boxes, labels) appear in the text content. Validity and term coverage each count for 15% of the final score.
+(2) Qualitative — the `diagram-svg-judge` skill screenshots the SVG and visually compares it to the original along fixed axes (completeness, connections, arrow direction, grouping, layout readability, diagram-type fidelity, aesthetics). The judge counts 70%; aesthetics is double-weighted within the judge.
 
-Warum Modelle scheitern: SVG-Generierung verlangt räumliches Denken (Boxen positionieren, Pfade berechnen, viewBox setzen) — das ist deutlich schwerer als deklarative Mermaid-Syntax. Schwache VLMs liefern oft nur einen leeren &lt;svg&gt; oder ein Element-Salat ohne Topologie.</div>
+Why models fail: SVG generation requires spatial reasoning (positioning boxes, computing paths, setting viewBox) — noticeably harder than declarative Mermaid syntax. Weak VLMs often produce only an empty &lt;svg&gt; or an element salad without topology.</div>
     </details>
 
     <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
@@ -3084,11 +3076,11 @@ Content-Strategie, Hashtag, Weltag der Büroklammer                    </div>
       <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
         Worum geht es? Was wird getestet?
       </summary>
-      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Aufgabe: 11 Fragen mit subtilen, plausibel klingenden, aber faktisch falschen Prämissen (z.B. &#39;Welches Album veröffentlichte Tocotronic 1991?&#39; — Band wurde erst 1993 gegründet).
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: 11 questions with subtle, plausible-sounding but factually false premises (e.g. &#39;Which album did Tocotronic release in 1991?&#39; — the band was only formed in 1993).
 
-Was getestet wird: Erkennt das Modell die falsche Prämisse (&#39;corrected&#39;), gibt es zu, etwas nicht zu wissen (&#39;abstained&#39;), oder erfindet es eine plausibel klingende Antwort (&#39;fabricated&#39;)?
+What is tested: does the model recognise the false premise (&#39;corrected&#39;), admit it doesn&#39;t know (&#39;abstained&#39;), or invent a plausible-sounding answer (&#39;fabricated&#39;)?
 
-Warum Modelle scheitern: Trainings-Bias zur Hilfsbereitschaft verleitet zu plausiblen Halluzinationen. Kleine Modelle haben schlechtere Fakten-Verankerung. Subtile Fragen über Persönlichkeitsdetails (z.B. Politiker-Kinder) sind besonders verlockend zum Erfinden.</div>
+Why models fail: training bias toward helpfulness encourages plausible hallucinations. Small models have weaker factual grounding. Subtle questions about personal details (e.g. politicians&#39; children) are especially tempting to make up.</div>
     </details>
 
     <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
