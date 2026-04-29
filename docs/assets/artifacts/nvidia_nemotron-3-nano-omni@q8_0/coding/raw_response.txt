@@ -1,0 +1,379 @@
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Kanban Board</title>
+  <style>
+    /* Confetti animation – a simple particle burst */
+    @keyframes confetti {
+      0%   { transform: translateY(0) scale(0); opacity: 0; }
+      100% { transform: translateY(-250px) scale(1.5); opacity: 1; }
+    }
+    #confetti {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 200px;
+      height: 200px;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      opacity: 0;
+    }
+    #confetti.active {
+      opacity: 1;
+      animation: confetti 2s forwards;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center p-4">
+
+  <!-- Columns container -->
+  <div class="w-full max-w-5xl grid grid-cols-1 gap-4">
+    <!-- Backlog column -->
+    <div id="backlog" data-testid="column-backlog"
+         class="bg-indigo-50 p-4 rounded-lg">
+      <h2 class="text-lg font-semibold mb-2">Backlog</h2>
+      <button data-testid="add-card" class="bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700">
+        Add card
+      </button>
+    </div>
+
+    <!-- In Progress column -->
+    <div id="inProgress" data-testid="column-in-progress"
+         class="bg-blue-50 p-4 rounded-lg">
+      <h2 class="text-lg font-semibold mb-2">In Progress</h2>
+      <button data-testid="add-card" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
+        Add card
+      </button>
+    </div>
+
+    <!-- Review column -->
+    <div id="review" data-testid="column-review"
+         class="bg-green-50 p-4 rounded-lg">
+      <h2 class="text-lg font-semibold mb-2">Review</h2>
+      <button data-testid="add-card" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
+        Add card
+      </button>
+    </div>
+
+    <!-- Done column -->
+    <div id="done" data-testid="column-done"
+         class="bg-yellow-50 p-4 rounded-lg">
+      <h2 class="text-lg font-semibold mb-2">Done</h2>
+      <button data-testid="add-card" class="bg-yellow-600 text-white px-3 py-1 rounded hover:bg-yellow-700">
+        Add card
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal for adding a new card (hidden by default) -->
+  <div id="card-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+    <div class="bg-white rounded-lg p-6 w-full max-w-md">
+      <h3 class="text-xl font-medium mb-4">Add New Card</h3>
+      <input type="text" id="card-input" data-testid="card-input"
+             placeholder="Card title..." class="w-full border rounded px-3 py-2 mb-4"/>
+      <button id="confirm-add-card"
+              class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+        Add
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal for confirming deletion -->
+  <div id="confirm-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+    <div class="bg-white rounded-lg p-6 w-full max-w-sm">
+      <h3 class="text-xl font-medium mb-2">Delete Card?</h3>
+      <p class="mb-4">This action cannot be undone.</p>
+      <button id="confirm-delete" data-testid="confirm-delete"
+              class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+        Confirm
+      </button>
+      <button id="cancel-delete"
+              class="ml-2 bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400">
+        Cancel
+      </button>
+    </div>
+  </div>
+
+  <!-- Confetti element (single reusable node) -->
+  <div id="confetti" class="confetti"></div>
+
+  <script>
+    /* --------------------------------------------------------------
+       Kanban Board – vanilla JavaScript implementation
+       Namespace: kanbanApp (stored in localStorage under key "kanbanApp")
+       -------------------------------------------------------------- */
+
+    // ---------------------------- State Management ----------------------------
+    const STATE = {
+      backlog: [],     // {id, text}
+      inProgress: [],
+      review: [],
+      done: []
+    };
+
+    const STORAGE_KEY = 'kanbanApp';
+
+    /** Load state from localStorage or initialise with dummy data */
+    function loadState() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          // Ensure all expected arrays exist
+          STATE.backlog = parsed.backlog || [];
+          STATE.inProgress = parsed.inProgress || [];
+          STATE.review = parsed.review || [];
+          STATE.done = parsed.done || [];
+        } catch (e) {
+          console.warn('Failed to parse stored state, using dummy data.', e);
+        }
+      } else {
+        // Dummy cards – three per column
+        STATE.backlog = [
+          { id: 'card-1', text: 'Write project proposal' },
+          { id: 'card-2', text: 'Design UI mockups' }
+        ];
+        STATE.inProgress = [
+          { id: 'card-3', text: 'Implement drag‑and‑drop' }
+        ];
+        STATE.review = [
+          { id: 'card-4', text: 'Code review checklist' }
+        ];
+        STATE.done = []; // start empty – confetti will trigger when a card arrives
+      }
+    }
+
+    /** Persist current state to localStorage */
+    function saveState() {
+      const data = JSON.stringify(STATE);
+      localStorage.setItem(STORAGE_KEY, data);
+    }
+
+    // ---------------------------- Rendering ----------------------------
+    /** Re‑create DOM for every column based on STATE */
+    function render() {
+      // Helper to create a card element
+      const createCardEl = (card) => {
+        const cardDiv = document.createElement('div');
+        cardDiv.id = card.id;                     // used for drag‑and‑drop data
+        cardDiv.dataset.testid = 'card';
+        cardDiv.className = 'flex items-center mb-2 p-3 bg-white rounded shadow';
+
+        const textSpan = document.createElement('span');
+        textSpan.className = 'flex-1 cursor-text';
+        textSpan.textContent = card.text;
+        // Double‑click to edit
+        textSpan.addEventListener('dblclick', () => startEdit(cardDiv, card.id));
+        cardDiv.appendChild(textSpan);
+
+        const delBtn = document.createElement('button');
+        delBtn.dataset.testid = 'delete-card';
+        delBtn.textContent = 'Delete';
+        delBtn.className = 'text-red-600 ml-2';
+        delBtn.addEventListener('click', () => openConfirmDelete(cardDiv, card.id));
+        cardDiv.appendChild(delBtn);
+
+        return cardDiv;
+      };
+
+      // Clear previous content (keep add‑card buttons)
+      document.getElementById('backlog').innerHTML = '';
+      document.getElementById('inProgress').innerHTML = '';
+      document.getElementById('review').innerHTML = '';
+      document.getElementById('done').innerHTML = '';
+
+      // Populate each column
+      const columns = {
+        backlog:    STATE.backlog,
+        inProgress: STATE.inProgress,
+        review:     STATE.review,
+        done:       STATE.done
+      };
+
+      Object.entries(columns).forEach(([columnId, cards]) => {
+        const colEl = document.getElementById(columnId);
+        // Add the "Add card" button again (it was cleared)
+        const addBtn = document.createElement('button');
+        addBtn.dataset.testid = 'add-card';
+        addBtn.textContent = 'Add card';
+        addBtn.className = `bg-${columnId === 'backlog' ? 'indigo' :
+                            columnId === 'inProgress' ? 'blue' :
+                            columnId === 'review' ? 'green' : 'yellow'}-600 text-white px-3 py-1 rounded hover:bg-${columnId}-700`;
+        addBtn.addEventListener('click', () => openAddCardModal(columnId));
+        colEl.appendChild(addBtn);
+
+        // Render each card
+        cards.forEach(card => colEl.appendChild(createCardEl(card)));
+      });
+    }
+
+    // ---------------------------- Editing ----------------------------
+    /** Make a card's text editable */
+    function startEdit(cardDiv, cardId) {
+      const columnId = cardDiv.parentElement.dataset.testid.replace('column-', '');
+      const cardsArray = STATE[columnId];
+      const cardObj = cardsArray.find(c => c.id === cardId);
+      if (!cardObj) return;
+
+      // Turn the span into a contenteditable element
+      const textSpan = cardDiv.querySelector('.flex-1');
+      textSpan.contentEditable = true;
+      textSpan.focus();
+
+      // Commit on Enter or when focus loses
+      const commitEdit = () => {
+        const newText = textSpan.textContent.trim();
+        if (newText !== cardObj.text) {
+          cardObj.text = newText;
+          saveState();
+          render(); // re‑render to reflect change (simple but effective)
+        }
+        textSpan.contentEditable = false;
+      };
+      textSpan.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          commitEdit();
+        }
+      });
+      textSpan.addEventListener('blur', commitEdit);
+    }
+
+    // ---------------------------- Adding a Card ----------------------------
+    const addModal = document.getElementById('card-modal');
+    const inputEl   = document.getElementById('card-input');
+    const confirmBtn= document.getElementById('confirm-add-card');
+
+    /** Open the "Add card" modal for a specific column */
+    function openAddCardModal(columnId) {
+      inputEl.value = '';
+      addModal.classList.remove('hidden');
+      inputEl.focus();
+    }
+
+    /** Add new card to the specified column */
+    confirmBtn.addEventListener('click', () => {
+      const title = inputEl.value.trim();
+      if (!title) return;
+      const newCard = { id: 'card-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5),
+                        text: title };
+      STATE[columnId].push(newCard);
+      saveState();
+      render();
+      addModal.classList.add('hidden');
+    });
+
+    // Pressing Enter inside the input also commits
+    inputEl.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        confirmBtn.click();
+      }
+    });
+
+    // ---------------------------- Deleting a Card ----------------------------
+    const confirmModal = document.getElementById('confirm-modal');
+    const confirmDelBtn = document.getElementById('confirm-delete');
+    const cancelDelBtn  = document.getElementById('cancel-delete');
+
+    /** Show confirmation modal for a card */
+    function openConfirmDelete(cardDiv, cardId) {
+      // Store reference to the card we want to delete
+      window.currentDeleteTarget = { cardDiv, cardId };
+      confirmModal.classList.remove('hidden');
+    }
+
+    confirmDelBtn.addEventListener('click', () => {
+      const { cardDiv, cardId } = window.currentDeleteTarget;
+      if (!cardDiv) return;
+      // Find column and index
+      const columnId = cardDiv.closest('[data-testid^=column]').dataset.testid.replace('column-','');
+      const idx = STATE[columnId].findIndex(c => c.id === cardId);
+      if (idx !== -1) {
+        STATE[columnId].splice(idx, 1);   // remove
+        saveState();
+        render();
+      }
+      confirmModal.classList.add('hidden');
+      window.currentDeleteTarget = null;
+    });
+
+    cancelDelBtn.addEventListener('click', () => {
+      confirmModal.classList.add('hidden');
+      window.currentDeleteTarget = null;
+    });
+
+    // ---------------------------- Drag‑and‑Drop ----------------------------
+    /** Drag start – store the card id */
+    document.addEventListener('dragstart', e => {
+      if (e.target.dataset.testid === 'card') {
+        const cardId = e.target.id;   // we set id attribute equal to card.id
+        e.dataTransfer.setData('text/plain', cardId);
+      }
+    });
+
+    /** Drag over – allow drop into any column */
+    document.addEventListener('dragover', e => {
+      if (e.target.dataset.testid?.startsWith('column-')) {
+        e.preventDefault(); // necessary to allow drop
+      }
+    });
+
+    /** Drop – move card to the new column */
+    document.addEventListener('drop', e => {
+      const targetColumn = e.target.closest('[data-testid^=column]');
+      if (!targetColumn) return;
+
+      const sourceColumn = e.dataTransfer.getData('text/plain')
+                           ? null; // placeholder – we actually retrieve id below
+      // Retrieve the card id from the dragged element (the element that started drag)
+      const draggedElement = document.querySelector('[draggable]');
+      if (!draggedElement) return;
+      const cardId = draggedElement.id;
+
+      // Find source column and remove card from its array
+      const sourceColumnId = draggedElement.closest('[data-testid^=column]').dataset.testid.replace('column-','');
+      const sourceArray = STATE[sourceColumnId];
+      const cardObj = sourceArray.find(c => c.id === cardId);
+      if (cardObj) sourceArray.splice(sourceArray.indexOf(cardObj), 1);
+
+      // Add to target column
+      const targetArray = STATE[targetColumn.dataset.testid.replace('column-','')];
+      targetArray.push(cardObj);
+
+      saveState();
+      render();
+
+      // Show confetti if the card landed in "Done"
+      if (targetColumn.id === 'done') {
+        showConfetti(targetColumn);
+      }
+    });
+
+    /** Helper – create a temporary confetti element positioned near drop */
+    function showConfetti(columnElement) {
+      const rect = columnElement.getBoundingClientRect();
+      const confettiEl = document.getElementById('confetti');
+      // Position roughly at the centre of the target column
+      confettiEl.style.left = `${rect.left + rect.width / 2}px`;
+      confettiEl.style.top  = `${rect.top + rect.height / 2}px`;
+      confettiEl.classList.add('active');
+
+      setTimeout(() => {
+        confettiEl.classList.remove('active');
+      }, 2000);
+    }
+
+    // ---------------------------- Initialisation ----------------------------
+    loadState();
+    render();
+
+  </script>
+</body>
+</html>
+```

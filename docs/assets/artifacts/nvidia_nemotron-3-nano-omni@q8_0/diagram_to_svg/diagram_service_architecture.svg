@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto-start-reverse">
+      <path d="M0,0 L0,6 L9,3 z" fill="#333"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="50" y="40" font-size="20" font-weight="bold">System Architecture</text>
+
+  <!-- Frontend Box -->
+  <g id="frontend-group">
+    <rect x="300" y="240" width="160" height="70" fill="#f9f9f9" stroke="#333" stroke-width="2"/>
+    <text x="380" y="275" font-size="14">Frontend (React)</text>
+  </g>
+
+  <!-- API Gateway Box -->
+  <g id="apigw-group">
+    <rect x="480" y="240" width="140" height="70" fill="#f9f9f9" stroke="#333" stroke-width="2"/>
+    <text x="550" y="275" font-size="14">API Gateway</text>
+  </g>
+
+  <!-- Auth Service Box -->
+  <g id="auth-group">
+    <rect x="650" y="230" width="110" height="50" fill="#f9f9f9" stroke="#333" stroke-width="2"/>
+    <text x="705" y="260" font-size="14">Auth Service (JWT)</text>
+  </g>
+
+  <!-- Data Store Box -->
+  <g id="datastore-group">
+    <rect x="800" y="230" width="110" height="50" fill="#f9f9f9" stroke="#333" stroke-width="2"/>
+    <text x="855" y="260" font-size="14">Data Store (SQL)</text>
+  </g>
+
+  <!-- Backend Box -->
+  <g id="backend-group">
+    <rect x="480" y="340" width="160" height="70" fill="#f9f9f9" stroke="#333" stroke-width="2"/>
+    <text x="560" y="375" font-size="14">Backend (Node.js + Express.js)</text>
+  </g>
+
+  <!-- Database Box -->
+  <g id="database-group">
+    <rect x="300" y="440" width="160" height="70" fill="#f9f9f9" stroke="#333" stroke-width="2"/>
+    <text x="380" y="475" font-size="14">Database (PostgreSQL)</text>
+  </g>
+
+  <!-- Message Queue Box -->
+  <g id="mq-group">
+    <rect x="650" y="440" width="140" height="70" fill="#f9f9f9" stroke="#333" stroke-width="2"/>
+    <text x="720" y="475" font-size="14">Message Queue (Kafka/RabbitMQ)</text>
+  </g>
+
+  <!-- Worker Service Box -->
+  <g id="worker-group">
+    <rect x="650" y="530" width="140" height="70" fill="#f9f9f9" stroke="#333" stroke-width="2"/>
+    <text x="720" y="565" font-size="14">Worker Service (Python)</text>
+  </g>
+
+  <!-- Admin Panel Box -->
+  <g id="admin-group">
+    <rect x="850" y="210" width="60" height="40" fill="#f9f9f9" stroke="#333" stroke-width="2"/>
+    <text x="880" y="235" font-size="12">Admin Panel</text>
+  </g>
+
+  <!-- Connections -->
+  <!-- Frontend -> API Gateway (Dashed) -->
+  <line x1="460" y1="290" x2="480" y2="290" stroke="#333" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow)"/>
+
+  <!-- API Gateway -> Auth Service (Up-Right) -->
+  <line x1="620" y1="275" x2="680" y2="230" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- API Gateway -> Data Store (Right) -->
+  <line x1="620" y1="275" x2="800" y2="275" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- API Gateway -> Backend (Down) -->
+  <line x1="550" y1="310" x2="550" y2="340" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Backend -> Database (Dashed Down-Left) -->
+  <line x1="640" y1="405" x2="300" y2="475" stroke="#333" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow)"/>
+
+  <!-- Backend -> Message Queue (Right) -->
+  <line x1="640" y1="405" x2="650" y2="405" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Message Queue -> Worker Service (Down) -->
+  <line x1="720" y1="510" x2="720" y2="530" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Admin Panel -> Data Store (Dashed) -->
+  <line x1="860" y1="240" x2="800" y2="275" stroke="#333" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow)"/>
+</svg>

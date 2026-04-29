@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kanban Board</title>
+    <!-- Tailwind CSS via CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Basic styles */
+        .board {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        .column {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 25%;
+            min-height: 300px;
+        }
+        .card {
+            background-color: #f9fafb;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 10px;
+            padding: 15px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card.dragging {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .card input {
+            border: none;
+            outline: none;
+            width: 100%;
+        }
+        .confetti {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-4">
+        <h1 class="text-3xl font-bold text-center mb-6">Kanban Board</h1>
+        <div class="board">
+            <!-- Columns -->
+            <div class="column" data-testid="column-backlog">
+                <h2 class="text-xl font-semibold mb-4">Backlog</h2>
+                <div data-testid="cards-backlog"></div>
+                <button class="btn-add-card" data-column="backlog" data-testid="add-card">Add card</button>
+            </div>
+            <div class="column" data-testid="column-in-progress">
+                <h2 class="text-xl font-semibold mb-4">In Progress</h2>
+                <div data-testid="cards-in-progress"></div>
+                <button class="btn-add-card" data-column="in-progress" data-testid="add-card">Add card</button>
+            </div>
+            <div class="column" data-testid="column-review">
+                <h2 class="text-xl font-semibold mb-4">Review</h2>
+                <div data-testid="cards-review"></div>
+                <button class="btn-add-card" data-column="review" data-testid="add-card">Add card</button>
+            </div>
+            <div class="column" data-testid="column-done">
+                <h2 class="text-xl font-semibold mb-4">Done</h2>
+                <div data-testid="cards-done"></div>
+                <button class="btn-add-card" data-column="done" data-testid="add-card">Add card</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete confirmation modal -->
+    <div class="modal hidden fixed top-0 left-0 w-full h-full bg-gray-800 bg-opacity-50 flex items-center justify-center" data-testid="delete-modal">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm text-center">
+            <p>Are you sure you want to delete this card?</p>
+            <button class="btn-confirm-delete mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700" data-testid="confirm-delete">Delete</button>
+            <button class="btn-cancel-delete ml-2 px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Confetti animation -->
+    <canvas class="confetti hidden" data-testid="confetti"></canvas>
+
+    <script>
+        const APP_NAMESPACE = 'kanbanApp';
+        let cards = JSON.parse(localStorage.getItem(`${APP_NAMESPACE}:cards`)) || {
+            backlog: [],
+            inProgress: [],
+            review: [],
+            done: []
+        };
+
+        const columns = ['backlog', 'inProgress', 'review', 'done'];
+        let draggedCard = null;
+
+        // Render cards
+        function renderCards() {
+            columns.forEach(column => {
+                const columnElement = document.querySelector(`data-testid="cards-${column}"`);
+                columnElement.innerHTML = '';
+                cards[column].forEach(card => {
+                    const cardElement = document.createElement('div');
+                    cardElement.classList.add('card', 'relative');
+                    cardElement.dataset.column = column;
+                    cardElement.setAttribute('data-testid', 'card');
+                    cardElement.innerHTML = `
+                        <input type="text" value="${card}" class="w-full" data-testid="card-input">
+                        <button class="absolute top-2 right-2 text-red-600 hover:text-red-700" data-testid="delete-card">Delete</button>
+                    `;
+                    columnElement.appendChild(cardElement);
+                });
+            });
+
+            // Add event listeners
+            document.querySelectorAll('[data-testid="card-input"]').forEach(input => {
+                input.addEventListener('keydown', handleCardEdit);
+            });
+
+            document.querySelectorAll('[data-testid="delete-card"]').forEach(button => {
+                button.addEventListener('click', handleCardDelete);
+            });
+        }
+
+        // Handle card edit
+        function handleCardEdit(event) {
+            if (event.key === 'Enter') {
+                const cardElement = event.target.parentElement;
+                const column = cardElement.dataset.column;
+                const index = Array.from(cardElement.parentElement.children).indexOf(cardElement);
+                cards[column][index] = event.target.value;
+                saveCards();
+            }
+        }
+
+        // Handle card delete
+        function handleCardDelete(event) {
+            const cardElement = event.target.parentElement;
+            const column = cardElement.dataset.column;
+            const index = Array.from(cardElement.parentElement.children).indexOf(cardElement);
+            shownDeleteModal(cardElement, column, index);
+        }
+
+        // Show delete confirmation modal
+        function shownDeleteModal(cardElement, column, index) {
+            const modal = document.querySelector('[data-testid="delete-modal"]');
+            modal.classList.remove('hidden');
+            document.querySelector('[data-testid="confirm-delete"]').addEventListener('click', () => {
+                cards[column].splice(index, 1);
+                saveCards();
+                cardElement.remove();
+                modal.classList.add('hidden');
+            });
+            document.querySelector('[data-testid="cancel-delete"]').addEventListener('click', () => {
+                modal.classList.add('hidden');
+            });
+        }
+
+        // Save cards to localStorage
+        function saveCards() {
+            localStorage.setItem(`${APP_NAMESPACE}:cards`, JSON.stringify(cards));
+        }
+
+        // Add card
+        function addCard(column) {
+            const columnElement = document.querySelector(`data-testid="cards-${column}"`);
+            const cardElement = document.createElement('div');
+            cardElement.classList.add('card', 'relative');
+            cardElement.dataset.column = column;
+            cardElement.setAttribute('data-testid', 'card');
+            cardElement.innerHTML = `
+                <input type="text" value="" class="w-full" data-testid="card-input">
+                <button class="absolute top-2 right-2 text-red-600 hover:text-red-700" data-testid="delete-card">Delete</button>
+            `;
+            columnElement.appendChild(cardElement);
+            cards[column].push('');
+            saveCards();
+
+            // Add event listeners to the new card
+            const input = cardElement.querySelector('[data-testid="card-input"]');
+            input.addEventListener('keydown', handleCardEdit);
+            input.focus();
+
+            const deleteButton = cardElement.querySelector('[data-testid="delete-card"]');
+            deleteButton.addEventListener('click', handleCardDelete);
+        }
+
+        // Add event listeners for adding cards
+        document.querySelectorAll('[data-testid="add-card"]').forEach(button => {
+            button.addEventListener('click', event => {
+                const column = event.target.dataset.column;
+                addCard(column);
+            });
+        });
+
+        // Initialize the board
+        if (Object.values(cards).flat().length === 0) {
+            // Add dummy cards
+            columns.forEach(column => {
+                for (let i = 0; i < 3; i++) {
+                    cards[column].push(`Card ${i + 1} in ${column}`);
+                }
+            });
+            saveCards();
+        }
+
+        renderCards();
+
+        // Drag and drop functionality
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('dragstart', event => {
+                draggedCard = event.target;
+                event.dataTransfer.setData('text/plain', '');
+            });
+        });
+
+        document.querySelectorAll('.column').forEach(column => {
+            column.addEventListener('dragover', event => {
+                event.preventDefault();
+            });
+            column.addEventListener('drop', event => {
+                if (draggedCard) {
+                    const currentColumn = draggedCard.dataset.column;
+                    const newColumn = event.target.closest('.column').dataset.testid.split('-')[1];
+                    if (currentColumn !== newColumn) {
+                        const oldIndex = Array.from(draggedCard.parentElement.children).indexOf(draggedCard);
+                        cards[currentColumn].splice(oldIndex, 1);
+                        const newIndex = Array.from(event.target.parentElement.children).indexOf(draggedCard) === -1 ? event.target.parentElement.children.length : Array.from(event.target.parentElement.children).indexOf(draggedCard);
+                        cards[newColumn].splice(newIndex, 0, draggedCard.querySelector('[data-testid="card-input"]').value);
+                        saveCards();
+                        renderCards();
+
+                        if (newColumn === 'done') {
+                            const confettiCanvas = document.querySelector('[data-testid="confetti"]');
+                            confetti(confettiCanvas);
+                        }
+                    }
+                }
+            });
+        });
+
+        // Confetti animation
+        function confetti(canvas) {
+            canvas.classList.remove('hidden');
+            const jsConfetti = new JSConfetti({ canvas });
+            jsConfetti.addConfetti();
+            setTimeout(() => {
+                canvas.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Initialize confetti library
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/js-confetti@0.8.2/dist/js-confetti.browser.min.js';
+        document.head.appendChild(script);
+    </script>
+</body>
+</html>

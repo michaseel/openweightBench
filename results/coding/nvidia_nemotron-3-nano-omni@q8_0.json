@@ -1,0 +1,201 @@
+{
+  "task": "coding",
+  "model_id": "nvidia/nemotron-3-nano-omni@q8_0",
+  "model_info": {
+    "id": "nvidia/nemotron-3-nano-omni@q8_0",
+    "type": "vlm",
+    "publisher": "nvidia",
+    "arch": "nemotron_h_moe",
+    "compatibility_type": "gguf",
+    "quantization": "q8_0",
+    "state": "not-loaded",
+    "max_context_length": 262144,
+    "capabilities": [
+      "tool_use"
+    ],
+    "loaded_context_length": null
+  },
+  "started_at": "2026-04-29T21:11:02.681257Z",
+  "completed_at": "2026-04-29T21:13:22.762990Z",
+  "metrics": {
+    "wall_seconds": 140.08554558397736,
+    "tokens_generated": 6254,
+    "tokens_per_second": 78.23609358753134,
+    "time_to_first_token_ms": 376.0,
+    "peak_rss_mb": 33545.6
+  },
+  "score": 0.6666666666666666,
+  "score_breakdown": {
+    "looks_like_html": true,
+    "html_length": 13917,
+    "raw_length": 13930,
+    "lint_checks": [
+      {
+        "id": "col_backlog",
+        "label": "Spalte 'Backlog'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_in_progress",
+        "label": "Spalte 'In Progress'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_review",
+        "label": "Spalte 'Review'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_done",
+        "label": "Spalte 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "drag_drop",
+        "label": "HTML5 drag & drop or sortable lib",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "local_storage",
+        "label": "localStorage persistence",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "tailwind_cdn",
+        "label": "Tailwind via CDN",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "confetti",
+        "label": "Confetti animation on 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Add card button",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "vanilla_js",
+        "label": "Vanilla JS (no React/Vue/Angular/Svelte)",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_alert_prompt",
+        "label": "No window.alert/prompt for CRUD",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "editable_cards",
+        "label": "Editable cards (contenteditable / input)",
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "lint_passed": 12,
+    "lint_total": 12,
+    "lint_score": 1.0,
+    "e2e_checks": [
+      {
+        "id": "renders",
+        "label": "Page loads with all 4 columns",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Add card via button",
+        "passed": false,
+        "detail": "Page.wait_for_selector: Timeout 2000ms exceeded.\nCall log:\n  - waiting for locator(\"[data-testid=\\\"card-input\\\"]\") to be visible\n    9 × locator resolved to hidden <input type=\"text\" id=\"card-input\" d"
+      },
+      {
+        "id": "no_double_add",
+        "label": "Card is added exactly 1× (no double submit)",
+        "passed": false,
+        "detail": "skipped — add flow failed"
+      },
+      {
+        "id": "delete_card",
+        "label": "Delete card via button + confirmation",
+        "passed": false,
+        "detail": "no cards available to delete"
+      },
+      {
+        "id": "persistence",
+        "label": "Cards survive a reload",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_console_errors",
+        "label": "No JS console errors",
+        "passed": false,
+        "detail": "pageerror: Unexpected token ';'; pageerror: Unexpected token ';'"
+      }
+    ],
+    "e2e_passed": 2,
+    "e2e_total": 6,
+    "e2e_score": 0.3333333333333333,
+    "judge": {
+      "scored_at": "2026-04-29T21:13:43.616596+00:00",
+      "judge_model": "openai/gpt-5.4",
+      "scores": {
+        "board_renders": 0.5,
+        "column_completeness": 0.5,
+        "cards_present": 0.0,
+        "ui_affordances": 0.5,
+        "design_quality": 0.4,
+        "code_structure": 0.5,
+        "dom_safety": 0.9,
+        "robustness": 0.3,
+        "code_quality": 0.2,
+        "render_matches_code": 0.0
+      },
+      "judge_score": 0.37,
+      "comment_visual": "Das Board rendert sichtbar mit vier Bereichen und Add-card-Buttons, aber die Spaltenüberschriften wirken nach dem Render teilweise verloren und es sind keinerlei Karten sichtbar. Die Oberfläche ist sauber, aber sehr roh und funktional unvollständig.",
+      "comment_code": "Die Grundstruktur ist in Abschnitte gegliedert und User-Text wird sicher per textContent gesetzt. Allerdings enthält der Code gravierende Logikfehler: columnId ist beim Hinzufügen nicht definiert, Spalten-Header werden im Render gelöscht und nicht wiederhergestellt, Mapping von data-testid zu State-Keys ist fehlerhaft, und Drag-and-drop ist faktisch kaputt, weil Karten nicht draggable gemacht werden.",
+      "comment_consistency": "Starke Diskrepanz zwischen Code und Screenshot: Der Code verspricht Dummy-Karten und mehr Interaktion, im Render sind nur leere Spalten mit Buttons zu sehen. Das deutet klar auf fehlerhaftes Initial-Rendering bzw. kaputte Render-Logik hin."
+    }
+  },
+  "raw_response": "\n```html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\" />\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>\n  <!-- Tailwind CSS via CDN -->\n  <script src=\"https://cdn.tailwindcss.com\"></script>\n  <title>Kanban Board</title>\n  <style>\n    /* Confetti animation – a simple particle burst */\n    @keyframes confetti {\n      0%   { transform: translateY(0) scale(0); opacity: 0; }\n      100% { transform: translateY(-250px) scale(1.5); opacity: 1; }\n    }\n    #confetti {\n      position: fixed;\n      top: 50%;\n      left: 50%;\n      width: 200px;\n      height: 200px;\n      pointer-events: none;\n      transform: translate(-50%, -50%);\n      opacity: 0;\n    }\n    #confetti.active {\n      opacity: 1;\n      animation: confetti 2s forwards;\n    }\n  </style>\n</head>\n<body class=\"bg-gray-100 min-h-screen flex flex-col items-center p-4\">\n\n  <!-- Columns container -->\n  <div class=\"w-full max-w-5xl grid grid-cols-1 gap-4\">\n    <!-- Backlog column -->\n    <div id=\"backlog\" data-testid=\"column-backlog\"\n         class=\"bg-indigo-50 p-4 rounded-lg\">\n      <h2 class=\"text-lg font-semibold mb-2\">Backlog</h2>\n      <button data-testid=\"add-card\" class=\"bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700\">\n        Add card\n      </button>\n    </div>\n\n    <!-- In Progress column -->\n    <div id=\"inProgress\" data-testid=\"column-in-progress\"\n         class=\"bg-blue-50 p-4 rounded-lg\">\n      <h2 class=\"text-lg font-semibold mb-2\">In Progress</h2>\n      <button data-testid=\"add-card\" class=\"bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700\">\n        Add card\n      </button>\n    </div>\n\n    <!-- Review column -->\n    <div id=\"review\" data-testid=\"column-review\"\n         class=\"bg-green-50 p-4 rounded-lg\">\n      <h2 class=\"text-lg font-semibold mb-2\">Review</h2>\n      <button data-testid=\"add-card\" class=\"bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700\">\n        Add card\n      </button>\n    </div>\n\n    <!-- Done column -->\n ",
+  "artifacts": [
+    {
+      "kind": "html",
+      "label": "Generierte App",
+      "path": "artifacts/nvidia_nemotron-3-nano-omni@q8_0/coding/output.html",
+      "mime": "text/html"
+    },
+    {
+      "kind": "text",
+      "label": "Raw model response",
+      "path": "artifacts/nvidia_nemotron-3-nano-omni@q8_0/coding/raw_response.txt",
+      "mime": "text/plain"
+    },
+    {
+      "kind": "image",
+      "label": "Screenshot der gerenderten App",
+      "path": "artifacts/nvidia_nemotron-3-nano-omni@q8_0/coding/screenshot.png",
+      "mime": "image/png"
+    }
+  ],
+  "error": null,
+  "hardware": {
+    "platform": "macOS-26.4.1-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "ram_total_gb": 128.0,
+    "cpu_count": 16
+  },
+  "bench_version": "0.1.0"
+}

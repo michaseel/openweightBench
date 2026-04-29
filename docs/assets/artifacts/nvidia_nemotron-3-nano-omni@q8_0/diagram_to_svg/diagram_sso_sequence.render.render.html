@@ -1,0 +1,80 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html,body{margin:0;background:#fff;font-family:system-ui,-apple-system,sans-serif}
+  .wrap{padding:24px;display:inline-block;background:#fff}
+  /* Force a concrete render box: many model-emitted SVGs only set viewBox.
+     Without a width here, an inline-block parent collapses the SVG to its
+     intrinsic ~300x150 (or smaller) and the screenshot becomes a tiny
+     blank tile. Fixed width + auto height uses viewBox aspect-ratio. */
+  .wrap svg{display:block;width:1200px;height:auto;max-width:none}
+</style></head><body><div class="wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800">
+    <defs>
+        <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M 0 0 L 0 6 L 9 3 z" fill="black"/>
+        </marker>
+    </defs>
+
+    <!-- Title -->
+    <text x="600" y="50" text-anchor="middle" font-size="24">SSO - Ablaufdiagramm</text>
+
+    <!-- User Stick Figure -->
+    <g id="user">
+        <circle cx="150" cy="320" r="10" fill="black"/>
+        <line x1="150" y1="330" x2="150" y2="400" stroke="black" stroke-width="2"/>
+        <line x1="145" y1="400" x2="155" y2="450" stroke="black" stroke-width="2"/>
+        <line x1="155" y1="400" x2="165" y2="450" stroke="black" stroke-width="2"/>
+        <line x1="140" y1="330" x2="160" y2="330" stroke="black" stroke-width="2"/>
+    </g>
+    <text x="150" y="430" text-anchor="middle" font-size="16">Benutzer</text>
+
+    <!-- App / Service Provider Box -->
+    <rect id="app-box" x="320" y="270" width="180" height="80" fill="white" stroke="black" stroke-width="2"/>
+    <text x="410" y="315" text-anchor="middle" font-size="16">App / Service Provider</text>
+
+    <!-- Identity Provider (IdP) Box -->
+    <rect id="idp-box" x="630" y="270" width="180" height="80" fill="white" stroke="black" stroke-width="2"/>
+    <text x="780" y="315" text-anchor="middle" font-size="16">Identity Provider (IdP)</text>
+
+    <!-- Login - Seite Box -->
+    <rect id="login-box" x="630" y="420" width="150" height="50" fill="white" stroke="black" stroke-width="2"/>
+    <text x="705" y="455" text-anchor="middle" font-size="16">Login - Seite</text>
+
+    <!-- Anmeldeabgabe korrekt? Diamond -->
+    <polygon id="diamond" points="700,430 780,550 700,670 620,550" fill="white" stroke="black" stroke-width="2"/>
+    <text x="700" y="550" text-anchor="middle" font-size="16">Anmeldeabgabe korrekt?</text>
+
+    <!-- Zugriff gewährt Box -->
+    <rect id="granted-box" x="290" y="670" width="120" height="60" fill="white" stroke="black" stroke-width="2"/>
+    <text x="350" y="705" text-anchor="middle" font-size="16">Zugriff gewährt</text>
+
+    <!-- Connections -->
+    
+    <!-- 1. User -> App -->
+    <line x1="150" y1="400" x2="320" y2="340" stroke="black" marker-end="url(#arrowhead)" />
+    <text x="235" y="360" font-size="14">1. Zugang zur App</text>
+
+    <!-- 2. App -> IdP -->
+    <line x1="500" y1="340" x2="630" y2="340" stroke="black" marker-end="url(#arrowhead)" />
+    <text x="565" y="330" font-size="14">2. Weiterleitung der Login-Seite</text>
+
+    <!-- 3. IdP -> Login Box -->
+    <line x1="780" y1="350" x2="780" y2="430" stroke="black" marker-end="url(#arrowhead)" />
+    <text x="790" y="400" font-size="14">3. Login Seite weiterleiten</text>
+
+    <!-- 4. Login Box -> Diamond -->
+    <line x1="780" y1="460" x2="620" y2="550" stroke="black" marker-end="url(#arrowhead)" />
+    <text x="700" y="500" font-size="14">4. Authentifizierung</text>
+
+    <!-- 5. Diamond -> Granted Box -->
+    <line x1="700" y1="670" x2="350" y2="680" stroke="black" marker-end="url(#arrowhead)" />
+    <text x="525" y="690" font-size="14">5. Token / Assertion (SSO Response)</text>
+
+    <!-- 6. Diamond -> App -->
+    <line x1="700" y1="430" x2="410" y2="340" stroke="black" marker-end="url(#arrowhead)" />
+    <text x="555" y="380" font-size="14">6. Rückmeldung durch die App mit Token</text>
+
+    <!-- 7. Granted Box -> App -->
+    <line x1="410" y1="680" x2="410" y2="340" stroke="black" marker-end="url(#arrowhead)" />
+    <text x="425" y="510" font-size="14">7. Zugriff auf Ressource</text>
+</svg></div></body></html>
