@@ -1,0 +1,89 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html,body{margin:0;background:#fff;font-family:system-ui,-apple-system,sans-serif}
+  .wrap{padding:24px;display:inline-block;background:#fff}
+  /* Force a concrete render box: many model-emitted SVGs only set viewBox.
+     Without a width here, an inline-block parent collapses the SVG to its
+     intrinsic ~300x150 (or smaller) and the screenshot becomes a tiny
+     blank tile. Fixed width + auto height uses viewBox aspect-ratio. */
+  .wrap svg{display:block;width:1200px;height:auto;max-width:none}
+</style></head><body><div class="wrap"><svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <path d="M0 0 L8 3.5 L0 7 L2 3.5 Z" fill="#000"/>
+    </marker>
+  </defs>
+
+  <g id="system-architecture">
+    <rect x="50" y="100" width="200" height="150" stroke="#000" fill="white"/>
+    <text x="60" y="125" font-size="14">Frontend (React)</text>
+    <text x="60" y="150">HTTPS</text>
+
+    <rect x="300" y="100" width="200" height="150" stroke="#000" fill="white"/>
+    <text x="310" y="125" font-size="14">API Gateway (Kong)</text>
+
+    <rect x="550" y="100" width="200" height="150" stroke="#000" fill="white"/>
+    <text x="560" y="125" font-size="14">Backend (Python / FastAPI)</text>
+
+    <rect x="800" y="100" width="200" height="150" stroke="#000" fill="white"/>
+    <text x="810" y="125" font-size="14">Message Queue (RabbitMQ)</text>
+
+    <rect x="50" y="320" width="200" height="150" stroke="#000" fill="white"/>
+    <text x="60" y="345" font-size="14">Auth Service (JWT)</text>
+
+    <rect x="300" y="320" width="200" height="150" stroke="#000" fill="white"/>
+    <text x="310" y="345" font-size="14">Worker Service (Python)</text>
+
+    <rect x="550" y="320" width="200" height="150" stroke="#000" fill="white"/>
+    <text x="560" y="345" font-size="14">File Storage (S3)</text>
+
+    <rect x="800" y="320" width="200" height="150" stroke="#000" fill="white"/>
+    <text x="810" y="345" font-size="14">Monitoring (Prometheus + Grafana)</text>
+
+    <rect x="50" y="540" width="200" height="100" stroke="#000" fill="white"/>
+    <text x="60" y="570" font-size="14">User DB (PostgreSQL)</text>
+
+    <rect x="300" y="540" width="200" height="100" stroke="#000" fill="white"/>
+    <text x="310" y="570" font-size="14">Database (PostgreSQL)</text>
+
+    <rect x="550" y="540" width="200" height="100" stroke="#000" fill="white"/>
+    <text x="560" y="570" font-size="14">External API (Payment Provider)</text>
+
+    <g id="goals">
+      <text x="50" y="30" font-size="16">Goals:</text>
+      <text x="60" y="50" font-size="12">- Scalability</text>
+      <text x="60" y="70" font-size="12">- Reliability</text>
+      <text x="60" y="90" font-size="12">- Security</text>
+      <text x="60" y="110" font-size="12">- Maintainability</text>
+    </g>
+
+    <g id="notes">
+      <text x="50" y="670" font-size="12">Notes</text>
+      <text x="60" y="690" font-size="12">- Use Docker for all services</text>
+      <text x="60" y="710" font-size="12">- CI/CD with Github Actions</text>
+      <text x="60" y="730" font-size="12">- Logs -> ELK Stack</text>
+    </g>
+
+    <line x1="250" y1="175" x2="300" y2="175" stroke="#000" marker-end="url(#arrowhead)"/>
+    <line x1="500" y1="175" x2="550" y2="175" stroke="#000" marker-end="url(#arrowhead)"/>
+    <line x1="750" y1="175" x2="800" y2="175" stroke="#000" marker-end="url(#arrowhead)"/>
+
+    <line x1="250" y1="395" x2="300" y2="395" stroke="#000" marker-end="url(#arrowhead)"/>
+    <line x1="500" y1="395" x2="550" y2="395" stroke="#000" marker-end="url(#arrowhead)"/>
+    <line x1="750" y1="395" x2="800" y2="395" stroke="#000" marker-end="url(#arrowhead)"/>
+
+    <line x1="250" y1="485" x2="300" y2="485" stroke="#000" marker-end="url(#arrowhead)"/>
+    <line x1="500" y1="485" x2="550" y2="485" stroke="#000" marker-end="url(#arrowhead)"/>
+    <line x1="750" y1="485" x2="800" y2="485" stroke="#000" marker-end="url(#arrowhead)"/>
+
+    <line x1="50" y1="250" x2="50" y2="320" stroke="#000"/>
+    <line x1="300" y1="250" x2="300" y2="320" stroke="#000"/>
+    <line x1="550" y1="250" x2="550" y2="320" stroke="#000"/>
+    <line x1="800" y1="250" x2="800" y2="320" stroke="#000"/>
+
+    <line x1="50" y1="470" x2="50" y2="540" stroke="#000"/>
+    <line x1="300" y1="470" x2="300" y2="540" stroke="#000"/>
+    <line x1="550" y1="470" x2="550" y2="540" stroke="#000"/>
+  </g>
+</svg></div></body></html>

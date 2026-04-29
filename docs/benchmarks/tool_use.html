@@ -155,28 +155,35 @@
 </style>
 
 <section class="mb-6">
-  <h1 class="text-2xl font-semibold tracking-tight">Tool Use</h1>
-<p class="mt-2 text-stone-600 max-w-3xl">Three tasks with OpenAI-style function calling: easy (read notes.md), medium (fix a FizzBuzz bug via unified diff), hard (combine config.json + weather mock). The model has to pick tools, supply correct arguments and format the final result correctly.</p>    <details class="mt-3 bg-stone-50 border border-stone-200 rounded">
-      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
-        Task & test logic in detail
-      </summary>
-      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: 3 scenarios (easy/medium/hard) with mocked tools (read_file, apply_diff, get_weather, list_files). The model has to call the right tools in the right order and answer at the end. Multi-turn (tool result comes back, model can call further tools).
+  <div class="flex items-stretch gap-5">
+    <div class="flex-1 min-w-0">
+      <h1 class="text-2xl font-semibold tracking-tight">Tool Use</h1>
+<p class="mt-2 text-stone-600 max-w-3xl">Three tasks with OpenAI-style function calling: easy (read notes.md), medium (fix a FizzBuzz bug via unified diff), hard (combine config.json + weather mock). The model has to pick tools, supply correct arguments and format the final result correctly.</p>        <details class="mt-3 bg-stone-50 border border-stone-200 rounded">
+          <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+            Task & test logic in detail
+          </summary>
+          <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: 3 scenarios (easy/medium/hard) with mocked tools (read_file, apply_diff, get_weather, list_files). The model has to call the right tools in the right order and answer at the end. Multi-turn (tool result comes back, model can call further tools).
 
 What is tested: OpenAI-style function calling, argument correctness, ordering on multi-step tasks (read file → parse JSON → query weather).
 
 Why models fail: models without &#39;tool_use&#39; capability ignore tool schemas. Weak models pick wrong tools or malformed arguments. The hard tier (JSON-format output) often breaks during the final synthesis.</div>
-    </details>
-    <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
-      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
-        Prompt
-      </summary>
-      <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
-          <div>
-            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System prompt</div>
-            <pre class="text-xs whitespace-pre-wrap text-stone-800">Du arbeitest in einer agentic IDE (vergleichbar mit Cursor/Claude Code). Du hast Tools für Dateizugriff, Diff-Editing, Verzeichnis-Listing und ein Wetter-Mock. Plane mehrstufig: erst aufklären, dann handeln, am Ende prüfen. Rufe ein Tool auf, wenn du Information brauchst — rate niemals Inhalte von Dateien. Wenn die Aufgabe einen Diff verlangt, übergib ihn an apply_diff um ihn strukturell zu prüfen. Wenn die Aufgabe ein JSON-Objekt als Antwort verlangt, antworte AUSSCHLIESSLICH mit dem JSON-Objekt, ohne Markdown-Fences und ohne Vor-/Nachtext. Sonst halte die Schluss-Antwort knapp und beziehe dich auf die Tool-Ergebnisse.</pre>
+        </details>
+        <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
+          <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+            Prompt
+          </summary>
+          <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
+              <div>
+                <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System prompt</div>
+                <pre class="text-xs whitespace-pre-wrap text-stone-800">Du arbeitest in einer agentic IDE (vergleichbar mit Cursor/Claude Code). Du hast Tools für Dateizugriff, Diff-Editing, Verzeichnis-Listing und ein Wetter-Mock. Plane mehrstufig: erst aufklären, dann handeln, am Ende prüfen. Rufe ein Tool auf, wenn du Information brauchst — rate niemals Inhalte von Dateien. Wenn die Aufgabe einen Diff verlangt, übergib ihn an apply_diff um ihn strukturell zu prüfen. Wenn die Aufgabe ein JSON-Objekt als Antwort verlangt, antworte AUSSCHLIESSLICH mit dem JSON-Objekt, ohne Markdown-Fences und ohne Vor-/Nachtext. Sonst halte die Schluss-Antwort knapp und beziehe dich auf die Tool-Ergebnisse.</pre>
+              </div>
           </div>
-      </div>
-    </details>
+        </details>
+    </div>
+    <img src="../assets/landing/tool_use.png" alt=""
+         class="hidden sm:block shrink-0 w-48 md:w-64 aspect-square self-start object-cover rounded-lg border border-stone-200 bg-stone-50"
+         loading="lazy" onerror="this.style.display='none'">
+  </div>
 </section>
 
 

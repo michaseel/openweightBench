@@ -1,0 +1,78 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html,body{margin:0;background:#fff;font-family:system-ui,-apple-system,sans-serif}
+  .wrap{padding:24px;display:inline-block;background:#fff}
+  /* Force a concrete render box: many model-emitted SVGs only set viewBox.
+     Without a width here, an inline-block parent collapses the SVG to its
+     intrinsic ~300x150 (or smaller) and the screenshot becomes a tiny
+     blank tile. Fixed width + auto height uses viewBox aspect-ratio. */
+  .wrap svg{display:block;width:1200px;height:auto;max-width:none}
+</style></head><body><div class="wrap"><svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <path d="M0 0 L8 3.5 L0 7 L2 3.5 Z" fill="#000"/>
+    </marker>
+  </defs>
+
+  <g id="diagram">
+    <rect x="50" y="100" width="150" height="80" stroke="#000" stroke-width="2" fill="white">
+      <text x="60" y="130" font-size="14">App / Service Provider</text>
+    </rect>
+
+    <rect x="350" y="100" width="200" height="80" stroke="#000" stroke-width="2" fill="white">
+      <text x="60" y="130" font-size="14">Identity Provider (IdP)</text>
+    </rect>
+
+    <rect x="50" y="300" width="150" height="80" stroke="#000" stroke-width="2" fill="white">
+      <text x="60" y="130" font-size="14">Login-Seite</text>
+    </rect>
+
+    <rect x="350" y="450" width="150" height="80" stroke="#000" stroke-width="2" fill="white">
+      <text x="60" y="130" font-size="14">Benutzer gibt Anmeldedaten ein</text>
+    </rect>
+
+    <rect x="50" y="600" width="150" height="80" stroke="#000" stroke-width="2" fill="white">
+      <text x="60" y="130" font-size="14">Zugriff gewährt</text>
+    </rect>
+
+    <circle cx="125" y="70" r="20" stroke="#000" stroke-width="2" fill="white">
+      <text x="115" y="78" font-size="12">Benutzer</text>
+    </circle>
+
+    <line x1="145" y1="70" x2="65" y2="100" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+    <text x="60" y="90" font-size="12">1. Zugang zu App</text>
+
+    <line x1="205" y1="140" x2="330" y2="140" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+    <text x="210" y="160" font-size="12">2. Weiterleitung zur Login-Seite</text>
+
+    <line x1="350" y1="140" x2="65" y2="300" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+    <text x="350" y="120" font-size="12">Identity Provider (IdP)</text>
+
+    <line x1="65" y1="380" x2="330" y2="450" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+    <text x="60" y="390" font-size="12">3. Login-Seite</text>
+
+    <line x1="405" y1="490" x2="65" y2="380" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+    <text x="410" y="470" font-size="12">4. Authentifizierung</text>
+
+    <polyline points="65 380, 145 380, 145 420, 65 450" stroke="#000" stroke-width="2"/>
+    <text x="75" y="410" font-size="12">Anmeldedaten korrekt?</text>
+    <line x1="145" y1="420" x2="350" y2="600" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+    <text x="150" y="480" font-size="12">Ja</text>
+
+    <line x1="405" y1="490" x2="350" y2="600" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+    <text x="410" y="570" font-size="12">Nein</text>
+
+    <line x1="350" y1="640" x2="65" y2="700" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+    <text x="350" y="620" font-size="12">6. Redirect zurück zur App mit Token</text>
+
+    <line x1="350" y1="640" x2="65" y2="700" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+    <text x="60" y="720" font-size="12">7. Zugriff</text>
+
+    <line x1="65" y1="180" x2="65" y2="270" stroke="#000" stroke-width="2"/>
+    <line x1="350" y1="180" x2="350" y2="270" stroke="#000" stroke-width="2"/>
+
+    <line x1="65" y1="450" x2="65" y2="580" stroke="#000" stroke-width="2"/>
+    <line x1="350" y1="450" x2="350" y2="600" stroke="#000" stroke-width="2"/>
+  </g>
+</svg></div></body></html>

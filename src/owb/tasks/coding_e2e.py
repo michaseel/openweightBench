@@ -34,11 +34,11 @@ def _ignored(text: str) -> bool:
 
 
 _REMAINING_CHECKS = (
-    ("add_card", "Karte hinzufügen via Button"),
-    ("no_double_add", "Karte wird genau 1× angelegt (kein Doppel-Submit)"),
-    ("delete_card", "Karte löschen via Button + Bestätigung"),
-    ("persistence", "Karten überleben einen Reload"),
-    ("no_console_errors", "Keine JS-Konsolen-Fehler"),
+    ("add_card", "Add card via button"),
+    ("no_double_add", "Card is added exactly 1× (no double submit)"),
+    ("delete_card", "Delete card via button + confirmation"),
+    ("persistence", "Cards survive a reload"),
+    ("no_console_errors", "No JS console errors"),
 )
 
 
@@ -79,12 +79,14 @@ def run_e2e_checks(html_path: Path, *, timeout_ms: int = 10000) -> list[E2ECheck
         try:
             page.goto(html_path.resolve().as_uri(), timeout=timeout_ms)
             page.wait_for_load_state("networkidle", timeout=timeout_ms)
+            # Give JS-rendered apps time to paint before inspecting the DOM.
+            page.wait_for_timeout(2000)
         except Exception as e:  # noqa: BLE001
             checks.append(
-                E2ECheck("renders", "Seite lädt mit allen 4 Spalten", False, f"Load-Fehler: {e}"[:200])
+                E2ECheck("renders", "Page loads with all 4 columns", False, f"load error: {e}"[:200])
             )
             for cid, lbl in _REMAINING_CHECKS:
-                checks.append(E2ECheck(cid, lbl, False, "Seite konnte nicht geladen werden"))
+                checks.append(E2ECheck(cid, lbl, False, "page could not be loaded"))
             browser.close()
             return checks
 
@@ -94,9 +96,9 @@ def run_e2e_checks(html_path: Path, *, timeout_ms: int = 10000) -> list[E2ECheck
         checks.append(
             E2ECheck(
                 "renders",
-                "Seite lädt mit allen 4 Spalten",
+                "Page loads with all 4 columns",
                 not missing,
-                "" if not missing else f"fehlende Spalten: {missing}",
+                "" if not missing else f"missing columns: {missing}",
             )
         )
 
@@ -114,7 +116,7 @@ def run_e2e_checks(html_path: Path, *, timeout_ms: int = 10000) -> list[E2ECheck
         delta = 0
         try:
             if page.query_selector('[data-testid="add-card"]') is None:
-                raise RuntimeError('kein [data-testid="add-card"] gefunden')
+                raise RuntimeError('no [data-testid="add-card"] found')
             page.click('[data-testid="add-card"]', timeout=2000)
             page.wait_for_selector('[data-testid="card-input"]', timeout=2000)
             # Type immediately — some apps cancel/blur the input on focus loss,
@@ -136,35 +138,35 @@ def run_e2e_checks(html_path: Path, *, timeout_ms: int = 10000) -> list[E2ECheck
             add_error = str(e)[:200]
 
         if add_error is not None:
-            checks.append(E2ECheck("add_card", "Karte hinzufügen via Button", False, add_error))
+            checks.append(E2ECheck("add_card", "Add card via button", False, add_error))
             checks.append(
                 E2ECheck(
                     "no_double_add",
-                    "Karte wird genau 1× angelegt (kein Doppel-Submit)",
+                    "Card is added exactly 1× (no double submit)",
                     False,
-                    "übersprungen — Add-Flow ist gescheitert",
+                    "skipped — add flow failed",
                 )
             )
         else:
             checks.append(
                 E2ECheck(
                     "add_card",
-                    "Karte hinzufügen via Button",
+                    "Add card via button",
                     delta >= 1,
-                    "" if delta >= 1 else "Karte wurde nicht erstellt (count unverändert)",
+                    "" if delta >= 1 else "card was not created (count unchanged)",
                 )
             )
             checks.append(
                 E2ECheck(
                     "no_double_add",
-                    "Karte wird genau 1× angelegt (kein Doppel-Submit)",
+                    "Card is added exactly 1× (no double submit)",
                     delta == 1,
                     ""
                     if delta == 1
                     else (
-                        f"Karte wurde {delta}× angelegt — Mehrfach-Listener oder Doppel-Submit"
+                        f"card was added {delta}× — multiple listeners or double submit"
                         if delta >= 2
-                        else "kein Add stattgefunden, daher nicht prüfbar"
+                        else "no add happened, so not verifiable"
                     ),
                 )
             )
@@ -177,15 +179,15 @@ def run_e2e_checks(html_path: Path, *, timeout_ms: int = 10000) -> list[E2ECheck
             checks.append(
                 E2ECheck(
                     "delete_card",
-                    "Karte löschen via Button + Bestätigung",
+                    "Delete card via button + confirmation",
                     False,
-                    "keine Karten zum Löschen vorhanden",
+                    "no cards available to delete",
                 )
             )
         else:
             try:
                 if page.query_selector('[data-testid="delete-card"]') is None:
-                    raise RuntimeError('kein [data-testid="delete-card"] gefunden')
+                    raise RuntimeError('no [data-testid="delete-card"] found')
                 page.locator('[data-testid="delete-card"]').first.click(timeout=2000)
                 page.wait_for_selector('[data-testid="confirm-delete"]', timeout=2000)
                 page.click('[data-testid="confirm-delete"]', timeout=2000)
@@ -202,16 +204,16 @@ def run_e2e_checks(html_path: Path, *, timeout_ms: int = 10000) -> list[E2ECheck
                 checks.append(
                     E2ECheck(
                         "delete_card",
-                        "Karte löschen via Button + Bestätigung",
+                        "Delete card via button + confirmation",
                         ok,
-                        "" if ok else f"vor Delete {before_del}, danach {actual}",
+                        "" if ok else f"before delete {before_del}, after {actual}",
                     )
                 )
             except Exception as e:  # noqa: BLE001
                 checks.append(
                     E2ECheck(
                         "delete_card",
-                        "Karte löschen via Button + Bestätigung",
+                        "Delete card via button + confirmation",
                         False,
                         str(e)[:200],
                     )
@@ -222,20 +224,21 @@ def run_e2e_checks(html_path: Path, *, timeout_ms: int = 10000) -> list[E2ECheck
         try:
             page.reload(timeout=timeout_ms)
             page.wait_for_load_state("networkidle", timeout=timeout_ms)
+            page.wait_for_timeout(2000)
             page.wait_for_selector('[data-testid="column-backlog"]', timeout=2000)
             actual = card_count()
             ok = actual == expected
             checks.append(
                 E2ECheck(
                     "persistence",
-                    "Karten überleben einen Reload",
+                    "Cards survive a reload",
                     ok,
-                    "" if ok else f"vor Reload {expected} Karten, nach Reload {actual}",
+                    "" if ok else f"before reload {expected} cards, after reload {actual}",
                 )
             )
         except Exception as e:  # noqa: BLE001
             checks.append(
-                E2ECheck("persistence", "Karten überleben einen Reload", False, str(e)[:200])
+                E2ECheck("persistence", "Cards survive a reload", False, str(e)[:200])
             )
 
         # 5. no console errors throughout the entire flow
@@ -243,7 +246,7 @@ def run_e2e_checks(html_path: Path, *, timeout_ms: int = 10000) -> list[E2ECheck
         checks.append(
             E2ECheck(
                 "no_console_errors",
-                "Keine JS-Konsolen-Fehler",
+                "No JS console errors",
                 not clean,
                 "" if not clean else "; ".join(clean[:3])[:300],
             )

@@ -362,10 +362,10 @@ def grade_mermaid(
             "checks": [
                 {
                     "id": "syntax_prelude",
-                    "label": "Gültige Mermaid-Einleitung",
+                    "label": "Valid Mermaid header",
                     "passed": starts_with_keyword,
                     "score": score,
-                    "detail": diagram_kind or "keine",
+                    "detail": diagram_kind or "none",
                 }
             ],
         }
@@ -431,45 +431,45 @@ def grade_mermaid(
     checks = [
         {
             "id": "syntax_prelude",
-            "label": "Gültige Mermaid-Einleitung",
+            "label": "Valid Mermaid header",
             "passed": starts_with_keyword,
             "score": syntax_score,
-            "detail": diagram_kind or "keine",
+            "detail": diagram_kind or "none",
         },
         {
             "id": "diagram_kind",
-            "label": "Passender Diagrammtyp",
+            "label": "Matching diagram kind",
             "passed": kind_score >= 0.7,
             "score": kind_score,
-            "detail": f"{kind or 'unbekannt'}; erwartet: {', '.join(sorted(spec['preferred_kinds']))}",
+            "detail": f"{kind or 'unknown'}; expected: {', '.join(sorted(spec['preferred_kinds']))}",
         },
         {
             "id": "content_terms",
-            "label": "Erwartete Beschriftungen/Entitäten",
+            "label": "Expected labels/entities",
             "passed": content_score >= 0.75,
             "score": content_score,
-            "detail": f"{len(matched_terms)}/{len(required_terms)} getroffen",
+            "detail": f"{len(matched_terms)}/{len(required_terms)} matched",
             "missing": missing_terms,
         },
         {
             "id": "relationships",
-            "label": "Erwartete Beziehungen/Pfeile",
+            "label": "Expected relationships/arrows",
             "passed": relationship_score >= 0.65,
             "score": relationship_score,
-            "detail": f"{len(matched_edges)}/{len(required_edges)} getroffen",
+            "detail": f"{len(matched_edges)}/{len(required_edges)} matched",
             "missing": missing_edges,
         },
         {
             "id": "section_completeness",
-            "label": "Vollständigkeit der Diagramm-Teilbereiche",
+            "label": "Completeness of diagram sections",
             "passed": group_score >= 0.75,
             "score": group_score,
-            "detail": f"{sum(1 for g in group_breakdown if g['score'] >= 0.75)}/{len(group_breakdown)} Bereiche ausreichend",
+            "detail": f"{sum(1 for g in group_breakdown if g['score'] >= 0.75)}/{len(group_breakdown)} sections sufficient",
             "groups": group_breakdown,
         },
         {
             "id": "hallucination_penalty",
-            "label": "Keine offensichtlichen Platzhalter/Halluzinationen",
+            "label": "No obvious placeholders/hallucinations",
             "passed": not forbidden_hits,
             "score": hallucination_score,
             "detail": ", ".join(forbidden_hits) if forbidden_hits else "",
@@ -621,7 +621,7 @@ class DiagramToMermaidTask(Task):
             artifacts.append(
                 Artifact(
                     kind="image",
-                    label=f"Quelle {src.stem}",
+                    label=f"Source {src.stem}",
                     path=str(img_target.relative_to(store.root)),
                     mime="image/jpeg",
                 )

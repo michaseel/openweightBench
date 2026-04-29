@@ -54,6 +54,7 @@ def screenshot_html(
     timeout_ms: int = 8000,
     wait_selector: str | None = None,
     crop_selector: str | None = None,
+    extra_wait_ms: int = 0,
 ) -> Path:
     """Open `html_path` in headless Chromium, save PNG to `out_path`.
 
@@ -73,6 +74,8 @@ def screenshot_html(
             page.wait_for_load_state("networkidle", timeout=timeout_ms)
         except Exception:  # noqa: BLE001
             pass
+        if extra_wait_ms > 0:
+            page.wait_for_timeout(extra_wait_ms)
         if wait_selector:
             try:
                 page.wait_for_selector(wait_selector, timeout=timeout_ms)

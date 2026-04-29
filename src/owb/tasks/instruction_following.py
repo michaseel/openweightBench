@@ -82,51 +82,51 @@ def _check(text: str) -> list[dict]:
     return [
         {
             "id": "four_paragraphs",
-            "label": "Genau vier Absätze",
+            "label": "Exactly four paragraphs",
             "passed": len(paragraphs) == 4,
-            "detail": f"{len(paragraphs)} Absätze gefunden",
+            "detail": f"{len(paragraphs)} paragraphs found",
         },
         {
             "id": "start_listen",
-            "label": "Erster Absatz beginnt mit 'Listen:'",
+            "label": "First paragraph starts with 'Listen:'",
             "passed": p1.startswith("Listen:"),
-            "detail": "" if p1.startswith("Listen:") else f"Anfang: {p1[:30]!r}",
+            "detail": "" if p1.startswith("Listen:") else f"start: {p1[:30]!r}",
         },
         {
             "id": "multiplication",
-            "label": "137 × 24 = 3288 korrekt",
+            "label": "137 × 24 = 3288 correct",
             "passed": mult_correct,
             "detail": (
-                f"gefunden: {mult_match.group(0)}" if mult_match else "Multiplikation nicht im Format gefunden"
+                f"found: {mult_match.group(0)}" if mult_match else "multiplication not found in expected format"
             ),
         },
         {
             "id": "tools_sorted",
-            "label": "Fünf alphabetisch sortierte Werkzeuge",
+            "label": "Five alphabetically sorted tools",
             "passed": tools_correct,
-            "detail": f"{len(tools)} Werkzeuge: {tools}" if tools else "keine Liste in Absatz 3 erkannt",
+            "detail": f"{len(tools)} tools: {tools}" if tools else "no list detected in paragraph 3",
         },
         {
             "id": "p4_seven_words",
-            "label": "Vierter Absatz: genau 7 Wörter",
+            "label": "Fourth paragraph: exactly 7 words",
             "passed": p4_correct,
-            "detail": f"{p4_words} Wörter im 4. Absatz",
+            "detail": f"{p4_words} words in paragraph 4",
         },
         {
             "id": "mentions_stahl",
-            "label": "Erwähnt 'Stahl' (im Fließtext)",
+            "label": "Mentions 'Stahl' (in body text)",
             "passed": stahl_correct,
             "detail": "",
         },
         {
             "id": "no_markdown",
-            "label": "Kein Markdown",
+            "label": "No Markdown",
             "passed": not has_md,
             "detail": "",
         },
         {
             "id": "trailing_json_consistent",
-            "label": "Trailing JSON konsistent mit Werkzeugen",
+            "label": "Trailing JSON consistent with tools",
             "passed": json_ok,
             "detail": "" if json_ok else f"JSON: {json_obj}",
         },

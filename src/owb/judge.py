@@ -426,7 +426,6 @@ _NIAH_AXES = [
     "setting",
     "plot",
     "themes",
-    "code_text_mix_recognized",
     "no_hallucinations",
 ]
 _NIAH_SCHEMA = {
@@ -440,7 +439,6 @@ _NIAH_SCHEMA = {
                 "setting": {"type": "number"},
                 "plot": {"type": "number"},
                 "themes": {"type": "number"},
-                "code_text_mix_recognized": {"type": "number"},
                 "no_hallucinations": {"type": "number"},
             },
             "required": _NIAH_AXES,
@@ -481,7 +479,7 @@ def judge_niah(model_id: str, root: Path, *, judge_model: str = DEFAULT_MODEL) -
     lengths = d["score_breakdown"].get("lengths") or []
     system = _read_skill(root, "summary-judge") + (
         "\n\n---\nWICHTIG: Du hast keine Tools. Pro Aufruf bewertest du genau eine Stage-Summary. "
-        "Antworte mit dem JSON-Objekt — judge_score 0..1 und sechs Sub-Achsen 0..1, plus Kommentar."
+        "Antworte mit dem JSON-Objekt — judge_score 0..1 und fünf Sub-Achsen 0..1, plus Kommentar."
     )
     comp_system = _read_skill(root, "summary-judge") + (
         "\n\n---\nWICHTIG: Du hast keine Tools. Bewerte jetzt nicht die Summary, sondern die "

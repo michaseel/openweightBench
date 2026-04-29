@@ -92,7 +92,7 @@ class CodingTask(Task):
             ),
             Artifact(
                 kind="text",
-                label="Roh-Antwort des Modells",
+                label="Raw model response",
                 path=str(raw_path.relative_to(store.root)),
                 mime="text/plain",
             ),
@@ -104,7 +104,7 @@ class CodingTask(Task):
                 from ..report.screenshots import screenshot_html
 
                 shot_path = artifact_dir / "screenshot.png"
-                screenshot_html(html_path, shot_path)
+                screenshot_html(html_path, shot_path, extra_wait_ms=2000)
                 artifacts.append(
                     Artifact(
                         kind="image",

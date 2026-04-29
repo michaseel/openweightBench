@@ -252,7 +252,7 @@
 <section id="vision" class="mb-12 scroll-mt-24">
   <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
     <h2 class="text-lg font-medium tracking-tight">vision</h2>
-    <a href="../benchmarks/vision.html" class="text-xs text-stone-500 hover:text-stone-900">alle Modelle in diesem Bench →</a>
+    <a href="../benchmarks/vision.html" class="text-xs text-stone-500 hover:text-stone-900">all models in this bench →</a>
   </div>
 
 
@@ -300,11 +300,11 @@ Why models fail: text-only models have no vision capability (filtered out). Weak
       </summary>
       <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
           <div>
-            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System-Prompt</div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System prompt</div>
             <pre class="text-xs whitespace-pre-wrap text-stone-800">Du bist OCR-Spezialist für deutsche Handschrift.</pre>
           </div>
           <div>
-            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Developer-Prompt</div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Developer prompt</div>
             <pre class="text-xs whitespace-pre-wrap text-stone-800">Auf dem Bild siehst du eine handschriftliche Meeting-Notiz mit klarer Struktur und gut lesbarer Schrift. Transkribiere den gesamten lesbaren Text. Behalte die Anordnung bei (Überschrift, Spalten, To-Dos). Bei unleserlichen Stellen schreibe &#39;[unleserlich]&#39;. Gib ausschließlich den puren OCR-Text im Markdown-Format zurück — keine Vorbemerkung, keine Erklärungen, kein Code-Fence.</pre>
           </div>
       </div>
@@ -331,7 +331,7 @@ Why models fail: text-only models have no vision capability (filtered out). Weak
                 <span class="text-amber-600">+5</span>
               </div>
                 <div class="text-xs text-stone-500">
-<span class="text-sky-700">9 verschoben</span> · <span class="text-violet-700">1 ähnlich</span>                </div>
+<span class="text-sky-700">9 relocated</span> · <span class="text-violet-700">1 fuzzy</span>                </div>
             <div class="text-3xl font-bold num leading-none text-emerald-700">
 0.79            </div>
           </div>
@@ -339,15 +339,15 @@ Why models fail: text-only models have no vision capability (filtered out). Weak
           <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
             <div class="p-3 bg-stone-50 grid grid-cols-1 gap-2">
                 <div class="zoom-frame">
-                  <button type="button" class="zoom-button" data-zoom-button aria-label="Bild vergrößern" title="Bild vergrößern">⛶</button>
+                  <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom image" title="Zoom image">⛶</button>
                   <img src="../assets/artifacts/google_gemma-4-e2b/vision/handwriting_easy.jpg"
                        class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded cursor-zoom-in"
                        loading="lazy">
                 </div>
             </div>
             <div>
-              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider">Modell-Antwort</div>
-              <pre class="p-4 text-sm whitespace-pre-wrap max-h-[600px] overflow-y-auto">Meetingnotizen Website - Relauch
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider">Model response</div>
+              <pre class="p-4 text-sm whitespace-pre-wrap max-h-[500px] overflow-y-auto">Meetingnotizen Website - Relauch
 12.06.25, 09:30 Uhr
 
 Anwesend: Anna, Ben, Mira, Jonas, Ece
@@ -377,16 +377,16 @@ Nächstes Meeting: 17.06., 10 Uhr</pre>
 
             <div class="border-t border-stone-200 bg-white">
               <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider flex items-center justify-between">
-                <span>Word-Diff Ground-Truth ↔ Modell</span>
+                <span>Word diff ground truth ↔ model</span>
                 <span class="num">
                   <span class="text-emerald-700">●</span> matched ·
-                  <span class="text-sky-700">●</span> verschoben ·
-                  <span class="text-violet-700">●</span> ähnlich ·
-                  <span class="text-red-600">●</span> fehlt im Modell ·
-                  <span class="text-amber-600">●</span> extra/falsch
+                  <span class="text-sky-700">●</span> relocated ·
+                  <span class="text-violet-700">●</span> fuzzy ·
+                  <span class="text-red-600">●</span> missing in model ·
+                  <span class="text-amber-600">●</span> extra/wrong
                 </span>
               </div>
-              <div class="p-4 text-sm leading-relaxed font-mono">
+              <div class="p-4 text-sm leading-relaxed font-mono max-h-[500px] overflow-y-auto">
 <span class="text-stone-700">meetingnotizen website</span>
 <span class="bg-violet-50 text-violet-700 px-0.5 rounded">relaunch ≈ relauch</span>
 <span class="text-stone-700">12 06 25 09 30 uhr anwesend anna ben mira jonas ece</span>
@@ -409,7 +409,7 @@ Nächstes Meeting: 17.06., 10 Uhr</pre>
 <span class="text-stone-700">nächstes meeting 17 06 10 uhr</span>
               </div>
               <details class="border-t border-stone-100">
-                <summary class="cursor-pointer px-4 py-2 text-xs text-stone-500 hover:text-stone-900">Ground Truth (zum Vergleich)</summary>
+                <summary class="cursor-pointer px-4 py-2 text-xs text-stone-500 hover:text-stone-900">Ground truth (for comparison)</summary>
                 <pre class="p-4 text-xs bg-stone-50 whitespace-pre-wrap">Meetingnotizen Website-Relaunch
 12.06.25, 09:30 Uhr
 
@@ -469,7 +469,7 @@ Nächstes Meeting: 17.06., 10 Uhr</pre>
                 <span class="text-amber-600">+9</span>
               </div>
                 <div class="text-xs text-stone-500">
-<span class="text-sky-700">1 verschoben</span> · <span class="text-violet-700">2 ähnlich</span>                </div>
+<span class="text-sky-700">1 relocated</span> · <span class="text-violet-700">2 fuzzy</span>                </div>
             <div class="text-3xl font-bold num leading-none text-emerald-700">
 0.71            </div>
           </div>
@@ -477,15 +477,15 @@ Nächstes Meeting: 17.06., 10 Uhr</pre>
           <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
             <div class="p-3 bg-stone-50 grid grid-cols-1 gap-2">
                 <div class="zoom-frame">
-                  <button type="button" class="zoom-button" data-zoom-button aria-label="Bild vergrößern" title="Bild vergrößern">⛶</button>
+                  <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom image" title="Zoom image">⛶</button>
                   <img src="../assets/artifacts/google_gemma-4-e2b/vision/handwriting_medium.jpg"
                        class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded cursor-zoom-in"
                        loading="lazy">
                 </div>
             </div>
             <div>
-              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider">Modell-Antwort</div>
-              <pre class="p-4 text-sm whitespace-pre-wrap max-h-[600px] overflow-y-auto">Meeting protokoll 21.05. 25 Uhr
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider">Model response</div>
+              <pre class="p-4 text-sm whitespace-pre-wrap max-h-[500px] overflow-y-auto">Meeting protokoll 21.05. 25 Uhr
 
 Teilnehmer: M. Schulte, T. Wagner, L. Becker
 S. Klein (später), H. Jo.
@@ -520,16 +520,16 @@ Rückfragen:
 
             <div class="border-t border-stone-200 bg-white">
               <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider flex items-center justify-between">
-                <span>Word-Diff Ground-Truth ↔ Modell</span>
+                <span>Word diff ground truth ↔ model</span>
                 <span class="num">
                   <span class="text-emerald-700">●</span> matched ·
-                  <span class="text-sky-700">●</span> verschoben ·
-                  <span class="text-violet-700">●</span> ähnlich ·
-                  <span class="text-red-600">●</span> fehlt im Modell ·
-                  <span class="text-amber-600">●</span> extra/falsch
+                  <span class="text-sky-700">●</span> relocated ·
+                  <span class="text-violet-700">●</span> fuzzy ·
+                  <span class="text-red-600">●</span> missing in model ·
+                  <span class="text-amber-600">●</span> extra/wrong
                 </span>
               </div>
-              <div class="p-4 text-sm leading-relaxed font-mono">
+              <div class="p-4 text-sm leading-relaxed font-mono max-h-[500px] overflow-y-auto">
 <span class="bg-red-50 text-red-700 px-0.5 rounded line-through">meetingprotokoll</span>
 <span class="bg-amber-50 text-amber-700 px-0.5 rounded">protokoll</span>
 <span class="text-stone-700">21 05 25</span>
@@ -576,7 +576,7 @@ Rückfragen:
 <span class="text-stone-700">04 06 25 10 uhr raum 2 15 rückfragen wie gehen wir mit dem risiko um priorisierung der features nochmal prüfen</span>
               </div>
               <details class="border-t border-stone-100">
-                <summary class="cursor-pointer px-4 py-2 text-xs text-stone-500 hover:text-stone-900">Ground Truth (zum Vergleich)</summary>
+                <summary class="cursor-pointer px-4 py-2 text-xs text-stone-500 hover:text-stone-900">Ground truth (for comparison)</summary>
                 <pre class="p-4 text-xs bg-stone-50 whitespace-pre-wrap">Meetingprotokoll
 21.05.25
 11 Uhr
@@ -645,7 +645,7 @@ Priorisierung der Features nochmal prüfen
                 <span class="text-amber-600">+23</span>
               </div>
                 <div class="text-xs text-stone-500">
-<span class="text-sky-700">10 verschoben</span> · <span class="text-violet-700">1 ähnlich</span>                </div>
+<span class="text-sky-700">10 relocated</span> · <span class="text-violet-700">1 fuzzy</span>                </div>
             <div class="text-3xl font-bold num leading-none text-amber-700">
 0.53            </div>
           </div>
@@ -653,15 +653,15 @@ Priorisierung der Features nochmal prüfen
           <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
             <div class="p-3 bg-stone-50 grid grid-cols-1 gap-2">
                 <div class="zoom-frame">
-                  <button type="button" class="zoom-button" data-zoom-button aria-label="Bild vergrößern" title="Bild vergrößern">⛶</button>
+                  <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom image" title="Zoom image">⛶</button>
                   <img src="../assets/artifacts/google_gemma-4-e2b/vision/handwriting_hard.jpg"
                        class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded cursor-zoom-in"
                        loading="lazy">
                 </div>
             </div>
             <div>
-              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider">Modell-Antwort</div>
-              <pre class="p-4 text-sm whitespace-pre-wrap max-h-[600px] overflow-y-auto">Besprechung Sommerfest
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider">Model response</div>
+              <pre class="p-4 text-sm whitespace-pre-wrap max-h-[500px] overflow-y-auto">Besprechung Sommerfest
 23.05.24 10:15 Uhr (Kaufi)
 
 Teilnehmer
@@ -712,16 +712,16 @@ kesten noch offen ?
 
             <div class="border-t border-stone-200 bg-white">
               <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider flex items-center justify-between">
-                <span>Word-Diff Ground-Truth ↔ Modell</span>
+                <span>Word diff ground truth ↔ model</span>
                 <span class="num">
                   <span class="text-emerald-700">●</span> matched ·
-                  <span class="text-sky-700">●</span> verschoben ·
-                  <span class="text-violet-700">●</span> ähnlich ·
-                  <span class="text-red-600">●</span> fehlt im Modell ·
-                  <span class="text-amber-600">●</span> extra/falsch
+                  <span class="text-sky-700">●</span> relocated ·
+                  <span class="text-violet-700">●</span> fuzzy ·
+                  <span class="text-red-600">●</span> missing in model ·
+                  <span class="text-amber-600">●</span> extra/wrong
                 </span>
               </div>
-              <div class="p-4 text-sm leading-relaxed font-mono">
+              <div class="p-4 text-sm leading-relaxed font-mono max-h-[500px] overflow-y-auto">
 <span class="text-stone-700">besprechung sommerfest 23 05 24 10 15 uhr</span>
 <span class="bg-red-50 text-red-700 px-0.5 rounded line-through">konfi chef fragen</span>
 <span class="bg-amber-50 text-amber-700 px-0.5 rounded">kaufi</span>
@@ -772,7 +772,7 @@ kesten noch offen ?
 <span class="bg-amber-50 text-amber-700 px-0.5 rounded">am see läufer zic max hat einen zeit merken uhr ca p p kesten noch unleserlich</span>
               </div>
               <details class="border-t border-stone-100">
-                <summary class="cursor-pointer px-4 py-2 text-xs text-stone-500 hover:text-stone-900">Ground Truth (zum Vergleich)</summary>
+                <summary class="cursor-pointer px-4 py-2 text-xs text-stone-500 hover:text-stone-900">Ground truth (for comparison)</summary>
                 <pre class="p-4 text-xs bg-stone-50 whitespace-pre-wrap">Besprechung Sommerfest
 23.05.24 10:15 Uhr (Konfi)
 
@@ -864,7 +864,7 @@ Müll / Reinigung klären</pre>
                 <span class="text-amber-600">+12</span>
               </div>
                 <div class="text-xs text-stone-500">
-<span class="text-sky-700">5 verschoben</span> · <span class="text-violet-700">2 ähnlich</span>                </div>
+<span class="text-sky-700">5 relocated</span> · <span class="text-violet-700">2 fuzzy</span>                </div>
             <div class="text-3xl font-bold num leading-none text-amber-700">
 0.19            </div>
           </div>
@@ -872,30 +872,30 @@ Müll / Reinigung klären</pre>
           <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
             <div class="p-3 bg-stone-50 grid grid-cols-1 gap-2">
                 <div class="zoom-frame">
-                  <button type="button" class="zoom-button" data-zoom-button aria-label="Bild vergrößern" title="Bild vergrößern">⛶</button>
+                  <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom image" title="Zoom image">⛶</button>
                   <img src="../assets/artifacts/google_gemma-4-e2b/vision/fraktur_innerpage.jpg"
                        class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded cursor-zoom-in"
                        loading="lazy">
                 </div>
             </div>
             <div>
-              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider">Modell-Antwort</div>
-              <pre class="p-4 text-sm whitespace-pre-wrap max-h-[600px] overflow-y-auto">deiner Großmutter wohl nur geträumt haben. „Rein,“ meinte Walineken harinäckig, sie hat ja auch die Prinzessin vom See gesehen, und das ist etwas ganz Besonderes.“ Der Kahn war mitwirtewirle der Insel ganz nahe gekommen, und das ist ein erwecktes Gutlieb. So kann sie es dir eräghen, frag sie nur aus, sie weiß alles.</pre>
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider">Model response</div>
+              <pre class="p-4 text-sm whitespace-pre-wrap max-h-[500px] overflow-y-auto">deiner Großmutter wohl nur geträumt haben. „Rein,“ meinte Walineken harinäckig, sie hat ja auch die Prinzessin vom See gesehen, und das ist etwas ganz Besonderes.“ Der Kahn war mitwirtewirle der Insel ganz nahe gekommen, und das ist ein erwecktes Gutlieb. So kann sie es dir eräghen, frag sie nur aus, sie weiß alles.</pre>
             </div>
           </div>
 
             <div class="border-t border-stone-200 bg-white">
               <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider flex items-center justify-between">
-                <span>Word-Diff Ground-Truth ↔ Modell</span>
+                <span>Word diff ground truth ↔ model</span>
                 <span class="num">
                   <span class="text-emerald-700">●</span> matched ·
-                  <span class="text-sky-700">●</span> verschoben ·
-                  <span class="text-violet-700">●</span> ähnlich ·
-                  <span class="text-red-600">●</span> fehlt im Modell ·
-                  <span class="text-amber-600">●</span> extra/falsch
+                  <span class="text-sky-700">●</span> relocated ·
+                  <span class="text-violet-700">●</span> fuzzy ·
+                  <span class="text-red-600">●</span> missing in model ·
+                  <span class="text-amber-600">●</span> extra/wrong
                 </span>
               </div>
-              <div class="p-4 text-sm leading-relaxed font-mono">
+              <div class="p-4 text-sm leading-relaxed font-mono max-h-[500px] overflow-y-auto">
 <span class="text-stone-700">deiner großmutter wohl nur geträumt haben</span>
 <span class="bg-red-50 text-red-700 px-0.5 rounded line-through">nein</span>
 <span class="bg-amber-50 text-amber-700 px-0.5 rounded">rein</span>
@@ -915,7 +915,7 @@ Müll / Reinigung klären</pre>
 <span class="bg-red-50 text-red-700 px-0.5 rounded line-through">die kinder landeten an einer dazu geeigneten stelle und befestigten ihn an einem aus dem wasser ragenden pflock sie erstiegen die kleine anhöhe auf der sich das gehöft befand in dem kurzen feinen grase welches den boden bedeckte blühte der thymian ein festgetretener weg führte gerade auf die schilfhütte zu die lag heimlich unter den weiden das mächtige geäst der majestätischen bäume mit silbergrauem spitzblättrigem laube beladen breitete sich weit und wuchtig über das niedere dach welches sich der erde zuneigte dahinter erblickte man ein stück garten und ackerland von rohr und schilf wie mit einem wall umschlossen eine alte frau saß vor der thür des hüttchens und spann ihr haar war so weiß wie das gewebe der spinnen welches im herbst über die stoppeln fliegt um ihren rocken hatte sie ein schwarzes band gebunden gottlieb und malineken kamen mit dem korbe und blieben vor ihr stehen großmutter sagte letztere er will nicht glauben daß du die seejungfern gesehen hast und er weiß nichts von der prinzessin vom see sie netzte ihren faden geht ihr man eures weges gab sie ihnen zur antwort großmutter du könntest ihm die geschichte von der prinzessin vom see wohl erzählen bat malineken sie läßt sich schön anhören und man muß sie doch wissen wenn man über den see fährt und in dem blumental tag für tag herumwandert ich meine ihr könntet euer vesper brauchen sagte die großmutter es hat eben vier uhr geschlagen ach ja rief malineken inbrünstig erdbeeren mit milch und ein stück brot dazu und dieweil wir das aufzehren erzählt ihr dem gottlieb die geschichte sie ließ nicht nach sie mußte ihren willen haben ein weilchen danach saßen die kinder auf einem baumstamm vor der hütte und hatten zwischen sich einen napf mit süßer milch in der schwammen die erdbeeren so dick daß man nicht wußte war das milch mit erdbeeren oder erdbeeren mit milch doch es mochte wohl auf eins herauskommen die großmutter blickte zuweilen nach ihnen hin</span>
               </div>
               <details class="border-t border-stone-100">
-                <summary class="cursor-pointer px-4 py-2 text-xs text-stone-500 hover:text-stone-900">Ground Truth (zum Vergleich)</summary>
+                <summary class="cursor-pointer px-4 py-2 text-xs text-stone-500 hover:text-stone-900">Ground truth (for comparison)</summary>
                 <pre class="p-4 text-xs bg-stone-50 whitespace-pre-wrap">deiner Großmutter wohl nur geträumt haben. „Nein,&#34; meinte Malineken hartnäckig, „sie hat ja auch die Prinzessin vom See gesehen, und das ist etwas ganz Besonderes.&#34; „Davon habe ich noch nie gehört,&#34; antwortete Gottlieb. „So kann sie es dir erzählen, frag sie nur aus, sie weiß alles.&#34;
 
 Der Kahn war mittlerweile der Insel ganz nahe gekommen; die Kinder landeten an einer dazu geeigneten Stelle und befestigten ihn an einem aus dem Wasser ragenden Pflock. Sie erstiegen die kleine Anhöhe, auf der sich das Gehöft befand. In dem kurzen, feinen Grase, welches den Boden bedeckte, blühte der Thymian; ein festgetretener Weg führte gerade auf die Schilfhütte zu, die lag heimlich unter den Weiden. Das mächtige Geäst der majestätischen Bäume, mit silbergrauem, spitzblättrigem Laube beladen, breitete sich weit und wuchtig über das niedere Dach, welches sich der Erde zuneigte. Dahinter erblickte man ein Stück Garten und Ackerland, von Rohr und Schilf wie mit einem Wall umschlossen. Eine alte Frau saß vor der Thür des Hüttchens und spann. Ihr Haar war so weiß wie das Gewebe der Spinnen, welches im Herbst über die Stoppeln fliegt, um ihren Rocken hatte sie ein schwarzes Band gebunden. Gottlieb und Malineken kamen mit dem Korbe und blieben vor ihr stehen. „Großmutter,&#34; sagte letztere, „er will nicht glauben, daß du die Seejungfern gesehen hast, und er weiß nichts von der Prinzessin vom See.&#34; Sie netzte ihren Faden. „Geht ihr man eures Weges,&#34; gab sie ihnen zur Antwort. „Großmutter, du könntest ihm die Geschichte von der Prinzessin vom See wohl erzählen,&#34; bat Malineken, „sie läßt sich schön anhören, und man muß sie doch wissen, wenn man über den See fährt und in dem Blumental Tag für Tag herumwandert.&#34; „Ich meine, ihr könntet euer Vesper brauchen,&#34; sagte die Großmutter, „es hat eben vier Uhr geschlagen.&#34; „Ach ja,&#34; rief Malineken inbrünstig, „Erdbeeren mit Milch und ein Stück Brot dazu; und dieweil wir das aufzehren, erzählt Ihr dem Gottlieb die Geschichte.&#34; Sie ließ nicht nach, sie mußte ihren Willen haben. Ein Weilchen danach saßen die Kinder auf einem Baumstamm vor der Hütte und hatten zwischen sich einen Napf mit süßer Milch, in der schwammen die Erdbeeren so dick, daß man nicht wußte, war das Milch mit Erdbeeren, oder Erdbeeren mit Milch; doch es mochte wohl auf eins herauskommen. Die Großmutter blickte zuweilen nach ihnen hin</pre>
@@ -925,7 +925,7 @@ Der Kahn war mittlerweile der Insel ganz nahe gekommen; die Kinder landeten an e
 
 
     <div class="mt-4 text-xs text-stone-500">
-      Artefakte:
+      Artefacts:
         <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-e2b/vision/handwriting_easy.txt" target="_blank">Handschrift OCR – leicht – Antwort</a>
         <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-e2b/vision/handwriting_easy.jpg" target="_blank">Handschrift OCR – leicht – Bild</a>
         <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-e2b/vision/handwriting_medium.txt" target="_blank">Handschrift OCR – mittel – Antwort</a>
@@ -939,7 +939,7 @@ Der Kahn war mittlerweile der Insel ganz nahe gekommen; die Kinder landeten an e
 <section id="niah" class="mb-12 scroll-mt-24">
   <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
     <h2 class="text-lg font-medium tracking-tight">niah</h2>
-    <a href="../benchmarks/niah.html" class="text-xs text-stone-500 hover:text-stone-900">alle Modelle in diesem Bench →</a>
+    <a href="../benchmarks/niah.html" class="text-xs text-stone-500 hover:text-stone-900">all models in this bench →</a>
   </div>
 
 
@@ -994,7 +994,7 @@ Why models fail: sliding-window attention (Gemma 4) only sees the last 1-2k toke
       </summary>
       <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
           <div>
-            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Developer-Prompt</div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Developer prompt</div>
             <pre class="text-xs whitespace-pre-wrap text-stone-800">TURN 1 (User):
 The following section contains a longer mixed text of German narrative and source code.
 
@@ -1018,36 +1018,36 @@ Answer as a numbered list 1., 2., 3. with one short sentence each.</pre>
     </details>
 
     <p class="mt-5 text-sm text-stone-600">
-      Pro Kontextlänge wurden 10 Needles über den Korpus verteilt. Der NIAH-Score kombiniert
-      Korpus-Zusammenfassung, Needle-Retrieval und optional Verstehen + Halluzinations-Fallen.
-      LLM-Judges ersetzen die heuristischen Scores für Summary und Verstehen, sobald vorhanden.
+      For each context length 10 needles are distributed across the corpus. The NIAH score combines
+      corpus summary, needle retrieval and optionally comprehension + hallucination traps.
+      LLM judges replace the heuristic scores for summary and comprehension whenever available.
     </p>
 
       <div class="mt-6">
         <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">
-          Stufe: <span class="num font-semibold text-stone-700">120k Tokens</span>
+          Stage: <span class="num font-semibold text-stone-700">120k tokens</span>
         </div>
 
             <div class="bg-sky-50 border border-sky-200 rounded-lg overflow-hidden">
               <div class="px-4 py-3 border-b border-sky-200 flex items-baseline justify-between">
                 <div>
-                  <span class="text-xs uppercase tracking-wider text-sky-700 font-semibold">Sub-Benchmark · Korpus-Zusammenfassung</span>
+                  <span class="text-xs uppercase tracking-wider text-sky-700 font-semibold">Sub-benchmark · corpus summary</span>
                   <span class="ml-2 text-xs text-stone-500">Turn 1</span>
                 </div>
                 <div class="text-sm num">
                     <span class="font-bold text-base text-amber-700">
                       0.69
                     </span>
-                    <span class="text-stone-500">LLM-Judge</span>
+                    <span class="text-stone-500">LLM judge</span>
                     <span class="ml-2 text-xs text-stone-400">heur. 1.00</span>
-                  <span class="ml-2 text-xs text-stone-500">~120k Tokens Input</span>
+                  <span class="ml-2 text-xs text-stone-500">~120k tokens input</span>
                 </div>
               </div>
               <div class="px-4 py-3 bg-white">
                 <pre class="text-sm text-stone-800 whitespace-pre-wrap leading-relaxed">Dieser Text ist eine tiefgründige Erzählung, die das idyllische Leben im „Blumental“ mit den brutalen Realitäten des Krieges und der sozialen Ungerechtigkeit kontrastiert. Die Hauptfiguren sind Gottlieb Hermann Lasso und seine geliebte Malineken, während sie sich durch historische Ereignisse wie die französische Besetzung und die Verfolgung von Freiheit kämpfen. Im Zentrum steht das tragische Schicksal des Gottlieb, dessen Leben durch den Krieg und die daraus resultierenden Gewalt zerrissen wird. Die Geschichte endet mit einer tiefen Reflexion über Gerechtigkeit, Gottes Wille und die unentrinnbare Notwendigkeit, sich für das Gute einzusetzen.</pre>
                   <div class="mt-3 border border-amber-200 bg-amber-50 rounded p-3">
                     <div class="flex items-baseline justify-between gap-3">
-                      <span class="text-xs uppercase tracking-wider text-amber-700">LLM-Judge Summary (openai/gpt-5.4)</span>
+                      <span class="text-xs uppercase tracking-wider text-amber-700">LLM judge summary (openai/gpt-5.4)</span>
                       <span class="text-lg font-bold num text-amber-700">0.69</span>
                     </div>
                       <ul class="mt-2 grid grid-cols-2 md:grid-cols-6 gap-2 text-xs">
@@ -1094,7 +1094,7 @@ Answer as a numbered list 1., 2., 3. with one short sentence each.</pre>
           <div class="mt-4 bg-white border border-stone-200 rounded-lg overflow-hidden">
             <div class="px-4 py-3 border-b border-stone-200 flex items-baseline justify-between">
               <div>
-                <span class="text-xs uppercase tracking-wider text-stone-700 font-semibold">Sub-Benchmark · Needle-Retrieval</span>
+                <span class="text-xs uppercase tracking-wider text-stone-700 font-semibold">Sub-benchmark · needle retrieval</span>
                 <span class="ml-2 text-xs text-stone-500">Turn 2</span>
               </div>
               <div class="text-sm num">
@@ -1110,75 +1110,75 @@ Answer as a numbered list 1., 2., 3. with one short sentence each.</pre>
                     <span class="mt-0.5"><span class="text-emerald-600">●</span></span>
                     <div class="flex-1 min-w-0">
                       <div class="font-medium text-stone-900">5% (5 %)</div>
-                      <div class="text-stone-500 mt-0.5">erwartet: blauer Ankerstein, Lübeck-1907, A-318</div>
+                      <div class="text-stone-500 mt-0.5">expected: blauer Ankerstein, Lübeck-1907, A-318</div>
                     </div>
                   </li>
                   <li class="text-xs flex items-start gap-2">
                     <span class="mt-0.5"><span class="text-emerald-600">●</span></span>
                     <div class="flex-1 min-w-0">
                       <div class="font-medium text-stone-900">10% (10 %)</div>
-                      <div class="text-stone-500 mt-0.5">erwartet: smaragdgrün, Schlüssel, Seriennummer, 7-Bravo-12</div>
+                      <div class="text-stone-500 mt-0.5">expected: smaragdgrün, Schlüssel, Seriennummer, 7-Bravo-12</div>
                     </div>
                   </li>
                   <li class="text-xs flex items-start gap-2">
                     <span class="mt-0.5"><span class="text-emerald-600">●</span></span>
                     <div class="flex-1 min-w-0">
                       <div class="font-medium text-stone-900">15% (15 %)</div>
-                      <div class="text-stone-500 mt-0.5">erwartet: Nordstern-Brigade, violetter</div>
+                      <div class="text-stone-500 mt-0.5">expected: Nordstern-Brigade, violetter</div>
                     </div>
                   </li>
                   <li class="text-xs flex items-start gap-2">
                     <span class="mt-0.5"><span class="text-emerald-600">●</span></span>
                     <div class="flex-1 min-w-0">
                       <div class="font-medium text-stone-900">25% (25 %)</div>
-                      <div class="text-stone-500 mt-0.5">erwartet: Indigo-Quark</div>
+                      <div class="text-stone-500 mt-0.5">expected: Indigo-Quark</div>
                     </div>
                   </li>
                   <li class="text-xs flex items-start gap-2">
                     <span class="mt-0.5"><span class="text-red-500">○</span></span>
                     <div class="flex-1 min-w-0">
                       <div class="font-medium text-stone-900">33% (33 %)</div>
-                      <div class="text-stone-500 mt-0.5">erwartet: Atlantis-Mira, NL-7711, 142</div>
+                      <div class="text-stone-500 mt-0.5">expected: Atlantis-Mira, NL-7711, 142</div>
                     </div>
                   </li>
                   <li class="text-xs flex items-start gap-2">
                     <span class="mt-0.5"><span class="text-emerald-600">●</span></span>
                     <div class="flex-1 min-w-0">
                       <div class="font-medium text-stone-900">50% (50 %)</div>
-                      <div class="text-stone-500 mt-0.5">erwartet: Ehrenmitglied, Aluminium-Gesellschaft, Köln</div>
+                      <div class="text-stone-500 mt-0.5">expected: Ehrenmitglied, Aluminium-Gesellschaft, Köln</div>
                     </div>
                   </li>
                   <li class="text-xs flex items-start gap-2">
                     <span class="mt-0.5"><span class="text-emerald-600">●</span></span>
                     <div class="flex-1 min-w-0">
                       <div class="font-medium text-stone-900">65% (65 %)</div>
-                      <div class="text-stone-500 mt-0.5">erwartet: Safran-Klops Margarethe, 7 Gramm|7 g, 3 Stunden|drei Stunden</div>
+                      <div class="text-stone-500 mt-0.5">expected: Safran-Klops Margarethe, 7 Gramm|7 g, 3 Stunden|drei Stunden</div>
                     </div>
                   </li>
                   <li class="text-xs flex items-start gap-2">
                     <span class="mt-0.5"><span class="text-emerald-600">●</span></span>
                     <div class="flex-1 min-w-0">
                       <div class="font-medium text-stone-900">75% (75 %)</div>
-                      <div class="text-stone-500 mt-0.5">erwartet: Erbe von Onkel Walpurgis, 42-Lima</div>
+                      <div class="text-stone-500 mt-0.5">expected: Erbe von Onkel Walpurgis, 42-Lima</div>
                     </div>
                   </li>
                   <li class="text-xs flex items-start gap-2">
                     <span class="mt-0.5"><span class="text-emerald-600">●</span></span>
                     <div class="flex-1 min-w-0">
                       <div class="font-medium text-stone-900">85% (85 %)</div>
-                      <div class="text-stone-500 mt-0.5">erwartet: 7f4a2e91-marlin-2026</div>
+                      <div class="text-stone-500 mt-0.5">expected: 7f4a2e91-marlin-2026</div>
                     </div>
                   </li>
                   <li class="text-xs flex items-start gap-2">
                     <span class="mt-0.5"><span class="text-red-500">○</span></span>
                     <div class="flex-1 min-w-0">
                       <div class="font-medium text-stone-900">90% (90 %)</div>
-                      <div class="text-stone-500 mt-0.5">erwartet: Coriolis-Effekt, Pendel, Memo, Dr. Kühn, 17.03.2024</div>
+                      <div class="text-stone-500 mt-0.5">expected: Coriolis-Effekt, Pendel, Memo, Dr. Kühn, 17.03.2024</div>
                     </div>
                   </li>
               </ul>
               <details class="mt-3">
-                <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Modell-Antwort auf die Needle-Fragen</summary>
+                <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Model response to the needle questions</summary>
                 <pre class="mt-2 text-xs bg-stone-50 border border-stone-200 rounded p-3 overflow-x-auto whitespace-pre-wrap">1. Der Stein im Schaufenster war ein blauer Ankerstein mit der Gravur „Lübeck-1907“ und der Inventarnummer A-318.
 2. Der Schmied verbarg einen smaragdgrünen Schlüssel mit der Seriennummer 7-Bravo-12 unter dem Amboss.
 3. Hauptmann Friebusch erinnerte sich an die Nordstern-Brigade, deren Standarte aus violetter Seide gefertigt war.
@@ -1196,28 +1196,28 @@ Answer as a numbered list 1., 2., 3. with one short sentence each.</pre>
             <div class="mt-4 bg-amber-50 border border-amber-200 rounded-lg overflow-hidden">
               <div class="px-4 py-3 border-b border-amber-200 flex items-baseline justify-between">
                 <div>
-                  <span class="text-xs uppercase tracking-wider text-amber-800 font-semibold">Sub-Benchmark · Verstehen + Halluzinations-Fallen</span>
+                  <span class="text-xs uppercase tracking-wider text-amber-800 font-semibold">Sub-benchmark · comprehension + hallucination traps</span>
                   <span class="ml-2 text-xs text-stone-500">Turn 3</span>
                 </div>
                 <div class="text-sm num">
                     <span class="font-bold text-base text-emerald-700">
                       0.83
                     </span>
-                    <span class="text-stone-500">LLM-Judge</span>
+                    <span class="text-stone-500">LLM judge</span>
                     <span class="ml-2 text-xs text-stone-400">heur. 0.50</span>
                   <span class="ml-2 text-xs text-stone-600">
-                    Fakten 2/4 ·
-                    Fallen 1/2
+                    Facts 2/4 ·
+                    Traps 1/2
                   </span>
                 </div>
               </div>
               <ul class="px-4 py-3 bg-white space-y-3">
                   <li class="border-l-4 border-emerald-500 pl-3">
                     <div class="flex items-baseline gap-2 flex-wrap">
-                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200">Faktenfrage</span>
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200">Factual question</span>
                       <div class="text-sm font-medium text-stone-900 flex-1">Wie heißt der Schmied vom Blumental, bei dem Gottlieb in der Lehre ist? (Vor- und Nachname)</div>
                         <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
-                              data-tooltip="LLM-Judge 1.00 · correct: Michael Lebbin ist richtig genannt; der zusätzliche zweite Vorname bei Gottlieb ist zwar fraglich, betrifft aber die Frage nicht.">
+                              data-tooltip="LLM judge 1.00 · correct: Michael Lebbin ist richtig genannt; der zusätzliche zweite Vorname bei Gottlieb ist zwar fraglich, betrifft aber die Frage nicht.">
                           J
                         </span>
                     </div>
@@ -1225,10 +1225,10 @@ Answer as a numbered list 1., 2., 3. with one short sentence each.</pre>
                   </li>
                   <li class="border-l-4 border-emerald-500 pl-3">
                     <div class="flex items-baseline gap-2 flex-wrap">
-                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200">Faktenfrage</span>
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200">Factual question</span>
                       <div class="text-sm font-medium text-stone-900 flex-1">Wie heißt der französische Kapitän, der Gottliebs Eltern getötet hat?</div>
                         <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
-                              data-tooltip="LLM-Judge 1.00 · correct: Etienne de Beaumont ist korrekt.">
+                              data-tooltip="LLM judge 1.00 · correct: Etienne de Beaumont ist korrekt.">
                           J
                         </span>
                     </div>
@@ -1236,10 +1236,10 @@ Answer as a numbered list 1., 2., 3. with one short sentence each.</pre>
                   </li>
                   <li class="border-l-4 border-red-500 pl-3">
                     <div class="flex items-baseline gap-2 flex-wrap">
-                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200">Faktenfrage</span>
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200">Factual question</span>
                       <div class="text-sm font-medium text-stone-900 flex-1">Womit lenkte Malineken die Wachen ab, um den Schlüssel zu entwenden?</div>
                         <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
-                              data-tooltip="LLM-Judge 0.00 · incorrect: Die Antwort erfindet eine andere Ablenkung und nennt weder Tuch/Kopftuch noch Semmel oder Verkleidung.">
+                              data-tooltip="LLM judge 0.00 · incorrect: Die Antwort erfindet eine andere Ablenkung und nennt weder Tuch/Kopftuch noch Semmel oder Verkleidung.">
                           J
                         </span>
                     </div>
@@ -1247,10 +1247,10 @@ Answer as a numbered list 1., 2., 3. with one short sentence each.</pre>
                   </li>
                   <li class="border-l-4 border-emerald-500 pl-3">
                     <div class="flex items-baseline gap-2 flex-wrap">
-                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200">Faktenfrage</span>
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200">Factual question</span>
                       <div class="text-sm font-medium text-stone-900 flex-1">Warum muss Gottlieb sich verborgen halten? Was würden die Franzosen sonst tun?</div>
                         <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
-                              data-tooltip="LLM-Judge 1.00 · correct: Inhaltlich richtig: Gottlieb muss verborgen bleiben, weil die Franzosen ihn sonst erschießen würden.">
+                              data-tooltip="LLM judge 1.00 · correct: Inhaltlich richtig: Gottlieb muss verborgen bleiben, weil die Franzosen ihn sonst erschießen würden.">
                           J
                         </span>
                     </div>
@@ -1258,10 +1258,10 @@ Answer as a numbered list 1., 2., 3. with one short sentence each.</pre>
                   </li>
                   <li class="border-l-4 border-emerald-500 pl-3">
                     <div class="flex items-baseline gap-2 flex-wrap">
-                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200">Halluzinations-Falle</span>
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200">Hallucination trap</span>
                       <div class="text-sm font-medium text-stone-900 flex-1">Wie heißt Gottliebs Onkel?</div>
                         <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
-                              data-tooltip="LLM-Judge 1.00 · correct: Die Falle wird sauber abgewehrt: Ein Onkel wird nicht genannt, Gottlieb ist Waise.">
+                              data-tooltip="LLM judge 1.00 · correct: Die Falle wird sauber abgewehrt: Ein Onkel wird nicht genannt, Gottlieb ist Waise.">
                           J
                         </span>
                     </div>
@@ -1269,10 +1269,10 @@ Answer as a numbered list 1., 2., 3. with one short sentence each.</pre>
                   </li>
                   <li class="border-l-4 border-emerald-500 pl-3">
                     <div class="flex items-baseline gap-2 flex-wrap">
-                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200">Halluzinations-Falle</span>
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200">Hallucination trap</span>
                       <div class="text-sm font-medium text-stone-900 flex-1">Mit welcher List überlistete Michael Lebbin Kaiser Bonaparte persönlich?</div>
                         <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
-                              data-tooltip="LLM-Judge 1.00 · correct: Die Falle wird im Kern richtig zurückgewiesen: Es gibt keine persönliche Begegnung oder List gegen Bonaparte.">
+                              data-tooltip="LLM judge 1.00 · correct: Die Falle wird im Kern richtig zurückgewiesen: Es gibt keine persönliche Begegnung oder List gegen Bonaparte.">
                           J
                         </span>
                     </div>
@@ -1284,7 +1284,7 @@ Answer as a numbered list 1., 2., 3. with one short sentence each.</pre>
 
 
     <div class="mt-4 text-xs text-stone-500">
-      Artefakte:
+      Artefacts:
         <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-e2b/niah/breakdown.json" target="_blank">Breakdown pro Kontextlänge</a>
         <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/haystacks/haystack_120k.txt" target="_blank">Haystack 120k Tokens</a>
     </div>
@@ -1292,7 +1292,7 @@ Answer as a numbered list 1., 2., 3. with one short sentence each.</pre>
 <section id="tool_use" class="mb-12 scroll-mt-24">
   <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
     <h2 class="text-lg font-medium tracking-tight">tool_use</h2>
-    <a href="../benchmarks/tool_use.html" class="text-xs text-stone-500 hover:text-stone-900">alle Modelle in diesem Bench →</a>
+    <a href="../benchmarks/tool_use.html" class="text-xs text-stone-500 hover:text-stone-900">all models in this bench →</a>
   </div>
 
 
@@ -1340,7 +1340,7 @@ Why models fail: models without &#39;tool_use&#39; capability ignore tool schema
       </summary>
       <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
           <div>
-            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System-Prompt</div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System prompt</div>
             <pre class="text-xs whitespace-pre-wrap text-stone-800">Du arbeitest in einer agentic IDE (vergleichbar mit Cursor/Claude Code). Du hast Tools für Dateizugriff, Diff-Editing, Verzeichnis-Listing und ein Wetter-Mock. Plane mehrstufig: erst aufklären, dann handeln, am Ende prüfen. Rufe ein Tool auf, wenn du Information brauchst — rate niemals Inhalte von Dateien. Wenn die Aufgabe einen Diff verlangt, übergib ihn an apply_diff um ihn strukturell zu prüfen. Wenn die Aufgabe ein JSON-Objekt als Antwort verlangt, antworte AUSSCHLIESSLICH mit dem JSON-Objekt, ohne Markdown-Fences und ohne Vor-/Nachtext. Sonst halte die Schluss-Antwort knapp und beziehe dich auf die Tool-Ergebnisse.</pre>
           </div>
       </div>
@@ -1356,20 +1356,20 @@ bg-emerald-50 text-emerald-700 border border-emerald-200
           </div>
             <div class="text-sm num">
               <span class="font-medium text-emerald-700">1.00</span>
-              <span class="text-stone-500"> · 3/3 Checks</span>
+              <span class="text-stone-500"> · 3/3 checks</span>
             </div>
         </div>
 
         <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">In notes.md stehen Sprint-Notizen. Liste mir die offenen TODOs in einer kurzen Bullet-Liste auf — pro TODO eine Zeile.</div>
 
           <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
-            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool-Aufrufe</div>
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool calls</div>
             <ol class="space-y-2 text-sm num">
                 <li>
                   <span class="font-medium text-stone-900">1. read_file</span>
                   <span class="text-stone-600">({"path": "notes.md"})</span>
                   <details class="mt-1">
-                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool-Result</summary>
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
                     <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap"># Sprint Notes — KW 17
 
 ## Erledigt
@@ -1413,7 +1413,7 @@ TODO: Safari-Repro-Setup auf </pre>
           </ul>
 
         <div class="px-4 py-3">
-          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Endgültige Antwort</div>
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Final answer</div>
           <pre class="text-sm whitespace-pre-wrap">Die offenen TODOs aus `notes.md` sind:
 
 * TODO: Caching-Layer für Produktsuche evaluieren (Redis vs in-memory)
@@ -1432,20 +1432,20 @@ bg-emerald-50 text-emerald-700 border border-emerald-200
           </div>
             <div class="text-sm num">
               <span class="font-medium text-emerald-700">1.00</span>
-              <span class="text-stone-500"> · 4/4 Checks</span>
+              <span class="text-stone-500"> · 4/4 checks</span>
             </div>
         </div>
 
         <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">Ich weiß nicht mehr, welche Datei in diesem Projekt die Konfiguration enthält. Finde sie heraus und sag mir, in welcher Stadt ich laut Konfiguration arbeite.</div>
 
           <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
-            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool-Aufrufe</div>
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool calls</div>
             <ol class="space-y-2 text-sm num">
                 <li>
                   <span class="font-medium text-stone-900">1. list_files</span>
                   <span class="text-stone-600">({})</span>
                   <details class="mt-1">
-                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool-Result</summary>
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
                     <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">[&#34;config.json&#34;, &#34;fizzbuzz.py&#34;, &#34;inventory.py&#34;, &#34;notes.md&#34;, &#34;users.json&#34;]</pre>
                   </details>
                 </li>
@@ -1453,7 +1453,7 @@ bg-emerald-50 text-emerald-700 border border-emerald-200
                   <span class="font-medium text-stone-900">2. read_file</span>
                   <span class="text-stone-600">({"path": "config.json"})</span>
                   <details class="mt-1">
-                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool-Result</summary>
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
                     <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{
   &#34;service&#34;: &#34;owb-test-fixture&#34;,
   &#34;city&#34;: &#34;München&#34;,
@@ -1494,7 +1494,7 @@ bg-emerald-50 text-emerald-700 border border-emerald-200
           </ul>
 
         <div class="px-4 py-3">
-          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Endgültige Antwort</div>
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Final answer</div>
           <pre class="text-sm whitespace-pre-wrap">Die Konfiguration befindet sich in der Datei `config.json`.
 
 Laut dieser Konfiguration arbeitest du in **München**.</pre>
@@ -1510,20 +1510,20 @@ bg-amber-50 text-amber-700 border border-amber-200
           </div>
             <div class="text-sm num">
               <span class="font-medium text-emerald-700">1.00</span>
-              <span class="text-stone-500"> · 6/6 Checks</span>
+              <span class="text-stone-500"> · 6/6 checks</span>
             </div>
         </div>
 
         <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">fizzbuzz.py hat einen Bug — die Funktion liefert die Werte 1..n-1 statt 1..n. Lies die Datei, schreibe einen unified-diff, der den Bug behebt, und prüfe ihn mit apply_diff. Antworte am Ende mit einer kurzen Erklärung des Fixes.</div>
 
           <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
-            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool-Aufrufe</div>
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool calls</div>
             <ol class="space-y-2 text-sm num">
                 <li>
                   <span class="font-medium text-stone-900">1. list_files</span>
                   <span class="text-stone-600">({})</span>
                   <details class="mt-1">
-                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool-Result</summary>
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
                     <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">[&#34;config.json&#34;, &#34;fizzbuzz.py&#34;, &#34;inventory.py&#34;, &#34;notes.md&#34;, &#34;users.json&#34;]</pre>
                   </details>
                 </li>
@@ -1531,7 +1531,7 @@ bg-amber-50 text-amber-700 border border-amber-200
                   <span class="font-medium text-stone-900">2. read_file</span>
                   <span class="text-stone-600">({"path": "fizzbuzz.py"})</span>
                   <details class="mt-1">
-                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool-Result</summary>
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
                     <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">&#34;&#34;&#34;Simple FizzBuzz with a deliberate off-by-one bug.&#34;&#34;&#34;
 
 
@@ -1559,7 +1559,7 @@ if __name__ == &#34;__main__&#34;:
                   <span class="font-medium text-stone-900">3. apply_diff</span>
                   <span class="text-stone-600">({"diff": "--- fizzbuzz.py\n+++ fizzbuzz.py\n@@ -4,7 +4,7 @@\n def fizzbuzz(n: int) -\u003e list[str]:\n     out: list[str] = []\n-    # BUG: range stops at n (exclusive), but FizzBuzz from 1..=n needs n+1.\n-    for i in range(1, n):\n+    # Fix: Iterate up to and including n\n+    for i in range(1, n + 1):\n         if i % 15 == 0:\n             out.append(\"FizzBuzz\")\n         elif i % 3 == 0:\n@@ -12,4 +12,4 @@\n         else:\n             out.append(str(i))\n     return out", "path": "fizzbuzz.py"})</span>
                   <details class="mt-1">
-                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool-Result</summary>
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
                     <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{&#34;ok&#34;: true, &#34;applied&#34;: 4, &#34;added_lines&#34;: 2, &#34;removed_lines&#34;: 2, &#34;note&#34;: &#34;structural-validation only; no real write performed&#34;}</pre>
                   </details>
                 </li>
@@ -1606,7 +1606,7 @@ if __name__ == &#34;__main__&#34;:
           </ul>
 
         <div class="px-4 py-3">
-          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Endgültige Antwort</div>
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Final answer</div>
           <pre class="text-sm whitespace-pre-wrap">Der Bug wurde behoben. Die Funktion iteriert nun korrekt von 1 bis einschließlich $n$ (`range(1, n + 1)`), wodurch die Werte 1..n statt 1..n-1 generiert werden.</pre>
         </div>
       </div>
@@ -1620,20 +1620,20 @@ bg-amber-50 text-amber-700 border border-amber-200
           </div>
             <div class="text-sm num">
               <span class="font-medium text-emerald-700">1.00</span>
-              <span class="text-stone-500"> · 6/6 Checks</span>
+              <span class="text-stone-500"> · 6/6 checks</span>
             </div>
         </div>
 
         <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">users.json enthält eine Liste aller Nutzer. Filtere die *aktiven* Nutzer mit Rolle &#39;admin&#39; oder &#39;editor&#39; und antworte AUSSCHLIESSLICH mit einem JSON-Objekt der Form {&#34;count&#34;: &lt;Zahl&gt;, &#34;users&#34;: [{&#34;id&#34;: ..., &#34;name&#34;: ..., &#34;role&#34;: ...}, ...]}. Keine Markdown-Fences, kein Vor- oder Nachtext.</div>
 
           <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
-            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool-Aufrufe</div>
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool calls</div>
             <ol class="space-y-2 text-sm num">
                 <li>
                   <span class="font-medium text-stone-900">1. read_file</span>
                   <span class="text-stone-600">({"path": "users.json"})</span>
                   <details class="mt-1">
-                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool-Result</summary>
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
                     <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{
   &#34;exported_at&#34;: &#34;2026-04-28T08:30:00Z&#34;,
   &#34;users&#34;: [
@@ -1705,7 +1705,7 @@ bg-amber-50 text-amber-700 border border-amber-200
           </ul>
 
         <div class="px-4 py-3">
-          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Endgültige Antwort</div>
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Final answer</div>
           <pre class="text-sm whitespace-pre-wrap">{
 &#34;count&#34;: 4,
 &#34;users&#34;: [
@@ -1743,20 +1743,20 @@ bg-amber-50 text-amber-700 border border-amber-200
           </div>
             <div class="text-sm num">
               <span class="font-medium text-emerald-700">1.00</span>
-              <span class="text-stone-500"> · 7/7 Checks</span>
+              <span class="text-stone-500"> · 7/7 checks</span>
             </div>
         </div>
 
         <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">Lies config.json und hol das Wetter für die dort eingetragene Stadt. Antworte AUSSCHLIESSLICH mit einem JSON-Objekt {&#34;city&#34;: ..., &#34;temp_c&#34;: ..., &#34;condition&#34;: ..., &#34;alert&#34;: &lt;bool&gt;}, wobei alert genau dann true ist, wenn temp_c den Schwellwert aus config.json überschreitet.</div>
 
           <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
-            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool-Aufrufe</div>
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool calls</div>
             <ol class="space-y-2 text-sm num">
                 <li>
                   <span class="font-medium text-stone-900">1. read_file</span>
                   <span class="text-stone-600">({"path": "config.json"})</span>
                   <details class="mt-1">
-                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool-Result</summary>
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
                     <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{
   &#34;service&#34;: &#34;owb-test-fixture&#34;,
   &#34;city&#34;: &#34;München&#34;,
@@ -1770,7 +1770,7 @@ bg-amber-50 text-amber-700 border border-amber-200
                   <span class="font-medium text-stone-900">2. get_weather</span>
                   <span class="text-stone-600">({"city": "M\u00fcnchen"})</span>
                   <details class="mt-1">
-                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool-Result</summary>
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
                     <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{&#34;city&#34;: &#34;M\u00fcnchen&#34;, &#34;temp_c&#34;: 9, &#34;condition&#34;: &#34;bew\u00f6lkt&#34;, &#34;wind_kmh&#34;: 7}</pre>
                   </details>
                 </li>
@@ -1823,7 +1823,7 @@ bg-amber-50 text-amber-700 border border-amber-200
           </ul>
 
         <div class="px-4 py-3">
-          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Endgültige Antwort</div>
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Final answer</div>
           <pre class="text-sm whitespace-pre-wrap">{&#34;city&#34;: &#34;München&#34;, &#34;temp_c&#34;: 9, &#34;condition&#34;: &#34;bewölkt&#34;, &#34;alert&#34;: false}</pre>
         </div>
       </div>
@@ -1836,20 +1836,20 @@ bg-red-50 text-red-700 border border-red-200">schwer</span>
           </div>
             <div class="text-sm num">
               <span class="font-medium text-emerald-700">1.00</span>
-              <span class="text-stone-500"> · 8/8 Checks</span>
+              <span class="text-stone-500"> · 8/8 checks</span>
             </div>
         </div>
 
         <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">Die Funktion calculate_total in inventory.py soll konsistent zum Projekt-Stil in compute_total umbenannt werden. Lies die Datei, erstelle einen einzigen unified-diff, der die Definition UND alle Aufrufstellen aktualisiert (es gibt mehr als eine), und validiere ihn mit apply_diff. Achte darauf, keine anderen Identifier-Vorkommen zu verändern. Antworte am Ende kurz, wie viele Stellen du geändert hast.</div>
 
           <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
-            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool-Aufrufe</div>
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool calls</div>
             <ol class="space-y-2 text-sm num">
                 <li>
                   <span class="font-medium text-stone-900">1. list_files</span>
                   <span class="text-stone-600">({})</span>
                   <details class="mt-1">
-                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool-Result</summary>
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
                     <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">[&#34;config.json&#34;, &#34;fizzbuzz.py&#34;, &#34;inventory.py&#34;, &#34;notes.md&#34;, &#34;users.json&#34;]</pre>
                   </details>
                 </li>
@@ -1857,7 +1857,7 @@ bg-red-50 text-red-700 border border-red-200">schwer</span>
                   <span class="font-medium text-stone-900">2. read_file</span>
                   <span class="text-stone-600">({"path": "inventory.py"})</span>
                   <details class="mt-1">
-                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool-Result</summary>
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
                     <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">&#34;&#34;&#34;Mini inventory accounting module — used as fixture for diff-edit benchmark.
 
 The function calculate_total() is called from 3 different places. A typical
@@ -1887,7 +1887,7 @@ def calculate_total(items: Iterable[LineItem]) -&gt; int:
                   <span class="font-medium text-stone-900">3. apply_diff</span>
                   <span class="text-stone-600">({"diff": "--- inventory.py\n+++ inventory.py\n@@ -10,7 +10,7 @@\n     discount_pct: float = 0.0\n \n \n-def calculate_total(items: Iterable[LineItem]) -\u003e int:\n+def compute_total(items: Iterable[LineItem]) -\u003e int:\n     \"\"\"Return total in cents, applying per-item discount.\"\"\"\n     total = 0\n     for item in items:\n@@ -21,16 +21,16 @@\n     return total\n \n \n def format_receipt(items: list[LineItem], currency: str = \"EUR\") -\u003e str:\n     \"\"\"Render a receipt showing each line and the grand total.\"\"\"\n     lines = []\n     for it in items:\n         lines.append(\n             f\"{it.sku:\u003c10} x{it.quantity:\u003e3}  {it.unit_price_cents / 100:\u003e7.2f} {currency}\"\n             + (f\"  (-{int(it.discount_pct * 100)}%)\" if it.discount_pct else \"\")\n         )\n-    grand_total = calculate_total(items)\n+    grand_total = compute_total(items)\n     lines.append(\"-\" * 40)\n     lines.append(f\"{\u0027TOTAL\u0027:\u003c10}        {grand_total / 100:\u003e7.2f} {currency}\")\n     return \"\\n\".join(lines)\n@@ -38,13 +38,13 @@\n     if not baskets:\n         return 0.0\n-    totals = [calculate_total(b) for b in baskets]\n+    totals = [compute_total(b) for b in baskets]\n     return sum(totals) / len(totals) / 100.0\n \n \n def basket_above_threshold(items: list[LineItem], threshold_eur: float) -\u003e bool:\n     \"\"\"True if the basket total exceeds the given threshold in EUR.\"\"\"\n-    return calculate_total(items) \u003e threshold_eur * 100\n+    return compute_total(items) \u003e threshold_eur * 100\n \n \n # ---- demo data --------------------------------------------------------------\n@@ -64,7 +64,7 @@\n if __name__ == \"__main__\":\n     basket = _demo_basket()\n     print(format_receipt(basket))\n     print()\n-    print(f\"Average basket: {average_basket(_demo_baskets()):.2f} EUR\")\n+    print(f\"Average basket: {average_basket(_demo_baskets()):.2f} EUR\")\n     print(\n         \"Above 50 EUR? \" + (\"yes\" if basket_above_threshold(basket, 50.0) else \"no\")\n     )", "path": "inventory.py"})</span>
                   <details class="mt-1">
-                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool-Result</summary>
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
                     <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{&#34;ok&#34;: true, &#34;applied&#34;: 10, &#34;added_lines&#34;: 5, &#34;removed_lines&#34;: 5, &#34;note&#34;: &#34;structural-validation only; no real write performed&#34;}</pre>
                   </details>
                 </li>
@@ -1946,7 +1946,7 @@ def calculate_total(items: Iterable[LineItem]) -&gt; int:
           </ul>
 
         <div class="px-4 py-3">
-          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Endgültige Antwort</div>
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Final answer</div>
           <pre class="text-sm whitespace-pre-wrap">Ich habe 5 Stellen geändert.</pre>
         </div>
       </div>
@@ -1959,20 +1959,20 @@ bg-red-50 text-red-700 border border-red-200">schwer</span>
           </div>
             <div class="text-sm num">
               <span class="font-medium text-emerald-700">1.00</span>
-              <span class="text-stone-500"> · 7/7 Checks</span>
+              <span class="text-stone-500"> · 7/7 checks</span>
             </div>
         </div>
 
         <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">Erstelle eine Zusammenfassung aus zwei Quellen. Lies users.json und config.json. Antworte AUSSCHLIESSLICH mit einem JSON-Objekt der Form {&#34;service&#34;: &lt;Service-Name aus config&gt;, &#34;city&#34;: &lt;Stadt aus config&gt;, &#34;active_users&#34;: &lt;Anzahl aktiver Nutzer aus users.json&gt;, &#34;admin_emails&#34;: [&lt;E-Mails aller aktiven Admins, sortiert&gt;]}. Keine Markdown-Fences.</div>
 
           <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
-            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool-Aufrufe</div>
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool calls</div>
             <ol class="space-y-2 text-sm num">
                 <li>
                   <span class="font-medium text-stone-900">1. read_file</span>
                   <span class="text-stone-600">({"path": "config.json"})</span>
                   <details class="mt-1">
-                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool-Result</summary>
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
                     <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{
   &#34;service&#34;: &#34;owb-test-fixture&#34;,
   &#34;city&#34;: &#34;München&#34;,
@@ -1986,7 +1986,7 @@ bg-red-50 text-red-700 border border-red-200">schwer</span>
                   <span class="font-medium text-stone-900">2. read_file</span>
                   <span class="text-stone-600">({"path": "users.json"})</span>
                   <details class="mt-1">
-                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool-Result</summary>
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
                     <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{
   &#34;exported_at&#34;: &#34;2026-04-28T08:30:00Z&#34;,
   &#34;users&#34;: [
@@ -2064,21 +2064,21 @@ bg-red-50 text-red-700 border border-red-200">schwer</span>
           </ul>
 
         <div class="px-4 py-3">
-          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Endgültige Antwort</div>
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Final answer</div>
           <pre class="text-sm whitespace-pre-wrap">{&#34;service&#34;: &#34;owb-test-fixture&#34;, &#34;city&#34;: &#34;München&#34;, &#34;active_users&#34;: 4, &#34;admin_emails&#34;: [&#34;anja.sommer@example.com&#34;, &#34;frederik.otto@example.com&#34;]}</pre>
         </div>
       </div>
 
 
     <div class="mt-4 text-xs text-stone-500">
-      Artefakte:
+      Artefacts:
         <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-e2b/tool_use/scenarios.json" target="_blank">Scenarios + Tool-Call-Verlauf</a>
     </div>
 </section>
 <section id="diagram_to_svg" class="mb-12 scroll-mt-24">
   <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
     <h2 class="text-lg font-medium tracking-tight">diagram_to_svg</h2>
-    <a href="../benchmarks/diagram_to_svg.html" class="text-xs text-stone-500 hover:text-stone-900">alle Modelle in diesem Bench →</a>
+    <a href="../benchmarks/diagram_to_svg.html" class="text-xs text-stone-500 hover:text-stone-900">all models in this bench →</a>
   </div>
 
 
@@ -2128,11 +2128,11 @@ Why models fail: SVG generation requires spatial reasoning (positioning boxes, c
       </summary>
       <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
           <div>
-            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System-Prompt</div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System prompt</div>
             <pre class="text-xs whitespace-pre-wrap text-stone-800">Du bist Spezialist für Diagramm-Erkennung und SVG. Du gibst sauberes, parsbares SVG zurück, das jeder Browser ohne externe Ressourcen rendern kann.</pre>
           </div>
           <div>
-            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Developer-Prompt</div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Developer prompt</div>
             <pre class="text-xs whitespace-pre-wrap text-stone-800">Auf dem Bild siehst du ein Diagramm (Architektur, Flowchart, Sequenz, Quadrant o.ä.). Erstelle eine SVG-Repräsentation des Diagramms.
 
 Anforderungen:
@@ -2153,55 +2153,55 @@ Anforderungen:
         <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
           <div class="font-medium num">diagram_eisenhower.png</div>
           <div class="text-sm">
-              <span class="text-emerald-700 font-medium">✓ SVG parsbar · 55 Elemente · 30 Texte</span>
+              <span class="text-emerald-700 font-medium">✓ SVG parseable · 55 elements · 30 text nodes</span>
 <span class="ml-3 font-bold num text-emerald-700">0.79</span>          </div>
         </div>
           <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
             <div class="p-3 bg-stone-50">
-              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Quelle</div>
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Source</div>
               <div class="zoom-frame">
-                <button type="button" class="zoom-button" data-zoom-button aria-label="Quelle vergrößern" title="Quelle vergrößern">⛶</button>
+                <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom source" title="Zoom source">⛶</button>
                 <img src="../assets/artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_eisenhower.png" class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded" alt="diagram_eisenhower.png">
               </div>
             </div>
             <div class="p-3">
-              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">SVG-Render</div>
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">SVG render</div>
               <div class="zoom-frame">
-                <button type="button" class="zoom-button" data-zoom-button aria-label="SVG-Render vergrößern" title="SVG-Render vergrößern">⛶</button>
-                <img src="../assets/artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_eisenhower.svg" class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded" alt="SVG-Render diagram_eisenhower.png">
+                <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom SVG render" title="Zoom SVG render">⛶</button>
+                <img src="../assets/artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_eisenhower.svg" class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded" alt="SVG render diagram_eisenhower.png">
               </div>
             </div>
           </div>
           <div class="border-t border-stone-100 px-4 py-2">
-            <a class="text-xs text-stone-600 underline" href="../assets/artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_eisenhower.svg" target="_blank">SVG-Datei öffnen ↗</a>
+            <a class="text-xs text-stone-600 underline" href="../assets/artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_eisenhower.svg" target="_blank">Open SVG file ↗</a>
           </div>
             <div class="border-t border-stone-100 px-4 py-3">
-              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Deterministischer Grader</div>
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Deterministic grader</div>
               <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
                 <li class="border rounded px-3 py-2 border-emerald-200 bg-emerald-50">
                   <div class="flex items-baseline justify-between gap-3">
-                    <span class="font-medium text-stone-900">SVG-Validität</span>
+                    <span class="font-medium text-stone-900">SVG validity</span>
                     <span class="font-bold num text-emerald-700">1.00</span>
                   </div>
                   <div class="mt-1 text-stone-600">
-<span class="num">55</span> Elemente · <span class="num">30</span> Text-Knoten · root <span class="num">&lt;svg&gt;</span>
+<span class="num">55</span> elements · <span class="num">30</span> text nodes · root <span class="num">&lt;svg&gt;</span>
                   </div>
                 </li>
                 <li class="border rounded px-3 py-2 border-amber-200 bg-amber-50">
                   <div class="flex items-baseline justify-between gap-3">
-                    <span class="font-medium text-stone-900">Begriffs-Abdeckung</span>
+                    <span class="font-medium text-stone-900">Term coverage</span>
                     <span class="font-bold num text-amber-700">0.58</span>
                   </div>
-                  <div class="mt-1 text-stone-600 num">14/24 getroffen</div>
+                  <div class="mt-1 text-stone-600 num">14/24 matched</div>
                     <div class="mt-1 text-stone-500">
-                      fehlt:
+                      missing:
 Content-Strategie, Newsletter, falschem Link, Merch-Ideen, Buzzword-Bingo, Last-Minute-Meeting …                    </div>
                 </li>
               </ul>
             </div>
             <div class="border-t border-stone-100 px-4 py-3 bg-amber-50">
               <div class="flex items-baseline justify-between mb-2">
-                <span class="text-xs uppercase tracking-wider text-amber-700">Qualitativ · Judge (openai/gpt-5.4)</span>
+                <span class="text-xs uppercase tracking-wider text-amber-700">Qualitative · judge (openai/gpt-5.4)</span>
                 <span class="text-2xl font-bold num text-amber-700">0.40</span>
               </div>
               <ul class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
@@ -2240,55 +2240,55 @@ Content-Strategie, Newsletter, falschem Link, Merch-Ideen, Buzzword-Bingo, Last-
         <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
           <div class="font-medium num">diagram_service_architecture.png</div>
           <div class="text-sm">
-              <span class="text-emerald-700 font-medium">✓ SVG parsbar · 76 Elemente · 28 Texte</span>
+              <span class="text-emerald-700 font-medium">✓ SVG parseable · 76 elements · 28 text nodes</span>
 <span class="ml-3 font-bold num text-emerald-700">0.93</span>          </div>
         </div>
           <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
             <div class="p-3 bg-stone-50">
-              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Quelle</div>
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Source</div>
               <div class="zoom-frame">
-                <button type="button" class="zoom-button" data-zoom-button aria-label="Quelle vergrößern" title="Quelle vergrößern">⛶</button>
+                <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom source" title="Zoom source">⛶</button>
                 <img src="../assets/artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_service_architecture.png" class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded" alt="diagram_service_architecture.png">
               </div>
             </div>
             <div class="p-3">
-              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">SVG-Render</div>
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">SVG render</div>
               <div class="zoom-frame">
-                <button type="button" class="zoom-button" data-zoom-button aria-label="SVG-Render vergrößern" title="SVG-Render vergrößern">⛶</button>
-                <img src="../assets/artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_service_architecture.svg" class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded" alt="SVG-Render diagram_service_architecture.png">
+                <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom SVG render" title="Zoom SVG render">⛶</button>
+                <img src="../assets/artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_service_architecture.svg" class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded" alt="SVG render diagram_service_architecture.png">
               </div>
             </div>
           </div>
           <div class="border-t border-stone-100 px-4 py-2">
-            <a class="text-xs text-stone-600 underline" href="../assets/artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_service_architecture.svg" target="_blank">SVG-Datei öffnen ↗</a>
+            <a class="text-xs text-stone-600 underline" href="../assets/artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_service_architecture.svg" target="_blank">Open SVG file ↗</a>
           </div>
             <div class="border-t border-stone-100 px-4 py-3">
-              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Deterministischer Grader</div>
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Deterministic grader</div>
               <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
                 <li class="border rounded px-3 py-2 border-emerald-200 bg-emerald-50">
                   <div class="flex items-baseline justify-between gap-3">
-                    <span class="font-medium text-stone-900">SVG-Validität</span>
+                    <span class="font-medium text-stone-900">SVG validity</span>
                     <span class="font-bold num text-emerald-700">1.00</span>
                   </div>
                   <div class="mt-1 text-stone-600">
-<span class="num">76</span> Elemente · <span class="num">28</span> Text-Knoten · root <span class="num">&lt;svg&gt;</span>
+<span class="num">76</span> elements · <span class="num">28</span> text nodes · root <span class="num">&lt;svg&gt;</span>
                   </div>
                 </li>
                 <li class="border rounded px-3 py-2 border-emerald-200 bg-emerald-50">
                   <div class="flex items-baseline justify-between gap-3">
-                    <span class="font-medium text-stone-900">Begriffs-Abdeckung</span>
+                    <span class="font-medium text-stone-900">Term coverage</span>
                     <span class="font-bold num text-emerald-700">0.85</span>
                   </div>
-                  <div class="mt-1 text-stone-600 num">17/20 getroffen</div>
+                  <div class="mt-1 text-stone-600 num">17/20 matched</div>
                     <div class="mt-1 text-stone-500">
-                      fehlt:
+                      missing:
 Auth Service, JWT, Database                    </div>
                 </li>
               </ul>
             </div>
             <div class="border-t border-stone-100 px-4 py-3 bg-amber-50">
               <div class="flex items-baseline justify-between mb-2">
-                <span class="text-xs uppercase tracking-wider text-amber-700">Qualitativ · Judge (openai/gpt-5.4)</span>
+                <span class="text-xs uppercase tracking-wider text-amber-700">Qualitative · judge (openai/gpt-5.4)</span>
                 <span class="text-2xl font-bold num text-amber-700">0.36</span>
               </div>
               <ul class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
@@ -2331,55 +2331,55 @@ Auth Service, JWT, Database                    </div>
         <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
           <div class="font-medium num">diagram_sso_sequence.png</div>
           <div class="text-sm">
-              <span class="text-emerald-700 font-medium">✓ SVG parsbar · 44 Elemente · 9 Texte</span>
+              <span class="text-emerald-700 font-medium">✓ SVG parseable · 44 elements · 9 text nodes</span>
 <span class="ml-3 font-bold num text-emerald-700">0.80</span>          </div>
         </div>
           <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
             <div class="p-3 bg-stone-50">
-              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Quelle</div>
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Source</div>
               <div class="zoom-frame">
-                <button type="button" class="zoom-button" data-zoom-button aria-label="Quelle vergrößern" title="Quelle vergrößern">⛶</button>
+                <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom source" title="Zoom source">⛶</button>
                 <img src="../assets/artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_sso_sequence.png" class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded" alt="diagram_sso_sequence.png">
               </div>
             </div>
             <div class="p-3">
-              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">SVG-Render</div>
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">SVG render</div>
               <div class="zoom-frame">
-                <button type="button" class="zoom-button" data-zoom-button aria-label="SVG-Render vergrößern" title="SVG-Render vergrößern">⛶</button>
-                <img src="../assets/artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_sso_sequence.svg" class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded" alt="SVG-Render diagram_sso_sequence.png">
+                <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom SVG render" title="Zoom SVG render">⛶</button>
+                <img src="../assets/artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_sso_sequence.svg" class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded" alt="SVG render diagram_sso_sequence.png">
               </div>
             </div>
           </div>
           <div class="border-t border-stone-100 px-4 py-2">
-            <a class="text-xs text-stone-600 underline" href="../assets/artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_sso_sequence.svg" target="_blank">SVG-Datei öffnen ↗</a>
+            <a class="text-xs text-stone-600 underline" href="../assets/artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_sso_sequence.svg" target="_blank">Open SVG file ↗</a>
           </div>
             <div class="border-t border-stone-100 px-4 py-3">
-              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Deterministischer Grader</div>
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Deterministic grader</div>
               <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
                 <li class="border rounded px-3 py-2 border-emerald-200 bg-emerald-50">
                   <div class="flex items-baseline justify-between gap-3">
-                    <span class="font-medium text-stone-900">SVG-Validität</span>
+                    <span class="font-medium text-stone-900">SVG validity</span>
                     <span class="font-bold num text-emerald-700">1.00</span>
                   </div>
                   <div class="mt-1 text-stone-600">
-<span class="num">44</span> Elemente · <span class="num">9</span> Text-Knoten · root <span class="num">&lt;svg&gt;</span>
+<span class="num">44</span> elements · <span class="num">9</span> text nodes · root <span class="num">&lt;svg&gt;</span>
                   </div>
                 </li>
                 <li class="border rounded px-3 py-2 border-amber-200 bg-amber-50">
                   <div class="flex items-baseline justify-between gap-3">
-                    <span class="font-medium text-stone-900">Begriffs-Abdeckung</span>
+                    <span class="font-medium text-stone-900">Term coverage</span>
                     <span class="font-bold num text-amber-700">0.60</span>
                   </div>
-                  <div class="mt-1 text-stone-600 num">9/15 getroffen</div>
+                  <div class="mt-1 text-stone-600 num">9/15 matched</div>
                     <div class="mt-1 text-stone-500">
-                      fehlt:
+                      missing:
 Authentifizierung, Token, Assertion, Ressourcen, Nein, Ja                    </div>
                 </li>
               </ul>
             </div>
             <div class="border-t border-stone-100 px-4 py-3 bg-amber-50">
               <div class="flex items-baseline justify-between mb-2">
-                <span class="text-xs uppercase tracking-wider text-amber-700">Qualitativ · Judge (openai/gpt-5.4)</span>
+                <span class="text-xs uppercase tracking-wider text-amber-700">Qualitative · judge (openai/gpt-5.4)</span>
                 <span class="text-2xl font-bold num text-amber-700">0.52</span>
               </div>
               <ul class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
@@ -2417,14 +2417,14 @@ Authentifizierung, Token, Assertion, Ressourcen, Nein, Ja                    </d
 
 
     <div class="mt-4 text-xs text-stone-500">
-      Artefakte:
-        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_eisenhower.png" target="_blank">Quelle diagram_eisenhower</a>
+      Artefacts:
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_eisenhower.png" target="_blank">Source diagram_eisenhower</a>
         <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_eisenhower.svg" target="_blank">SVG diagram_eisenhower</a>
         <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_eisenhower.render.png" target="_blank">Render diagram_eisenhower</a>
-        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_service_architecture.png" target="_blank">Quelle diagram_service_architecture</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_service_architecture.png" target="_blank">Source diagram_service_architecture</a>
         <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_service_architecture.svg" target="_blank">SVG diagram_service_architecture</a>
         <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_service_architecture.render.png" target="_blank">Render diagram_service_architecture</a>
-        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_sso_sequence.png" target="_blank">Quelle diagram_sso_sequence</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_sso_sequence.png" target="_blank">Source diagram_sso_sequence</a>
         <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_sso_sequence.svg" target="_blank">SVG diagram_sso_sequence</a>
         <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_sso_sequence.render.png" target="_blank">Render diagram_sso_sequence</a>
     </div>
@@ -2432,7 +2432,7 @@ Authentifizierung, Token, Assertion, Ressourcen, Nein, Ja                    </d
 <section id="hallucination" class="mb-12 scroll-mt-24">
   <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
     <h2 class="text-lg font-medium tracking-tight">hallucination</h2>
-    <a href="../benchmarks/hallucination.html" class="text-xs text-stone-500 hover:text-stone-900">alle Modelle in diesem Bench →</a>
+    <a href="../benchmarks/hallucination.html" class="text-xs text-stone-500 hover:text-stone-900">all models in this bench →</a>
   </div>
 
 
@@ -2480,7 +2480,7 @@ Why models fail: training bias toward helpfulness encourages plausible hallucina
       </summary>
       <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
           <div>
-            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System-Prompt</div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System prompt</div>
             <pre class="text-xs whitespace-pre-wrap text-stone-800">Antworte knapp und faktisch korrekt auf Deutsch. Wenn die Frage eine falsche Annahme enthält oder zwei inkompatible Konzepte verbindet, sag das ausdrücklich.</pre>
           </div>
       </div>
@@ -2515,7 +2515,7 @@ Why models fail: training bias toward helpfulness encourages plausible hallucina
           <div class="flex items-baseline gap-2">
             <div class="text-sm font-medium text-stone-900 flex-1">In welchem Jahr beendete Konrad Adenauer seine Amtszeit als Bundespräsident der Bundesrepublik Deutschland?</div>
               <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
-                    data-tooltip="LLM-Judge: falsch · Prämisse erkannt: nein · Fabrication: ja: Die Antwort übernimmt die falsche Prämisse und nennt mit 1963 ein erfundenes Endjahr einer angeblichen Bundespräsidenten-Amtszeit. Es fehlt die Korrektur, dass Adenauer nie Bundespräsident war.">
+                    data-tooltip="LLM judge: falsch · premise caught: no · fabrication: yes: Die Antwort übernimmt die falsche Prämisse und nennt mit 1963 ein erfundenes Endjahr einer angeblichen Bundespräsidenten-Amtszeit. Es fehlt die Korrektur, dass Adenauer nie Bundespräsident war.">
                 J
               </span>
           </div>
@@ -2525,7 +2525,7 @@ Why models fail: training bias toward helpfulness encourages plausible hallucina
           <div class="flex items-baseline gap-2">
             <div class="text-sm font-medium text-stone-900 flex-1">In welchem Stadtteil Hamburgs steht die berühmte Frauenkirche, und wann wurde ihr Wiederaufbau abgeschlossen?</div>
               <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
-                    data-tooltip="LLM-Judge: falsch · Prämisse erkannt: nein · Fabrication: ja: Die Antwort erfindet einen Hamburger Standort und bestätigt damit die falsche Prämisse. Zwar ist 2005 mit Dresden assoziierbar, aber hier wird die Frauenkirche fälschlich nach Hamburg verlegt.">
+                    data-tooltip="LLM judge: falsch · premise caught: no · fabrication: yes: Die Antwort erfindet einen Hamburger Standort und bestätigt damit die falsche Prämisse. Zwar ist 2005 mit Dresden assoziierbar, aber hier wird die Frauenkirche fälschlich nach Hamburg verlegt.">
                 J
               </span>
           </div>
@@ -2535,7 +2535,7 @@ Why models fail: training bias toward helpfulness encourages plausible hallucina
           <div class="flex items-baseline gap-2">
             <div class="text-sm font-medium text-stone-900 flex-1">Wie viele Zentimeter Mut passen in eine Schublade?</div>
               <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
-                    data-tooltip="LLM-Judge: korrekt · Prämisse erkannt: ja · Fabrication: nein: Die Antwort benennt korrekt, dass Mut keine messbare Einheit ist und so nicht in Zentimetern angegeben werden kann. Damit wird der Kategorienfehler explizit erkannt.">
+                    data-tooltip="LLM judge: korrekt · premise caught: yes · fabrication: no: Die Antwort benennt korrekt, dass Mut keine messbare Einheit ist und so nicht in Zentimetern angegeben werden kann. Damit wird der Kategorienfehler explizit erkannt.">
                 J
               </span>
           </div>
@@ -2545,7 +2545,7 @@ Why models fail: training bias toward helpfulness encourages plausible hallucina
           <div class="flex items-baseline gap-2">
             <div class="text-sm font-medium text-stone-900 flex-1">Welches Album veröffentlichte die Band Tocotronic im Jahr 1991?</div>
               <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
-                    data-tooltip="LLM-Judge: ausgewichen · Prämisse erkannt: nein · Fabrication: nein: Die Antwort verweigert eine konkrete Albumangabe, korrigiert aber nicht die falsche Prämisse. Es fehlt der Hinweis, dass Tocotronic 1991 noch nicht existierte.">
+                    data-tooltip="LLM judge: ausgewichen · premise caught: no · fabrication: no: Die Antwort verweigert eine konkrete Albumangabe, korrigiert aber nicht die falsche Prämisse. Es fehlt der Hinweis, dass Tocotronic 1991 noch nicht existierte.">
                 J
               </span>
           </div>
@@ -2555,7 +2555,7 @@ Why models fail: training bias toward helpfulness encourages plausible hallucina
           <div class="flex items-baseline gap-2">
             <div class="text-sm font-medium text-stone-900 flex-1">An welchen Tagen war Albert Einstein im Züricher Patentamt regulär anwesend, bevor er an die ETH wechselte?</div>
               <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
-                    data-tooltip="LLM-Judge: ausgewichen · Prämisse erkannt: nein · Fabrication: nein: Die Antwort weicht auf fehlende Aufzeichnungen aus, übernimmt aber implizit das falsche Züricher Patentamt. Es fehlt die Korrektur, dass Einstein im Patentamt in Bern arbeitete.">
+                    data-tooltip="LLM judge: ausgewichen · premise caught: no · fabrication: no: Die Antwort weicht auf fehlende Aufzeichnungen aus, übernimmt aber implizit das falsche Züricher Patentamt. Es fehlt die Korrektur, dass Einstein im Patentamt in Bern arbeitete.">
                 J
               </span>
           </div>
@@ -2565,7 +2565,7 @@ Why models fail: training bias toward helpfulness encourages plausible hallucina
           <div class="flex items-baseline gap-2">
             <div class="text-sm font-medium text-stone-900 flex-1">Wie viele Tatort-Folgen hat Til Schweiger als Münchner Kommissar gedreht?</div>
               <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
-                    data-tooltip="LLM-Judge: ausgewichen · Prämisse erkannt: nein · Fabrication: nein: Die Antwort sagt nur, die Information sei nicht bekannt, ohne die falsche München-Prämisse zu korrigieren. Es fehlt der Hinweis auf Schweigers Hamburger Tatort-Rolle.">
+                    data-tooltip="LLM judge: ausgewichen · premise caught: no · fabrication: no: Die Antwort sagt nur, die Information sei nicht bekannt, ohne die falsche München-Prämisse zu korrigieren. Es fehlt der Hinweis auf Schweigers Hamburger Tatort-Rolle.">
                 J
               </span>
           </div>
@@ -2575,7 +2575,7 @@ Why models fail: training bias toward helpfulness encourages plausible hallucina
           <div class="flex items-baseline gap-2">
             <div class="text-sm font-medium text-stone-900 flex-1">Wie viel Schlaf benötigt ein Vertrag pro Nacht?</div>
               <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
-                    data-tooltip="LLM-Judge: korrekt · Prämisse erkannt: ja · Fabrication: nein: Die Antwort stellt klar, dass ein Vertrag keinen Schlaf benötigt. Damit wird der Kategorienfehler ausdrücklich erkannt.">
+                    data-tooltip="LLM judge: korrekt · premise caught: yes · fabrication: no: Die Antwort stellt klar, dass ein Vertrag keinen Schlaf benötigt. Damit wird der Kategorienfehler ausdrücklich erkannt.">
                 J
               </span>
           </div>
@@ -2585,7 +2585,7 @@ Why models fail: training bias toward helpfulness encourages plausible hallucina
           <div class="flex items-baseline gap-2">
             <div class="text-sm font-medium text-stone-900 flex-1">In welcher Tonart steht das Wort &#39;Donnerstag&#39;?</div>
               <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
-                    data-tooltip="LLM-Judge: korrekt · Prämisse erkannt: ja · Fabrication: nein: Die Antwort sagt explizit, dass das Wort keine musikalische Tonart hat. Das erkennt den Kategorienfehler sauber und ohne Halluzination.">
+                    data-tooltip="LLM judge: korrekt · premise caught: yes · fabrication: no: Die Antwort sagt explizit, dass das Wort keine musikalische Tonart hat. Das erkennt den Kategorienfehler sauber und ohne Halluzination.">
                 J
               </span>
           </div>
@@ -2595,7 +2595,7 @@ Why models fail: training bias toward helpfulness encourages plausible hallucina
           <div class="flex items-baseline gap-2">
             <div class="text-sm font-medium text-stone-900 flex-1">Wie groß war die Wikingerflotte, die im 11. Jahrhundert von Lübeck aus operierte?</div>
               <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
-                    data-tooltip="LLM-Judge: ausgewichen · Prämisse erkannt: nein · Fabrication: nein: Die Antwort bestreitet nur die genaue Beleglage, übernimmt aber, dass es eine Wikingerflotte von Lübeck aus gegeben habe. Es fehlt die Korrektur, dass Lübeck dafür zeitlich gar nicht passt.">
+                    data-tooltip="LLM judge: ausgewichen · premise caught: no · fabrication: no: Die Antwort bestreitet nur die genaue Beleglage, übernimmt aber, dass es eine Wikingerflotte von Lübeck aus gegeben habe. Es fehlt die Korrektur, dass Lübeck dafür zeitlich gar nicht passt.">
                 J
               </span>
           </div>
@@ -2605,7 +2605,7 @@ Why models fail: training bias toward helpfulness encourages plausible hallucina
           <div class="flex items-baseline gap-2">
             <div class="text-sm font-medium text-stone-900 flex-1">Wer schrieb das Vorwort zur Erstausgabe von Schillers Roman &#39;Der Verlorene Sohn&#39;?</div>
               <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
-                    data-tooltip="LLM-Judge: ausgewichen · Prämisse erkannt: nein · Fabrication: nein: Die Antwort behauptet nur fehlende Bekanntheit des Vorworts und akzeptiert damit implizit das Werk. Es fehlt die Korrektur, dass Schiller keinen Roman mit diesem Titel schrieb.">
+                    data-tooltip="LLM judge: ausgewichen · premise caught: no · fabrication: no: Die Antwort behauptet nur fehlende Bekanntheit des Vorworts und akzeptiert damit implizit das Werk. Es fehlt die Korrektur, dass Schiller keinen Roman mit diesem Titel schrieb.">
                 J
               </span>
           </div>
@@ -2615,7 +2615,7 @@ Why models fail: training bias toward helpfulness encourages plausible hallucina
           <div class="flex items-baseline gap-2">
             <div class="text-sm font-medium text-stone-900 flex-1">Wie viele Michelin-Sterne hat das Restaurant von Helene Fischer in Hamburg?</div>
               <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
-                    data-tooltip="LLM-Judge: ausgewichen · Prämisse erkannt: nein · Fabrication: nein: Die Antwort weicht aus und übernimmt implizit, dass es ein Restaurant von Helene Fischer in Hamburg gibt. Es fehlt die Korrektur, dass sie kein solches Restaurant betreibt.">
+                    data-tooltip="LLM judge: ausgewichen · premise caught: no · fabrication: no: Die Antwort weicht aus und übernimmt implizit, dass es ein Restaurant von Helene Fischer in Hamburg gibt. Es fehlt die Korrektur, dass sie kein solches Restaurant betreibt.">
                 J
               </span>
           </div>
@@ -2625,7 +2625,7 @@ Why models fail: training bias toward helpfulness encourages plausible hallucina
           <div class="flex items-baseline gap-2">
             <div class="text-sm font-medium text-stone-900 flex-1">Bei welcher Luftfeuchtigkeit wachsen Wahrheiten am besten?</div>
               <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
-                    data-tooltip="LLM-Judge: korrekt · Prämisse erkannt: ja · Fabrication: nein: Die Antwort erklärt, dass die Frage metaphorisch ist und Wahrheiten nicht von Luftfeuchtigkeit abhängen. Damit wird der Kategorienfehler klar benannt.">
+                    data-tooltip="LLM judge: korrekt · premise caught: yes · fabrication: no: Die Antwort erklärt, dass die Frage metaphorisch ist und Wahrheiten nicht von Luftfeuchtigkeit abhängen. Damit wird der Kategorienfehler klar benannt.">
                 J
               </span>
           </div>
@@ -2635,7 +2635,7 @@ Why models fail: training bias toward helpfulness encourages plausible hallucina
 
 
     <div class="mt-4 text-xs text-stone-500">
-      Artefakte:
+      Artefacts:
         <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-e2b/hallucination/responses.json" target="_blank">Alle Fragen + Antworten + Klassifikation</a>
     </div>
 </section>

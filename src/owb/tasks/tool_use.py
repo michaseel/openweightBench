@@ -197,16 +197,16 @@ class ToolUseTask(Task):
                 }
             )
 
-        # 2. Tool-Argumente — Pfad/Stadt müssen passen
+        # 2. Tool arguments — path/city must match
         for tool_name, expected in (scenario.get("expected_args") or {}).items():
             calls = [h for h in history if h["tool"] == tool_name]
             if not calls:
                 checks.append(
                     {
                         "id": f"args_{tool_name}",
-                        "label": f"Argumente für '{tool_name}'",
+                        "label": f"Arguments for '{tool_name}'",
                         "passed": False,
-                        "detail": "Tool nicht aufgerufen",
+                        "detail": "tool not called",
                     }
                 )
                 continue
@@ -214,7 +214,7 @@ class ToolUseTask(Task):
             checks.append(
                 {
                     "id": f"args_{tool_name}",
-                    "label": f"Argumente für '{tool_name}'",
+                    "label": f"Arguments for '{tool_name}'",
                     "passed": ok,
                     "detail": det,
                 }
@@ -241,7 +241,7 @@ class ToolUseTask(Task):
             checks.append(
                 {
                     "id": "diff_validates",
-                    "label": f"Diff für {diff_target} validiert strukturell",
+                    "label": f"Diff for {diff_target} validates structurally",
                     "passed": ok,
                     "detail": f"applied={applied_total}, calls={len(diff_calls)}",
                 }
@@ -251,9 +251,9 @@ class ToolUseTask(Task):
                 checks.append(
                     {
                         "id": "diff_min_changes",
-                        "label": f"Diff ändert ≥{min_changes} Zeilen",
+                        "label": f"Diff changes ≥{min_changes} lines",
                         "passed": applied_total >= min_changes,
-                        "detail": f"angewendet: {applied_total}",
+                        "detail": f"applied: {applied_total}",
                     }
                 )
             for required in scenario.get("expect_diff_contains", []):
@@ -261,9 +261,9 @@ class ToolUseTask(Task):
                 checks.append(
                     {
                         "id": f"diff_contains_{required}",
-                        "label": f"Diff enthält '{required}'",
+                        "label": f"Diff contains '{required}'",
                         "passed": found,
-                        "detail": "" if found else "Token im Diff-Body nicht gefunden",
+                        "detail": "" if found else "token not found in diff body",
                     }
                 )
 
@@ -274,9 +274,9 @@ class ToolUseTask(Task):
             checks.append(
                 {
                     "id": "json_format",
-                    "label": "Antwort enthält gültiges JSON",
+                    "label": "Response contains valid JSON",
                     "passed": json_ok,
-                    "detail": "" if json_ok else "kein parsbares JSON in Antwort",
+                    "detail": "" if json_ok else "no parseable JSON in response",
                 }
             )
             if json_ok:
@@ -287,9 +287,9 @@ class ToolUseTask(Task):
                     checks.append(
                         {
                             "id": "json_keys",
-                            "label": f"JSON enthält Felder {expected_keys}",
+                            "label": f"JSON contains fields {expected_keys}",
                             "passed": not missing,
-                            "detail": "fehlt: " + ", ".join(missing) if missing else "alle Felder vorhanden",
+                            "detail": "missing: " + ", ".join(missing) if missing else "all fields present",
                         }
                     )
                 ev = scenario.get("expect_json_eval") or {}
@@ -341,9 +341,9 @@ class ToolUseTask(Task):
             checks.append(
                 {
                     "id": "soft_mention",
-                    "label": f"Antwort erwähnt {min_hits}/{len(soft)} der Schlüssel-Begriffe",
+                    "label": f"Response mentions {min_hits}/{len(soft)} of the key terms",
                     "passed": len(hits) >= min_hits,
-                    "detail": f"erwähnt: {hits}, fehlt: {[w for w in soft if w not in hits]}",
+                    "detail": f"mentioned: {hits}, missing: {[w for w in soft if w not in hits]}",
                 }
             )
 

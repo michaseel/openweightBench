@@ -248,7 +248,7 @@ class DiagramToSvgTask(Task):
             artifacts.append(
                 Artifact(
                     kind="image",
-                    label=f"Quelle {src.stem}",
+                    label=f"Source {src.stem}",
                     path=str(img_target.relative_to(store.root)),
                     mime="image/jpeg",
                 )

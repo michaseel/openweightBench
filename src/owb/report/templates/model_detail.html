@@ -94,12 +94,12 @@
 <section id="{{ t.task }}" class="mb-12 scroll-mt-24">
   <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
     <h2 class="text-lg font-medium tracking-tight">{{ t.task }}</h2>
-    <a href="../benchmarks/{{ t.task }}.html" class="text-xs text-stone-500 hover:text-stone-900">alle Modelle in diesem Bench →</a>
+    <a href="../benchmarks/{{ t.task }}.html" class="text-xs text-stone-500 hover:text-stone-900">all models in this bench →</a>
   </div>
 
   {% if t.error %}
     <div class="mt-3 px-4 py-3 rounded bg-red-50 border border-red-200 text-red-700 text-sm">
-      <strong>Fehler:</strong> {{ t.error }}
+      <strong>Error:</strong> {{ t.error }}
     </div>
   {% endif %}
 
@@ -123,15 +123,15 @@
         {% set _judge_v = t.score_breakdown.judge.judge_score if t.score_breakdown.judge else None %}
         <div class="mt-3 grid grid-cols-3 gap-2 text-center">
           <div class="rounded border border-stone-200 px-2 py-1.5">
-            <div class="text-[10px] uppercase tracking-wider text-stone-500">Statisch</div>
+            <div class="text-[10px] uppercase tracking-wider text-stone-500">Static</div>
             <div class="text-base font-bold num {% if _lint_v is none %}text-stone-300{% elif _lint_v >= 0.7 %}text-emerald-700{% elif _lint_v > 0 %}text-amber-700{% else %}text-red-600{% endif %}">{% if _lint_v is none %}—{% else %}{{ "%.2f"|format(_lint_v) }}{% endif %}</div>
           </div>
           <div class="rounded border border-stone-200 px-2 py-1.5">
-            <div class="text-[10px] uppercase tracking-wider text-stone-500">Funktional</div>
+            <div class="text-[10px] uppercase tracking-wider text-stone-500">Functional</div>
             <div class="text-base font-bold num {% if _e2e_v is none %}text-stone-300{% elif _e2e_v >= 0.7 %}text-emerald-700{% elif _e2e_v > 0 %}text-amber-700{% else %}text-red-600{% endif %}">{% if _e2e_v is none %}—{% else %}{{ "%.2f"|format(_e2e_v) }}{% endif %}</div>
           </div>
           <div class="rounded border border-stone-200 px-2 py-1.5">
-            <div class="text-[10px] uppercase tracking-wider text-stone-500">Qualitativ</div>
+            <div class="text-[10px] uppercase tracking-wider text-stone-500">Qualitative</div>
             <div class="text-base font-bold num {% if _judge_v is none %}text-stone-300{% elif _judge_v >= 0.7 %}text-emerald-700{% elif _judge_v > 0 %}text-amber-700{% else %}text-red-600{% endif %}">{% if _judge_v is none %}—{% else %}{{ "%.2f"|format(_judge_v) }}{% endif %}</div>
           </div>
         </div>
@@ -158,7 +158,7 @@
     </div>
   </div>
 
-  {# Aufgaben-Explainer #}
+  {# Task explainer #}
   {% if explanations.get(t.task) %}
     <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
       <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
@@ -178,13 +178,13 @@
       <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
         {% if _p.system %}
           <div>
-            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System-Prompt</div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System prompt</div>
             <pre class="text-xs whitespace-pre-wrap text-stone-800">{{ _p.system }}</pre>
           </div>
         {% endif %}
         {% if _p.user %}
           <div>
-            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Developer-Prompt</div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Developer prompt</div>
             <pre class="text-xs whitespace-pre-wrap text-stone-800">{{ _p.user }}</pre>
           </div>
         {% endif %}
@@ -196,7 +196,7 @@
   {% if t.task == "nonsense" and t.score_breakdown.questions %}
     <p class="mt-5 text-sm text-stone-600">
       <strong class="text-stone-900 num">{{ t.score_breakdown.hits }}/{{ t.score_breakdown.total }}</strong>
-      Quatsch-Fragen wurden erkannt. Grüner Rand = das Modell hat den Unsinn explizit zurückgewiesen.
+      nonsense questions were recognised. Green border = the model explicitly pushed back on the nonsense.
     </p>
     <ul class="mt-3 space-y-3">
       {% for q in t.score_breakdown.questions %}
@@ -259,7 +259,7 @@
             <div class="text-sm font-medium text-stone-900 flex-1">{{ q.prompt }}</div>
             {% if q.judge %}
               <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
-                    data-tooltip="LLM-Judge: {{ q.judge.verdict }} · Prämisse erkannt: {{ "ja" if q.judge.false_premise_caught else "nein" }} · Fabrication: {{ "ja" if q.judge.fabrication_detected else "nein" }}{% if q.judge.comment %}: {{ q.judge.comment }}{% endif %}">
+                    data-tooltip="LLM judge: {{ q.judge.verdict }} · premise caught: {{ "yes" if q.judge.false_premise_caught else "no" }} · fabrication: {{ "yes" if q.judge.fabrication_detected else "no" }}{% if q.judge.comment %}: {{ q.judge.comment }}{% endif %}">
                 J
               </span>
             {% endif %}
@@ -297,25 +297,25 @@
   {# --------------------------------------------------------- niah #}
   {% elif t.task in ["niah", "niah_deep"] and t.score_breakdown.lengths %}
     <p class="mt-5 text-sm text-stone-600">
-      Pro Kontextlänge wurden 10 Needles über den Korpus verteilt. Der NIAH-Score kombiniert
-      Korpus-Zusammenfassung, Needle-Retrieval und optional Verstehen + Halluzinations-Fallen.
-      LLM-Judges ersetzen die heuristischen Scores für Summary und Verstehen, sobald vorhanden.
+      For each context length 10 needles are distributed across the corpus. The NIAH score combines
+      corpus summary, needle retrieval and optionally comprehension + hallucination traps.
+      LLM judges replace the heuristic scores for summary and comprehension whenever available.
     </p>
 
     {% for L in t.score_breakdown.lengths %}
       <div class="mt-6">
         <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">
-          Stufe: <span class="num font-semibold text-stone-700">{{ L.length_tokens // 1000 }}k Tokens</span>
-          {% if L.skipped %}<span class="ml-2 text-stone-500">übersprungen — {{ L.reason }}</span>{% endif %}
+          Stage: <span class="num font-semibold text-stone-700">{{ L.length_tokens // 1000 }}k tokens</span>
+          {% if L.skipped %}<span class="ml-2 text-stone-500">skipped — {{ L.reason }}</span>{% endif %}
         </div>
 
         {% if not L.skipped %}
-          {# ─── Sub-Benchmark 1: Korpus-Zusammenfassung (Turn 1) ─── #}
+          {# ─── Sub-benchmark 1: corpus summary (turn 1) ─── #}
           {% if L.raw_summary %}
             <div class="bg-sky-50 border border-sky-200 rounded-lg overflow-hidden">
               <div class="px-4 py-3 border-b border-sky-200 flex items-baseline justify-between">
                 <div>
-                  <span class="text-xs uppercase tracking-wider text-sky-700 font-semibold">Sub-Benchmark · Korpus-Zusammenfassung</span>
+                  <span class="text-xs uppercase tracking-wider text-sky-700 font-semibold">Sub-benchmark · corpus summary</span>
                   <span class="ml-2 text-xs text-stone-500">Turn 1</span>
                 </div>
                 <div class="text-sm num">
@@ -323,15 +323,15 @@
                     <span class="font-bold text-base {% if L.judge.judge_score >= 0.7 %}text-emerald-700{% elif L.judge.judge_score == 0 %}text-red-700{% else %}text-amber-700{% endif %}">
                       {{ "%.2f"|format(L.judge.judge_score) }}
                     </span>
-                    <span class="text-stone-500">LLM-Judge</span>
+                    <span class="text-stone-500">LLM judge</span>
                     <span class="ml-2 text-xs text-stone-400">heur. {{ "%.2f"|format(L.summary_score) }}</span>
                   {% else %}
                     <span class="font-bold text-base {% if L.summary_passed == L.summary_total %}text-emerald-700{% elif L.summary_passed == 0 %}text-red-700{% else %}text-amber-700{% endif %}">
                       {{ L.summary_passed }}/{{ L.summary_total }}
                     </span>
-                    <span class="text-stone-500">Kriterien</span>
+                    <span class="text-stone-500">criteria</span>
                   {% endif %}
-                  <span class="ml-2 text-xs text-stone-500">~{{ L.approx_corpus_tokens // 1000 }}k Tokens Input</span>
+                  <span class="ml-2 text-xs text-stone-500">~{{ L.approx_corpus_tokens // 1000 }}k tokens input</span>
                 </div>
               </div>
               <div class="px-4 py-3 bg-white">
@@ -339,7 +339,7 @@
                 {% if L.judge %}
                   <div class="mt-3 border border-amber-200 bg-amber-50 rounded p-3">
                     <div class="flex items-baseline justify-between gap-3">
-                      <span class="text-xs uppercase tracking-wider text-amber-700">LLM-Judge Summary ({{ L.judge.judge_model }})</span>
+                      <span class="text-xs uppercase tracking-wider text-amber-700">LLM judge summary ({{ L.judge.judge_model }})</span>
                       <span class="text-lg font-bold num {% if L.judge.judge_score >= 0.7 %}text-emerald-700{% elif L.judge.judge_score == 0 %}text-red-700{% else %}text-amber-700{% endif %}">{{ "%.2f"|format(L.judge.judge_score) }}</span>
                     </div>
                     {% if L.judge.axes %}
@@ -368,11 +368,11 @@
             </div>
           {% endif %}
 
-          {# ─── Sub-Benchmark 2: Needle-Retrieval (Turn 2) ─── #}
+          {# ─── Sub-benchmark 2: needle retrieval (turn 2) ─── #}
           <div class="mt-4 bg-white border border-stone-200 rounded-lg overflow-hidden">
             <div class="px-4 py-3 border-b border-stone-200 flex items-baseline justify-between">
               <div>
-                <span class="text-xs uppercase tracking-wider text-stone-700 font-semibold">Sub-Benchmark · Needle-Retrieval</span>
+                <span class="text-xs uppercase tracking-wider text-stone-700 font-semibold">Sub-benchmark · needle retrieval</span>
                 <span class="ml-2 text-xs text-stone-500">Turn 2</span>
               </div>
               <div class="text-sm num">
@@ -389,27 +389,27 @@
                     <span class="mt-0.5">{% if n.hit %}<span class="text-emerald-600">●</span>{% else %}<span class="text-red-500">○</span>{% endif %}</span>
                     <div class="flex-1 min-w-0">
                       <div class="font-medium text-stone-900">{{ n.depth_label }} ({{ "%.0f"|format(n.depth_pct * 100) }} %)</div>
-                      <div class="text-stone-500 mt-0.5">erwartet: {{ n.expected_keywords|join(", ") }}</div>
+                      <div class="text-stone-500 mt-0.5">expected: {{ n.expected_keywords|join(", ") }}</div>
                     </div>
                   </li>
                 {% endfor %}
               </ul>
               <details class="mt-3">
-                <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Modell-Antwort auf die Needle-Fragen</summary>
+                <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Model response to the needle questions</summary>
                 <pre class="mt-2 text-xs bg-stone-50 border border-stone-200 rounded p-3 overflow-x-auto whitespace-pre-wrap">{{ L.raw_answer }}</pre>
               </details>
               {% if L.error %}
-                <div class="mt-2 text-xs text-red-600">Fehler: {{ L.error }}</div>
+                <div class="mt-2 text-xs text-red-600">Error: {{ L.error }}</div>
               {% endif %}
             </div>
           </div>
 
-          {# ─── Sub-Benchmark 3: Verstehen + Halluzinations-Fallen (Turn 3) ─── #}
+          {# ─── Sub-benchmark 3: comprehension + hallucination traps (turn 3) ─── #}
           {% if L.get('comprehension_questions') %}
             <div class="mt-4 bg-amber-50 border border-amber-200 rounded-lg overflow-hidden">
               <div class="px-4 py-3 border-b border-amber-200 flex items-baseline justify-between">
                 <div>
-                  <span class="text-xs uppercase tracking-wider text-amber-800 font-semibold">Sub-Benchmark · Verstehen + Halluzinations-Fallen</span>
+                  <span class="text-xs uppercase tracking-wider text-amber-800 font-semibold">Sub-benchmark · comprehension + hallucination traps</span>
                   <span class="ml-2 text-xs text-stone-500">Turn 3</span>
                 </div>
                 <div class="text-sm num">
@@ -417,7 +417,7 @@
                     <span class="font-bold text-base {% if L.comprehension_judge.judge_score >= 0.7 %}text-emerald-700{% elif L.comprehension_judge.judge_score == 0 %}text-red-700{% else %}text-amber-700{% endif %}">
                       {{ "%.2f"|format(L.comprehension_judge.judge_score) }}
                     </span>
-                    <span class="text-stone-500">LLM-Judge</span>
+                    <span class="text-stone-500">LLM judge</span>
                     <span class="ml-2 text-xs text-stone-400">heur. {{ "%.2f"|format(L.comprehension_score) }}</span>
                   {% else %}
                     <span class="font-bold text-base {% if L.comprehension_score >= 0.7 %}text-emerald-700{% elif L.comprehension_score == 0 %}text-red-700{% else %}text-amber-700{% endif %}">
@@ -425,8 +425,8 @@
                     </span>
                   {% endif %}
                   <span class="ml-2 text-xs text-stone-600">
-                    Fakten {{ L.comprehension_facts_hits }}/{{ L.comprehension_facts_total }} ·
-                    Fallen {{ L.comprehension_traps_passed }}/{{ L.comprehension_traps_total }}
+                    Facts {{ L.comprehension_facts_hits }}/{{ L.comprehension_facts_total }} ·
+                    Traps {{ L.comprehension_traps_passed }}/{{ L.comprehension_traps_total }}
                   </span>
                 </div>
               </div>
@@ -441,14 +441,14 @@
                   <li class="border-l-4 {% if qj.value %}{% if qj.value.score >= 0.7 %}border-emerald-500{% elif qj.value.score > 0 %}border-amber-500{% else %}border-red-500{% endif %}{% elif q.hit %}border-emerald-500{% else %}border-red-400{% endif %} pl-3">
                     <div class="flex items-baseline gap-2 flex-wrap">
                       {% if q.type == "trap" %}
-                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200">Halluzinations-Falle</span>
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200">Hallucination trap</span>
                       {% else %}
-                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200">Faktenfrage</span>
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200">Factual question</span>
                       {% endif %}
                       <div class="text-sm font-medium text-stone-900 flex-1">{{ q.prompt }}</div>
                       {% if qj.value %}
                         <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
-                              data-tooltip="LLM-Judge {{ "%.2f"|format(qj.value.score) }} · {{ qj.value.verdict }}{% if qj.value.comment %}: {{ qj.value.comment }}{% endif %}">
+                              data-tooltip="LLM judge {{ "%.2f"|format(qj.value.score) }} · {{ qj.value.verdict }}{% if qj.value.comment %}: {{ qj.value.comment }}{% endif %}">
                           J
                         </span>
                       {% endif %}
@@ -466,13 +466,13 @@
   {# --------------------------------------------------- long_context #}
   {% elif t.task == "long_context" and t.score_breakdown.questions %}
     <p class="mt-5 text-sm text-stone-600">
-      Kontext: <span class="num">~{{ t.score_breakdown.context_tokens_target // 1000 }}k Tokens</span>.
-      Zusammenfassung: <strong class="text-stone-900 num">{{ t.score_breakdown.summary_passed }}/{{ t.score_breakdown.summary_total }}</strong> Kriterien ·
-      Verstehen: <strong class="text-stone-900 num">{{ t.score_breakdown.comp_hits }}/{{ t.score_breakdown.comp_total }}</strong> Treffer.
+      Context: <span class="num">~{{ t.score_breakdown.context_tokens_target // 1000 }}k tokens</span>.
+      Summary: <strong class="text-stone-900 num">{{ t.score_breakdown.summary_passed }}/{{ t.score_breakdown.summary_total }}</strong> criteria ·
+      Comprehension: <strong class="text-stone-900 num">{{ t.score_breakdown.comp_hits }}/{{ t.score_breakdown.comp_total }}</strong> hits.
     </p>
 
     <div class="mt-3 bg-white border border-stone-200 rounded">
-      <div class="px-4 py-2 border-b border-stone-200 text-xs text-stone-500 uppercase tracking-wider">Zusammenfassung</div>
+      <div class="px-4 py-2 border-b border-stone-200 text-xs text-stone-500 uppercase tracking-wider">Summary</div>
       <pre class="px-4 py-3 text-sm text-stone-800 whitespace-pre-wrap">{{ t.score_breakdown.summary }}</pre>
     </div>
     <ul class="mt-3 grid grid-cols-1 md:grid-cols-3 gap-2">
@@ -495,20 +495,20 @@
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-2">
                 {% if q.type == "trap" %}
-                  <span class="text-xs uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">Halluzinations-Falle</span>
+                  <span class="text-xs uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">Hallucination trap</span>
                 {% else %}
-                  <span class="text-xs uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-50 text-stone-600 border border-stone-200">Faktenfrage</span>
+                  <span class="text-xs uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-50 text-stone-600 border border-stone-200">Factual question</span>
                 {% endif %}
                 <div class="text-sm font-medium text-stone-900 flex-1">{{ q.prompt }}</div>
               </div>
               {% if q.type == "trap" %}
                 <div class="text-xs text-stone-500 mt-1">
-                  Erwartet: {{ q.trap_explanation }} —
+                  Expected: {{ q.trap_explanation }} —
                   Verdict: <span class="num font-medium {% if q.verdict in ['corrected','abstained'] %}text-emerald-700{% else %}text-red-700{% endif %}">{{ q.verdict }}</span>
                 </div>
               {% else %}
                 <div class="text-xs text-stone-500 mt-1">
-                  Stichwörter <span class="num">{{ q.matched_keywords|length }}/{{ q.expected_keywords|length }}</span>:
+                  Keywords <span class="num">{{ q.matched_keywords|length }}/{{ q.expected_keywords|length }}</span>:
                   {% for kw in q.expected_keywords %}
                     <span class="{% if kw in q.matched_keywords %}text-emerald-700 font-medium{% else %}text-stone-400 line-through{% endif %}">{{ kw }}</span>{% if not loop.last %}, {% endif %}
                   {% endfor %}
@@ -525,8 +525,8 @@
   {% elif t.task == "comprehension" and t.score_breakdown.questions %}
     <p class="mt-5 text-sm text-stone-600">
       <strong class="text-stone-900 num">{{ t.score_breakdown.hits }}/{{ t.score_breakdown.total }}</strong>
-      Verständnisfragen korrekt beantwortet — geprüft per Stichwort-Match in der Antwort.
-      Eingeführter Kontext: <span class="num">~{{ t.score_breakdown.context_tokens_target // 1000 }}k Tokens</span>.
+      comprehension questions answered correctly — verified by keyword match in the answer.
+      Context provided: <span class="num">~{{ t.score_breakdown.context_tokens_target // 1000 }}k tokens</span>.
     </p>
 
     <ul class="mt-3 space-y-3">
@@ -537,22 +537,22 @@
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-2">
                 {% if q.type == "trap" %}
-                  <span class="text-xs uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">Halluzinations-Falle</span>
+                  <span class="text-xs uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">Hallucination trap</span>
                 {% else %}
-                  <span class="text-xs uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-50 text-stone-600 border border-stone-200">Faktenfrage</span>
+                  <span class="text-xs uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-50 text-stone-600 border border-stone-200">Factual question</span>
                 {% endif %}
                 <div class="text-sm font-medium text-stone-900 flex-1">{{ q.prompt }}</div>
               </div>
 
               {% if q.type == "trap" %}
                 <div class="text-xs text-stone-500 mt-1">
-                  Erwartet: {{ q.trap_explanation }} —
+                  Expected: {{ q.trap_explanation }} —
                   Verdict: <span class="num font-medium {% if q.verdict in ['corrected','abstained'] %}text-emerald-700{% else %}text-red-700{% endif %}">{{ q.verdict }}</span>
                 </div>
               {% else %}
                 <div class="text-xs text-stone-500 mt-1">
-                  Stichwörter <span class="num">{{ q.matched_keywords|length }}/{{ q.expected_keywords|length }}</span>
-                  (mind. {{ q.min_match }} reicht):
+                  Keywords <span class="num">{{ q.matched_keywords|length }}/{{ q.expected_keywords|length }}</span>
+                  (min {{ q.min_match }} required):
                   {% for kw in q.expected_keywords %}
                     <span class="{% if kw in q.matched_keywords %}text-emerald-700 font-medium{% else %}text-stone-400 line-through{% endif %}">{{ kw }}</span>{% if not loop.last %}, {% endif %}
                   {% endfor %}
@@ -569,14 +569,14 @@
   {# ----------------------------------------------------- summarization #}
   {% elif t.task == "summarization" and t.score_breakdown.checks %}
     <div class="mt-5 bg-white border border-stone-200 rounded">
-      <div class="px-4 py-2 border-b border-stone-200 text-xs text-stone-500 uppercase tracking-wider">Vier-Satz-Zusammenfassung</div>
+      <div class="px-4 py-2 border-b border-stone-200 text-xs text-stone-500 uppercase tracking-wider">Four-sentence summary</div>
       <pre class="px-4 py-3 text-sm text-stone-800 whitespace-pre-wrap">{{ t.score_breakdown.summary }}</pre>
     </div>
     <p class="mt-3 text-sm text-stone-600">
-      <strong class="text-stone-900 num">{{ t.score_breakdown.passed }}/{{ t.score_breakdown.total }}</strong> Kriterien erfüllt
-      · <span class="num">{{ t.score_breakdown.sentence_count }}</span> Sätze
-      · <span class="num">{{ t.score_breakdown.word_count }}</span> Wörter
-      · <span class="num">{{ t.score_breakdown.keyword_hits }}/{{ t.score_breakdown.keyword_total }}</span> Plot-Stichworte
+      <strong class="text-stone-900 num">{{ t.score_breakdown.passed }}/{{ t.score_breakdown.total }}</strong> criteria met
+      · <span class="num">{{ t.score_breakdown.sentence_count }}</span> sentences
+      · <span class="num">{{ t.score_breakdown.word_count }}</span> words
+      · <span class="num">{{ t.score_breakdown.keyword_hits }}/{{ t.score_breakdown.keyword_total }}</span> plot keywords
     </p>
     <ul class="mt-3 grid grid-cols-1 md:grid-cols-3 gap-2">
       {% for c in t.score_breakdown.checks %}
@@ -607,7 +607,7 @@
           {% else %}
             <div class="text-sm num">
               <span class="font-medium {% if s.score >= 0.7 %}text-emerald-700{% endif %}">{{ "%.2f"|format(s.score) }}</span>
-              <span class="text-stone-500"> · {{ s.passed }}/{{ s.total }} Checks</span>
+              <span class="text-stone-500"> · {{ s.passed }}/{{ s.total }} checks</span>
             </div>
           {% endif %}
         </div>
@@ -616,14 +616,14 @@
 
         {% if s.history %}
           <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
-            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool-Aufrufe</div>
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool calls</div>
             <ol class="space-y-2 text-sm num">
               {% for h in s.history %}
                 <li>
                   <span class="font-medium text-stone-900">{{ loop.index }}. {{ h.tool }}</span>
                   <span class="text-stone-600">({{ h.args|tojson }})</span>
                   <details class="mt-1">
-                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool-Result</summary>
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
                     <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{{ h.result }}</pre>
                   </details>
                 </li>
@@ -647,7 +647,7 @@
         {% endif %}
 
         <div class="px-4 py-3">
-          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Endgültige Antwort</div>
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Final answer</div>
           <pre class="text-sm whitespace-pre-wrap">{{ s.final_text }}</pre>
         </div>
       </div>
@@ -661,9 +661,9 @@
           <div class="font-medium num">{{ d.image_name }}</div>
           <div class="text-sm">
             {% if d.grade and d.grade.parsed %}
-              <span class="text-emerald-700 font-medium">✓ SVG parsbar · {{ d.grade.element_count }} Elemente · {{ d.grade.text_count }} Texte</span>
+              <span class="text-emerald-700 font-medium">✓ SVG parseable · {{ d.grade.element_count }} elements · {{ d.grade.text_count }} text nodes</span>
             {% else %}
-              <span class="text-red-700 font-medium">✗ SVG nicht parsbar</span>
+              <span class="text-red-700 font-medium">✗ SVG not parseable</span>
             {% endif %}
             {% if d.grade %}<span class="ml-3 font-bold num {% if d.grade.score >= 0.7 %}text-emerald-700{% elif d.grade.score > 0 %}text-amber-700{% else %}text-red-600{% endif %}">{{ "%.2f"|format(d.grade.score) }}</span>{% endif %}
           </div>
@@ -673,48 +673,48 @@
         {% else %}
           <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
             <div class="p-3 bg-stone-50">
-              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Quelle</div>
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Source</div>
               <div class="zoom-frame">
-                <button type="button" class="zoom-button" data-zoom-button aria-label="Quelle vergrößern" title="Quelle vergrößern">⛶</button>
+                <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom source" title="Zoom source">⛶</button>
                 <img src="{{ artifact_url(d.image_path) }}" class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded" alt="{{ d.image_name }}">
               </div>
             </div>
             <div class="p-3">
-              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">SVG-Render</div>
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">SVG render</div>
               <div class="zoom-frame">
-                <button type="button" class="zoom-button" data-zoom-button aria-label="SVG-Render vergrößern" title="SVG-Render vergrößern">⛶</button>
-                <img src="{{ artifact_url(d.svg_path) }}" class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded" alt="SVG-Render {{ d.image_name }}">
+                <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom SVG render" title="Zoom SVG render">⛶</button>
+                <img src="{{ artifact_url(d.svg_path) }}" class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded" alt="SVG render {{ d.image_name }}">
               </div>
             </div>
           </div>
           <div class="border-t border-stone-100 px-4 py-2">
-            <a class="text-xs text-stone-600 underline" href="{{ artifact_url(d.svg_path) }}" target="_blank">SVG-Datei öffnen ↗</a>
+            <a class="text-xs text-stone-600 underline" href="{{ artifact_url(d.svg_path) }}" target="_blank">Open SVG file ↗</a>
           </div>
           {% if d.grade %}
             <div class="border-t border-stone-100 px-4 py-3">
-              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Deterministischer Grader</div>
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Deterministic grader</div>
               <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
                 <li class="border rounded px-3 py-2 {% if d.grade.parsed and d.grade.has_root and d.grade.element_count >= 5 and d.grade.text_count >= 1 %}border-emerald-200 bg-emerald-50{% else %}border-red-200 bg-red-50{% endif %}">
                   <div class="flex items-baseline justify-between gap-3">
-                    <span class="font-medium text-stone-900">SVG-Validität</span>
+                    <span class="font-medium text-stone-900">SVG validity</span>
                     <span class="font-bold num {% if d.grade.parsed and d.grade.has_root and d.grade.element_count >= 5 and d.grade.text_count >= 1 %}text-emerald-700{% else %}text-red-600{% endif %}">{% if d.grade.parsed and d.grade.has_root and d.grade.element_count >= 5 and d.grade.text_count >= 1 %}1.00{% else %}0.00{% endif %}</span>
                   </div>
                   <div class="mt-1 text-stone-600">
-                    {% if d.grade.parse_error %}Parse-Fehler: <span class="num">{{ d.grade.parse_error }}</span>
-                    {% else %}<span class="num">{{ d.grade.element_count }}</span> Elemente · <span class="num">{{ d.grade.text_count }}</span> Text-Knoten · root <span class="num">{% if d.grade.has_root %}&lt;svg&gt;{% else %}fehlt{% endif %}</span>
+                    {% if d.grade.parse_error %}Parse error: <span class="num">{{ d.grade.parse_error }}</span>
+                    {% else %}<span class="num">{{ d.grade.element_count }}</span> elements · <span class="num">{{ d.grade.text_count }}</span> text nodes · root <span class="num">{% if d.grade.has_root %}&lt;svg&gt;{% else %}missing{% endif %}</span>
                     {% endif %}
                   </div>
                 </li>
                 {% set _coverage = (d.grade.matched_terms|length) / (d.grade.matched_terms|length + d.grade.missing_terms|length) if (d.grade.matched_terms|length + d.grade.missing_terms|length) > 0 else 1.0 %}
                 <li class="border rounded px-3 py-2 {% if _coverage >= 0.7 %}border-emerald-200 bg-emerald-50{% elif _coverage > 0 %}border-amber-200 bg-amber-50{% else %}border-red-200 bg-red-50{% endif %}">
                   <div class="flex items-baseline justify-between gap-3">
-                    <span class="font-medium text-stone-900">Begriffs-Abdeckung</span>
+                    <span class="font-medium text-stone-900">Term coverage</span>
                     <span class="font-bold num {% if _coverage >= 0.7 %}text-emerald-700{% elif _coverage > 0 %}text-amber-700{% else %}text-red-600{% endif %}">{{ "%.2f"|format(_coverage) }}</span>
                   </div>
-                  <div class="mt-1 text-stone-600 num">{{ d.grade.matched_terms|length }}/{{ d.grade.matched_terms|length + d.grade.missing_terms|length }} getroffen</div>
+                  <div class="mt-1 text-stone-600 num">{{ d.grade.matched_terms|length }}/{{ d.grade.matched_terms|length + d.grade.missing_terms|length }} matched</div>
                   {% if d.grade.missing_terms %}
                     <div class="mt-1 text-stone-500">
-                      fehlt:
+                      missing:
                       {% for m in d.grade.missing_terms[:6] %}{{ m }}{% if not loop.last %}, {% endif %}{% endfor %}
                       {% if d.grade.missing_terms|length > 6 %} …{% endif %}
                     </div>
@@ -726,7 +726,7 @@
           {% if d.judge %}
             <div class="border-t border-stone-100 px-4 py-3 bg-amber-50">
               <div class="flex items-baseline justify-between mb-2">
-                <span class="text-xs uppercase tracking-wider text-amber-700">Qualitativ · Judge ({{ d.judge.judge_model }})</span>
+                <span class="text-xs uppercase tracking-wider text-amber-700">Qualitative · judge ({{ d.judge.judge_model }})</span>
                 <span class="text-2xl font-bold num text-amber-700">{{ "%.2f"|format(d.judge.judge_score) }}</span>
               </div>
               <ul class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
@@ -752,10 +752,10 @@
           <div class="font-medium num">{{ d.image_name }}</div>
           <div class="text-sm">
             {% if d.starts_with_keyword %}
-              <span class="text-emerald-700 font-medium">✓ erkennt als <span class="num">{{ d.diagram_kind }}</span></span>
+              <span class="text-emerald-700 font-medium">✓ recognised as <span class="num">{{ d.diagram_kind }}</span></span>
               {% if d.grade %}<span class="ml-3 font-bold num {% if d.grade.score >= 0.7 %}text-emerald-700{% elif d.grade.score > 0 %}text-amber-700{% else %}text-red-600{% endif %}">{{ "%.2f"|format(d.grade.score) }}</span>{% endif %}
             {% else %}
-              <span class="text-red-700 font-medium">✗ keine gültige Mermaid-Einleitung</span>
+              <span class="text-red-700 font-medium">✗ no valid Mermaid header</span>
             {% endif %}
           </div>
         </div>
@@ -764,32 +764,32 @@
         {% else %}
           <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
             <div class="p-3 bg-stone-50">
-              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Quelle</div>
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Source</div>
               <div class="zoom-frame">
-                <button type="button" class="zoom-button" data-zoom-button aria-label="Quelle vergrößern" title="Quelle vergrößern">⛶</button>
+                <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom source" title="Zoom source">⛶</button>
                 <img src="{{ artifact_url(d.image_path) }}" class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded" alt="{{ d.image_name }}">
               </div>
             </div>
             <div class="p-3">
-              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Mermaid-Render</div>
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Mermaid render</div>
               <div class="zoom-frame">
-                <button type="button" class="zoom-button" data-zoom-button aria-label="Mermaid-Render vergrößern" title="Mermaid-Render vergrößern">⛶</button>
+                <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom Mermaid render" title="Zoom Mermaid render">⛶</button>
                 <div class="mermaid zoomable-mermaid bg-white border border-stone-200 rounded p-3 overflow-x-auto">{{ d.mermaid }}</div>
               </div>
               {% if d.normalization_warnings %}
                 <div class="mt-2 text-xs text-stone-500">
-                  normalisiert: {{ d.normalization_warnings|join(", ") }}
+                  normalised: {{ d.normalization_warnings|join(", ") }}
                 </div>
               {% endif %}
             </div>
           </div>
           <details class="border-t border-stone-100">
-            <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900 px-4 py-2">Mermaid-Quellcode</summary>
+            <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900 px-4 py-2">Mermaid source</summary>
             <pre class="px-4 py-3 text-xs bg-stone-50 whitespace-pre-wrap">{{ d.mermaid }}</pre>
           </details>
           {% if d.grade %}
             <div class="border-t border-stone-100 px-4 py-3">
-              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Deterministischer Grader</div>
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Deterministic grader</div>
               <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
                 {% for c in d.grade.checks %}
                   <li class="border rounded px-3 py-2 {% if c.passed %}border-emerald-200 bg-emerald-50{% else %}border-amber-200 bg-amber-50{% endif %}">
@@ -800,7 +800,7 @@
                     {% if c.detail %}<div class="mt-1 text-stone-600">{{ c.detail }}</div>{% endif %}
                     {% if c.missing %}
                       <div class="mt-1 text-stone-500">
-                        fehlt:
+                        missing:
                         {% for m in c.missing[:6] %}
                           {% if m.from is defined %}{{ m.from }} → {{ m.to }}{% else %}{{ m }}{% endif %}{% if not loop.last %}, {% endif %}
                         {% endfor %}
@@ -811,7 +811,7 @@
                 {% endfor %}
               </ul>
               {% if d.grade.score_caps %}
-                <div class="mt-2 text-xs text-amber-700">Score-Cap: {{ d.grade.score_caps|join(", ") }}</div>
+                <div class="mt-2 text-xs text-amber-700">Score cap: {{ d.grade.score_caps|join(", ") }}</div>
               {% endif %}
             </div>
           {% endif %}
@@ -847,9 +847,9 @@
               </div>
               {% if s.ocr.relocated_matched or s.ocr.fuzzy_matched %}
                 <div class="text-xs text-stone-500">
-                  {% if s.ocr.relocated_matched %}<span class="text-sky-700">{{ s.ocr.relocated_matched }} verschoben</span>{% endif %}
+                  {% if s.ocr.relocated_matched %}<span class="text-sky-700">{{ s.ocr.relocated_matched }} relocated</span>{% endif %}
                   {% if s.ocr.relocated_matched and s.ocr.fuzzy_matched %} · {% endif %}
-                  {% if s.ocr.fuzzy_matched %}<span class="text-violet-700">{{ s.ocr.fuzzy_matched }} ähnlich</span>{% endif %}
+                  {% if s.ocr.fuzzy_matched %}<span class="text-violet-700">{{ s.ocr.fuzzy_matched }} fuzzy</span>{% endif %}
                 </div>
               {% endif %}
             {% endif %}
@@ -865,35 +865,35 @@
             <div class="p-3 bg-stone-50 grid grid-cols-1 gap-2">
               {% for ip in s.image_paths %}
                 <div class="zoom-frame">
-                  <button type="button" class="zoom-button" data-zoom-button aria-label="Bild vergrößern" title="Bild vergrößern">⛶</button>
+                  <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom image" title="Zoom image">⛶</button>
                   <img src="{{ artifact_url(ip) }}"
                        class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded cursor-zoom-in"
                        loading="lazy">
                 </div>
               {% endfor %}
               {% if not s.ocr and s.expected_keywords %}
-                <div class="text-xs text-stone-500 mt-1">erwartete Stichwörter: {{ s.expected_keywords|join(", ") }}</div>
+                <div class="text-xs text-stone-500 mt-1">expected keywords: {{ s.expected_keywords|join(", ") }}</div>
               {% endif %}
             </div>
             <div>
-              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider">Modell-Antwort</div>
-              <pre class="p-4 text-sm whitespace-pre-wrap max-h-[600px] overflow-y-auto">{{ s.answer }}</pre>
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider">Model response</div>
+              <pre class="p-4 text-sm whitespace-pre-wrap max-h-[500px] overflow-y-auto">{{ s.answer }}</pre>
             </div>
           </div>
 
           {% if s.ocr %}
             <div class="border-t border-stone-200 bg-white">
               <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider flex items-center justify-between">
-                <span>Word-Diff Ground-Truth ↔ Modell</span>
+                <span>Word diff ground truth ↔ model</span>
                 <span class="num">
                   <span class="text-emerald-700">●</span> matched ·
-                  <span class="text-sky-700">●</span> verschoben ·
-                  <span class="text-violet-700">●</span> ähnlich ·
-                  <span class="text-red-600">●</span> fehlt im Modell ·
-                  <span class="text-amber-600">●</span> extra/falsch
+                  <span class="text-sky-700">●</span> relocated ·
+                  <span class="text-violet-700">●</span> fuzzy ·
+                  <span class="text-red-600">●</span> missing in model ·
+                  <span class="text-amber-600">●</span> extra/wrong
                 </span>
               </div>
-              <div class="p-4 text-sm leading-relaxed font-mono">
+              <div class="p-4 text-sm leading-relaxed font-mono max-h-[500px] overflow-y-auto">
                 {% for op in s.ocr.opcodes %}
                   {% if op.tag == 'equal' %}<span class="text-stone-700">{{ op.gt }}</span>
                   {% elif op.tag == 'moved' %}<span class="bg-sky-50 text-sky-700 px-0.5 rounded">{{ op.gt }}</span>
@@ -905,7 +905,7 @@
                 {% endfor %}
               </div>
               <details class="border-t border-stone-100">
-                <summary class="cursor-pointer px-4 py-2 text-xs text-stone-500 hover:text-stone-900">Ground Truth (zum Vergleich)</summary>
+                <summary class="cursor-pointer px-4 py-2 text-xs text-stone-500 hover:text-stone-900">Ground truth (for comparison)</summary>
                 <pre class="p-4 text-xs bg-stone-50 whitespace-pre-wrap">{{ s.ground_truth }}</pre>
               </details>
             </div>
@@ -916,12 +916,12 @@
 
   {# --------------------------------------------------------- coding #}
   {% elif t.task == "coding" %}
-    {# CTA + screenshot direkt unter dem Score #}
+    {# CTA + screenshot directly below the score #}
     {% for a in t.artifacts %}
       {% if a.kind == "html" %}
         <a href="{{ artifact_url(a.path) }}" target="_blank"
            class="mt-5 block bg-emerald-600 hover:bg-emerald-700 text-white text-center font-semibold text-lg rounded px-6 py-5 shadow-sm transition">
-          ▶ Generierte App in neuem Tab öffnen ↗
+          ▶ Open generated app in a new tab ↗
         </a>
       {% endif %}
     {% endfor %}
@@ -930,14 +930,14 @@
         <div class="mt-4 bg-white border border-stone-200 rounded">
           <div class="px-4 py-2 border-b border-stone-200 text-sm font-medium">{{ a.label }}</div>
           <div class="zoom-frame">
-            <button type="button" class="zoom-button" data-zoom-button aria-label="Screenshot vergrößern" title="Screenshot vergrößern">⛶</button>
+            <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom screenshot" title="Zoom screenshot">⛶</button>
             <img src="{{ artifact_url(a.path) }}" class="zoomable block w-full max-h-[600px] object-contain bg-stone-50 cursor-zoom-in" alt="{{ a.label }}">
           </div>
         </div>
       {% endif %}
     {% endfor %}
 
-    {# Judge-Karte #}
+    {# Judge card #}
     {% if t.score_breakdown.judge %}
       {% set j = t.score_breakdown.judge %}
       {% set visual_keys = ["board_renders","column_completeness","cards_present","ui_affordances","design_quality"] %}
@@ -945,13 +945,13 @@
       <div class="mt-5 bg-amber-50 border border-amber-200 rounded">
         <div class="px-4 py-3 border-b border-amber-200 flex items-baseline justify-between">
           <div>
-            <span class="text-xs uppercase tracking-wider text-amber-700">Qualitativ · LLM-as-Judge ({{ j.judge_model }})</span>
+            <span class="text-xs uppercase tracking-wider text-amber-700">Qualitative · LLM-as-judge ({{ j.judge_model }})</span>
             <span class="ml-3 text-xs text-stone-500 num">{{ j.scored_at }}</span>
           </div>
           <div class="text-3xl font-bold num text-amber-700">{{ "%.2f"|format(j.judge_score) }}</div>
         </div>
         <div class="px-4 py-3 border-b border-amber-200">
-          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Visuell (Screenshot)</div>
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Visual (screenshot)</div>
           <ul class="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs">
             {% for k in visual_keys %}
               {% set v = j.scores.get(k) %}
@@ -966,7 +966,7 @@
           {% if j.comment_visual %}<div class="mt-3 text-sm text-stone-700">{{ j.comment_visual }}</div>{% endif %}
         </div>
         <div class="px-4 py-3 border-b border-amber-200">
-          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Code-Qualität (HTML/JS)</div>
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Code quality (HTML/JS)</div>
           <ul class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
             {% for k in code_keys %}
               {% set v = j.scores.get(k) %}
@@ -983,7 +983,7 @@
         {% if j.scores.render_matches_code is not none %}
           <div class="px-4 py-3">
             <div class="text-xs uppercase tracking-wider text-stone-500 mb-2 flex items-baseline justify-between">
-              <span>Konsistenz Render ↔ Code</span>
+              <span>Render ↔ code consistency</span>
               <span class="text-base font-bold num {% if j.scores.render_matches_code >= 0.7 %}text-emerald-700{% elif j.scores.render_matches_code == 0 %}text-red-600{% else %}text-amber-700{% endif %}">{{ "%.2f"|format(j.scores.render_matches_code) }}</span>
             </div>
             {% if j.comment_consistency %}<div class="text-sm text-stone-700">{{ j.comment_consistency }}</div>{% endif %}
@@ -995,11 +995,11 @@
       </div>
     {% endif %}
 
-    {# Statische Checks (Linter) #}
+    {# Static checks (linter) #}
     {% if t.score_breakdown.lint_checks %}
       <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
         <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
-          Statisch · Linter-Checks ({{ t.score_breakdown.lint_passed }}/{{ t.score_breakdown.lint_total }} bestanden)
+          Static · linter checks ({{ t.score_breakdown.lint_passed }}/{{ t.score_breakdown.lint_total }} passed)
         </summary>
         <div class="px-4 py-3 border-t border-stone-200 bg-white rounded-b">
           <ul class="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -1017,11 +1017,11 @@
       </details>
     {% endif %}
 
-    {# Funktionale Checks (Playwright E2E) #}
+    {# Functional checks (Playwright E2E) #}
     {% if t.score_breakdown.e2e_checks %}
       <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
         <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
-          Funktional · E2E-Tests ({{ t.score_breakdown.e2e_passed }}/{{ t.score_breakdown.e2e_total }} bestanden)
+          Functional · E2E tests ({{ t.score_breakdown.e2e_passed }}/{{ t.score_breakdown.e2e_total }} passed)
         </summary>
         <div class="px-4 py-3 border-t border-stone-200 bg-white rounded-b">
           <ul class="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -1039,11 +1039,11 @@
       </details>
     {% endif %}
 
-    {# Roh-Antwort im Klapp-Element #}
+    {# Raw response in collapsible #}
     {% if t.raw_response %}
       <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
         <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
-          Roh-Antwort des Modells
+          Raw model response
         </summary>
         <pre class="px-4 py-3 text-xs bg-white whitespace-pre-wrap border-t border-stone-200 rounded-b overflow-x-auto">{{ t.raw_response }}</pre>
       </details>
@@ -1071,22 +1071,22 @@
 
     <p class="mt-5 text-sm text-stone-600">
       <strong class="text-stone-900 num">{{ t.score_breakdown.normalized_hits }}/{{ t.score_breakdown.completed_turns }}</strong>
-      Echo-Turns korrekt zurückgegeben (normalisiert) ·
+      echo turns returned correctly (normalised) ·
       <strong class="text-stone-900 num">{{ t.score_breakdown.exact_hits }}/{{ t.score_breakdown.completed_turns }}</strong>
-      zeichengenau ·
+      character-exact ·
       Generation: <span class="num">{{ "%.0f"|format(t.score_breakdown.first_speed) }} → {{ "%.0f"|format(t.score_breakdown.last_speed) }} tok/s</span>
       ({% if t.score_breakdown.slowdown_pct > 0 %}<span class="text-amber-700 num">−{{ "%.0f"|format(t.score_breakdown.slowdown_pct) }}%</span>{% else %}<span class="text-emerald-700 num">+{{ "%.0f"|format(-t.score_breakdown.slowdown_pct) }}%</span>{% endif %})
       {% if t.score_breakdown.get('first_prefill_seconds') is not none and t.score_breakdown.get('last_prefill_seconds') is not none %}
         · Prefill: <span class="num">{{ "%.2f"|format(t.score_breakdown.get('first_prefill_seconds')) }} → {{ "%.2f"|format(t.score_breakdown.get('last_prefill_seconds')) }} s</span>
       {% endif %}
-      · festes Kontextfenster {{ t.score_breakdown.context_window_loaded // 1024 }}k.
+      · fixed context window {{ t.score_breakdown.context_window_loaded // 1024 }}k.
     </p>
 
-    {# ─── Kombinierter Chart: Generation-Speed (links) + Prefill-Zeit (rechts) ─── #}
+    {# ─── Combined chart: generation speed (left axis) + prefill time (right axis) ─── #}
     {% set chart_pad_r2 = 44 if has_prefill else chart_pad_r %}
     {% set inner_w2 = chart_w - chart_pad_l - chart_pad_r2 %}
     <div class="mt-4 bg-white border border-stone-200 rounded p-4 overflow-x-auto">
-      <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Generation-Speed &amp; Prefill-Zeit pro Turn</div>
+      <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Generation speed &amp; prefill time per turn</div>
       <svg viewBox="0 0 {{ chart_w }} {{ chart_h }}" class="w-full h-56 num" preserveAspectRatio="xMidYMid meet">
         <line x1="{{ chart_pad_l }}" y1="{{ chart_pad_t + inner_h }}" x2="{{ chart_pad_l + inner_w2 }}" y2="{{ chart_pad_t + inner_h }}" stroke="#d6d3d1" stroke-width="1"/>
         <line x1="{{ chart_pad_l }}" y1="{{ chart_pad_t }}" x2="{{ chart_pad_l }}" y2="{{ chart_pad_t + inner_h }}" stroke="#0369a1" stroke-width="1"/>
@@ -1102,7 +1102,7 @@
           {% endif %}
         {% endfor %}
 
-        {# Prefill-Linie (rechte Achse) zuerst, damit die Generation-Linie obendrauf liegt. #}
+        {# Prefill line (right axis) first, so the generation line sits on top. #}
         {% if has_prefill %}
           {% set ns2 = namespace(prev_x=none, prev_y=none) %}
           {% for s in steps %}
@@ -1121,7 +1121,7 @@
           {% endfor %}
         {% endif %}
 
-        {# Generation-Linie (linke Achse). #}
+        {# Generation line (left axis). #}
         {% set ns = namespace(prev_x=none, prev_y=none) %}
         {% for s in steps %}
           {% set x = chart_pad_l + (inner_w2 * loop.index0 / (step_count - 1 if step_count > 1 else 1)) %}
@@ -1139,21 +1139,21 @@
           {% set ns.prev_y = y %}
         {% endfor %}
 
-        <text x="{{ chart_pad_l + inner_w2 / 2 }}" y="{{ chart_h - 4 }}" font-size="10" fill="#57534e" text-anchor="middle">Turn-Nummer</text>
+        <text x="{{ chart_pad_l + inner_w2 / 2 }}" y="{{ chart_h - 4 }}" font-size="10" fill="#57534e" text-anchor="middle">Turn number</text>
       </svg>
       <div class="mt-2 text-xs text-stone-500 flex items-center gap-4 flex-wrap">
-        <span><span class="inline-block w-3 h-0.5 align-middle mr-1" style="background:#0369a1"></span>Generation tok/s (linke Achse)</span>
+        <span><span class="inline-block w-3 h-0.5 align-middle mr-1" style="background:#0369a1"></span>Generation tok/s (left axis)</span>
         {% if has_prefill %}
-          <span><span class="inline-block w-3 h-0.5 align-middle mr-1" style="background:#b45309"></span>Prefill-Zeit s (rechte Achse)</span>
+          <span><span class="inline-block w-3 h-0.5 align-middle mr-1" style="background:#b45309"></span>Prefill time s (right axis)</span>
         {% endif %}
-        <span><span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-600 align-middle mr-1"></span>Echo korrekt</span>
-        <span><span class="inline-block w-2.5 h-2.5 rounded-full bg-red-600 align-middle mr-1"></span>Echo abweichend</span>
+        <span><span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-600 align-middle mr-1"></span>Echo correct</span>
+        <span><span class="inline-block w-2.5 h-2.5 rounded-full bg-red-600 align-middle mr-1"></span>Echo divergent</span>
       </div>
     </div>
 
     <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
       <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
-        Pro Turn: Eingabe vs. Modell-Antwort
+        Per turn: input vs. model response
       </summary>
       <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-4">
         {% for s in steps %}
@@ -1161,17 +1161,17 @@
             <div class="text-xs text-stone-500 num">
               Turn {{ s.turn }} · gen {{ "%.1f"|format(s.tokens_per_second) }} tok/s · prompt {{ s.prompt_tokens }} tok
               {% if s.get('prefill_seconds') is not none %} · prefill {{ "%.3f"|format(s.get('prefill_seconds')) }} s{% endif %}
-              {% if s.exact_match %} · <span class="text-emerald-700">zeichengenau</span>
-              {% elif s.normalized_match %} · <span class="text-emerald-700">normalisiert match</span>
-              {% else %} · <span class="text-red-700">abweichend</span>{% endif %}
+              {% if s.exact_match %} · <span class="text-emerald-700">character-exact</span>
+              {% elif s.normalized_match %} · <span class="text-emerald-700">normalised match</span>
+              {% else %} · <span class="text-red-700">divergent</span>{% endif %}
             </div>
             <div class="mt-1 grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <div class="text-[10px] uppercase tracking-wider text-stone-500">Eingabe</div>
+                <div class="text-[10px] uppercase tracking-wider text-stone-500">Input</div>
                 <pre class="text-xs whitespace-pre-wrap text-stone-800">{{ s.input_chunk }}</pre>
               </div>
               <div>
-                <div class="text-[10px] uppercase tracking-wider text-stone-500">Modell</div>
+                <div class="text-[10px] uppercase tracking-wider text-stone-500">Model</div>
                 <pre class="text-xs whitespace-pre-wrap text-stone-800">{{ s.model_output }}</pre>
               </div>
             </div>
@@ -1185,7 +1185,7 @@
     {% if t.raw_response %}
       <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
         <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
-          Roh-Antwort des Modells
+          Raw model response
         </summary>
         <pre class="px-4 py-3 text-xs bg-white whitespace-pre-wrap border-t border-stone-200 rounded-b overflow-x-auto">{{ t.raw_response }}</pre>
       </details>
@@ -1195,7 +1195,7 @@
   {# Always-visible compact list of every artefact's download link #}
   {% if t.artifacts %}
     <div class="mt-4 text-xs text-stone-500">
-      Artefakte:
+      Artefacts:
       {% for a in t.artifacts %}
         <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="{{ artifact_url(a.path) }}" target="_blank">{{ a.label }}</a>
       {% endfor %}

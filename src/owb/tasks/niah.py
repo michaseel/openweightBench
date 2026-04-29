@@ -98,19 +98,19 @@ def _score_summary(summary: str) -> dict:
     checks = [
         {
             "id": "sentence_count",
-            "label": f"{SUMMARY_MIN_SENTENCES}-{SUMMARY_MAX_SENTENCES} Sätze",
+            "label": f"{SUMMARY_MIN_SENTENCES}-{SUMMARY_MAX_SENTENCES} sentences",
             "passed": SUMMARY_MIN_SENTENCES <= sentence_count <= SUMMARY_MAX_SENTENCES,
-            "detail": f"{sentence_count} Sätze gezählt",
+            "detail": f"{sentence_count} sentences counted",
         },
         {
             "id": "max_words",
-            "label": f"Höchstens {SUMMARY_MAX_WORDS} Wörter",
+            "label": f"At most {SUMMARY_MAX_WORDS} words",
             "passed": 0 < words <= SUMMARY_MAX_WORDS,
-            "detail": f"{words} Wörter",
+            "detail": f"{words} words",
         },
         {
             "id": "keyword_coverage",
-            "label": f"Korpus-Stichwörter ({keyword_hits}/{keyword_total})",
+            "label": f"Corpus keywords ({keyword_hits}/{keyword_total})",
             "passed": keyword_hits >= max(1, int(keyword_total * 0.5)),
             "detail": ", ".join(
                 f"{'✓' if kw.lower() in summary.lower() else '✗'} {kw}"

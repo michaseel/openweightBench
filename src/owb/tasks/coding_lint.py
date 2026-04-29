@@ -63,9 +63,9 @@ def lint_kanban(html: str) -> list[LintCheck]:
     checks.append(
         LintCheck(
             id="drag_drop",
-            label="HTML5 Drag&Drop oder Sortable-Lib",
+            label="HTML5 drag & drop or sortable lib",
             passed=has_dnd,
-            detail="" if has_dnd else "kein draggable / dragstart / sortable.js gefunden",
+            detail="" if has_dnd else "no draggable / dragstart / sortable.js found",
         )
     )
 
@@ -74,9 +74,9 @@ def lint_kanban(html: str) -> list[LintCheck]:
     checks.append(
         LintCheck(
             id="local_storage",
-            label="localStorage-Persistenz",
+            label="localStorage persistence",
             passed=has_ls,
-            detail="" if has_ls else "kein localStorage-Aufruf gefunden",
+            detail="" if has_ls else "no localStorage call found",
         )
     )
 
@@ -87,7 +87,7 @@ def lint_kanban(html: str) -> list[LintCheck]:
             id="tailwind_cdn",
             label="Tailwind via CDN",
             passed=has_tailwind,
-            detail="" if has_tailwind else "tailwindcss CDN nicht eingebunden",
+            detail="" if has_tailwind else "tailwindcss CDN not loaded",
         )
     )
 
@@ -96,9 +96,9 @@ def lint_kanban(html: str) -> list[LintCheck]:
     checks.append(
         LintCheck(
             id="confetti",
-            label="Confetti-Animation auf 'Done'",
+            label="Confetti animation on 'Done'",
             passed=has_confetti,
-            detail="" if has_confetti else "kein 'confetti' im Code",
+            detail="" if has_confetti else "no 'confetti' in the code",
         )
     )
 
@@ -112,9 +112,9 @@ def lint_kanban(html: str) -> list[LintCheck]:
     checks.append(
         LintCheck(
             id="add_card",
-            label="Add-Card-Button",
+            label="Add card button",
             passed=has_add,
-            detail="" if has_add else "kein Add-Button-Trigger gefunden",
+            detail="" if has_add else "no add-button trigger found",
         )
     )
 
@@ -124,9 +124,9 @@ def lint_kanban(html: str) -> list[LintCheck]:
     checks.append(
         LintCheck(
             id="vanilla_js",
-            label="Vanilla JS (kein React/Vue/Angular/Svelte)",
+            label="Vanilla JS (no React/Vue/Angular/Svelte)",
             passed=not blockers,
-            detail=f"erkannt: {blockers}" if blockers else "",
+            detail=f"detected: {blockers}" if blockers else "",
         )
     )
 
@@ -135,9 +135,9 @@ def lint_kanban(html: str) -> list[LintCheck]:
     checks.append(
         LintCheck(
             id="no_alert_prompt",
-            label="Keine window.alert/prompt für CRUD",
+            label="No window.alert/prompt for CRUD",
             passed=not uses_alert,
-            detail="alert/prompt verwendet" if uses_alert else "",
+            detail="alert/prompt used" if uses_alert else "",
         )
     )
 
@@ -151,9 +151,9 @@ def lint_kanban(html: str) -> list[LintCheck]:
     checks.append(
         LintCheck(
             id="editable_cards",
-            label="Editierbare Karten (contenteditable / input)",
+            label="Editable cards (contenteditable / input)",
             passed=editable,
-            detail="" if editable else "kein contenteditable / input gefunden",
+            detail="" if editable else "no contenteditable / input found",
         )
     )
 

@@ -332,19 +332,19 @@ class SummarizationTask(Task):
         checks = [
             {
                 "id": "sentence_count",
-                "label": f"Genau {self.required_sentences} Sätze",
+                "label": f"Exactly {self.required_sentences} sentences",
                 "passed": sent_count == self.required_sentences,
-                "detail": f"{sent_count} Sätze gezählt",
+                "detail": f"{sent_count} sentences counted",
             },
             {
                 "id": "max_words",
-                "label": f"Höchstens {self.max_words} Wörter",
+                "label": f"At most {self.max_words} words",
                 "passed": words <= self.max_words,
-                "detail": f"{words} Wörter",
+                "detail": f"{words} words",
             },
             {
                 "id": "keyword_coverage",
-                "label": f"Plot-Stichworte ({keyword_hits}/{keyword_total})",
+                "label": f"Plot keywords ({keyword_hits}/{keyword_total})",
                 "passed": keyword_hits >= max(1, int(keyword_total * 0.6)),
                 "detail": ", ".join(
                     f"{'✓' if kw.lower() in answer.lower() else '✗'} {kw}"
@@ -547,19 +547,19 @@ class LongContextTask(Task):
         sum_checks = [
             {
                 "id": "sentence_count",
-                "label": f"Genau {self.required_sentences} Sätze",
+                "label": f"Exactly {self.required_sentences} sentences",
                 "passed": sent_count == self.required_sentences,
-                "detail": f"{sent_count} Sätze",
+                "detail": f"{sent_count} sentences",
             },
             {
                 "id": "max_words",
-                "label": f"≤{self.max_words} Wörter",
+                "label": f"≤{self.max_words} words",
                 "passed": 0 < words <= self.max_words,
-                "detail": f"{words} Wörter",
+                "detail": f"{words} words",
             },
             {
                 "id": "keyword_coverage",
-                "label": f"Plot-Stichwörter ({kw_hits}/{kw_total})",
+                "label": f"Plot keywords ({kw_hits}/{kw_total})",
                 "passed": kw_hits >= max(1, int(kw_total * 0.6)),
                 "detail": ", ".join(
                     f"{'✓' if kw.lower() in summary.lower() else '✗'} {kw}"

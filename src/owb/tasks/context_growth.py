@@ -300,7 +300,7 @@ class ContextGrowthTask(Task):
             artifacts=[
                 Artifact(
                     kind="json",
-                    label="Schritt-für-Schritt Metriken",
+                    label="Step-by-step metrics",
                     path=str(bd_path.relative_to(store.root)),
                     mime="application/json",
                 ),
