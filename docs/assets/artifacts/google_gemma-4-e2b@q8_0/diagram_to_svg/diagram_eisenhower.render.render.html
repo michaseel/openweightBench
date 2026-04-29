@@ -1,0 +1,78 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html,body{margin:0;background:#fff;font-family:system-ui,-apple-system,sans-serif}
+  .wrap{padding:24px;display:inline-block;background:#fff}
+  /* Force a concrete render box: many model-emitted SVGs only set viewBox.
+     Without a width here, an inline-block parent collapses the SVG to its
+     intrinsic ~300x150 (or smaller) and the screenshot becomes a tiny
+     blank tile. Fixed width + auto height uses viewBox aspect-ratio. */
+  .wrap svg{display:block;width:1200px;height:auto;max-width:none}
+</style></head><body><div class="wrap"><svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+    <style>
+        .axis-line { stroke: #333; stroke-width: 2; }
+        .quadrant-box { fill: #f9f9f9; stroke: #333; stroke-width: 1; }
+        .title-text { font-size: 16px; font-weight: bold; fill: #000; }
+        .task-text { font-size: 14px; fill: #333; }
+        .axis-label { font-size: 16px; font-weight: bold; fill: #555; }
+    </style>
+
+    <!-- Title -->
+    <text x="400" y="30" text-anchor="middle" class="title-text">Eisenhower - Matrix - Marketing</text>
+
+    <!-- Axes Setup -->
+    <!-- Y-Axis (Wichtigkeit) -->
+    <line x1="50" y1="50" x2="50" y2="550" class="axis-line"/>
+    <text x="25" y="100" class="axis-label">Wichtigkeit</text>
+
+    <!-- X-Axis (Dringlichkeit) -->
+    <line x1="50" y1="550" x2="750" y2="550" class="axis-line"/>
+    <text x="450" y="585" text-anchor="middle" class="axis-label">Dringlichkeit</text>
+
+    <!-- Quadrant 1: Wichtig + Nicht dringend (Top Left) -->
+    <g id="q1" transform="translate(50, 50)">
+        <rect x="0" y="0" width="350" height="250" class="quadrant-box"/>
+        <text x="175" y="30" text-anchor="middle" class="title-text">Wichtig + Nicht dringend</text>
+        <g class="task-text" transform="translate(20, 50)">
+            <text x="0" y="0">Content - Strategie</text>
+            <text x="0" y="25">Brand schärfen</text>
+            <text x="0" y="50">SEO aufwärmen</text>
+            <text x="0" y="75">Zielgruppen verstehen</text>
+        </g>
+    </g>
+
+    <!-- Quadrant 2: Wichtig + Dringend (Top Right) -->
+    <g id="q2" transform="translate(400, 50)">
+        <rect x="350" y="0" width="350" height="250" class="quadrant-box"/>
+        <text x="525" y="30" text-anchor="middle" class="title-text">Wichtig + Dringend</text>
+        <g class="task-text" transform="translate(370, 50)">
+            <text x="0" y="0">Merch-Ideen mit Glitzer</text>
+            <text x="0" y="25">Buzzword - Bingo</text>
+            <text x="0" y="50">TikTok - Tanz mit dem Maskottchen</text>
+        </g>
+    </g>
+
+    <!-- Quadrant 3: Nicht wichtig + Nicht dringend (Bottom Left) -->
+    <g id="q3" transform="translate(50, 300)">
+        <rect x="0" y="0" width="350" height="250" class="quadrant-box"/>
+        <text x="175" y="30" text-anchor="middle" class="title-text">Nicht wichtig + Nicht dringend</text>
+    </g>
+
+    <!-- Quadrant 4: Nicht wichtig + Dringend (Bottom Right) -->
+    <g id="q4" transform="translate(400, 300)">
+        <rect x="350" y="0" width="350" height="250" class="quadrant-box"/>
+        <text x="525" y="30" text-anchor="middle" class="title-text">Nicht wichtig + Dringend</text>
+        <g class="task-text" transform="translate(370, 50)">
+            <text x="0" y="0">Kampagne retten</text>
+            <text x="0" y="25">Shitstorm beantworten</text>
+            <text x="0" y="50">Newsletter mit falschem Link fixen</text>
+            <text x="0" y="75">Chef will bis 14 Uhr "viral gehen"</text>
+            <text x="0" y="100">Kaffee zählt nicht. Aber hilf.</text>
+        </g>
+    </g>
+
+    <!-- Connecting Arrows/Flow (Simplified representation of matrix flow) -->
+    <line x1="250" y1="50" x2="250" y2="550" stroke="#999" stroke-dasharray="4 2"/>
+    <line x1="600" y1="50" x2="600" y2="550" stroke="#999" stroke-dasharray="4 2"/>
+
+</svg></div></body></html>

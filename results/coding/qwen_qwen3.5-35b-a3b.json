@@ -1,0 +1,201 @@
+{
+  "task": "coding",
+  "model_id": "qwen/qwen3.5-35b-a3b",
+  "model_info": {
+    "id": "qwen/qwen3.5-35b-a3b",
+    "type": "vlm",
+    "publisher": "qwen",
+    "arch": "qwen35moe",
+    "compatibility_type": "gguf",
+    "quantization": "Q4_K_M",
+    "state": "not-loaded",
+    "max_context_length": 262144,
+    "capabilities": [
+      "tool_use"
+    ],
+    "loaded_context_length": null
+  },
+  "started_at": "2026-04-28T19:45:02.762970Z",
+  "completed_at": "2026-04-28T19:46:55.665448Z",
+  "metrics": {
+    "wall_seconds": 112.90161037503276,
+    "tokens_generated": 5988,
+    "tokens_per_second": 78.87036873833581,
+    "time_to_first_token_ms": 347.0,
+    "peak_rss_mb": 21049.6
+  },
+  "score": 0.9166666666666667,
+  "score_breakdown": {
+    "looks_like_html": true,
+    "html_length": 19429,
+    "raw_length": 19443,
+    "lint_checks": [
+      {
+        "id": "col_backlog",
+        "label": "Spalte 'Backlog'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_in_progress",
+        "label": "Spalte 'In Progress'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_review",
+        "label": "Spalte 'Review'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_done",
+        "label": "Spalte 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "drag_drop",
+        "label": "HTML5 Drag&Drop oder Sortable-Lib",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "local_storage",
+        "label": "localStorage-Persistenz",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "tailwind_cdn",
+        "label": "Tailwind via CDN",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "confetti",
+        "label": "Confetti-Animation auf 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Add-Card-Button",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "vanilla_js",
+        "label": "Vanilla JS (kein React/Vue/Angular/Svelte)",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_alert_prompt",
+        "label": "Keine window.alert/prompt für CRUD",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "editable_cards",
+        "label": "Editierbare Karten (contenteditable / input)",
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "lint_passed": 12,
+    "lint_total": 12,
+    "lint_score": 1.0,
+    "e2e_checks": [
+      {
+        "id": "renders",
+        "label": "Seite lädt mit allen 4 Spalten",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Karte hinzufügen via Button",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_double_add",
+        "label": "Karte wird genau 1× angelegt (kein Doppel-Submit)",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "delete_card",
+        "label": "Karte löschen via Button + Bestätigung",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "persistence",
+        "label": "Karten überleben einen Reload",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_console_errors",
+        "label": "Keine JS-Konsolen-Fehler",
+        "passed": false,
+        "detail": "pageerror: seedDummyData is not defined; pageerror: seedDummyData is not defined"
+      }
+    ],
+    "e2e_passed": 5,
+    "e2e_total": 6,
+    "e2e_score": 0.8333333333333334,
+    "judge": {
+      "scored_at": "2026-04-28T21:45:55.314285+00:00",
+      "judge_model": "openai/gpt-5.4",
+      "scores": {
+        "board_renders": 0.5,
+        "column_completeness": 1.0,
+        "cards_present": 0.0,
+        "ui_affordances": 0.5,
+        "design_quality": 0.7,
+        "code_structure": 0.7,
+        "dom_safety": 0.8,
+        "robustness": 0.4,
+        "code_quality": 0.6,
+        "render_matches_code": 0.2
+      },
+      "judge_score": 0.5349999999999999,
+      "comment_visual": "Das Board rendert sichtbar mit allen vier Spalten und Add-Card-Buttons, aber es sind keinerlei Beispielkarten vorhanden. Optisch ist es sauber und modern, wirkt jedoch leer und damit funktional unvollständig.",
+      "comment_code": "Der Code ist ordentlich in Funktionen gegliedert und nutzt meist sichere DOM-APIs statt rohem innerHTML für Nutzdaten. Schwächen sind fehlende try/catch-Absicherung bei saveState/localStorage, mehrfaches Registrieren des Keydown-Handlers in focusInput und ein fehleranfälliger Drop-Pfad, der teils Elemente ohne data-testid als Ziel behandelt.",
+      "comment_consistency": "Deutliche Diskrepanz zwischen Anspruch und Render: Der Code seeded Dummy-Daten beim leeren State, der Screenshot zeigt trotzdem überall 0 Karten. Das spricht klar für einen Initialisierungs-/Render-Bug oder dafür, dass die Karten in den falschen Container selektiert werden und daher unsichtbar bleiben."
+    }
+  },
+  "raw_response": "\n\n```html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Vibrant Kanban Board</title>\n    \n    <!-- Tailwind CSS via CDN -->\n    <script src=\"https://cdn.tailwindcss.com\"></script>\n\n    <!-- Custom Styles & Animations -->\n    <style>\n        /* Custom Scrollbar */\n        ::-webkit-scrollbar { width: 8px; }\n        ::-webkit-scrollbar-track { background: #f1f5f9; }\n        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }\n        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }\n\n        /* Drag and Drop Visuals */\n        .dragging { opacity: 0.5; transform: scale(0.98); border: 2px dashed #6366f1; }\n        .column.drag-over { background-color: rgba(99, 102, 241, 0.1); border: 2px dashed #6366f1; transition: all 0.2s ease; }\n\n        /* Custom Modal Animation */\n        #delete-modal { transition: opacity 0.3s ease; }\n        \n        /* Confetti Particle Styles */\n        .confetti { position: absolute; width: 10px; height: 10px; animation: fall linear forwards; z-index: 50; pointer-events: none; }\n        @keyframes fall { to { transform: translateY(100vh) rotate(720deg); opacity: 0; } }\n\n        /* Editable Area Focus State */\n        .editable:focus { outline: none; background-color: #fffbeb; border-radius: 4px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }\n    </style>\n</head>\n<body class=\"bg-slate-50 text-slate-800 h-screen overflow-hidden flex flex-col font-sans\">\n\n    <!-- Header -->\n    <header class=\"bg-white border-b border-slate-200 px-6 py-4 shadow-sm z-10 flex justify-between items-center\">\n        <div>\n            <h1 class=\"text-xl font-bold text-indigo-600 tracking-tight\">Kanban Board</h1>\n            <p class=\"text-xs text-slate-500 mt-1\">Productivity Tracker</p>\n        </div>\n    </header>\n\n    <!-- Main Board Area -->\n    <main id=\"board-container\" class=\"flex-1 overflow-x-auto p-6 flex gap-6 items-start\">\n   ",
+  "artifacts": [
+    {
+      "kind": "html",
+      "label": "Generierte App",
+      "path": "artifacts/qwen_qwen3.5-35b-a3b/coding/output.html",
+      "mime": "text/html"
+    },
+    {
+      "kind": "text",
+      "label": "Roh-Antwort des Modells",
+      "path": "artifacts/qwen_qwen3.5-35b-a3b/coding/raw_response.txt",
+      "mime": "text/plain"
+    },
+    {
+      "kind": "image",
+      "label": "Screenshot der gerenderten App",
+      "path": "artifacts/qwen_qwen3.5-35b-a3b/coding/screenshot.png",
+      "mime": "image/png"
+    }
+  ],
+  "error": null,
+  "hardware": {
+    "platform": "macOS-26.4.1-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "ram_total_gb": 128.0,
+    "cpu_count": 16
+  },
+  "bench_version": "0.1.0"
+}

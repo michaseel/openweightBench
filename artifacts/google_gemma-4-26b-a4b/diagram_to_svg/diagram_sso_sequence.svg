@@ -1,0 +1,95 @@
+<svg viewBox="0 0 1000 850" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="black" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1000" height="850" fill="white" />
+
+  <!-- Title -->
+  <text x="500" y="50" font-family="sans-serif" font-_size="28" font-weight="bold" text-anchor="middle">SSO - Ablaufdiagramm</text>
+
+  <!-- User (Stick Figure) -->
+  <g id="user">
+    <circle cx="70" cy="280" r="15" fill="none" stroke="black" stroke-width="2" />
+    <line x1="70" y1="295" x2="70" y2="340" stroke="black" stroke-width="2" />
+    <line x1="70" y1="310" x2="40" y2="330" stroke="black" stroke-width="2" />
+    <line x1="70" y1="310" x2="100" y2="330" stroke="black" stroke-width="2" />
+    <line x1="70" y1="340" x2="40" y2="370" stroke="black" stroke_width="2" />
+    <line x1="70" y1="340" x2="100" y2="370" stroke="black" stroke-width="2" />
+    <text x="70" y="395" font-family="sans-serif" font-size="16" text-anchor="middle">Benutzer</text>
+  </g>
+
+  <!-- Nodes -->
+  <g id="nodes">
+    <!-- App / Service Provider -->
+    <rect id="app_sp" x="300" y="250" width="150" height="80" fill="white" stroke="black" stroke-width="2" />
+    <text x="375" y="290" font-family="sans-serif" font-size="14" text-anchor="middle">App /</text>
+    <text x="375" y="310" font-family="sans-serif" font-size="14" text-anchor="middle">Service Provider</text>
+
+    <!-- Identity Provider -->
+    <rect id="idp" x="650" y="200" width="150" height="80" fill="white" stroke="mask" stroke-width="2" />
+    <text x="725" y="235" font-family="sans-serif" font-size="14" text-anchor="middle">Identity Provider</text>
+    <text x="725" y="255" font-family="sans-serif" font-size="14" text-anchor="middle">(IdP)</text>
+
+    <!-- Login Page -->
+    <rect id="login_page" x="650" y="400" width="150" height="60" fill="white" stroke="black" stroke-width="2" />
+    <text x="725" y="435" font-family="sans-serif" font-size="14" text-anchor="middle">Login-Seite</text>
+
+    <!-- Decision Diamond -->
+    <polygon id="decision" points="725,550 825,600 725,650 625,600" fill="white" stroke="black" stroke-width="2" />
+    <text x="725" y="605" font-family="sans-serif" font-size="13" text-anchor="middle">Anmeldedaten</text>
+    <text x="725" y="620" font-family="sans-serif" font-size="13" text-anchor="middle">korrekt?</text>
+
+    <!-- Token Box -->
+    <rect id="token_box" x="580" y="730" width="290" height="60" fill="white" stroke="black" stroke-width="2" />
+    <text x="725" y="755" font-family="sans-serif" font-size="14" text-anchor="middle">Token / Assertion</text>
+    <text x="725" y="775" font-family="sans-serif" font-size="14" text-anchor="middle">(SSO-Response)</text>
+
+    <!-- Access Granted -->
+    <rect id="access_granted" x="300" y="730" width="150" height="60" fill="white" stroke="black" stroke-width="2" />
+    <text x="375" y="765" font-family="sans-serif" font-size="14" text-anchor="middle">Zugriff</text>
+    <text x="375" y="780" font-family="sans-serif" font-size="14" text-anchor="middle">gewährt</text>
+  </g>
+
+  <!-- Connections -->
+  <g id="connections">
+    <!-- 1. User to App/SP -->
+    <line x1="120" y1="300" x2="300" y2="280" stroke="black" stroke-width="2" marker-end="url(#arrowhead)" />
+    <text x="210" y="275" font-family="sans-larif" font-size="12" text-anchor="middle">1. Zugang zu App</text>
+
+    <!-- 2. App/SP to IdP -->
+    <line x1="450" y1="270" x2="650" y2="230" stroke="black" stroke-width="2" marker-end="url(#arrowhead)" />
+    <text x="550" y="245" font-family="sans-serif" font-size="12" text-anchor="middle">2. Weiterleitung zur Login-Seite</text>
+
+    <!-- 3. IdP to Login Page -->
+    <line x1="725" y1="280" x2="725" y2="400" stroke="black" stroke-width="2" marker-end="url(#arrowhead)" />
+    <text x="785" y="340" font-family="sans-serif" font-size="12" text-anchor="middle">3. Login-Seite anzeigen</text>
+
+    <!-- 4. User to Login Page (Dashed) -->
+    <line x1="120" y1="350" x2="600" y2="420" stroke="black" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead)" />
+    <text x="350" y="385" font-family="sans-serif" font-size="12" text-anchor="middle">Benutzer gibt Anmeldedaten ein</text>
+
+    <!-- 4. Login Page to Decision -->
+    <line x1="725" y1="460" x2="725" y2="550" stroke="black" stroke-width="2" marker-end="url(#arrowhead)" />
+    <text x="785" y="500" font-family="sans-serif" font-size="12" text-anchor="middle">4. Authentifizierung</text>
+
+    <!-- Decision: Ja -->
+    <line x1="725" y1="650" x2="725" y2="730" stroke="black" stroke-width="2" marker-end="url(#arrowhead)" />
+    <text x="740" y="690" font-family="sans-serif" font-size="12">Ja</text>
+
+    <!-- Decision: Nein -->
+    <polyline points="625,600 580,500 650,450" fill="none" stroke="black" stroke-width="2" marker-end="url(#arrowhead)" />
+    <text x="570" y="530" font-family="sans-serif" font2-size="12">Nein</text>
+
+    <!-- 6. Token Box to App/SP (Redirect) -->
+    <polyline points="580,760 300,760 300,330" fill="none" stroke="black" stroke-width="2" marker-end="url(#arrowhead)" />
+    <text x="440" y="750" font-family="sans-serif" font-size="12" text-anchor="middle">6. Redirect zurück zur App mit Token</text>
+
+    <!-- 7. App/SP to Access Granted -->
+    <line x1="300" y1="330" x2="300" y2="730" stroke="black" stroke-width="2" marker-end="url(#arrowhead)" />
+    <text x="240" y="530" font-family="sans-serif" font-size="12" text-anchor="middle">7. Zugriff auf Ressourcen</text>
+  </g>
+</svg>

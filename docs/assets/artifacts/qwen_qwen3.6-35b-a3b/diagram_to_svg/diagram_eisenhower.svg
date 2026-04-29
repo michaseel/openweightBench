@@ -1,0 +1,156 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 800" width="100%" height="100%">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#333" />
+    </marker>
+    <style>
+      .title { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Marker Felt', sans-serif; font-size: 32px; font-weight: bold; fill: #333; text-anchor: middle; }
+      .axis-label { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Marker Felt', sans-serif; font-size: 24px; fill: #333; }
+      .quadrant-header { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Marker Felt', sans-serif; font-size: 20px; font-weight: bold; fill: #000080; text-decoration: underline; }
+      .list-item { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Marker Felt', sans-serif; font-size: 18px; fill: #333; }
+      .side-note { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Marker Felt', sans-serif; font-size: 18px; fill: #000080; }
+      .box { fill: #ffffff; stroke: #333; stroke-width: 3; }
+      .axis-line { stroke: #333; stroke-width: 3; fill: none; }
+      .icon { fill: none; stroke: #000080; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+      .icon-fill { fill: #000080; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#ffffff" />
+
+  <!-- Title -->
+  <text x="500" y="80" class="title">Eisenhower - Matrix - Marketing</text>
+  <line x1="200" y1="95" x2="800" y2="95" stroke="#333" stroke-width="2" />
+
+  <!-- Axes -->
+  <!-- Y Axis -->
+  <line x1="180" y1="150" x2="180" y2="650" class="axis-line" marker-end="url(#arrow)" />
+  <text x="140" y="400" class="axis-label" transform="rotate(-90, 140, 400)" text-anchor="middle">Wichtigkeit</text>
+  <text x="180" y="140" class="axis-label" text-anchor="middle">hoch</text>
+  <text x="180" y="670" class="axis-label" text-anchor="middle">niedrig</text>
+
+  <!-- X Axis -->
+  <line x1="180" y1="650" x2="820" y2="650" class="axis-line" marker-end="url(#arrow)" />
+  <text x="500" y="690" class="axis-label" text-anchor="middle">Dringlichkeit</text>
+  <text x="180" y="670" class="axis-label" text-anchor="middle">niedrig</text>
+  <text x="820" y="670" class="axis-label" text-anchor="middle">hoch</text>
+
+  <!-- Main Quadrant Box -->
+  <rect x="200" y="150" width="600" height="500" class="box" />
+  <!-- Cross lines -->
+  <line x1="500" y1="150" x2="500" y2="650" class="axis-line" />
+  <line x1="200" y1="400" x2="800" y2="400" class="axis-line" />
+
+  <!-- Quadrant 1: Top Left (Wichtig + Nicht dringend) -->
+  <g id="quadrant-tl">
+    <text x="220" y="190" class="quadrant-header">Wichtig + Nicht dringend</text>
+    <text x="220" y="230" class="list-item">• Content-Strategie</text>
+    <text x="220" y="260" class="list-item">• Brand schärfen</text>
+    <text x="220" y="290" class="list-item">• SEO aufräumen</text>
+    <text x="220" y="320" class="list-item">• Zielgruppen verstehen</text>
+    
+    <!-- Target Icon -->
+    <g transform="translate(650, 350) scale(0.8)">
+      <circle cx="0" cy="0" r="30" class="icon" />
+      <circle cx="0" cy="0" r="20" class="icon" />
+      <circle cx="0" cy="0" r="10" class="icon" />
+      <circle cx="0" cy="0" r="3" class="icon-fill" />
+      <!-- Arrow -->
+      <path d="M -40 -40 L -10 -10 M -40 -40 L -30 -50 M -40 -40 L -20 -45" class="icon" />
+    </g>
+  </g>
+
+  <!-- Quadrant 2: Top Right (Wichtig + Dringend) -->
+  <g id="quadrant-tr">
+    <text x="520" y="190" class="quadrant-header">Wichtig + Dringend</text>
+    <text x="520" y="230" class="list-item">• Kampagne retten</text>
+    <text x="520" y="260" class="list-item">• Shitstorm beantworten</text>
+    <text x="520" y="290" class="list-item">• Newsletter mit</text>
+    <text x="520" y="315" class="list-item">  falschem Link fixen</text>
+    <text x="520" y="345" class="list-item">• Chef will bis 14 Uhr</text>
+    <text x="520" y="370" class="list-item">  "viral gehen"</text>
+
+    <!-- Megaphone Icon -->
+    <g transform="translate(720, 420) scale(0.6)">
+      <path d="M -20 -20 L 20 -10 L 20 10 L -20 20 Z" class="icon" />
+      <path d="M -20 20 L -30 25 L -30 -25 L -20 -20" class="icon" />
+      <path d="M 20 -10 L 30 -15 L 30 15 L 20 10" class="icon" />
+      <path d="M 30 -15 L 40 -25 M 30 15 L 40 25" class="icon" />
+    </g>
+
+    <!-- Viral Starburst -->
+    <g transform="translate(750, 250)">
+      <path d="M 0 -20 L 10 -10 L 20 -15 L 15 -5 L 25 5 L 15 10 L 20 20 L 10 15 L 0 25 L -10 15 L -20 20 L -15 10 L -25 5 L -15 -5 L -20 -15 L -10 -10 Z" class="icon" />
+      <text x="0" y="5" class="side-note" font-size="14" text-anchor="middle" font-weight="bold">VIRAL??</text>
+    </g>
+  </g>
+
+  <!-- Quadrant 3: Bottom Left (Nicht wichtig + Nicht dringend) -->
+  <g id="quadrant-bl">
+    <text x="220" y="440" class="quadrant-header">Nicht wichtig + Nicht dringend</text>
+    <text x="220" y="480" class="list-item">• Merch-Ideen mit Glitzer</text>
+    <text x="220" y="510" class="list-item">• Buzzword-Bingo</text>
+    <text x="220" y="540" class="list-item">• TikTok-Tanz mit dem</text>
+    <text x="220" y="565" class="list-item">  Maskottchen</text>
+    <text x="220" y="595" class="list-item">• Hashtag brainstormen</text>
+    <text x="220" y="620" class="list-item" font-style="italic">#innovation #synergy #wow</text>
+
+    <!-- Unicorn Icon -->
+    <g transform="translate(650, 550) scale(0.8)">
+      <path d="M -20 20 Q -30 0 -10 -10 Q 0 -30 10 -20 Q 20 -10 10 10 L 10 20 Z" class="icon" />
+      <path d="M -5 -15 L 0 -35 L 5 -15" class="icon" />
+      <path d="M -10 0 Q -20 10 -10 20" class="icon" />
+      <path d="M 10 0 Q 20 10 10 20" class="icon" />
+      <!-- Sparkles -->
+      <path d="M -30 -20 L -30 -30 M -35 -25 L -25 -25" class="icon" />
+      <path d="M 20 -30 L 20 -40 M 15 -35 L 25 -35" class="icon" />
+    </g>
+  </g>
+
+  <!-- Quadrant 4: Bottom Right (Nicht wichtig + Dringend) -->
+  <g id="quadrant-br">
+    <text x="520" y="440" class="quadrant-header">Nicht wichtig + Dringend</text>
+    <text x="520" y="480" class="list-item">• Noch ein Last-Minute-Meeting</text>
+    <text x="520" y="510" class="list-item">• Kann das Logo größer?</text>
+    <text x="520" y="540" class="list-item">• LinkedIn-Post für</text>
+    <text x="520" y="565" class="list-item">  "Welttag der Büroklammer"</text>
+    <text x="520" y="595" class="list-item">• Folie 27 schöner machen</text>
+
+    <!-- Exclamation Marks -->
+    <g transform="translate(750, 580)">
+      <path d="M 0 -20 L 0 10 M -5 -25 L 5 -25" class="icon" />
+      <path d="M 20 -20 L 20 10 M 15 -25 L 25 -25" class="icon" />
+      <path d="M 40 -20 L 40 10 M 35 -25 L 45 -25" class="icon" />
+      <circle cx="0" cy="25" r="3" class="icon-fill" />
+      <circle cx="20" cy="25" r="3" class="icon-fill" />
+      <circle cx="40" cy="25" r="3" class="icon-fill" />
+    </g>
+  </g>
+
+  <!-- Side Notes -->
+  <!-- Left Side Note -->
+  <g transform="translate(80, 500)">
+    <path d="M 0 10 Q -15 -5 0 -20 Q 15 -5 0 10" class="icon" />
+    <text x="20" y="0" class="side-note">Erledigen,</text>
+    <text x="20" y="25" class="side-note">wenn das</text>
+    <text x="20" y="50" class="side-note">Internet</text>
+    <text x="20" y="75" class="side-note">wieder da</text>
+    <text x="20" y="100" class="side-note">ist. :)</text>
+  </g>
+
+  <!-- Right Side Note (Top) -->
+  <g transform="translate(850, 150)">
+    <!-- Coffee Cup -->
+    <path d="M -15 -20 L 15 -20 L 15 10 Q 15 20 0 20 Q -15 20 -15 10 Z" class="icon" />
+    <path d="M 15 -10 Q 25 -10 25 0 Q 25 10 15 10" class="icon" />
+    <path d="M -5 -25 Q -10 -35 -5 -45" class="icon" />
+    <path d="M 5 -25 Q 0 -35 5 -45" class="icon" />
+    
+    <text x="0" y="40" class="side-note">Kaffee</text>
+    <text x="0" y="65" class="side-note">zählt nicht.</text>
+    <text x="0" y="90" class="side-note">Aber hilft.</text>
+    <text x="0" y="115" class="side-note">:)</text>
+  </g>
+
+</svg>

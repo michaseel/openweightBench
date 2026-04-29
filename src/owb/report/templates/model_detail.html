@@ -1,0 +1,1210 @@
+{% set landing_href = "../index.html" %}
+{% set home_href = "../index.html" %}
+{% set tab_url_prefix = "../benchmarks/" %}
+{% extends "_layout.html" %}
+{% block title %}{{ model_id }} — Open Weight Bench{% endblock %}
+{% block main_max %}max-w-7xl{% endblock %}
+{% block content %}
+
+<section class="mb-8">
+  <div class="text-xs text-stone-500"><a href="../index.html" class="hover:text-stone-900">← Übersicht</a></div>
+  <h1 class="mt-2 text-2xl font-semibold tracking-tight num">{{ model_id }}</h1>
+  {% set _cap_labels = {
+    "tool_use": "Trainiert für Tool / Function Calling — kann externe Tools aufrufen.",
+    "reasoning": "Modell mit eingebautem Chain-of-Thought-Reasoning.",
+    "vision": "Akzeptiert Bilder als Input (VLM).",
+  } %}
+  <div class="mt-2 flex flex-wrap gap-2 text-xs">
+    <span class="px-2 py-1 rounded border"
+          style="background-color: {{ vendor_color }}; color: {{ '#1c1917' if vendor_label_dark else '#fff' }}; border-color: {{ vendor_color }};"
+          data-tooltip="Hersteller bzw. Publisher des Modells. Farbe zeigt die Modellfamilie.">{{ vendor }}</span>
+    {% if params_b is not none %}
+      <span class="px-2 py-1 rounded bg-stone-100 border border-stone-200 num"
+            data-tooltip="{% if is_moe %}{% if active_params_b is not none %}Mixture-of-Experts: {{ params_b }} Mrd. Gesamtparameter, davon {{ active_params_b }} Mrd. aktiv pro Token.{% else %}Mixture-of-Experts: {{ params_b }} Mrd. Gesamtparameter; aktive Parameter pro Token unbekannt.{% endif %}{% else %}Dense-Modell: {{ params_b }} Mrd. Parameter — alle pro Token aktiv.{% endif %}">
+        {{ params_b }}B
+        {% if is_moe %}
+          {% if active_params_b is not none %}· {{ active_params_b }}B aktiv{% else %}· MoE{% endif %}
+        {% else %}· dense{% endif %}
+      </span>
+    {% elif is_moe %}
+      <span class="px-2 py-1 rounded bg-stone-100 border border-stone-200"
+            data-tooltip="Mixture-of-Experts — Parameter-Anzahl unbekannt.">MoE</span>
+    {% endif %}
+    <span class="px-2 py-1 rounded bg-stone-100 border border-stone-200 num"
+          data-tooltip="Datei-Format und Quantisierung der Gewichte (z. B. Q8_0 = 8-bit, MXFP4 = 4-bit Mixed Precision). Niedrigere Bit-Werte = kleinerer RAM-Bedarf, potenziell etwas geringere Qualität.">{{ model_info.compatibility_type }} / {{ model_info.quantization }}</span>
+    <span class="px-2 py-1 rounded bg-stone-100 border border-stone-200 num"
+          data-tooltip="Maximale Kontextlänge des Modells in Tokens (k = 1024). Inputs jenseits dieser Grenze werden vom Backend abgeschnitten.">ctx {{ model_info.max_context_length // 1024 }}k</span>
+    {% if released %}
+      <span class="px-2 py-1 rounded bg-stone-100 border border-stone-200 num"
+            data-tooltip="Veröffentlichungsdatum gemäß HuggingFace-Modellkarte (createdAt).">released {{ released }}</span>
+    {% endif %}
+    {# Capabilities am Ende — vision ist gelb hervorgehoben, der Rest grün. #}
+    {% if model_info.type == "vlm" %}
+      <span class="px-2 py-1 rounded bg-amber-100 border border-amber-300 text-amber-900"
+            data-tooltip="{{ _cap_labels.vision }}">vision</span>
+    {% endif %}
+    {% for c in model_info.capabilities %}
+      <span class="px-2 py-1 rounded bg-emerald-50 border border-emerald-200 text-emerald-700"
+            data-tooltip="{{ _cap_labels.get(c, c ~ ' — Capability laut LM Studio.') }}">{{ c }}</span>
+    {% endfor %}
+  </div>
+</section>
+
+<div class="lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-8 lg:items-start">
+  <aside class="hidden lg:block sticky top-4 self-start">
+    <nav class="bg-white border border-stone-200 rounded-lg p-4 max-h-[calc(100vh-2rem)] overflow-y-auto">
+      <div class="text-xs uppercase tracking-wider text-stone-500">Modell</div>
+      <div class="mt-1 text-sm font-semibold text-stone-900 break-all leading-snug num">{{ model_id }}</div>
+      <dl class="mt-3 grid grid-cols-2 gap-2 text-xs">
+        <div>
+          <dt class="text-stone-500">Peak-RAM</dt>
+          <dd class="font-semibold text-stone-900 num">{% if peak_ram_mb %}{{ "%.1f"|format(peak_ram_mb / 1024) }} GB{% else %}—{% endif %}</dd>
+        </div>
+        <div>
+          <dt class="text-stone-500">Wall total</dt>
+          <dd class="font-semibold text-stone-900 num">{% if total_wall >= 60 %}{{ "%.1f"|format(total_wall / 60) }} min{% else %}{{ "%.0f"|format(total_wall) }} s{% endif %}</dd>
+        </div>
+      </dl>
+      <div class="mt-4 pt-3 border-t border-stone-200 text-xs uppercase tracking-wider text-stone-500">Benchmarks</div>
+      <ul class="mt-2 space-y-0.5">
+        {% for t in results %}
+          {% set _nav_pending = t.task == "coding" and not t.error and t.score is not none and not (t.score_breakdown.judge and t.score_breakdown.judge.judge_score) %}
+          <li>
+            <a href="#{{ t.task }}" class="flex items-center justify-between gap-2 py-1.5 px-2 rounded hover:bg-stone-50 group">
+              <span class="text-sm text-stone-700 group-hover:text-stone-900 truncate">{{ t.task }}{% if _nav_pending %} <span class="text-[10px] text-stone-400">prelim.</span>{% endif %}</span>
+              <span class="flex items-baseline gap-2 num shrink-0">
+                <span class="text-sm font-semibold {% if t.error %}text-red-500{% elif _nav_pending %}text-stone-400{% elif t.score is not none and t.score >= 0.7 %}text-emerald-700{% elif t.score is not none and t.score > 0 %}text-amber-700{% else %}text-stone-400{% endif %}">
+                  {% if t.error and 'timeout' in t.error|lower %}—
+                  {% elif t.error %}!
+                  {% elif t.score is not none %}{{ "%.2f"|format(t.score) }}
+                  {% else %}—{% endif %}
+                </span>
+                <span class="text-[10px] text-stone-400 w-10 text-right">{% if t.metrics.wall_seconds >= 60 %}{{ "%.0f"|format(t.metrics.wall_seconds / 60) }}m{% else %}{{ "%.0f"|format(t.metrics.wall_seconds) }}s{% endif %}</span>
+              </span>
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </nav>
+  </aside>
+
+  <div class="min-w-0">
+
+{% for t in results %}
+<section id="{{ t.task }}" class="mb-12 scroll-mt-24">
+  <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
+    <h2 class="text-lg font-medium tracking-tight">{{ t.task }}</h2>
+    <a href="../benchmarks/{{ t.task }}.html" class="text-xs text-stone-500 hover:text-stone-900">alle Modelle in diesem Bench →</a>
+  </div>
+
+  {% if t.error %}
+    <div class="mt-3 px-4 py-3 rounded bg-red-50 border border-red-200 text-red-700 text-sm">
+      <strong>Fehler:</strong> {{ t.error }}
+    </div>
+  {% endif %}
+
+  {% set _judge_pending = t.task == "coding" and not t.error and t.score is not none and not (t.score_breakdown.judge and t.score_breakdown.judge.judge_score) %}
+  <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+    {# big score card #}
+    <div class="md:col-span-1 bg-white border-2 {% if _judge_pending %}border-stone-300{% elif t.score is not none and t.score >= 0.7 %}border-emerald-500{% elif t.score is not none and t.score > 0 %}border-amber-400{% else %}border-stone-300{% endif %} rounded-lg p-5 flex flex-col justify-center">
+      <div class="text-xs uppercase tracking-wider text-stone-500">Score{% if _judge_pending %} <span class="text-stone-400">· preliminary</span>{% endif %}</div>
+      <div class="mt-1 text-5xl font-bold num leading-none {% if _judge_pending %}text-stone-400{% elif t.score is not none and t.score >= 0.7 %}text-emerald-700{% elif t.score is not none and t.score > 0 %}text-amber-700{% else %}text-stone-400{% endif %}">
+        {% if t.error and 'timeout' in t.error|lower %}timeout
+        {% elif t.error %}error
+        {% elif t.score is not none %}{{ "%.2f"|format(t.score) }}
+        {% else %}—{% endif %}
+      </div>
+      {% if _judge_pending %}
+        <div class="mt-2 text-xs text-stone-500">Qualitativ-Signal (LLM-as-Judge) noch nicht ausgeführt.</div>
+      {% endif %}
+      {% if t.task == "coding" and not t.error %}
+        {% set _lint_v = t.score_breakdown.lint_score %}
+        {% set _e2e_v = t.score_breakdown.e2e_score if t.score_breakdown.e2e_total else None %}
+        {% set _judge_v = t.score_breakdown.judge.judge_score if t.score_breakdown.judge else None %}
+        <div class="mt-3 grid grid-cols-3 gap-2 text-center">
+          <div class="rounded border border-stone-200 px-2 py-1.5">
+            <div class="text-[10px] uppercase tracking-wider text-stone-500">Statisch</div>
+            <div class="text-base font-bold num {% if _lint_v is none %}text-stone-300{% elif _lint_v >= 0.7 %}text-emerald-700{% elif _lint_v > 0 %}text-amber-700{% else %}text-red-600{% endif %}">{% if _lint_v is none %}—{% else %}{{ "%.2f"|format(_lint_v) }}{% endif %}</div>
+          </div>
+          <div class="rounded border border-stone-200 px-2 py-1.5">
+            <div class="text-[10px] uppercase tracking-wider text-stone-500">Funktional</div>
+            <div class="text-base font-bold num {% if _e2e_v is none %}text-stone-300{% elif _e2e_v >= 0.7 %}text-emerald-700{% elif _e2e_v > 0 %}text-amber-700{% else %}text-red-600{% endif %}">{% if _e2e_v is none %}—{% else %}{{ "%.2f"|format(_e2e_v) }}{% endif %}</div>
+          </div>
+          <div class="rounded border border-stone-200 px-2 py-1.5">
+            <div class="text-[10px] uppercase tracking-wider text-stone-500">Qualitativ</div>
+            <div class="text-base font-bold num {% if _judge_v is none %}text-stone-300{% elif _judge_v >= 0.7 %}text-emerald-700{% elif _judge_v > 0 %}text-amber-700{% else %}text-red-600{% endif %}">{% if _judge_v is none %}—{% else %}{{ "%.2f"|format(_judge_v) }}{% endif %}</div>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+    {# secondary metrics in 2x2 grid #}
+    <div class="md:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">tok/s</dt>
+        <dd class="mt-1 text-xl font-semibold num">{{ "%.0f"|format(t.metrics.tokens_per_second) }}</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Tokens</dt>
+        <dd class="mt-1 text-xl font-semibold num">{% if t.metrics.tokens_generated %}{{ t.metrics.tokens_generated }}{% else %}—{% endif %}</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Wall</dt>
+        <dd class="mt-1 text-xl font-semibold num">{{ "%.1f"|format(t.metrics.wall_seconds) }} s</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">RAM</dt>
+        <dd class="mt-1 text-xl font-semibold num">{% if t.metrics.peak_rss_mb %}{{ "%.1f"|format(t.metrics.peak_rss_mb / 1024) }} GB{% else %}—{% endif %}</dd>
+      </div>
+    </div>
+  </div>
+
+  {# Aufgaben-Explainer #}
+  {% if explanations.get(t.task) %}
+    <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Worum geht es? Was wird getestet?
+      </summary>
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">{{ explanations.get(t.task) }}</div>
+    </details>
+  {% endif %}
+
+  {# Prompts (System + Developer/User) #}
+  {% set _p = system_prompts.get(t.task) %}
+  {% if _p %}
+    <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Prompt
+      </summary>
+      <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
+        {% if _p.system %}
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System-Prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">{{ _p.system }}</pre>
+          </div>
+        {% endif %}
+        {% if _p.user %}
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Developer-Prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">{{ _p.user }}</pre>
+          </div>
+        {% endif %}
+      </div>
+    </details>
+  {% endif %}
+
+  {# ----------------------------------------------------------- nonsense #}
+  {% if t.task == "nonsense" and t.score_breakdown.questions %}
+    <p class="mt-5 text-sm text-stone-600">
+      <strong class="text-stone-900 num">{{ t.score_breakdown.hits }}/{{ t.score_breakdown.total }}</strong>
+      Quatsch-Fragen wurden erkannt. Grüner Rand = das Modell hat den Unsinn explizit zurückgewiesen.
+    </p>
+    <ul class="mt-3 space-y-3">
+      {% for q in t.score_breakdown.questions %}
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 {% if q.pushback_detected %}border-l-emerald-500{% else %}border-l-red-400{% endif %} rounded p-4">
+          <div class="flex items-start gap-3">
+            <span class="text-xl mt-0.5">{% if q.pushback_detected %}<span class="text-emerald-600">✓</span>{% else %}<span class="text-red-500">✗</span>{% endif %}</span>
+            <div class="min-w-0 flex-1">
+              <div class="text-sm font-medium text-stone-900">{{ q.prompt }}</div>
+              <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">{{ q.response }}</div>
+              {% if q.error %}<div class="mt-2 text-sm text-red-600">Fehler: {{ q.error }}</div>{% endif %}
+            </div>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+
+  {# ------------------------------------------------------ hallucination #}
+  {% elif t.task == "hallucination" and t.score_breakdown.questions %}
+    <p class="mt-5 text-sm text-stone-600">
+      {% if t.score_breakdown.judge and t.score_breakdown.judge.judge_score is not none %}
+        <span class="font-semibold text-amber-700">LLM-Judge aktiv</span>
+        <span class="num">({{ t.score_breakdown.judge.judge_model }}, Score {{ "%.2f"|format(t.score_breakdown.judge.judge_score) }})</span>
+        · heuristische Klassifikation:
+      {% else %}
+        <span class="font-semibold text-stone-700">Heuristischer Grader</span>
+        · kein LLM-Judge im Result:
+      {% endif %}
+      <span class="num"><strong class="text-stone-900">{{ t.score_breakdown.corrected }}</strong> korrigiert</span>
+      ·
+      <span class="num"><strong class="text-stone-900">{{ t.score_breakdown.abstained }}</strong> 'weiß nicht'</span>
+      ·
+      <span class="num"><strong class="text-stone-900">{{ t.score_breakdown.fabricated }}</strong> erfunden</span>
+      / {{ t.score_breakdown.total }} Fragen mit falscher Prämisse.
+    </p>
+    {% if t.score_breakdown.judge and t.score_breakdown.judge.judge_score is not none %}
+      {% set hj = t.score_breakdown.judge %}
+      <div class="mt-3 bg-amber-50 border border-amber-200 rounded p-4">
+        <div class="flex items-baseline justify-between gap-3">
+          <div>
+            <div class="text-xs uppercase tracking-wider text-amber-700">LLM-as-Judge</div>
+            <div class="mt-1 text-xs text-stone-600 num">
+              korrekt {{ hj.korrekt }} · ausgewichen {{ hj.ausgewichen }} · falsch {{ hj.falsch }} · total {{ hj.total }}
+            </div>
+          </div>
+          <div class="text-3xl font-bold num {% if hj.judge_score >= 0.7 %}text-emerald-700{% elif hj.judge_score == 0 %}text-red-700{% else %}text-amber-700{% endif %}">
+            {{ "%.2f"|format(hj.judge_score) }}
+          </div>
+        </div>
+      </div>
+    {% endif %}
+    <ul class="mt-3 space-y-3">
+      {% for q in t.score_breakdown.questions %}
+        {% set tone = ({"corrected": "emerald", "abstained": "amber", "fabricated": "red", "error": "stone"})[q.verdict] %}
+        {% set judge_tone = none %}
+        {% if q.judge %}
+          {% set judge_tone = "emerald" if q.judge.verdict == "korrekt" else ("amber" if q.judge.verdict == "ausgewichen" else "red") %}
+        {% endif %}
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-{{ judge_tone or tone }}-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">{{ q.prompt }}</div>
+            {% if q.judge %}
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM-Judge: {{ q.judge.verdict }} · Prämisse erkannt: {{ "ja" if q.judge.false_premise_caught else "nein" }} · Fabrication: {{ "ja" if q.judge.fabrication_detected else "nein" }}{% if q.judge.comment %}: {{ q.judge.comment }}{% endif %}">
+                J
+              </span>
+            {% endif %}
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">{{ q.response }}</div>
+          {% if q.error %}<div class="mt-2 text-sm text-red-600">Fehler: {{ q.error }}</div>{% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+
+  {# ----------------------------------------------- instruction_following #}
+  {% elif t.task == "instruction_following" and t.score_breakdown.checks %}
+    <p class="mt-5 text-sm text-stone-600">
+      <strong class="text-stone-900 num">{{ t.score_breakdown.passed }}/{{ t.score_breakdown.total }}</strong>
+      Constraints eingehalten.
+    </p>
+
+    <div class="mt-3 bg-white border border-stone-200 rounded">
+      <div class="px-4 py-2 border-b border-stone-200 text-xs text-stone-500 uppercase tracking-wider">Antwort des Modells</div>
+      <pre class="px-4 py-3 text-sm text-stone-800 whitespace-pre-wrap">{{ t.score_breakdown.response }}</pre>
+    </div>
+
+    <ul class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-2">
+      {% for c in t.score_breakdown.checks %}
+        <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+          <span class="text-base mt-0.5">{% if c.passed %}<span class="text-emerald-600">✓</span>{% else %}<span class="text-red-600">✗</span>{% endif %}</span>
+          <div class="text-sm flex-1">
+            <div class="font-medium text-stone-900">{{ c.label }}</div>
+            {% if c.detail %}<div class="text-xs text-stone-500 mt-0.5">{{ c.detail }}</div>{% endif %}
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+
+  {# --------------------------------------------------------- niah #}
+  {% elif t.task in ["niah", "niah_deep"] and t.score_breakdown.lengths %}
+    <p class="mt-5 text-sm text-stone-600">
+      Pro Kontextlänge wurden 10 Needles über den Korpus verteilt. Der NIAH-Score kombiniert
+      Korpus-Zusammenfassung, Needle-Retrieval und optional Verstehen + Halluzinations-Fallen.
+      LLM-Judges ersetzen die heuristischen Scores für Summary und Verstehen, sobald vorhanden.
+    </p>
+
+    {% for L in t.score_breakdown.lengths %}
+      <div class="mt-6">
+        <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">
+          Stufe: <span class="num font-semibold text-stone-700">{{ L.length_tokens // 1000 }}k Tokens</span>
+          {% if L.skipped %}<span class="ml-2 text-stone-500">übersprungen — {{ L.reason }}</span>{% endif %}
+        </div>
+
+        {% if not L.skipped %}
+          {# ─── Sub-Benchmark 1: Korpus-Zusammenfassung (Turn 1) ─── #}
+          {% if L.raw_summary %}
+            <div class="bg-sky-50 border border-sky-200 rounded-lg overflow-hidden">
+              <div class="px-4 py-3 border-b border-sky-200 flex items-baseline justify-between">
+                <div>
+                  <span class="text-xs uppercase tracking-wider text-sky-700 font-semibold">Sub-Benchmark · Korpus-Zusammenfassung</span>
+                  <span class="ml-2 text-xs text-stone-500">Turn 1</span>
+                </div>
+                <div class="text-sm num">
+                  {% if L.judge and L.judge.judge_score is not none %}
+                    <span class="font-bold text-base {% if L.judge.judge_score >= 0.7 %}text-emerald-700{% elif L.judge.judge_score == 0 %}text-red-700{% else %}text-amber-700{% endif %}">
+                      {{ "%.2f"|format(L.judge.judge_score) }}
+                    </span>
+                    <span class="text-stone-500">LLM-Judge</span>
+                    <span class="ml-2 text-xs text-stone-400">heur. {{ "%.2f"|format(L.summary_score) }}</span>
+                  {% else %}
+                    <span class="font-bold text-base {% if L.summary_passed == L.summary_total %}text-emerald-700{% elif L.summary_passed == 0 %}text-red-700{% else %}text-amber-700{% endif %}">
+                      {{ L.summary_passed }}/{{ L.summary_total }}
+                    </span>
+                    <span class="text-stone-500">Kriterien</span>
+                  {% endif %}
+                  <span class="ml-2 text-xs text-stone-500">~{{ L.approx_corpus_tokens // 1000 }}k Tokens Input</span>
+                </div>
+              </div>
+              <div class="px-4 py-3 bg-white">
+                <pre class="text-sm text-stone-800 whitespace-pre-wrap leading-relaxed">{{ L.raw_summary }}</pre>
+                {% if L.judge %}
+                  <div class="mt-3 border border-amber-200 bg-amber-50 rounded p-3">
+                    <div class="flex items-baseline justify-between gap-3">
+                      <span class="text-xs uppercase tracking-wider text-amber-700">LLM-Judge Summary ({{ L.judge.judge_model }})</span>
+                      <span class="text-lg font-bold num {% if L.judge.judge_score >= 0.7 %}text-emerald-700{% elif L.judge.judge_score == 0 %}text-red-700{% else %}text-amber-700{% endif %}">{{ "%.2f"|format(L.judge.judge_score) }}</span>
+                    </div>
+                    {% if L.judge.axes %}
+                      <ul class="mt-2 grid grid-cols-2 md:grid-cols-6 gap-2 text-xs">
+                        {% for k, v in L.judge.axes.items() %}
+                          <li class="bg-white border border-amber-100 rounded px-2 py-1 text-center">
+                            <div class="text-stone-500">{{ k.replace("_", " ") }}</div>
+                            <div class="font-bold num {% if v >= 0.7 %}text-emerald-700{% elif v == 0 %}text-red-700{% else %}text-amber-700{% endif %}">{{ "%.2f"|format(v) }}</div>
+                          </li>
+                        {% endfor %}
+                      </ul>
+                    {% endif %}
+                    {% if L.judge.comment %}<div class="mt-2 text-sm text-stone-700">{{ L.judge.comment }}</div>{% endif %}
+                  </div>
+                {% endif %}
+                {% if L.summary_checks %}
+                  <ul class="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    {% for c in L.summary_checks %}
+                      <li class="text-xs px-2 py-1 rounded border {% if c.passed %}border-emerald-200 bg-emerald-50 text-emerald-800{% else %}border-red-200 bg-red-50 text-red-800{% endif %}">
+                        {{ "✓" if c.passed else "✗" }} {{ c.label }} · {{ c.detail }}
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </div>
+            </div>
+          {% endif %}
+
+          {# ─── Sub-Benchmark 2: Needle-Retrieval (Turn 2) ─── #}
+          <div class="mt-4 bg-white border border-stone-200 rounded-lg overflow-hidden">
+            <div class="px-4 py-3 border-b border-stone-200 flex items-baseline justify-between">
+              <div>
+                <span class="text-xs uppercase tracking-wider text-stone-700 font-semibold">Sub-Benchmark · Needle-Retrieval</span>
+                <span class="ml-2 text-xs text-stone-500">Turn 2</span>
+              </div>
+              <div class="text-sm num">
+                <span class="font-bold text-base {% if L.hits == L.total %}text-emerald-700{% elif L.hits == 0 %}text-red-700{% else %}text-amber-700{% endif %}">
+                  {{ L.hits }}/{{ L.total }}
+                </span>
+                <span class="text-stone-500">hits</span>
+              </div>
+            </div>
+            <div class="px-4 py-3">
+              <ul class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
+                {% for n in L.needles %}
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5">{% if n.hit %}<span class="text-emerald-600">●</span>{% else %}<span class="text-red-500">○</span>{% endif %}</span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">{{ n.depth_label }} ({{ "%.0f"|format(n.depth_pct * 100) }} %)</div>
+                      <div class="text-stone-500 mt-0.5">erwartet: {{ n.expected_keywords|join(", ") }}</div>
+                    </div>
+                  </li>
+                {% endfor %}
+              </ul>
+              <details class="mt-3">
+                <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Modell-Antwort auf die Needle-Fragen</summary>
+                <pre class="mt-2 text-xs bg-stone-50 border border-stone-200 rounded p-3 overflow-x-auto whitespace-pre-wrap">{{ L.raw_answer }}</pre>
+              </details>
+              {% if L.error %}
+                <div class="mt-2 text-xs text-red-600">Fehler: {{ L.error }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          {# ─── Sub-Benchmark 3: Verstehen + Halluzinations-Fallen (Turn 3) ─── #}
+          {% if L.get('comprehension_questions') %}
+            <div class="mt-4 bg-amber-50 border border-amber-200 rounded-lg overflow-hidden">
+              <div class="px-4 py-3 border-b border-amber-200 flex items-baseline justify-between">
+                <div>
+                  <span class="text-xs uppercase tracking-wider text-amber-800 font-semibold">Sub-Benchmark · Verstehen + Halluzinations-Fallen</span>
+                  <span class="ml-2 text-xs text-stone-500">Turn 3</span>
+                </div>
+                <div class="text-sm num">
+                  {% if L.comprehension_judge and L.comprehension_judge.judge_score is not none %}
+                    <span class="font-bold text-base {% if L.comprehension_judge.judge_score >= 0.7 %}text-emerald-700{% elif L.comprehension_judge.judge_score == 0 %}text-red-700{% else %}text-amber-700{% endif %}">
+                      {{ "%.2f"|format(L.comprehension_judge.judge_score) }}
+                    </span>
+                    <span class="text-stone-500">LLM-Judge</span>
+                    <span class="ml-2 text-xs text-stone-400">heur. {{ "%.2f"|format(L.comprehension_score) }}</span>
+                  {% else %}
+                    <span class="font-bold text-base {% if L.comprehension_score >= 0.7 %}text-emerald-700{% elif L.comprehension_score == 0 %}text-red-700{% else %}text-amber-700{% endif %}">
+                      {{ "%.2f"|format(L.comprehension_score) }}
+                    </span>
+                  {% endif %}
+                  <span class="ml-2 text-xs text-stone-600">
+                    Fakten {{ L.comprehension_facts_hits }}/{{ L.comprehension_facts_total }} ·
+                    Fallen {{ L.comprehension_traps_passed }}/{{ L.comprehension_traps_total }}
+                  </span>
+                </div>
+              </div>
+              <ul class="px-4 py-3 bg-white space-y-3">
+                {% for q in L.comprehension_questions %}
+                  {% set qj = namespace(value=none) %}
+                  {% if L.comprehension_judge and L.comprehension_judge.questions %}
+                    {% for jq in L.comprehension_judge.questions %}
+                      {% if jq.id == q.id %}{% set qj.value = jq %}{% endif %}
+                    {% endfor %}
+                  {% endif %}
+                  <li class="border-l-4 {% if qj.value %}{% if qj.value.score >= 0.7 %}border-emerald-500{% elif qj.value.score > 0 %}border-amber-500{% else %}border-red-500{% endif %}{% elif q.hit %}border-emerald-500{% else %}border-red-400{% endif %} pl-3">
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                      {% if q.type == "trap" %}
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200">Halluzinations-Falle</span>
+                      {% else %}
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200">Faktenfrage</span>
+                      {% endif %}
+                      <div class="text-sm font-medium text-stone-900 flex-1">{{ q.prompt }}</div>
+                      {% if qj.value %}
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                              data-tooltip="LLM-Judge {{ "%.2f"|format(qj.value.score) }} · {{ qj.value.verdict }}{% if qj.value.comment %}: {{ qj.value.comment }}{% endif %}">
+                          J
+                        </span>
+                      {% endif %}
+                    </div>
+                    <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">{{ q.answer }}</div>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+        {% endif %}
+      </div>
+    {% endfor %}
+
+  {# --------------------------------------------------- long_context #}
+  {% elif t.task == "long_context" and t.score_breakdown.questions %}
+    <p class="mt-5 text-sm text-stone-600">
+      Kontext: <span class="num">~{{ t.score_breakdown.context_tokens_target // 1000 }}k Tokens</span>.
+      Zusammenfassung: <strong class="text-stone-900 num">{{ t.score_breakdown.summary_passed }}/{{ t.score_breakdown.summary_total }}</strong> Kriterien ·
+      Verstehen: <strong class="text-stone-900 num">{{ t.score_breakdown.comp_hits }}/{{ t.score_breakdown.comp_total }}</strong> Treffer.
+    </p>
+
+    <div class="mt-3 bg-white border border-stone-200 rounded">
+      <div class="px-4 py-2 border-b border-stone-200 text-xs text-stone-500 uppercase tracking-wider">Zusammenfassung</div>
+      <pre class="px-4 py-3 text-sm text-stone-800 whitespace-pre-wrap">{{ t.score_breakdown.summary }}</pre>
+    </div>
+    <ul class="mt-3 grid grid-cols-1 md:grid-cols-3 gap-2">
+      {% for c in t.score_breakdown.summary_checks %}
+        <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+          <span class="text-base mt-0.5">{% if c.passed %}<span class="text-emerald-600">✓</span>{% else %}<span class="text-red-600">✗</span>{% endif %}</span>
+          <div class="text-sm flex-1">
+            <div class="font-medium text-stone-900">{{ c.label }}</div>
+            {% if c.detail %}<div class="text-xs text-stone-500 mt-0.5">{{ c.detail }}</div>{% endif %}
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+
+    <ul class="mt-5 space-y-3">
+      {% for q in t.score_breakdown.questions %}
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 {% if q.hit %}border-l-emerald-500{% else %}border-l-red-400{% endif %} rounded p-4">
+          <div class="flex items-start gap-3">
+            <span class="text-base mt-0.5">{% if q.hit %}<span class="text-emerald-600">✓</span>{% else %}<span class="text-red-500">✗</span>{% endif %}</span>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2">
+                {% if q.type == "trap" %}
+                  <span class="text-xs uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">Halluzinations-Falle</span>
+                {% else %}
+                  <span class="text-xs uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-50 text-stone-600 border border-stone-200">Faktenfrage</span>
+                {% endif %}
+                <div class="text-sm font-medium text-stone-900 flex-1">{{ q.prompt }}</div>
+              </div>
+              {% if q.type == "trap" %}
+                <div class="text-xs text-stone-500 mt-1">
+                  Erwartet: {{ q.trap_explanation }} —
+                  Verdict: <span class="num font-medium {% if q.verdict in ['corrected','abstained'] %}text-emerald-700{% else %}text-red-700{% endif %}">{{ q.verdict }}</span>
+                </div>
+              {% else %}
+                <div class="text-xs text-stone-500 mt-1">
+                  Stichwörter <span class="num">{{ q.matched_keywords|length }}/{{ q.expected_keywords|length }}</span>:
+                  {% for kw in q.expected_keywords %}
+                    <span class="{% if kw in q.matched_keywords %}text-emerald-700 font-medium{% else %}text-stone-400 line-through{% endif %}">{{ kw }}</span>{% if not loop.last %}, {% endif %}
+                  {% endfor %}
+                </div>
+              {% endif %}
+              <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">{{ q.answer }}</div>
+            </div>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+
+  {# --------------------------------------------------- comprehension #}
+  {% elif t.task == "comprehension" and t.score_breakdown.questions %}
+    <p class="mt-5 text-sm text-stone-600">
+      <strong class="text-stone-900 num">{{ t.score_breakdown.hits }}/{{ t.score_breakdown.total }}</strong>
+      Verständnisfragen korrekt beantwortet — geprüft per Stichwort-Match in der Antwort.
+      Eingeführter Kontext: <span class="num">~{{ t.score_breakdown.context_tokens_target // 1000 }}k Tokens</span>.
+    </p>
+
+    <ul class="mt-3 space-y-3">
+      {% for q in t.score_breakdown.questions %}
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 {% if q.hit %}border-l-emerald-500{% else %}border-l-red-400{% endif %} rounded p-4">
+          <div class="flex items-start gap-3">
+            <span class="text-base mt-0.5">{% if q.hit %}<span class="text-emerald-600">✓</span>{% else %}<span class="text-red-500">✗</span>{% endif %}</span>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2">
+                {% if q.type == "trap" %}
+                  <span class="text-xs uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">Halluzinations-Falle</span>
+                {% else %}
+                  <span class="text-xs uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-50 text-stone-600 border border-stone-200">Faktenfrage</span>
+                {% endif %}
+                <div class="text-sm font-medium text-stone-900 flex-1">{{ q.prompt }}</div>
+              </div>
+
+              {% if q.type == "trap" %}
+                <div class="text-xs text-stone-500 mt-1">
+                  Erwartet: {{ q.trap_explanation }} —
+                  Verdict: <span class="num font-medium {% if q.verdict in ['corrected','abstained'] %}text-emerald-700{% else %}text-red-700{% endif %}">{{ q.verdict }}</span>
+                </div>
+              {% else %}
+                <div class="text-xs text-stone-500 mt-1">
+                  Stichwörter <span class="num">{{ q.matched_keywords|length }}/{{ q.expected_keywords|length }}</span>
+                  (mind. {{ q.min_match }} reicht):
+                  {% for kw in q.expected_keywords %}
+                    <span class="{% if kw in q.matched_keywords %}text-emerald-700 font-medium{% else %}text-stone-400 line-through{% endif %}">{{ kw }}</span>{% if not loop.last %}, {% endif %}
+                  {% endfor %}
+                </div>
+              {% endif %}
+
+              <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">{{ q.answer }}</div>
+            </div>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+
+  {# ----------------------------------------------------- summarization #}
+  {% elif t.task == "summarization" and t.score_breakdown.checks %}
+    <div class="mt-5 bg-white border border-stone-200 rounded">
+      <div class="px-4 py-2 border-b border-stone-200 text-xs text-stone-500 uppercase tracking-wider">Vier-Satz-Zusammenfassung</div>
+      <pre class="px-4 py-3 text-sm text-stone-800 whitespace-pre-wrap">{{ t.score_breakdown.summary }}</pre>
+    </div>
+    <p class="mt-3 text-sm text-stone-600">
+      <strong class="text-stone-900 num">{{ t.score_breakdown.passed }}/{{ t.score_breakdown.total }}</strong> Kriterien erfüllt
+      · <span class="num">{{ t.score_breakdown.sentence_count }}</span> Sätze
+      · <span class="num">{{ t.score_breakdown.word_count }}</span> Wörter
+      · <span class="num">{{ t.score_breakdown.keyword_hits }}/{{ t.score_breakdown.keyword_total }}</span> Plot-Stichworte
+    </p>
+    <ul class="mt-3 grid grid-cols-1 md:grid-cols-3 gap-2">
+      {% for c in t.score_breakdown.checks %}
+        <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+          <span class="text-base mt-0.5">{% if c.passed %}<span class="text-emerald-600">✓</span>{% else %}<span class="text-red-600">✗</span>{% endif %}</span>
+          <div class="text-sm flex-1">
+            <div class="font-medium text-stone-900">{{ c.label }}</div>
+            {% if c.detail %}<div class="text-xs text-stone-500 mt-0.5">{{ c.detail }}</div>{% endif %}
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+
+  {# --------------------------------------------------------- tool_use #}
+  {% elif t.task == "tool_use" and t.score_breakdown.scenarios %}
+    {% for s in t.score_breakdown.scenarios %}
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div>
+            <span class="font-medium">{{ s.id }}</span>
+            <span class="ml-2 text-xs uppercase tracking-wider px-1.5 py-0.5 rounded
+              {% if s.difficulty == 'leicht' %}bg-emerald-50 text-emerald-700 border border-emerald-200
+              {% elif s.difficulty == 'mittel' %}bg-amber-50 text-amber-700 border border-amber-200
+              {% else %}bg-red-50 text-red-700 border border-red-200{% endif %}">{{ s.difficulty }}</span>
+          </div>
+          {% if s.error %}
+            <span class="text-red-700 text-sm">{{ s.error }}</span>
+          {% else %}
+            <div class="text-sm num">
+              <span class="font-medium {% if s.score >= 0.7 %}text-emerald-700{% endif %}">{{ "%.2f"|format(s.score) }}</span>
+              <span class="text-stone-500"> · {{ s.passed }}/{{ s.total }} Checks</span>
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">{{ s.user_prompt }}</div>
+
+        {% if s.history %}
+          <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool-Aufrufe</div>
+            <ol class="space-y-2 text-sm num">
+              {% for h in s.history %}
+                <li>
+                  <span class="font-medium text-stone-900">{{ loop.index }}. {{ h.tool }}</span>
+                  <span class="text-stone-600">({{ h.args|tojson }})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool-Result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{{ h.result }}</pre>
+                  </details>
+                </li>
+              {% endfor %}
+            </ol>
+          </div>
+        {% endif %}
+
+        {% if s.checks %}
+          <ul class="px-4 py-3 border-b border-stone-100 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+            {% for c in s.checks %}
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5">{% if c.passed %}<span class="text-emerald-600">✓</span>{% else %}<span class="text-red-600">✗</span>{% endif %}</span>
+                <div>
+                  <div class="font-medium text-stone-900">{{ c.label }}</div>
+                  {% if c.detail %}<div class="text-xs text-stone-500">{{ c.detail }}</div>{% endif %}
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+
+        <div class="px-4 py-3">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Endgültige Antwort</div>
+          <pre class="text-sm whitespace-pre-wrap">{{ s.final_text }}</pre>
+        </div>
+      </div>
+    {% endfor %}
+
+  {# ------------------------------------------ diagram_to_svg #}
+  {% elif t.task == "diagram_to_svg" and t.score_breakdown.diagrams %}
+    {% for d in t.score_breakdown.diagrams %}
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div class="font-medium num">{{ d.image_name }}</div>
+          <div class="text-sm">
+            {% if d.grade and d.grade.parsed %}
+              <span class="text-emerald-700 font-medium">✓ SVG parsbar · {{ d.grade.element_count }} Elemente · {{ d.grade.text_count }} Texte</span>
+            {% else %}
+              <span class="text-red-700 font-medium">✗ SVG nicht parsbar</span>
+            {% endif %}
+            {% if d.grade %}<span class="ml-3 font-bold num {% if d.grade.score >= 0.7 %}text-emerald-700{% elif d.grade.score > 0 %}text-amber-700{% else %}text-red-600{% endif %}">{{ "%.2f"|format(d.grade.score) }}</span>{% endif %}
+          </div>
+        </div>
+        {% if d.error %}
+          <div class="px-4 py-3 text-sm text-red-600">{{ d.error }}</div>
+        {% else %}
+          <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
+            <div class="p-3 bg-stone-50">
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Quelle</div>
+              <div class="zoom-frame">
+                <button type="button" class="zoom-button" data-zoom-button aria-label="Quelle vergrößern" title="Quelle vergrößern">⛶</button>
+                <img src="{{ artifact_url(d.image_path) }}" class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded" alt="{{ d.image_name }}">
+              </div>
+            </div>
+            <div class="p-3">
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">SVG-Render</div>
+              <div class="zoom-frame">
+                <button type="button" class="zoom-button" data-zoom-button aria-label="SVG-Render vergrößern" title="SVG-Render vergrößern">⛶</button>
+                <img src="{{ artifact_url(d.svg_path) }}" class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded" alt="SVG-Render {{ d.image_name }}">
+              </div>
+            </div>
+          </div>
+          <div class="border-t border-stone-100 px-4 py-2">
+            <a class="text-xs text-stone-600 underline" href="{{ artifact_url(d.svg_path) }}" target="_blank">SVG-Datei öffnen ↗</a>
+          </div>
+          {% if d.grade %}
+            <div class="border-t border-stone-100 px-4 py-3">
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Deterministischer Grader</div>
+              <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+                <li class="border rounded px-3 py-2 {% if d.grade.parsed and d.grade.has_root and d.grade.element_count >= 5 and d.grade.text_count >= 1 %}border-emerald-200 bg-emerald-50{% else %}border-red-200 bg-red-50{% endif %}">
+                  <div class="flex items-baseline justify-between gap-3">
+                    <span class="font-medium text-stone-900">SVG-Validität</span>
+                    <span class="font-bold num {% if d.grade.parsed and d.grade.has_root and d.grade.element_count >= 5 and d.grade.text_count >= 1 %}text-emerald-700{% else %}text-red-600{% endif %}">{% if d.grade.parsed and d.grade.has_root and d.grade.element_count >= 5 and d.grade.text_count >= 1 %}1.00{% else %}0.00{% endif %}</span>
+                  </div>
+                  <div class="mt-1 text-stone-600">
+                    {% if d.grade.parse_error %}Parse-Fehler: <span class="num">{{ d.grade.parse_error }}</span>
+                    {% else %}<span class="num">{{ d.grade.element_count }}</span> Elemente · <span class="num">{{ d.grade.text_count }}</span> Text-Knoten · root <span class="num">{% if d.grade.has_root %}&lt;svg&gt;{% else %}fehlt{% endif %}</span>
+                    {% endif %}
+                  </div>
+                </li>
+                {% set _coverage = (d.grade.matched_terms|length) / (d.grade.matched_terms|length + d.grade.missing_terms|length) if (d.grade.matched_terms|length + d.grade.missing_terms|length) > 0 else 1.0 %}
+                <li class="border rounded px-3 py-2 {% if _coverage >= 0.7 %}border-emerald-200 bg-emerald-50{% elif _coverage > 0 %}border-amber-200 bg-amber-50{% else %}border-red-200 bg-red-50{% endif %}">
+                  <div class="flex items-baseline justify-between gap-3">
+                    <span class="font-medium text-stone-900">Begriffs-Abdeckung</span>
+                    <span class="font-bold num {% if _coverage >= 0.7 %}text-emerald-700{% elif _coverage > 0 %}text-amber-700{% else %}text-red-600{% endif %}">{{ "%.2f"|format(_coverage) }}</span>
+                  </div>
+                  <div class="mt-1 text-stone-600 num">{{ d.grade.matched_terms|length }}/{{ d.grade.matched_terms|length + d.grade.missing_terms|length }} getroffen</div>
+                  {% if d.grade.missing_terms %}
+                    <div class="mt-1 text-stone-500">
+                      fehlt:
+                      {% for m in d.grade.missing_terms[:6] %}{{ m }}{% if not loop.last %}, {% endif %}{% endfor %}
+                      {% if d.grade.missing_terms|length > 6 %} …{% endif %}
+                    </div>
+                  {% endif %}
+                </li>
+              </ul>
+            </div>
+          {% endif %}
+          {% if d.judge %}
+            <div class="border-t border-stone-100 px-4 py-3 bg-amber-50">
+              <div class="flex items-baseline justify-between mb-2">
+                <span class="text-xs uppercase tracking-wider text-amber-700">Qualitativ · Judge ({{ d.judge.judge_model }})</span>
+                <span class="text-2xl font-bold num text-amber-700">{{ "%.2f"|format(d.judge.judge_score) }}</span>
+              </div>
+              <ul class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+                {% for k, v in (d.judge.scores or {}).items() %}
+                  <li class="text-center bg-white border border-amber-200 rounded p-2">
+                    <div class="text-stone-500 capitalize">{{ k.replace("_", " ") }}</div>
+                    <div class="text-base font-bold num {% if v >= 0.7 %}text-emerald-700{% elif v > 0 %}text-amber-700{% else %}text-red-600{% endif %}">{{ "%.2f"|format(v) }}</div>
+                  </li>
+                {% endfor %}
+              </ul>
+              {% if d.judge.comment %}<div class="mt-3 text-sm text-stone-700">{{ d.judge.comment }}</div>{% endif %}
+            </div>
+          {% endif %}
+        {% endif %}
+      </div>
+    {% endfor %}
+
+  {# ------------------------------------------ diagram_to_mermaid #}
+  {% elif t.task == "diagram_to_mermaid" and t.score_breakdown.diagrams %}
+    {% for d in t.score_breakdown.diagrams %}
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div class="font-medium num">{{ d.image_name }}</div>
+          <div class="text-sm">
+            {% if d.starts_with_keyword %}
+              <span class="text-emerald-700 font-medium">✓ erkennt als <span class="num">{{ d.diagram_kind }}</span></span>
+              {% if d.grade %}<span class="ml-3 font-bold num {% if d.grade.score >= 0.7 %}text-emerald-700{% elif d.grade.score > 0 %}text-amber-700{% else %}text-red-600{% endif %}">{{ "%.2f"|format(d.grade.score) }}</span>{% endif %}
+            {% else %}
+              <span class="text-red-700 font-medium">✗ keine gültige Mermaid-Einleitung</span>
+            {% endif %}
+          </div>
+        </div>
+        {% if d.error %}
+          <div class="px-4 py-3 text-sm text-red-600">{{ d.error }}</div>
+        {% else %}
+          <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
+            <div class="p-3 bg-stone-50">
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Quelle</div>
+              <div class="zoom-frame">
+                <button type="button" class="zoom-button" data-zoom-button aria-label="Quelle vergrößern" title="Quelle vergrößern">⛶</button>
+                <img src="{{ artifact_url(d.image_path) }}" class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded" alt="{{ d.image_name }}">
+              </div>
+            </div>
+            <div class="p-3">
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Mermaid-Render</div>
+              <div class="zoom-frame">
+                <button type="button" class="zoom-button" data-zoom-button aria-label="Mermaid-Render vergrößern" title="Mermaid-Render vergrößern">⛶</button>
+                <div class="mermaid zoomable-mermaid bg-white border border-stone-200 rounded p-3 overflow-x-auto">{{ d.mermaid }}</div>
+              </div>
+              {% if d.normalization_warnings %}
+                <div class="mt-2 text-xs text-stone-500">
+                  normalisiert: {{ d.normalization_warnings|join(", ") }}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+          <details class="border-t border-stone-100">
+            <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900 px-4 py-2">Mermaid-Quellcode</summary>
+            <pre class="px-4 py-3 text-xs bg-stone-50 whitespace-pre-wrap">{{ d.mermaid }}</pre>
+          </details>
+          {% if d.grade %}
+            <div class="border-t border-stone-100 px-4 py-3">
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Deterministischer Grader</div>
+              <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+                {% for c in d.grade.checks %}
+                  <li class="border rounded px-3 py-2 {% if c.passed %}border-emerald-200 bg-emerald-50{% else %}border-amber-200 bg-amber-50{% endif %}">
+                    <div class="flex items-baseline justify-between gap-3">
+                      <span class="font-medium text-stone-900">{{ c.label }}</span>
+                      <span class="font-bold num {% if c.score >= 0.7 %}text-emerald-700{% elif c.score > 0 %}text-amber-700{% else %}text-red-600{% endif %}">{{ "%.2f"|format(c.score) }}</span>
+                    </div>
+                    {% if c.detail %}<div class="mt-1 text-stone-600">{{ c.detail }}</div>{% endif %}
+                    {% if c.missing %}
+                      <div class="mt-1 text-stone-500">
+                        fehlt:
+                        {% for m in c.missing[:6] %}
+                          {% if m.from is defined %}{{ m.from }} → {{ m.to }}{% else %}{{ m }}{% endif %}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                        {% if c.missing|length > 6 %} …{% endif %}
+                      </div>
+                    {% endif %}
+                  </li>
+                {% endfor %}
+              </ul>
+              {% if d.grade.score_caps %}
+                <div class="mt-2 text-xs text-amber-700">Score-Cap: {{ d.grade.score_caps|join(", ") }}</div>
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endif %}
+      </div>
+    {% endfor %}
+
+  {# ---------------------------------------------------- vision #}
+  {% elif t.task == "vision" and t.score_breakdown.subtasks %}
+    {% for s in t.score_breakdown.subtasks %}
+      <div class="mt-5 bg-white border border-stone-200 rounded overflow-hidden">
+        <div class="px-4 py-3 border-b border-stone-200 flex items-center justify-between bg-stone-50 gap-3 flex-wrap">
+          <div>
+            <span class="font-medium">{{ s.label }}</span>
+            <span class="ml-3 text-xs text-stone-500 num">
+              {% if s.wall_seconds %}{{ "%.1f"|format(s.wall_seconds) }} s{% endif %}
+              {% if s.tokens_per_second %} · {{ "%.0f"|format(s.tokens_per_second) }} t/s{% endif %}
+            </span>
+          </div>
+          <div class="flex items-center gap-4 num">
+            {% if s.ocr %}
+              <div class="text-xs">
+                <span class="text-stone-500">Recall</span>
+                <span class="font-bold text-base text-emerald-700">{{ "%.0f"|format(s.ocr.recall * 100) }}%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">Precision</span>
+                <span class="font-bold text-base text-emerald-700">{{ "%.0f"|format(s.ocr.precision * 100) }}%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">{{ s.ocr.matched }}/{{ s.ocr.gt_total }}</span>
+                <span class="text-amber-600">+{{ s.ocr.extra }}</span>
+              </div>
+              {% if s.ocr.relocated_matched or s.ocr.fuzzy_matched %}
+                <div class="text-xs text-stone-500">
+                  {% if s.ocr.relocated_matched %}<span class="text-sky-700">{{ s.ocr.relocated_matched }} verschoben</span>{% endif %}
+                  {% if s.ocr.relocated_matched and s.ocr.fuzzy_matched %} · {% endif %}
+                  {% if s.ocr.fuzzy_matched %}<span class="text-violet-700">{{ s.ocr.fuzzy_matched }} ähnlich</span>{% endif %}
+                </div>
+              {% endif %}
+            {% endif %}
+            <div class="text-3xl font-bold num leading-none {% if s.score >= 0.7 %}text-emerald-700{% elif s.score == 0 %}text-red-600{% else %}text-amber-700{% endif %}">
+              {% if s.error %}—{% else %}{{ "%.2f"|format(s.score) }}{% endif %}
+            </div>
+          </div>
+        </div>
+        {% if s.error %}
+          <div class="px-4 py-3 text-sm text-red-600">{{ s.error }}</div>
+        {% else %}
+          <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
+            <div class="p-3 bg-stone-50 grid grid-cols-1 gap-2">
+              {% for ip in s.image_paths %}
+                <div class="zoom-frame">
+                  <button type="button" class="zoom-button" data-zoom-button aria-label="Bild vergrößern" title="Bild vergrößern">⛶</button>
+                  <img src="{{ artifact_url(ip) }}"
+                       class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded cursor-zoom-in"
+                       loading="lazy">
+                </div>
+              {% endfor %}
+              {% if not s.ocr and s.expected_keywords %}
+                <div class="text-xs text-stone-500 mt-1">erwartete Stichwörter: {{ s.expected_keywords|join(", ") }}</div>
+              {% endif %}
+            </div>
+            <div>
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider">Modell-Antwort</div>
+              <pre class="p-4 text-sm whitespace-pre-wrap max-h-[600px] overflow-y-auto">{{ s.answer }}</pre>
+            </div>
+          </div>
+
+          {% if s.ocr %}
+            <div class="border-t border-stone-200 bg-white">
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider flex items-center justify-between">
+                <span>Word-Diff Ground-Truth ↔ Modell</span>
+                <span class="num">
+                  <span class="text-emerald-700">●</span> matched ·
+                  <span class="text-sky-700">●</span> verschoben ·
+                  <span class="text-violet-700">●</span> ähnlich ·
+                  <span class="text-red-600">●</span> fehlt im Modell ·
+                  <span class="text-amber-600">●</span> extra/falsch
+                </span>
+              </div>
+              <div class="p-4 text-sm leading-relaxed font-mono">
+                {% for op in s.ocr.opcodes %}
+                  {% if op.tag == 'equal' %}<span class="text-stone-700">{{ op.gt }}</span>
+                  {% elif op.tag == 'moved' %}<span class="bg-sky-50 text-sky-700 px-0.5 rounded">{{ op.gt }}</span>
+                  {% elif op.tag == 'fuzzy' %}<span class="bg-violet-50 text-violet-700 px-0.5 rounded">{{ op.gt }} ≈ {{ op.pred }}</span>
+                  {% elif op.tag == 'delete' %}<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">{{ op.gt }}</span>
+                  {% elif op.tag == 'insert' %}<span class="bg-amber-50 text-amber-700 px-0.5 rounded">{{ op.pred }}</span>
+                  {% elif op.tag == 'replace' %}<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">{{ op.gt }}</span> <span class="bg-amber-50 text-amber-700 px-0.5 rounded">→ {{ op.pred }}</span>
+                  {% endif %}
+                {% endfor %}
+              </div>
+              <details class="border-t border-stone-100">
+                <summary class="cursor-pointer px-4 py-2 text-xs text-stone-500 hover:text-stone-900">Ground Truth (zum Vergleich)</summary>
+                <pre class="p-4 text-xs bg-stone-50 whitespace-pre-wrap">{{ s.ground_truth }}</pre>
+              </details>
+            </div>
+          {% endif %}
+        {% endif %}
+      </div>
+    {% endfor %}
+
+  {# --------------------------------------------------------- coding #}
+  {% elif t.task == "coding" %}
+    {# CTA + screenshot direkt unter dem Score #}
+    {% for a in t.artifacts %}
+      {% if a.kind == "html" %}
+        <a href="{{ artifact_url(a.path) }}" target="_blank"
+           class="mt-5 block bg-emerald-600 hover:bg-emerald-700 text-white text-center font-semibold text-lg rounded px-6 py-5 shadow-sm transition">
+          ▶ Generierte App in neuem Tab öffnen ↗
+        </a>
+      {% endif %}
+    {% endfor %}
+    {% for a in t.artifacts %}
+      {% if a.kind == "image" %}
+        <div class="mt-4 bg-white border border-stone-200 rounded">
+          <div class="px-4 py-2 border-b border-stone-200 text-sm font-medium">{{ a.label }}</div>
+          <div class="zoom-frame">
+            <button type="button" class="zoom-button" data-zoom-button aria-label="Screenshot vergrößern" title="Screenshot vergrößern">⛶</button>
+            <img src="{{ artifact_url(a.path) }}" class="zoomable block w-full max-h-[600px] object-contain bg-stone-50 cursor-zoom-in" alt="{{ a.label }}">
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+
+    {# Judge-Karte #}
+    {% if t.score_breakdown.judge %}
+      {% set j = t.score_breakdown.judge %}
+      {% set visual_keys = ["board_renders","column_completeness","cards_present","ui_affordances","design_quality"] %}
+      {% set code_keys = ["code_structure","dom_safety","robustness","code_quality"] %}
+      <div class="mt-5 bg-amber-50 border border-amber-200 rounded">
+        <div class="px-4 py-3 border-b border-amber-200 flex items-baseline justify-between">
+          <div>
+            <span class="text-xs uppercase tracking-wider text-amber-700">Qualitativ · LLM-as-Judge ({{ j.judge_model }})</span>
+            <span class="ml-3 text-xs text-stone-500 num">{{ j.scored_at }}</span>
+          </div>
+          <div class="text-3xl font-bold num text-amber-700">{{ "%.2f"|format(j.judge_score) }}</div>
+        </div>
+        <div class="px-4 py-3 border-b border-amber-200">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Visuell (Screenshot)</div>
+          <ul class="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs">
+            {% for k in visual_keys %}
+              {% set v = j.scores.get(k) %}
+              {% if v is not none %}
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">{{ k.replace("_", " ") }}</div>
+                  <div class="text-base font-bold num {% if v >= 0.7 %}text-emerald-700{% elif v == 0 %}text-red-600{% else %}text-amber-700{% endif %}">{{ "%.2f"|format(v) }}</div>
+                </li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+          {% if j.comment_visual %}<div class="mt-3 text-sm text-stone-700">{{ j.comment_visual }}</div>{% endif %}
+        </div>
+        <div class="px-4 py-3 border-b border-amber-200">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Code-Qualität (HTML/JS)</div>
+          <ul class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+            {% for k in code_keys %}
+              {% set v = j.scores.get(k) %}
+              {% if v is not none %}
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">{{ k.replace("_", " ") }}</div>
+                  <div class="text-base font-bold num {% if v >= 0.7 %}text-emerald-700{% elif v == 0 %}text-red-600{% else %}text-amber-700{% endif %}">{{ "%.2f"|format(v) }}</div>
+                </li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+          {% if j.comment_code %}<div class="mt-3 text-sm text-stone-700">{{ j.comment_code }}</div>{% endif %}
+        </div>
+        {% if j.scores.render_matches_code is not none %}
+          <div class="px-4 py-3">
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2 flex items-baseline justify-between">
+              <span>Konsistenz Render ↔ Code</span>
+              <span class="text-base font-bold num {% if j.scores.render_matches_code >= 0.7 %}text-emerald-700{% elif j.scores.render_matches_code == 0 %}text-red-600{% else %}text-amber-700{% endif %}">{{ "%.2f"|format(j.scores.render_matches_code) }}</span>
+            </div>
+            {% if j.comment_consistency %}<div class="text-sm text-stone-700">{{ j.comment_consistency }}</div>{% endif %}
+          </div>
+        {% endif %}
+        {% if j.comment and not j.comment_visual %}
+          <div class="px-4 py-3 border-t border-amber-200 text-sm text-stone-700">{{ j.comment }}</div>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    {# Statische Checks (Linter) #}
+    {% if t.score_breakdown.lint_checks %}
+      <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+        <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+          Statisch · Linter-Checks ({{ t.score_breakdown.lint_passed }}/{{ t.score_breakdown.lint_total }} bestanden)
+        </summary>
+        <div class="px-4 py-3 border-t border-stone-200 bg-white rounded-b">
+          <ul class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            {% for c in t.score_breakdown.lint_checks %}
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5">{% if c.passed %}<span class="text-emerald-600">✓</span>{% else %}<span class="text-red-600">✗</span>{% endif %}</span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">{{ c.label }}</div>
+                  {% if c.detail %}<div class="text-xs text-stone-500 mt-0.5">{{ c.detail }}</div>{% endif %}
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </details>
+    {% endif %}
+
+    {# Funktionale Checks (Playwright E2E) #}
+    {% if t.score_breakdown.e2e_checks %}
+      <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+        <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+          Funktional · E2E-Tests ({{ t.score_breakdown.e2e_passed }}/{{ t.score_breakdown.e2e_total }} bestanden)
+        </summary>
+        <div class="px-4 py-3 border-t border-stone-200 bg-white rounded-b">
+          <ul class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            {% for c in t.score_breakdown.e2e_checks %}
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5">{% if c.passed %}<span class="text-emerald-600">✓</span>{% else %}<span class="text-red-600">✗</span>{% endif %}</span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">{{ c.label }}</div>
+                  {% if c.detail %}<div class="text-xs text-stone-500 mt-0.5 font-mono break-all">{{ c.detail }}</div>{% endif %}
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </details>
+    {% endif %}
+
+    {# Roh-Antwort im Klapp-Element #}
+    {% if t.raw_response %}
+      <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+        <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+          Roh-Antwort des Modells
+        </summary>
+        <pre class="px-4 py-3 text-xs bg-white whitespace-pre-wrap border-t border-stone-200 rounded-b overflow-x-auto">{{ t.raw_response }}</pre>
+      </details>
+    {% endif %}
+
+  {# ---------------------------------------------------- context_growth #}
+  {% elif t.task == "context_growth" and t.score_breakdown.steps %}
+    {% set steps = t.score_breakdown.steps %}
+    {% set step_count = steps|length %}
+    {% set chart_w = 720 %}
+    {% set chart_h = 200 %}
+    {% set chart_pad_l = 44 %}
+    {% set chart_pad_r = 12 %}
+    {% set chart_pad_t = 10 %}
+    {% set chart_pad_b = 24 %}
+    {% set inner_w = chart_w - chart_pad_l - chart_pad_r %}
+    {% set inner_h = chart_h - chart_pad_t - chart_pad_b %}
+    {% set _gen_speeds = [] %}
+    {% for s in steps %}{% set _v = s.get('tokens_per_second') %}{% if _v %}{% set _ = _gen_speeds.append(_v) %}{% endif %}{% endfor %}
+    {% set max_gen = ([0.001] + _gen_speeds) | max %}
+    {% set prefill_secs = [] %}
+    {% for s in steps %}{% set _v = s.get('prefill_seconds') %}{% if _v is not none %}{% set _ = prefill_secs.append(_v) %}{% endif %}{% endfor %}
+    {% set max_prefill = ([0.001] + prefill_secs) | max %}
+    {% set has_prefill = prefill_secs|length > 0 %}
+
+    <p class="mt-5 text-sm text-stone-600">
+      <strong class="text-stone-900 num">{{ t.score_breakdown.normalized_hits }}/{{ t.score_breakdown.completed_turns }}</strong>
+      Echo-Turns korrekt zurückgegeben (normalisiert) ·
+      <strong class="text-stone-900 num">{{ t.score_breakdown.exact_hits }}/{{ t.score_breakdown.completed_turns }}</strong>
+      zeichengenau ·
+      Generation: <span class="num">{{ "%.0f"|format(t.score_breakdown.first_speed) }} → {{ "%.0f"|format(t.score_breakdown.last_speed) }} tok/s</span>
+      ({% if t.score_breakdown.slowdown_pct > 0 %}<span class="text-amber-700 num">−{{ "%.0f"|format(t.score_breakdown.slowdown_pct) }}%</span>{% else %}<span class="text-emerald-700 num">+{{ "%.0f"|format(-t.score_breakdown.slowdown_pct) }}%</span>{% endif %})
+      {% if t.score_breakdown.get('first_prefill_seconds') is not none and t.score_breakdown.get('last_prefill_seconds') is not none %}
+        · Prefill: <span class="num">{{ "%.2f"|format(t.score_breakdown.get('first_prefill_seconds')) }} → {{ "%.2f"|format(t.score_breakdown.get('last_prefill_seconds')) }} s</span>
+      {% endif %}
+      · festes Kontextfenster {{ t.score_breakdown.context_window_loaded // 1024 }}k.
+    </p>
+
+    {# ─── Kombinierter Chart: Generation-Speed (links) + Prefill-Zeit (rechts) ─── #}
+    {% set chart_pad_r2 = 44 if has_prefill else chart_pad_r %}
+    {% set inner_w2 = chart_w - chart_pad_l - chart_pad_r2 %}
+    <div class="mt-4 bg-white border border-stone-200 rounded p-4 overflow-x-auto">
+      <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Generation-Speed &amp; Prefill-Zeit pro Turn</div>
+      <svg viewBox="0 0 {{ chart_w }} {{ chart_h }}" class="w-full h-56 num" preserveAspectRatio="xMidYMid meet">
+        <line x1="{{ chart_pad_l }}" y1="{{ chart_pad_t + inner_h }}" x2="{{ chart_pad_l + inner_w2 }}" y2="{{ chart_pad_t + inner_h }}" stroke="#d6d3d1" stroke-width="1"/>
+        <line x1="{{ chart_pad_l }}" y1="{{ chart_pad_t }}" x2="{{ chart_pad_l }}" y2="{{ chart_pad_t + inner_h }}" stroke="#0369a1" stroke-width="1"/>
+        {% if has_prefill %}
+          <line x1="{{ chart_pad_l + inner_w2 }}" y1="{{ chart_pad_t }}" x2="{{ chart_pad_l + inner_w2 }}" y2="{{ chart_pad_t + inner_h }}" stroke="#b45309" stroke-width="1"/>
+        {% endif %}
+        {% for tick_pct in [0, 25, 50, 75, 100] %}
+          {% set y = chart_pad_t + inner_h - (inner_h * tick_pct / 100) %}
+          <line x1="{{ chart_pad_l }}" y1="{{ y }}" x2="{{ chart_pad_l + inner_w2 }}" y2="{{ y }}" stroke="#f5f5f4" stroke-width="1"/>
+          <text x="{{ chart_pad_l - 4 }}" y="{{ y + 3 }}" font-size="9" fill="#0369a1" text-anchor="end">{{ "%.0f"|format(max_gen * tick_pct / 100) }}</text>
+          {% if has_prefill %}
+            <text x="{{ chart_pad_l + inner_w2 + 4 }}" y="{{ y + 3 }}" font-size="9" fill="#b45309" text-anchor="start">{{ "%.2f"|format(max_prefill * tick_pct / 100) }}</text>
+          {% endif %}
+        {% endfor %}
+
+        {# Prefill-Linie (rechte Achse) zuerst, damit die Generation-Linie obendrauf liegt. #}
+        {% if has_prefill %}
+          {% set ns2 = namespace(prev_x=none, prev_y=none) %}
+          {% for s in steps %}
+            {% if s.get('prefill_seconds') is not none %}
+              {% set x = chart_pad_l + (inner_w2 * loop.index0 / (step_count - 1 if step_count > 1 else 1)) %}
+              {% set y = chart_pad_t + inner_h - (inner_h * (s.get('prefill_seconds') / max_prefill if max_prefill > 0 else 0)) %}
+              {% if ns2.prev_x is not none %}
+                <line x1="{{ ns2.prev_x }}" y1="{{ ns2.prev_y }}" x2="{{ x }}" y2="{{ y }}" stroke="#b45309" stroke-width="2" stroke-opacity="0.85"/>
+              {% endif %}
+              <circle cx="{{ x }}" cy="{{ y }}" r="2.8" fill="#b45309">
+                <title>Turn {{ s.turn }} · prefill {{ "%.3f"|format(s.get('prefill_seconds') or 0) }} s · prompt {{ s.prompt_tokens }} tok</title>
+              </circle>
+              {% set ns2.prev_x = x %}
+              {% set ns2.prev_y = y %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+
+        {# Generation-Linie (linke Achse). #}
+        {% set ns = namespace(prev_x=none, prev_y=none) %}
+        {% for s in steps %}
+          {% set x = chart_pad_l + (inner_w2 * loop.index0 / (step_count - 1 if step_count > 1 else 1)) %}
+          {% set y = chart_pad_t + inner_h - (inner_h * (s.tokens_per_second / max_gen if max_gen > 0 else 0)) %}
+          {% if ns.prev_x is not none %}
+            <line x1="{{ ns.prev_x }}" y1="{{ ns.prev_y }}" x2="{{ x }}" y2="{{ y }}" stroke="#0369a1" stroke-width="2"/>
+          {% endif %}
+          <circle cx="{{ x }}" cy="{{ y }}" r="3.5" fill="{% if s.normalized_match %}#059669{% else %}#dc2626{% endif %}" stroke="#0369a1" stroke-width="1">
+            <title>Turn {{ s.turn }} · gen {{ "%.1f"|format(s.tokens_per_second) }} tok/s · prompt {{ s.prompt_tokens }} tok · {% if s.normalized_match %}match{% else %}miss{% endif %}</title>
+          </circle>
+          {% if loop.index == 1 or loop.index == step_count or loop.index % 5 == 0 %}
+            <text x="{{ x }}" y="{{ chart_pad_t + inner_h + 14 }}" font-size="9" fill="#78716c" text-anchor="middle">{{ s.turn }}</text>
+          {% endif %}
+          {% set ns.prev_x = x %}
+          {% set ns.prev_y = y %}
+        {% endfor %}
+
+        <text x="{{ chart_pad_l + inner_w2 / 2 }}" y="{{ chart_h - 4 }}" font-size="10" fill="#57534e" text-anchor="middle">Turn-Nummer</text>
+      </svg>
+      <div class="mt-2 text-xs text-stone-500 flex items-center gap-4 flex-wrap">
+        <span><span class="inline-block w-3 h-0.5 align-middle mr-1" style="background:#0369a1"></span>Generation tok/s (linke Achse)</span>
+        {% if has_prefill %}
+          <span><span class="inline-block w-3 h-0.5 align-middle mr-1" style="background:#b45309"></span>Prefill-Zeit s (rechte Achse)</span>
+        {% endif %}
+        <span><span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-600 align-middle mr-1"></span>Echo korrekt</span>
+        <span><span class="inline-block w-2.5 h-2.5 rounded-full bg-red-600 align-middle mr-1"></span>Echo abweichend</span>
+      </div>
+    </div>
+
+    <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Pro Turn: Eingabe vs. Modell-Antwort
+      </summary>
+      <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-4">
+        {% for s in steps %}
+          <div class="border-l-4 {% if s.exact_match %}border-emerald-500{% elif s.normalized_match %}border-emerald-300{% else %}border-red-400{% endif %} pl-3">
+            <div class="text-xs text-stone-500 num">
+              Turn {{ s.turn }} · gen {{ "%.1f"|format(s.tokens_per_second) }} tok/s · prompt {{ s.prompt_tokens }} tok
+              {% if s.get('prefill_seconds') is not none %} · prefill {{ "%.3f"|format(s.get('prefill_seconds')) }} s{% endif %}
+              {% if s.exact_match %} · <span class="text-emerald-700">zeichengenau</span>
+              {% elif s.normalized_match %} · <span class="text-emerald-700">normalisiert match</span>
+              {% else %} · <span class="text-red-700">abweichend</span>{% endif %}
+            </div>
+            <div class="mt-1 grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <div class="text-[10px] uppercase tracking-wider text-stone-500">Eingabe</div>
+                <pre class="text-xs whitespace-pre-wrap text-stone-800">{{ s.input_chunk }}</pre>
+              </div>
+              <div>
+                <div class="text-[10px] uppercase tracking-wider text-stone-500">Modell</div>
+                <pre class="text-xs whitespace-pre-wrap text-stone-800">{{ s.model_output }}</pre>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </details>
+
+  {# --------------------------------------------------------- generic #}
+  {% else %}
+    {% if t.raw_response %}
+      <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+        <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+          Roh-Antwort des Modells
+        </summary>
+        <pre class="px-4 py-3 text-xs bg-white whitespace-pre-wrap border-t border-stone-200 rounded-b overflow-x-auto">{{ t.raw_response }}</pre>
+      </details>
+    {% endif %}
+  {% endif %}
+
+  {# Always-visible compact list of every artefact's download link #}
+  {% if t.artifacts %}
+    <div class="mt-4 text-xs text-stone-500">
+      Artefakte:
+      {% for a in t.artifacts %}
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="{{ artifact_url(a.path) }}" target="_blank">{{ a.label }}</a>
+      {% endfor %}
+    </div>
+  {% endif %}
+</section>
+{% endfor %}
+
+  </div>
+</div>
+
+{% endblock %}

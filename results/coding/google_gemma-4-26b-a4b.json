@@ -1,0 +1,201 @@
+{
+  "task": "coding",
+  "model_id": "google/gemma-4-26b-a4b",
+  "model_info": {
+    "id": "google/gemma-4-26b-a4b",
+    "type": "vlm",
+    "publisher": "google",
+    "arch": "gemma4",
+    "compatibility_type": "gguf",
+    "quantization": "Q4_K_M",
+    "state": "not-loaded",
+    "max_context_length": 262144,
+    "capabilities": [
+      "tool_use"
+    ],
+    "loaded_context_length": null
+  },
+  "started_at": "2026-04-28T17:34:30.204498Z",
+  "completed_at": "2026-04-28T17:36:22.122194Z",
+  "metrics": {
+    "wall_seconds": 111.91580270801205,
+    "tokens_generated": 7067,
+    "tokens_per_second": 88.7237399480692,
+    "time_to_first_token_ms": 342.0,
+    "peak_rss_mb": 17157.5
+  },
+  "score": 0.6666666666666666,
+  "score_breakdown": {
+    "looks_like_html": true,
+    "html_length": 21157,
+    "raw_length": 21169,
+    "lint_checks": [
+      {
+        "id": "col_backlog",
+        "label": "Spalte 'Backlog'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_in_progress",
+        "label": "Spalte 'In Progress'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_review",
+        "label": "Spalte 'Review'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_done",
+        "label": "Spalte 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "drag_drop",
+        "label": "HTML5 Drag&Drop oder Sortable-Lib",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "local_storage",
+        "label": "localStorage-Persistenz",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "tailwind_cdn",
+        "label": "Tailwind via CDN",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "confetti",
+        "label": "Confetti-Animation auf 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Add-Card-Button",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "vanilla_js",
+        "label": "Vanilla JS (kein React/Vue/Angular/Svelte)",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_alert_prompt",
+        "label": "Keine window.alert/prompt für CRUD",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "editable_cards",
+        "label": "Editierbare Karten (contenteditable / input)",
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "lint_passed": 12,
+    "lint_total": 12,
+    "lint_score": 1.0,
+    "e2e_checks": [
+      {
+        "id": "renders",
+        "label": "Seite lädt mit allen 4 Spalten",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Karte hinzufügen via Button",
+        "passed": false,
+        "detail": "Page.wait_for_selector: Timeout 2000ms exceeded.\nCall log:\n  - waiting for locator(\"[data-testid=\\\"card-input\\\"]\") to be visible\n"
+      },
+      {
+        "id": "no_double_add",
+        "label": "Karte wird genau 1× angelegt (kein Doppel-Submit)",
+        "passed": false,
+        "detail": "übersprungen — Add-Flow ist gescheitert"
+      },
+      {
+        "id": "delete_card",
+        "label": "Karte löschen via Button + Bestätigung",
+        "passed": false,
+        "detail": "keine Karten zum Löschen vorhanden"
+      },
+      {
+        "id": "persistence",
+        "label": "Karten überleben einen Reload",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_console_errors",
+        "label": "Keine JS-Konsolen-Fehler",
+        "passed": false,
+        "detail": "console.error: Error: <path> attribute d: Expected number, \"…5h5a1 1 0 110 2h-lag5v5a1 1 0 11…\".; pageerror: Unexpected identifier 'title'; console.error: Error: <path> attribute d: Expected number, \"…5h5a1 1 0 110 2h-lag5v5a1 1 0 11…\"."
+      }
+    ],
+    "e2e_passed": 2,
+    "e2e_total": 6,
+    "e2e_score": 0.3333333333333333,
+    "judge": {
+      "scored_at": "2026-04-28T21:45:05.917035+00:00",
+      "judge_model": "openai/gpt-5.4",
+      "scores": {
+        "board_renders": 0.5,
+        "column_completeness": 1.0,
+        "cards_present": 0.0,
+        "ui_affordances": 0.5,
+        "design_quality": 0.8,
+        "code_structure": 0.6,
+        "dom_safety": 0.7,
+        "robustness": 0.2,
+        "code_quality": 0.2,
+        "render_matches_code": 0.0
+      },
+      "judge_score": 0.45500000000000007,
+      "comment_visual": "Das Board rendert sichtbar mit vier klar erkennbaren Spalten und Add-Card-Buttons, optisch ordentlich und modern. Allerdings sind keinerlei Beispielkarten zu sehen, obwohl der Screen sonst wie eine funktionsfähige Kanban-Oberfläche aussieht.",
+      "comment_code": "Die Grundstruktur ist brauchbar mit getrennten Funktionen für Init, Render und Interaktionen, und User-Titel werden überwiegend sicher per textContent gesetzt. Gleichzeitig enthält der Code mehrere gravierende Syntax- und Logikfehler (z.B. \"→title\", \"newTR\", defekte SVG-Attribute), kein try/catch um localStorage/JSON.parse und gemischte Nutzung von innerHTML für Button-Markup.",
+      "comment_consistency": "Starke Diskrepanz zwischen Code und Render: Im Code sind vier Initialkarten definiert und renderBoard() sollte sie anzeigen, im Screenshot bleiben alle Spalten leer und alle Zähler stehen auf 0. Das spricht sehr klar für einen Laufzeit- oder Parse-Fehler beim Init und ist ein klassischer render/code mismatch."
+    }
+  },
+  "raw_response": "```html\n<!DOCTYPE html>\n<html lang=\"card\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Vibrant Kanban Board</title>\n    <!-- Tailwind CSS for modern styling -->\n    <script src=\"https://cdn.tailwindcss.com\"></script>\n    <!-- Canvas Confetti for the celebration effect -->\n    <script src=\"https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js\"></script>\n    <style>\n        /* Custom transitions for smooth UI interactions */\n        .card-transition {\n            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;\n        }\n        .column-drop-zone {\n            transition: background-color 0.2s ease;\n        }\n        .dragging {\n            opacity: 0.5;\n            transform: scale(0.95);\n        }\n        /* Custom scrollbar for a cleaner look */\n        ::-webkit-scrollbar {\n            width: 6px;\n        }\n        ::-webkit-scrollbar-track {\n            background: transparent;\n        }\n        ::-webkit-scrollbar-thumb {\n            background: #e2e8f0;\n            border-radius: 10px;\n        }\n        ::-webkit-scrollbar-thumb:hover {\n            background: #cbd5e1;\n        }\n    </style>\n</head>\n<body class=\"bg-slate-50 text-slate-900 min-h-screen font-sans antialiased\">\n\n    <div class=\"max-w-7xl mx-auto p-6 lg:p-10\">\n        <!-- Header Section -->\n        <header class=\"mb-10 flex items-center justify-between\">\n            <div>\n                <h1 class=\"text-4xl font-extrabold tracking-tight text-slate-900\">Project Board</h1>\n                <p class=\"text-slate-500 mt-2\">Manage your tasks and workflow efficiently.</p>\n            </div>\n            <div class=\"hidden md:block\">\n                <span class=\"px-4 py-2 bg-white border border-slate-200 rounded-full text-sm font-medium text-slate-600 shadow-sm\">\n                    Vanilla JS Kanban\n                </span>\n            </div>\n        </header>\n\n        <!-- Kanban B",
+  "artifacts": [
+    {
+      "kind": "html",
+      "label": "Generierte App",
+      "path": "artifacts/google_gemma-4-26b-a4b/coding/output.html",
+      "mime": "text/html"
+    },
+    {
+      "kind": "text",
+      "label": "Roh-Antwort des Modells",
+      "path": "artifacts/google_gemma-4-26b-a4b/coding/raw_response.txt",
+      "mime": "text/plain"
+    },
+    {
+      "kind": "image",
+      "label": "Screenshot der gerenderten App",
+      "path": "artifacts/google_gemma-4-26b-a4b/coding/screenshot.png",
+      "mime": "image/png"
+    }
+  ],
+  "error": null,
+  "hardware": {
+    "platform": "macOS-26.4.1-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "ram_total_gb": 128.0,
+    "cpu_count": 16
+  },
+  "bench_version": "0.1.0"
+}

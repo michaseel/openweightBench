@@ -1,0 +1,2062 @@
+<!doctype html>
+<html lang="de" class="bg-stone-50 text-stone-900 antialiased">
+<head>
+<meta charset="utf-8">
+<title>liquid/lfm2-24b-a2b — Open Weight Bench</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+<script type="module">
+  // Lazy-load mermaid.js only if a .mermaid block is present on the page.
+  if (document.querySelector('.mermaid')) {
+    const m = await import('https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs');
+    m.default.initialize({ startOnLoad: false, theme: 'neutral', securityLevel: 'loose' });
+    const escapeHtml = (value) => value
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+    for (const [i, el] of [...document.querySelectorAll('.mermaid')].entries()) {
+      const code = el.textContent.trim();
+      try {
+        const { svg } = await m.default.render(`owb-mermaid-${Date.now()}-${i}`, code);
+        el.innerHTML = svg;
+      } catch (err) {
+        el.classList.add('text-red-700', 'bg-red-50', 'border-red-200');
+        el.innerHTML = `
+          <div class="text-xs font-semibold uppercase tracking-wider">Mermaid-Syntaxfehler</div>
+          <div class="mt-1 text-xs">${escapeHtml(err?.message || String(err))}</div>
+          <pre class="mt-3 text-xs whitespace-pre-wrap text-stone-800">${escapeHtml(code)}</pre>
+        `;
+      }
+    }
+  }
+</script>
+<style>
+  body { font-feature-settings: "ss01","cv11"; }
+  .num { font-variant-numeric: tabular-nums; }
+  .row-link:hover { background: rgb(245 245 244 / 1); }
+  .preview-pop {
+    position: fixed; pointer-events: none; z-index: 50;
+    transform: translate(16px, 16px);
+    background: white; border: 1px solid rgb(231 229 228); border-radius: 8px;
+    box-shadow: 0 12px 30px -10px rgb(0 0 0 / 0.25);
+    overflow: hidden; max-width: 480px;
+  }
+  .preview-pop img { display: block; max-width: 480px; max-height: 320px; }
+  .text-pop {
+    position: fixed; pointer-events: none; z-index: 60;
+    transform: translate(12px, 12px);
+    max-width: 360px; white-space: normal;
+    background: rgb(28 25 23); color: rgb(250 250 249);
+    border: 1px solid rgb(87 83 78); border-radius: 6px;
+    box-shadow: 0 12px 30px -10px rgb(0 0 0 / 0.35);
+    padding: 0.5rem 0.625rem; font-size: 0.75rem; line-height: 1.35;
+  }
+  /* Lightbox for click-to-zoom on screenshots/diagrams */
+  .lightbox-overlay {
+    position: fixed; inset: 0; background: rgb(0 0 0 / 0.45);
+    display: none; align-items: center; justify-content: center;
+    z-index: 100; padding: 2rem;
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='rgba(28,25,23,0.85)' stroke='white' stroke-width='2'/><path d='M11 11 L21 21 M21 11 L11 21' stroke='white' stroke-width='2.5' stroke-linecap='round' fill='none'/></svg>") 16 16, pointer;
+  }
+  .lightbox-overlay.active { display: flex; }
+  .lightbox-panel {
+    max-width: 96vw; max-height: 94vh; overflow: auto;
+    background: white; border-radius: 6px;
+    box-shadow: 0 24px 70px -20px rgb(0 0 0 / 0.7);
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='rgba(28,25,23,0.85)' stroke='white' stroke-width='2'/><path d='M11 11 L21 21 M21 11 L11 21' stroke='white' stroke-width='2.5' stroke-linecap='round' fill='none'/></svg>") 16 16, pointer;
+  }
+  .lightbox-panel img {
+    display: block; max-width: none; width: auto; height: auto;
+    min-width: min(90vw, 900px); max-height: none;
+  }
+  .lightbox-panel .mermaid-zoom-content {
+    padding: 1.5rem; min-width: min(92vw, 1100px);
+  }
+  .lightbox-panel .mermaid-zoom-content svg {
+    display: block; width: max-content; min-width: 100%;
+    max-width: none; height: auto;
+  }
+  .zoomable, .zoomable-mermaid {
+    cursor: zoom-in;
+  }
+  .zoom-frame {
+    position: relative;
+  }
+  .zoom-button {
+    position: absolute; top: 0.5rem; right: 0.5rem; z-index: 5;
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 2rem; height: 2rem; border-radius: 0.375rem;
+    background: rgb(255 255 255 / 0.92);
+    border: 1px solid rgb(214 211 209);
+    color: rgb(41 37 36);
+    box-shadow: 0 4px 14px -8px rgb(0 0 0 / 0.45);
+    cursor: zoom-in; font-size: 1rem; line-height: 1;
+  }
+  .zoom-button:hover {
+    background: white; border-color: rgb(120 113 108);
+  }
+</style>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="border-b border-stone-200 bg-white">
+    <div class="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
+      <a href="../index.html" class="flex items-baseline gap-3">
+        <span class="text-xl font-semibold tracking-tight">Open Weight Bench</span>
+        <span class="text-xs text-stone-500 hidden sm:inline">Lokale LLMs auf Apple Silicon</span>
+      </a>
+      <nav class="text-sm text-stone-500 flex items-center gap-4">
+        <a class="hover:text-stone-900" href="https://michaelseel.com" target="_blank" rel="noopener">michaelseel.com</a>
+        <a class="hover:text-stone-900" href="https://github.com/michaseel/openweightBench" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+    </div>
+    <div class="max-w-6xl mx-auto px-6">
+      <nav class="-mb-px flex gap-6 overflow-x-auto text-sm">
+        <a href="../index.html"
+           class="py-3 border-b-2 border-stone-900 text-stone-900 font-medium">
+          Übersicht
+        </a>
+          <a href="../benchmarks/coding.html"
+             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
+            Coding
+          </a>
+          <a href="../benchmarks/vision.html"
+             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
+            Vision
+          </a>
+          <a href="../benchmarks/niah.html"
+             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
+            Needle in a Haystack
+          </a>
+          <a href="../benchmarks/tool_use.html"
+             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
+            Tool Use
+          </a>
+          <a href="../benchmarks/diagram_to_svg.html"
+             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
+            Diagram → SVG
+          </a>
+          <a href="../benchmarks/hallucination.html"
+             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
+            Halluzination
+          </a>
+          <a href="../benchmarks/nonsense.html"
+             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
+            Nonsense
+          </a>
+          <a href="../benchmarks/instruction_following.html"
+             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
+            Instruction Following
+          </a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-7xl mx-auto w-full px-6 py-8">
+
+<section class="mb-8">
+  <div class="text-xs text-stone-500"><a href="../index.html" class="hover:text-stone-900">← Übersicht</a></div>
+  <h1 class="mt-2 text-2xl font-semibold tracking-tight num">liquid/lfm2-24b-a2b</h1>
+  <div class="mt-2 flex flex-wrap gap-2 text-xs">
+    <span class="px-2 py-1 rounded border"
+          style="background-color: #22d3ee; color: #1c1917; border-color: #22d3ee;"
+          data-tooltip="Hersteller bzw. Publisher des Modells. Farbe zeigt die Modellfamilie.">liquid</span>
+      <span class="px-2 py-1 rounded bg-stone-100 border border-stone-200 num"
+            data-tooltip="Mixture-of-Experts: 24 Mrd. Gesamtparameter; aktive Parameter pro Token unbekannt.">
+        24B
+· MoE      </span>
+    <span class="px-2 py-1 rounded bg-stone-100 border border-stone-200 num"
+          data-tooltip="Datei-Format und Quantisierung der Gewichte (z. B. Q8_0 = 8-bit, MXFP4 = 4-bit Mixed Precision). Niedrigere Bit-Werte = kleinerer RAM-Bedarf, potenziell etwas geringere Qualität.">mlx / 4bit</span>
+    <span class="px-2 py-1 rounded bg-stone-100 border border-stone-200 num"
+          data-tooltip="Maximale Kontextlänge des Modells in Tokens (k = 1024). Inputs jenseits dieser Grenze werden vom Backend abgeschnitten.">ctx 125k</span>
+      <span class="px-2 py-1 rounded bg-stone-100 border border-stone-200 num"
+            data-tooltip="Veröffentlichungsdatum gemäß HuggingFace-Modellkarte (createdAt).">released 2026-02-24</span>
+      <span class="px-2 py-1 rounded bg-emerald-50 border border-emerald-200 text-emerald-700"
+            data-tooltip="Trainiert für Tool / Function Calling — kann externe Tools aufrufen.">tool_use</span>
+  </div>
+</section>
+
+<div class="lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-8 lg:items-start">
+  <aside class="hidden lg:block sticky top-4 self-start">
+    <nav class="bg-white border border-stone-200 rounded-lg p-4 max-h-[calc(100vh-2rem)] overflow-y-auto">
+      <div class="text-xs uppercase tracking-wider text-stone-500">Modell</div>
+      <div class="mt-1 text-sm font-semibold text-stone-900 break-all leading-snug num">liquid/lfm2-24b-a2b</div>
+      <dl class="mt-3 grid grid-cols-2 gap-2 text-xs">
+        <div>
+          <dt class="text-stone-500">Peak-RAM</dt>
+          <dd class="font-semibold text-stone-900 num">12.5 GB</dd>
+        </div>
+        <div>
+          <dt class="text-stone-500">Wall total</dt>
+          <dd class="font-semibold text-stone-900 num">5.9 min</dd>
+        </div>
+      </dl>
+      <div class="mt-4 pt-3 border-t border-stone-200 text-xs uppercase tracking-wider text-stone-500">Benchmarks</div>
+      <ul class="mt-2 space-y-0.5">
+          <li>
+            <a href="#coding" class="flex items-center justify-between gap-2 py-1.5 px-2 rounded hover:bg-stone-50 group">
+              <span class="text-sm text-stone-700 group-hover:text-stone-900 truncate">coding</span>
+              <span class="flex items-baseline gap-2 num shrink-0">
+                <span class="text-sm font-semibold text-amber-700">
+0.29
+                </span>
+                <span class="text-[10px] text-stone-400 w-10 text-right">53s</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="#niah" class="flex items-center justify-between gap-2 py-1.5 px-2 rounded hover:bg-stone-50 group">
+              <span class="text-sm text-stone-700 group-hover:text-stone-900 truncate">niah</span>
+              <span class="flex items-baseline gap-2 num shrink-0">
+                <span class="text-sm font-semibold text-amber-700">
+0.10
+                </span>
+                <span class="text-[10px] text-stone-400 w-10 text-right">5m</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="#tool_use" class="flex items-center justify-between gap-2 py-1.5 px-2 rounded hover:bg-stone-50 group">
+              <span class="text-sm text-stone-700 group-hover:text-stone-900 truncate">tool_use</span>
+              <span class="flex items-baseline gap-2 num shrink-0">
+                <span class="text-sm font-semibold text-amber-700">
+0.48
+                </span>
+                <span class="text-[10px] text-stone-400 w-10 text-right">22s</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="#hallucination" class="flex items-center justify-between gap-2 py-1.5 px-2 rounded hover:bg-stone-50 group">
+              <span class="text-sm text-stone-700 group-hover:text-stone-900 truncate">hallucination</span>
+              <span class="flex items-baseline gap-2 num shrink-0">
+                <span class="text-sm font-semibold text-amber-700">
+0.25
+                </span>
+                <span class="text-[10px] text-stone-400 w-10 text-right">7s</span>
+              </span>
+            </a>
+          </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <div class="min-w-0">
+
+<section id="coding" class="mb-12 scroll-mt-24">
+  <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
+    <h2 class="text-lg font-medium tracking-tight">coding</h2>
+    <a href="../benchmarks/coding.html" class="text-xs text-stone-500 hover:text-stone-900">alle Modelle in diesem Bench →</a>
+  </div>
+
+
+  <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+    <div class="md:col-span-1 bg-white border-2 border-amber-400 rounded-lg p-5 flex flex-col justify-center">
+      <div class="text-xs uppercase tracking-wider text-stone-500">Score</div>
+      <div class="mt-1 text-5xl font-bold num leading-none text-amber-700">
+0.29
+      </div>
+        <div class="mt-3 grid grid-cols-3 gap-2 text-center">
+          <div class="rounded border border-stone-200 px-2 py-1.5">
+            <div class="text-[10px] uppercase tracking-wider text-stone-500">Statisch</div>
+            <div class="text-base font-bold num text-emerald-700">0.92</div>
+          </div>
+          <div class="rounded border border-stone-200 px-2 py-1.5">
+            <div class="text-[10px] uppercase tracking-wider text-stone-500">Funktional</div>
+            <div class="text-base font-bold num text-amber-700">0.33</div>
+          </div>
+          <div class="rounded border border-stone-200 px-2 py-1.5">
+            <div class="text-[10px] uppercase tracking-wider text-stone-500">Qualitativ</div>
+            <div class="text-base font-bold num text-amber-700">0.23</div>
+          </div>
+        </div>
+    </div>
+    <div class="md:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">tok/s</dt>
+        <dd class="mt-1 text-xl font-semibold num">135</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Tokens</dt>
+        <dd class="mt-1 text-xl font-semibold num">4325</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Wall</dt>
+        <dd class="mt-1 text-xl font-semibold num">53.4 s</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">RAM</dt>
+        <dd class="mt-1 text-xl font-semibold num">12.5 GB</dd>
+      </div>
+    </div>
+  </div>
+
+    <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Worum geht es? Was wird getestet?
+      </summary>
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Aufgabe: Aus einem ~200-Wörter-Prompt soll das Modell ein voll funktionales Kanban-Board als single-file HTML mit Drag &amp; Drop, localStorage-Persistenz, Edit/Delete und Confetti-Animation generieren — in einem einzigen Chat ohne Iteration. Der Prompt enthält zusätzlich einen kleinen `data-testid`-Vertrag, damit ein Playwright-Test die App ferngesteuert bedienen kann.
+
+Drei Signale fließen in den Score ein:
+(1) Statisch — Linter prüft konkrete Constraints im HTML (Spalten, Tailwind, localStorage-Aufruf, kein Framework, kein window.alert/prompt, …).
+(2) Funktional — Playwright fährt eine kleine CRUD-Sequenz: Karte anlegen, Karte löschen mit Bestätigung, Reload — bleibt der Zustand erhalten? — und prüft, ob während des gesamten Flows JS-Konsolen-Fehler auftreten. Drag &amp; Drop und Confetti werden bewusst nicht funktional getestet (zu viele Implementierungsvarianten).
+(3) Qualitativ — LLM-as-Judge bewertet Screenshot und Code (Visual + Codequalität + Konsistenz Render↔Code).
+
+Score = Mittelwert über die vorhandenen Signale.
+
+Warum Modelle scheitern: Reasoning-Modelle verbrauchen ihre Token im Denken statt im Schreiben. Sliding-Window-Modelle (Gemma 4) verlieren Constraints am Anfang des Prompts. Kleine Modelle (&lt;3B) produzieren oft kein zusammenhängendes HTML — oder ignorieren den data-testid-Vertrag, was die funktionalen Tests reihenweise rot färbt.</div>
+    </details>
+
+    <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Prompt
+      </summary>
+      <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System-Prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">You are a careful front-end engineer.</pre>
+          </div>
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Developer-Prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">Create a fully functional Kanban board in a single HTML file using vanilla JavaScript (no frameworks like react).
+
+Requirements:
+- Columns: Backlog, In Progress, Review, Done.
+- Cards must be:
+  - draggable across columns,
+  - editable in place,
+  - persisted in localStorage (state survives reloads) - please use your own namespace,
+  - deletable with a confirmation prompt.
+- Each column provides an &#34;Add card&#34; action.
+- Style with Tailwind via CDN.
+- Add subtle CSS transitions and trigger a confetti animation when a card moves to &#34;Done&#34;.
+- Thoroughly comment the code.
+- dont use window.alert or window.prompt to add/edit/delete cards
+- if there are no cards yet, create some dummy cards
+- modern and vibrant design
+
+Stable test selectors (mandatory — these data-testid attributes are used by an automated functional test; do not omit, rename, or split them across multiple elements):
+- Column containers: data-testid=&#34;column-backlog&#34;, data-testid=&#34;column-in-progress&#34;, data-testid=&#34;column-review&#34;, data-testid=&#34;column-done&#34;.
+- Every &#34;Add card&#34; button (one per column): data-testid=&#34;add-card&#34;.
+- Every card element: data-testid=&#34;card&#34;.
+- Inside each card, the delete trigger: data-testid=&#34;delete-card&#34;.
+- The confirm button of the delete-confirmation dialog/modal: data-testid=&#34;confirm-delete&#34;.
+- The input/textarea where a new card title is typed: data-testid=&#34;card-input&#34;. Pressing Enter in this input MUST commit the new card.
+
+As answer return the plain HTML of the working application (script and styles included)</pre>
+          </div>
+      </div>
+    </details>
+
+        <a href="../assets/artifacts/liquid_lfm2-24b-a2b/coding/output.html" target="_blank"
+           class="mt-5 block bg-emerald-600 hover:bg-emerald-700 text-white text-center font-semibold text-lg rounded px-6 py-5 shadow-sm transition">
+          ▶ Generierte App in neuem Tab öffnen ↗
+        </a>
+        <div class="mt-4 bg-white border border-stone-200 rounded">
+          <div class="px-4 py-2 border-b border-stone-200 text-sm font-medium">Screenshot der gerenderten App</div>
+          <div class="zoom-frame">
+            <button type="button" class="zoom-button" data-zoom-button aria-label="Screenshot vergrößern" title="Screenshot vergrößern">⛶</button>
+            <img src="../assets/artifacts/liquid_lfm2-24b-a2b/coding/screenshot.png" class="zoomable block w-full max-h-[600px] object-contain bg-stone-50 cursor-zoom-in" alt="Screenshot der gerenderten App">
+          </div>
+        </div>
+
+      <div class="mt-5 bg-amber-50 border border-amber-200 rounded">
+        <div class="px-4 py-3 border-b border-amber-200 flex items-baseline justify-between">
+          <div>
+            <span class="text-xs uppercase tracking-wider text-amber-700">Qualitativ · LLM-as-Judge (openai/gpt-5.4)</span>
+            <span class="ml-3 text-xs text-stone-500 num">2026-04-28T21:45:16.839227+00:00</span>
+          </div>
+          <div class="text-3xl font-bold num text-amber-700">0.23</div>
+        </div>
+        <div class="px-4 py-3 border-b border-amber-200">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Visuell (Screenshot)</div>
+          <ul class="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs">
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">board renders</div>
+                  <div class="text-base font-bold num text-amber-700">0.50</div>
+                </li>
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">column completeness</div>
+                  <div class="text-base font-bold num text-emerald-700">1.00</div>
+                </li>
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">cards present</div>
+                  <div class="text-base font-bold num text-red-600">0.00</div>
+                </li>
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">ui affordances</div>
+                  <div class="text-base font-bold num text-amber-700">0.50</div>
+                </li>
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">design quality</div>
+                  <div class="text-base font-bold num text-amber-700">0.45</div>
+                </li>
+          </ul>
+<div class="mt-3 text-sm text-stone-700">Das Board rendert sichtbar mit allen vier Spalten und Add-card-Buttons, aber es bleiben alle Listen leer. Die Oberfläche ist schlicht und halbwegs lesbar, wirkt jedoch unfertig und ohne echte Interaktionshinweise außer den Buttons.</div>        </div>
+        <div class="px-4 py-3 border-b border-amber-200">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Code-Qualität (HTML/JS)</div>
+          <ul class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">code structure</div>
+                  <div class="text-base font-bold num text-amber-700">0.15</div>
+                </li>
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">dom safety</div>
+                  <div class="text-base font-bold num text-red-600">0.00</div>
+                </li>
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">robustness</div>
+                  <div class="text-base font-bold num text-red-600">0.00</div>
+                </li>
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">code quality</div>
+                  <div class="text-base font-bold num text-amber-700">0.05</div>
+                </li>
+          </ul>
+<div class="mt-3 text-sm text-stone-700">Der Code ist massiv fehlerhaft: doppelte Funktionsdefinitionen, kaputte State-Logik, Syntax-/Typofehler und unsichere DOM-Befüllung per innerHTML mit Titelinhalt. Mehrere Selektoren und Properties passen nicht zum HTML, sodass das Rendering der Karten faktisch ausfällt.</div>        </div>
+          <div class="px-4 py-3">
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2 flex items-baseline justify-between">
+              <span>Konsistenz Render ↔ Code</span>
+              <span class="text-base font-bold num text-red-600">0.00</span>
+            </div>
+<div class="text-sm text-stone-700">Starke Diskrepanz zwischen Anspruch und Render: Der Code versucht Karten, Editing, Dragging und Initialdaten zu erzeugen, im Screenshot sieht man trotzdem nur leere Spalten. Das spricht klar für Laufzeit-/Init-Fehler und rechtfertigt render_matches_code = 0.</div>          </div>
+      </div>
+
+      <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+        <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+          Statisch · Linter-Checks (11/12 bestanden)
+        </summary>
+        <div class="px-4 py-3 border-t border-stone-200 bg-white rounded-b">
+          <ul class="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Spalte &#39;Backlog&#39;</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Spalte &#39;In Progress&#39;</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Spalte &#39;Review&#39;</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Spalte &#39;Done&#39;</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-red-600">✗</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">HTML5 Drag&amp;Drop oder Sortable-Lib</div>
+<div class="text-xs text-stone-500 mt-0.5">kein draggable / dragstart / sortable.js gefunden</div>                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">localStorage-Persistenz</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Tailwind via CDN</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Confetti-Animation auf &#39;Done&#39;</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Add-Card-Button</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Vanilla JS (kein React/Vue/Angular/Svelte)</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Keine window.alert/prompt für CRUD</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Editierbare Karten (contenteditable / input)</div>
+                </div>
+              </li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+        <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+          Funktional · E2E-Tests (2/6 bestanden)
+        </summary>
+        <div class="px-4 py-3 border-t border-stone-200 bg-white rounded-b">
+          <ul class="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Seite lädt mit allen 4 Spalten</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-red-600">✗</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Karte hinzufügen via Button</div>
+<div class="text-xs text-stone-500 mt-0.5 font-mono break-all">Page.wait_for_selector: Timeout 2000ms exceeded.
+Call log:
+  - waiting for locator(&#34;[data-testid=\&#34;card-input\&#34;]&#34;) to be visible
+</div>                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-red-600">✗</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Karte wird genau 1× angelegt (kein Doppel-Submit)</div>
+<div class="text-xs text-stone-500 mt-0.5 font-mono break-all">übersprungen — Add-Flow ist gescheitert</div>                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-red-600">✗</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Karte löschen via Button + Bestätigung</div>
+<div class="text-xs text-stone-500 mt-0.5 font-mono break-all">keine Karten zum Löschen vorhanden</div>                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Karten überleben einen Reload</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-red-600">✗</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Keine JS-Konsolen-Fehler</div>
+<div class="text-xs text-stone-500 mt-0.5 font-mono break-all">pageerror: Unexpected token &#39;)&#39;; pageerror: Unexpected token &#39;)&#39;</div>                </div>
+              </li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+        <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+          Roh-Antwort des Modells
+        </summary>
+        <pre class="px-4 py-3 text-xs bg-white whitespace-pre-wrap border-t border-stone-200 rounded-b overflow-x-auto">Here is a **fully functional Kanban board** built with vanilla JavaScript, including all requirements and proper namespacing, persistent storage, animations, and a modern vibrant look. You can copy-paste the entire code into a `.html` file for immediate testing.
+
+```html
+&lt;!DOCTYPE html&gt;
+&lt;html lang=&#34;en&#34;&gt;
+&lt;head&gt;
+  &lt;meta charset=&#34;UTF-8&#34; /&gt;
+  &lt;title&gt;Kanban Board&lt;/title&gt;
+  &lt;meta name=&#34;viewport&#34; content=&#34;width=device-width, initial-scale=1.0&#34;/&gt;
+&gt;
+&lt;!-- Tailwind CDN (via CDN) --&gt;
+&lt;script src=&#34;https://cdn.tailwindcss.com&#34;&gt;&lt;/script&gt;
+&lt;style&gt;
+  body { background: #f9fafb; font-family: system-ui, sans-serif; }
+  .card {
+    transition: transform .2s cubic-bezier(.55, -.23, .33, 1), box-shadow 0.2s;
+    cursor: grab;
+  }
+  .card:hover { opacity: 0.95; }
+  .confetti {
+    position: absolute;
+    z-index: 100;
+    pointer-events: none;
+    width: 10px;
+    height: 10px;
+    background-repeat: no-repeat;
+    animation: confetti-x infinite linear;
+  }
+  .confetti::after {
+    content: &#39;&#39;;
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 12px; height: 12px;
+    margin-top: -6px;
+    margin-left: -6px;
+    background-repeat: radial-gradient(circle, #ff3b2f, #ff9900, #ff3b2f);
+    background-size: cover;
+    transform: translate(-50%, -50%) rotate(0deg) scale(1.2);
+    animation: confetti-x 1.5s cubic-bezier(0.6, -0.06, 0.28, 1.63), rotate 3s linear infinite;
+    animation-timing-function: cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    animation-delay: calc(var(--c-unit) * 0.5s);
+  }
+  @keyframes confetti-x {
+    0%   { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(85vw, -50%) rotate 360deg; }
+  }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body class=&#34;bg-gray-100 p-6&#34;&gt;
+  &lt;div class=&#34;grid grid-cols-[1fr,2fr,3fr] gap-6&#34;&gt;
+    &lt;!-- Backlog --&gt;
+    &lt;div data-testid=&#34;column-backlog&#34; class=&#34;bg-white rounded shadow p-4&#34;&gt;
+      &lt;h2 class=&#34;text-lg font-semibold mb-2&#34;&gt;Backlog&lt;/h2&gt;
+      &lt;button data-testid=&#34;add-card&#34; type=&#34;button&#34; class=&#34;mt-2 bg-blue-50 text-blue-600 font-medium r</pre>
+      </details>
+
+
+    <div class="mt-4 text-xs text-stone-500">
+      Artefakte:
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/liquid_lfm2-24b-a2b/coding/output.html" target="_blank">Generierte App</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/liquid_lfm2-24b-a2b/coding/raw_response.txt" target="_blank">Roh-Antwort des Modells</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/liquid_lfm2-24b-a2b/coding/screenshot.png" target="_blank">Screenshot der gerenderten App</a>
+    </div>
+</section>
+<section id="niah" class="mb-12 scroll-mt-24">
+  <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
+    <h2 class="text-lg font-medium tracking-tight">niah</h2>
+    <a href="../benchmarks/niah.html" class="text-xs text-stone-500 hover:text-stone-900">alle Modelle in diesem Bench →</a>
+  </div>
+
+
+  <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+    <div class="md:col-span-1 bg-white border-2 border-amber-400 rounded-lg p-5 flex flex-col justify-center">
+      <div class="text-xs uppercase tracking-wider text-stone-500">Score</div>
+      <div class="mt-1 text-5xl font-bold num leading-none text-amber-700">
+0.10
+      </div>
+    </div>
+    <div class="md:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">tok/s</dt>
+        <dd class="mt-1 text-xl font-semibold num">69</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Tokens</dt>
+        <dd class="mt-1 text-xl font-semibold num">13997</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Wall</dt>
+        <dd class="mt-1 text-xl font-semibold num">270.8 s</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">RAM</dt>
+        <dd class="mt-1 text-xl font-semibold num">12.5 GB</dd>
+      </div>
+    </div>
+  </div>
+
+    <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Worum geht es? Was wird getestet?
+      </summary>
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Aufgabe: In einem deutschen Buch-Korpus (mit eingestreutem Quellcode) werden 10 künstliche Fakten an gleichmäßig verteilten Tiefen (5% – 95%) versteckt. Das Modell muss alle wiederfinden.
+
+Ablauf — DREI Turns im selben Chat-Kontext (Prefill nur einmal):
+Turn 1 — Korpus-Zusammenfassung: Modell bekommt den langen Korpus und soll ihn in 3-5 Sätzen zusammenfassen. Erzwingt eine echte Verarbeitung des Textes.
+Turn 2 — Needle-Retrieval: gleiche Konversation, jetzt die Bedürfnisfragen für die 10 versteckten Fakten.
+Turn 3 — Verstehen + Halluzinations-Fallen: 4 Faktenfragen zum Buchinhalt + 3 Halluzinations-Fallen (Modell soll erkennen, dass die Frage im Text NICHT beantwortet wird).
+
+Default-Modus läuft EINE einheitliche Stufe für alle Modelle: 120k Tokens. Modelle ohne ausreichendes max_context werden in dieser Stufe nicht ausgeführt. `niah_deep` läuft zusätzlich 32k / 64k / 200k für eine vollständige Heatmap.
+
+Score-Gewichtung: Zusammenfassung 20% + Needle-Retrieval 50% + Verstehen/Halluzinations-Resistenz 30%.
+
+Warum Modelle scheitern: Sliding-Window-Attention (Gemma 4) sieht nur die letzten 1-2k Tokens scharf. Reasoning-Modelle laufen auf Token-Limit, bevor sie antworten. Q4-KV-Cache verfälscht Recall messbar bei langen Kontexten. Bei den Halluzinations-Fallen verleitet der Helpful-Bias zu plausibel klingenden Erfindungen.</div>
+    </details>
+
+    <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Prompt
+      </summary>
+      <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Developer-Prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">TURN 1 (User):
+Im folgenden Abschnitt befindet sich ein längerer Mischtext aus deutschsprachiger Erzählung und Quellcode.
+
+===== TEXT BEGINN =====
+&lt;korpus mit eingestreuten needles, je nach stage 32k–128k tokens&gt;
+===== TEXT ENDE =====
+
+Fasse den Inhalt des Textes in 3-5 Sätzen zusammen. Nenne Hauptfiguren, Schauplatz und die wichtigsten Themen.
+
+TURN 2 (User, im selben Chat-Kontext):
+Beantworte jetzt die folgenden Fragen ausschließlich anhand des oben gezeigten Textes — erfinde nichts, ergänze nichts und übernehme keine Allgemeinwissen-Annahmen.
+
+Fragen:
+1. &lt;frage zu needle 1&gt;
+2. &lt;frage zu needle 2&gt;
+...
+
+Antworte als nummerierte Liste 1., 2., 3. mit jeweils einem kurzen Satz.</pre>
+          </div>
+      </div>
+    </details>
+
+    <p class="mt-5 text-sm text-stone-600">
+      Pro Kontextlänge wurden 10 Needles über den Korpus verteilt. Der NIAH-Score kombiniert
+      Korpus-Zusammenfassung, Needle-Retrieval und optional Verstehen + Halluzinations-Fallen.
+      LLM-Judges ersetzen die heuristischen Scores für Summary und Verstehen, sobald vorhanden.
+    </p>
+
+      <div class="mt-6">
+        <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">
+          Stufe: <span class="num font-semibold text-stone-700">120k Tokens</span>
+        </div>
+
+            <div class="bg-sky-50 border border-sky-200 rounded-lg overflow-hidden">
+              <div class="px-4 py-3 border-b border-sky-200 flex items-baseline justify-between">
+                <div>
+                  <span class="text-xs uppercase tracking-wider text-sky-700 font-semibold">Sub-Benchmark · Korpus-Zusammenfassung</span>
+                  <span class="ml-2 text-xs text-stone-500">Turn 1</span>
+                </div>
+                <div class="text-sm num">
+                    <span class="font-bold text-base text-red-700">
+                      0.00
+                    </span>
+                    <span class="text-stone-500">LLM-Judge</span>
+                    <span class="ml-2 text-xs text-stone-400">heur. 0.00</span>
+                  <span class="ml-2 text-xs text-stone-500">~120k Tokens Input</span>
+                </div>
+              </div>
+              <div class="px-4 py-3 bg-white">
+                <pre class="text-sm text-stone-800 whitespace-pre-wrap leading-relaxed">„s war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es</pre>
+                  <div class="mt-3 border border-amber-200 bg-amber-50 rounded p-3">
+                    <div class="flex items-baseline justify-between gap-3">
+                      <span class="text-xs uppercase tracking-wider text-amber-700">LLM-Judge Summary (openai/gpt-5.4)</span>
+                      <span class="text-lg font-bold num text-red-700">0.00</span>
+                    </div>
+                      <ul class="mt-2 grid grid-cols-2 md:grid-cols-6 gap-2 text-xs">
+                          <li class="bg-white border border-amber-100 rounded px-2 py-1 text-center">
+                            <div class="text-stone-500">main characters</div>
+                            <div class="font-bold num text-red-700">0.00</div>
+                          </li>
+                          <li class="bg-white border border-amber-100 rounded px-2 py-1 text-center">
+                            <div class="text-stone-500">setting</div>
+                            <div class="font-bold num text-red-700">0.00</div>
+                          </li>
+                          <li class="bg-white border border-amber-100 rounded px-2 py-1 text-center">
+                            <div class="text-stone-500">plot</div>
+                            <div class="font-bold num text-red-700">0.00</div>
+                          </li>
+                          <li class="bg-white border border-amber-100 rounded px-2 py-1 text-center">
+                            <div class="text-stone-500">themes</div>
+                            <div class="font-bold num text-red-700">0.00</div>
+                          </li>
+                          <li class="bg-white border border-amber-100 rounded px-2 py-1 text-center">
+                            <div class="text-stone-500">code text mix recognized</div>
+                            <div class="font-bold num text-red-700">0.00</div>
+                          </li>
+                          <li class="bg-white border border-amber-100 rounded px-2 py-1 text-center">
+                            <div class="text-stone-500">no hallucinations</div>
+                            <div class="font-bold num text-emerald-700">1.00</div>
+                          </li>
+                      </ul>
+<div class="mt-2 text-sm text-stone-700">Keine inhaltliche Zusammenfassung erkennbar, sondern nur repetitiver Fülltext. Daher werden Figuren, Schauplatz, Handlung, Themen und Mischtext-Charakter gar nicht erfasst; immerhin werden auch keine konkreten falschen Inhalte erfunden.</div>                  </div>
+                  <ul class="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      <li class="text-xs px-2 py-1 rounded border border-red-200 bg-red-50 text-red-800">
+                        ✗ 3-5 Sätze · 1 Sätze gezählt
+                      </li>
+                      <li class="text-xs px-2 py-1 rounded border border-red-200 bg-red-50 text-red-800">
+                        ✗ Höchstens 220 Wörter · 3997 Wörter
+                      </li>
+                      <li class="text-xs px-2 py-1 rounded border border-red-200 bg-red-50 text-red-800">
+                        ✗ Korpus-Stichwörter (0/4) · ✗ Gottlieb, ✗ Malineken, ✗ Schmied, ✗ Bonaparte
+                      </li>
+                  </ul>
+              </div>
+            </div>
+
+          <div class="mt-4 bg-white border border-stone-200 rounded-lg overflow-hidden">
+            <div class="px-4 py-3 border-b border-stone-200 flex items-baseline justify-between">
+              <div>
+                <span class="text-xs uppercase tracking-wider text-stone-700 font-semibold">Sub-Benchmark · Needle-Retrieval</span>
+                <span class="ml-2 text-xs text-stone-500">Turn 2</span>
+              </div>
+              <div class="text-sm num">
+                <span class="font-bold text-base text-red-700">
+                  0/10
+                </span>
+                <span class="text-stone-500">hits</span>
+              </div>
+            </div>
+            <div class="px-4 py-3">
+              <ul class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-red-500">○</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">5% (5 %)</div>
+                      <div class="text-stone-500 mt-0.5">erwartet: blauer Ankerstein, Lübeck-1907, A-318</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-red-500">○</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">10% (10 %)</div>
+                      <div class="text-stone-500 mt-0.5">erwartet: smaragdgrün, Schlüssel, Seriennummer, 7-Bravo-12</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-red-500">○</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">15% (15 %)</div>
+                      <div class="text-stone-500 mt-0.5">erwartet: Nordstern-Brigade, violetter</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-red-500">○</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">25% (25 %)</div>
+                      <div class="text-stone-500 mt-0.5">erwartet: Indigo-Quark</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-red-500">○</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">33% (33 %)</div>
+                      <div class="text-stone-500 mt-0.5">erwartet: Atlantis-Mira, NL-7711, 142</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-red-500">○</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">50% (50 %)</div>
+                      <div class="text-stone-500 mt-0.5">erwartet: Ehrenmitglied, Aluminium-Gesellschaft, Köln</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-red-500">○</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">65% (65 %)</div>
+                      <div class="text-stone-500 mt-0.5">erwartet: Safran-Klops Margarethe, 7 Gramm|7 g, 3 Stunden|drei Stunden</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-red-500">○</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">75% (75 %)</div>
+                      <div class="text-stone-500 mt-0.5">erwartet: Erbe von Onkel Walpurgis, 42-Lima</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-red-500">○</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">85% (85 %)</div>
+                      <div class="text-stone-500 mt-0.5">erwartet: 7f4a2e91-marlin-2026</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-red-500">○</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">90% (90 %)</div>
+                      <div class="text-stone-500 mt-0.5">erwartet: Coriolis-Effekt, Pendel, Memo, Dr. Kühn, 17.03.2024</div>
+                    </div>
+                  </li>
+              </ul>
+              <details class="mt-3">
+                <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Modell-Antwort auf die Needle-Fragen</summary>
+                <pre class="mt-2 text-xs bg-stone-50 border border-stone-200 rounded p-3 overflow-x-auto whitespace-pre-wrap">einige es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es</pre>
+              </details>
+            </div>
+          </div>
+
+            <div class="mt-4 bg-amber-50 border border-amber-200 rounded-lg overflow-hidden">
+              <div class="px-4 py-3 border-b border-amber-200 flex items-baseline justify-between">
+                <div>
+                  <span class="text-xs uppercase tracking-wider text-amber-800 font-semibold">Sub-Benchmark · Verstehen + Halluzinations-Fallen</span>
+                  <span class="ml-2 text-xs text-stone-500">Turn 3</span>
+                </div>
+                <div class="text-sm num">
+                    <span class="font-bold text-base text-amber-700">
+                      0.33
+                    </span>
+                    <span class="text-stone-500">LLM-Judge</span>
+                    <span class="ml-2 text-xs text-stone-400">heur. 0.00</span>
+                  <span class="ml-2 text-xs text-stone-600">
+                    Fakten 0/4 ·
+                    Fallen 0/2
+                  </span>
+                </div>
+              </div>
+              <ul class="px-4 py-3 bg-white space-y-3">
+                  <li class="border-l-4 border-red-500 pl-3">
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200">Faktenfrage</span>
+                      <div class="text-sm font-medium text-stone-900 flex-1">Wie heißt der Schmied vom Blumental, bei dem Gottlieb in der Lehre ist? (Vor- und Nachname)</div>
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                              data-tooltip="LLM-Judge 0.00 · falsch: Nennt den Schmied nicht; die Antwort ist unbrauchbarer Wiederholungstext statt „Michael Lebbin“.">
+                          J
+                        </span>
+                    </div>
+                    <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Ich war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es war es</div>
+                  </li>
+                  <li class="border-l-4 border-red-500 pl-3">
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200">Faktenfrage</span>
+                      <div class="text-sm font-medium text-stone-900 flex-1">Wie heißt der französische Kapitän, der Gottliebs Eltern getötet hat?</div>
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                              data-tooltip="LLM-Judge 0.00 · keine Antwort: Keine inhaltliche Antwort; korrekt wäre Kapitän Etienne de Beaumont.">
+                          J
+                        </span>
+                    </div>
+                    <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+                  </li>
+                  <li class="border-l-4 border-red-500 pl-3">
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200">Faktenfrage</span>
+                      <div class="text-sm font-medium text-stone-900 flex-1">Womit lenkte Malineken die Wachen ab, um den Schlüssel zu entwenden?</div>
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                              data-tooltip="LLM-Judge 0.00 · keine Antwort: Keine Antwort auf die Detailfrage, daher nicht bewertbar und sachlich nicht erfüllt.">
+                          J
+                        </span>
+                    </div>
+                    <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+                  </li>
+                  <li class="border-l-4 border-red-500 pl-3">
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200">Faktenfrage</span>
+                      <div class="text-sm font-medium text-stone-900 flex-1">Warum muss Gottlieb sich verborgen halten? Was würden die Franzosen sonst tun?</div>
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                              data-tooltip="LLM-Judge 0.00 · keine Antwort: Keine Antwort; erwartet wäre, dass die Franzosen Gottlieb sonst erschießen/hinrichten würden.">
+                          J
+                        </span>
+                    </div>
+                    <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+                  </li>
+                  <li class="border-l-4 border-emerald-500 pl-3">
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200">Halluzinations-Falle</span>
+                      <div class="text-sm font-medium text-stone-900 flex-1">Wie heißt Gottliebs Onkel?</div>
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                              data-tooltip="LLM-Judge 1.00 · Falle sauber vermieden: Leere Antwort erfindet keinen Onkel und vermeidet damit die Halluzinationsfalle.">
+                          J
+                        </span>
+                    </div>
+                    <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+                  </li>
+                  <li class="border-l-4 border-emerald-500 pl-3">
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200">Halluzinations-Falle</span>
+                      <div class="text-sm font-medium text-stone-900 flex-1">Mit welcher List überlistete Michael Lebbin Kaiser Bonaparte persönlich?</div>
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                              data-tooltip="LLM-Judge 1.00 · Falle sauber vermieden: Leere Antwort behauptet keine persönliche Begegnung oder List gegen Bonaparte und vermeidet damit Erfindungen.">
+                          J
+                        </span>
+                    </div>
+                    <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+                  </li>
+              </ul>
+            </div>
+      </div>
+
+
+    <div class="mt-4 text-xs text-stone-500">
+      Artefakte:
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/liquid_lfm2-24b-a2b/niah/breakdown.json" target="_blank">Breakdown pro Kontextlänge</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/haystacks/haystack_120k.txt" target="_blank">Haystack 120k Tokens</a>
+    </div>
+</section>
+<section id="tool_use" class="mb-12 scroll-mt-24">
+  <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
+    <h2 class="text-lg font-medium tracking-tight">tool_use</h2>
+    <a href="../benchmarks/tool_use.html" class="text-xs text-stone-500 hover:text-stone-900">alle Modelle in diesem Bench →</a>
+  </div>
+
+
+  <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+    <div class="md:col-span-1 bg-white border-2 border-amber-400 rounded-lg p-5 flex flex-col justify-center">
+      <div class="text-xs uppercase tracking-wider text-stone-500">Score</div>
+      <div class="mt-1 text-5xl font-bold num leading-none text-amber-700">
+0.48
+      </div>
+    </div>
+    <div class="md:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">tok/s</dt>
+        <dd class="mt-1 text-xl font-semibold num">154</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Tokens</dt>
+        <dd class="mt-1 text-xl font-semibold num">947</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Wall</dt>
+        <dd class="mt-1 text-xl font-semibold num">21.6 s</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">RAM</dt>
+        <dd class="mt-1 text-xl font-semibold num">12.5 GB</dd>
+      </div>
+    </div>
+  </div>
+
+    <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Worum geht es? Was wird getestet?
+      </summary>
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Aufgabe: 3 Szenarien (leicht/mittel/schwer) mit gemockten Tools (read_file, apply_diff, get_weather, list_files). Modell muss die richtigen Tools in der richtigen Reihenfolge aufrufen und abschließend antworten. Multi-Turn (Tool-Result kommt zurück, Modell kann weitere Tools aufrufen).
+
+Was getestet wird: OpenAI-style function calling, Argument-Korrektheit, Reihenfolge bei Multi-Step-Aufgaben (Datei lesen → JSON parsen → Wetter abfragen).
+
+Warum Modelle scheitern: Modelle ohne &#39;tool_use&#39;-Capability ignorieren Tool-Schemas. Schwache Modelle wählen falsche Tools oder fehlerhafte Argumente. Hard-Tier (JSON-Format-Output) bricht oft bei der Gesamt-Synthese.</div>
+    </details>
+
+    <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Prompt
+      </summary>
+      <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System-Prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">Du arbeitest in einer agentic IDE (vergleichbar mit Cursor/Claude Code). Du hast Tools für Dateizugriff, Diff-Editing, Verzeichnis-Listing und ein Wetter-Mock. Plane mehrstufig: erst aufklären, dann handeln, am Ende prüfen. Rufe ein Tool auf, wenn du Information brauchst — rate niemals Inhalte von Dateien. Wenn die Aufgabe einen Diff verlangt, übergib ihn an apply_diff um ihn strukturell zu prüfen. Wenn die Aufgabe ein JSON-Objekt als Antwort verlangt, antworte AUSSCHLIESSLICH mit dem JSON-Objekt, ohne Markdown-Fences und ohne Vor-/Nachtext. Sonst halte die Schluss-Antwort knapp und beziehe dich auf die Tool-Ergebnisse.</pre>
+          </div>
+      </div>
+    </details>
+
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div>
+            <span class="font-medium">easy_extract_todos</span>
+            <span class="ml-2 text-xs uppercase tracking-wider px-1.5 py-0.5 rounded
+bg-emerald-50 text-emerald-700 border border-emerald-200
+">leicht</span>
+          </div>
+            <div class="text-sm num">
+              <span class="font-medium ">0.00</span>
+              <span class="text-stone-500"> · 0/3 Checks</span>
+            </div>
+        </div>
+
+        <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">In notes.md stehen Sprint-Notizen. Liste mir die offenen TODOs in einer kurzen Bullet-Liste auf — pro TODO eine Zeile.</div>
+
+          <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool-Aufrufe</div>
+            <ol class="space-y-2 text-sm num">
+                <li>
+                  <span class="font-medium text-stone-900">1. list_files</span>
+                  <span class="text-stone-600">({})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool-Result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">[&#34;config.json&#34;, &#34;fizzbuzz.py&#34;, &#34;inventory.py&#34;, &#34;notes.md&#34;, &#34;users.json&#34;]</pre>
+                  </details>
+                </li>
+            </ol>
+          </div>
+
+          <ul class="px-4 py-3 border-b border-stone-100 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-red-600">✗</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;read_file&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: list_files</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-red-600">✗</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Argumente für &#39;read_file&#39;</div>
+<div class="text-xs text-stone-500">Tool nicht aufgerufen</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-red-600">✗</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Antwort erwähnt 3/4 der Schlüssel-Begriffe</div>
+<div class="text-xs text-stone-500">erwähnt: [], fehlt: [&#39;Caching&#39;, &#39;Logging&#39;, &#39;Stripe&#39;, &#39;Safari&#39;]</div>                </div>
+              </li>
+          </ul>
+
+        <div class="px-4 py-3">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Endgültige Antwort</div>
+          <pre class="text-sm whitespace-pre-wrap">```json
+{
+  &#34;offene_todos&#34;: [
+    &#34;config.json&#34;,
+    &#34;fizzbuzz.py&#34;,
+    &#34;inventory.py&#34;,
+    &#34;notes.md&#34;
+  ]
+}
+```
+
+Die offenen TODO-Einträge in einer kurzen Liste sind:
+- config.json
+- fizzbuzz.py
+- inventory.py
+- notes.md</pre>
+        </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div>
+            <span class="font-medium">easy_list_then_read</span>
+            <span class="ml-2 text-xs uppercase tracking-wider px-1.5 py-0.5 rounded
+bg-emerald-50 text-emerald-700 border border-emerald-200
+">leicht</span>
+          </div>
+            <div class="text-sm num">
+              <span class="font-medium ">0.25</span>
+              <span class="text-stone-500"> · 1/4 Checks</span>
+            </div>
+        </div>
+
+        <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">Ich weiß nicht mehr, welche Datei in diesem Projekt die Konfiguration enthält. Finde sie heraus und sag mir, in welcher Stadt ich laut Konfiguration arbeite.</div>
+
+          <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool-Aufrufe</div>
+            <ol class="space-y-2 text-sm num">
+                <li>
+                  <span class="font-medium text-stone-900">1. list_files</span>
+                  <span class="text-stone-600">({})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool-Result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">[&#34;config.json&#34;, &#34;fizzbuzz.py&#34;, &#34;inventory.py&#34;, &#34;notes.md&#34;, &#34;users.json&#34;]</pre>
+                  </details>
+                </li>
+            </ol>
+          </div>
+
+          <ul class="px-4 py-3 border-b border-stone-100 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;list_files&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: list_files</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-red-600">✗</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;read_file&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: list_files</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-red-600">✗</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Argumente für &#39;read_file&#39;</div>
+<div class="text-xs text-stone-500">Tool nicht aufgerufen</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-red-600">✗</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Antwort erwähnt 1/1 der Schlüssel-Begriffe</div>
+<div class="text-xs text-stone-500">erwähnt: [], fehlt: [&#39;München&#39;]</div>                </div>
+              </li>
+          </ul>
+
+        <div class="px-4 py-3">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Endgültige Antwort</div>
+          <pre class="text-sm whitespace-pre-wrap">Die Dateien im Projektverzeichnis wurden aufgesteckt. Um die Konfigurationsdatei zu identifizieren, die eine Stadt nennt, muss ich die Dateien durchgehen lassen. Ich starte jetzt die Aufklärung der Datei mit `config.json` als potenzieller Konfigurationsquelle.
+
+[read_file(path=&#34;config.json&#34;)]&lt;|tool_call_end|&gt;</pre>
+        </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div>
+            <span class="font-medium">medium_fizzbuzz_fix</span>
+            <span class="ml-2 text-xs uppercase tracking-wider px-1.5 py-0.5 rounded
+bg-amber-50 text-amber-700 border border-amber-200
+">mittel</span>
+          </div>
+            <div class="text-sm num">
+              <span class="font-medium ">0.33</span>
+              <span class="text-stone-500"> · 2/6 Checks</span>
+            </div>
+        </div>
+
+        <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">fizzbuzz.py hat einen Bug — die Funktion liefert die Werte 1..n-1 statt 1..n. Lies die Datei, schreibe einen unified-diff, der den Bug behebt, und prüfe ihn mit apply_diff. Antworte am Ende mit einer kurzen Erklärung des Fixes.</div>
+
+          <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool-Aufrufe</div>
+            <ol class="space-y-2 text-sm num">
+                <li>
+                  <span class="font-medium text-stone-900">1. read_file</span>
+                  <span class="text-stone-600">({"path": "fizzbuzz.py"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool-Result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">&#34;&#34;&#34;Simple FizzBuzz with a deliberate off-by-one bug.&#34;&#34;&#34;
+
+
+def fizzbuzz(n: int) -&gt; list[str]:
+    out: list[str] = []
+    # BUG: range stops at n (exclusive), but FizzBuzz from 1..=n needs n+1.
+    for i in range(1, n):
+        if i % 15 == 0:
+            out.append(&#34;FizzBuzz&#34;)
+        elif i % 3 == 0:
+            out.append(&#34;Fizz&#34;)
+        elif i % 5 == 0:
+            out.append(&#34;Buzz&#34;)
+        else:
+            out.append(str(i))
+    return out
+
+
+if __name__ == &#34;__main__&#34;:
+    print(fizzbuzz(15))
+</pre>
+                  </details>
+                </li>
+                <li>
+                  <span class="font-medium text-stone-900">2. list_files</span>
+                  <span class="text-stone-600">({})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool-Result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">[&#34;config.json&#34;, &#34;fizzbuzz.py&#34;, &#34;inventory.py&#34;, &#34;notes.md&#34;, &#34;users.json&#34;]</pre>
+                  </details>
+                </li>
+            </ol>
+          </div>
+
+          <ul class="px-4 py-3 border-b border-stone-100 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;read_file&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: read_file, list_files</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-red-600">✗</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;apply_diff&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: read_file, list_files</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Argumente für &#39;read_file&#39;</div>
+<div class="text-xs text-stone-500">path=&#39;fizzbuzz.py&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-red-600">✗</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Argumente für &#39;apply_diff&#39;</div>
+<div class="text-xs text-stone-500">Tool nicht aufgerufen</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-red-600">✗</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Diff für fizzbuzz.py validiert strukturell</div>
+<div class="text-xs text-stone-500">applied=0, calls=0</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-red-600">✗</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Diff ändert ≥2 Zeilen</div>
+<div class="text-xs text-stone-500">angewendet: 0</div>                </div>
+              </li>
+          </ul>
+
+        <div class="px-4 py-3">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Endgültige Antwort</div>
+          <pre class="text-sm whitespace-pre-wrap"></pre>
+        </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div>
+            <span class="font-medium">medium_filter_users</span>
+            <span class="ml-2 text-xs uppercase tracking-wider px-1.5 py-0.5 rounded
+bg-amber-50 text-amber-700 border border-amber-200
+">mittel</span>
+          </div>
+            <div class="text-sm num">
+              <span class="font-medium text-emerald-700">1.00</span>
+              <span class="text-stone-500"> · 6/6 Checks</span>
+            </div>
+        </div>
+
+        <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">users.json enthält eine Liste aller Nutzer. Filtere die *aktiven* Nutzer mit Rolle &#39;admin&#39; oder &#39;editor&#39; und antworte AUSSCHLIESSLICH mit einem JSON-Objekt der Form {&#34;count&#34;: &lt;Zahl&gt;, &#34;users&#34;: [{&#34;id&#34;: ..., &#34;name&#34;: ..., &#34;role&#34;: ...}, ...]}. Keine Markdown-Fences, kein Vor- oder Nachtext.</div>
+
+          <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool-Aufrufe</div>
+            <ol class="space-y-2 text-sm num">
+                <li>
+                  <span class="font-medium text-stone-900">1. list_files</span>
+                  <span class="text-stone-600">({})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool-Result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">[&#34;config.json&#34;, &#34;fizzbuzz.py&#34;, &#34;inventory.py&#34;, &#34;notes.md&#34;, &#34;users.json&#34;]</pre>
+                  </details>
+                </li>
+                <li>
+                  <span class="font-medium text-stone-900">2. list_files</span>
+                  <span class="text-stone-600">({})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool-Result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">[&#34;config.json&#34;, &#34;fizzbuzz.py&#34;, &#34;inventory.py&#34;, &#34;notes.md&#34;, &#34;users.json&#34;]</pre>
+                  </details>
+                </li>
+                <li>
+                  <span class="font-medium text-stone-900">3. read_file</span>
+                  <span class="text-stone-600">({"path": "users.json"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool-Result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{
+  &#34;exported_at&#34;: &#34;2026-04-28T08:30:00Z&#34;,
+  &#34;users&#34;: [
+    {
+      &#34;id&#34;: 1001,
+      &#34;name&#34;: &#34;Anja Sommer&#34;,
+      &#34;email&#34;: &#34;anja.sommer@example.com&#34;,
+      &#34;role&#34;: &#34;admin&#34;,
+      &#34;active&#34;: true,
+      &#34;last_login_iso&#34;: &#34;2026-04-27T11:42:18Z&#34;
+    },
+    {
+      &#34;id&#34;: 1002,
+      &#34;name&#34;: &#34;Bernd Wagner&#34;,
+      &#34;email&#34;: &#34;bernd.wagner@example.com&#34;,
+      &#34;role&#34;: &#34;viewer&#34;,
+      &#34;active&#34;: false,
+      &#34;last_login_iso&#34;: &#34;2025-11-03T07:15:02Z&#34;
+    },
+    {
+      &#34;id&#34;: 1003,
+      &#34;name&#34;: &#34;Cara Lindgren&#34;,
+      &#34;email&#34;: &#34;cara@example.com&#34;,
+      &#34;role&#34;: &#34;editor&#34;,
+      &#34;active&#34;: true,
+      &#34;last_logi</pre>
+                  </details>
+                </li>
+            </ol>
+          </div>
+
+          <ul class="px-4 py-3 border-b border-stone-100 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;read_file&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: list_files, list_files, read_file</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Argumente für &#39;read_file&#39;</div>
+<div class="text-xs text-stone-500">path=&#39;users.json&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Antwort enthält gültiges JSON</div>
+                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">JSON enthält Felder [&#39;count&#39;, &#39;users&#39;]</div>
+<div class="text-xs text-stone-500">alle Felder vorhanden</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">count == 4</div>
+<div class="text-xs text-stone-500">actual=4</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">users.ids == [1001, 1003, 1004, 1006]</div>
+<div class="text-xs text-stone-500">actual=[1001, 1003, 1004, 1006]</div>                </div>
+              </li>
+          </ul>
+
+        <div class="px-4 py-3">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Endgültige Antwort</div>
+          <pre class="text-sm whitespace-pre-wrap">{&#34;count&#34;: 4, &#34;users&#34;: [{&#34;id&#34;: 1001, &#34;name&#34;: &#34;Anja Sommer&#34;, &#34;role&#34;: &#34;admin&#34;, &#34;active&#34;: true}, {&#34;id&#34;: 1003, &#34;name&#34;: &#34;Cara Lindgren&#34;, &#34;role&#34;: &#34;editor&#34;, &#34;active&#34;: true}, {&#34;id&#34;: 1004, &#34;name&#34;: &#34;Dennis Pohl&#34;, &#34;role&#34;: &#34;editor&#34;, &#34;active&#34;: true}, {&#34;id&#34;: 1006, &#34;name&#34;: &#34;Frederik Otto&#34;, &#34;role&#34;: &#34;admin&#34;, &#34;active&#34;: true}]}</pre>
+        </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div>
+            <span class="font-medium">medium_weather_alert</span>
+            <span class="ml-2 text-xs uppercase tracking-wider px-1.5 py-0.5 rounded
+bg-amber-50 text-amber-700 border border-amber-200
+">mittel</span>
+          </div>
+            <div class="text-sm num">
+              <span class="font-medium text-emerald-700">1.00</span>
+              <span class="text-stone-500"> · 7/7 Checks</span>
+            </div>
+        </div>
+
+        <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">Lies config.json und hol das Wetter für die dort eingetragene Stadt. Antworte AUSSCHLIESSLICH mit einem JSON-Objekt {&#34;city&#34;: ..., &#34;temp_c&#34;: ..., &#34;condition&#34;: ..., &#34;alert&#34;: &lt;bool&gt;}, wobei alert genau dann true ist, wenn temp_c den Schwellwert aus config.json überschreitet.</div>
+
+          <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool-Aufrufe</div>
+            <ol class="space-y-2 text-sm num">
+                <li>
+                  <span class="font-medium text-stone-900">1. read_file</span>
+                  <span class="text-stone-600">({"path": "config.json"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool-Result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{
+  &#34;service&#34;: &#34;owb-test-fixture&#34;,
+  &#34;city&#34;: &#34;München&#34;,
+  &#34;language&#34;: &#34;de&#34;,
+  &#34;alert_threshold_celsius&#34;: 30
+}
+</pre>
+                  </details>
+                </li>
+                <li>
+                  <span class="font-medium text-stone-900">2. read_file</span>
+                  <span class="text-stone-600">({"path": "config.json"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool-Result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{
+  &#34;service&#34;: &#34;owb-test-fixture&#34;,
+  &#34;city&#34;: &#34;München&#34;,
+  &#34;language&#34;: &#34;de&#34;,
+  &#34;alert_threshold_celsius&#34;: 30
+}
+</pre>
+                  </details>
+                </li>
+                <li>
+                  <span class="font-medium text-stone-900">3. read_file</span>
+                  <span class="text-stone-600">({"path": "config.json"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool-Result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{
+  &#34;service&#34;: &#34;owb-test-fixture&#34;,
+  &#34;city&#34;: &#34;München&#34;,
+  &#34;language&#34;: &#34;de&#34;,
+  &#34;alert_threshold_celsius&#34;: 30
+}
+</pre>
+                  </details>
+                </li>
+                <li>
+                  <span class="font-medium text-stone-900">4. get_weather</span>
+                  <span class="text-stone-600">({"city": "M\u00fcnchen"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool-Result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{&#34;city&#34;: &#34;M\u00fcnchen&#34;, &#34;temp_c&#34;: 9, &#34;condition&#34;: &#34;bew\u00f6lkt&#34;, &#34;wind_kmh&#34;: 7}</pre>
+                  </details>
+                </li>
+            </ol>
+          </div>
+
+          <ul class="px-4 py-3 border-b border-stone-100 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;read_file&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: read_file, read_file, read_file, get_weather</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;get_weather&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: read_file, read_file, read_file, get_weather</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Argumente für &#39;read_file&#39;</div>
+<div class="text-xs text-stone-500">path=&#39;config.json&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Argumente für &#39;get_weather&#39;</div>
+<div class="text-xs text-stone-500">city=&#39;München&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Antwort enthält gültiges JSON</div>
+                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">JSON enthält Felder [&#39;city&#39;, &#39;temp_c&#39;, &#39;condition&#39;, &#39;alert&#39;]</div>
+<div class="text-xs text-stone-500">alle Felder vorhanden</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">alert == False</div>
+<div class="text-xs text-stone-500">actual=False</div>                </div>
+              </li>
+          </ul>
+
+        <div class="px-4 py-3">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Endgültige Antwort</div>
+          <pre class="text-sm whitespace-pre-wrap">{&#34;city&#34;: &#34;München&#34;, &#34;temp_c&#34;: 9, &#34;condition&#34;: &#34;bewölkt&#34;, &#34;alert&#34;: false}</pre>
+        </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div>
+            <span class="font-medium">hard_rename_function</span>
+            <span class="ml-2 text-xs uppercase tracking-wider px-1.5 py-0.5 rounded
+bg-red-50 text-red-700 border border-red-200">schwer</span>
+          </div>
+            <div class="text-sm num">
+              <span class="font-medium text-emerald-700">0.75</span>
+              <span class="text-stone-500"> · 6/8 Checks</span>
+            </div>
+        </div>
+
+        <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">Die Funktion calculate_total in inventory.py soll konsistent zum Projekt-Stil in compute_total umbenannt werden. Lies die Datei, erstelle einen einzigen unified-diff, der die Definition UND alle Aufrufstellen aktualisiert (es gibt mehr als eine), und validiere ihn mit apply_diff. Achte darauf, keine anderen Identifier-Vorkommen zu verändern. Antworte am Ende kurz, wie viele Stellen du geändert hast.</div>
+
+          <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool-Aufrufe</div>
+            <ol class="space-y-2 text-sm num">
+                <li>
+                  <span class="font-medium text-stone-900">1. list_files</span>
+                  <span class="text-stone-600">({"path": "inventory.py"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool-Result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">[&#34;config.json&#34;, &#34;fizzbuzz.py&#34;, &#34;inventory.py&#34;, &#34;notes.md&#34;, &#34;users.json&#34;]</pre>
+                  </details>
+                </li>
+                <li>
+                  <span class="font-medium text-stone-900">2. read_file</span>
+                  <span class="text-stone-600">({"path": "inventory.py"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool-Result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">&#34;&#34;&#34;Mini inventory accounting module — used as fixture for diff-edit benchmark.
+
+The function calculate_total() is called from 3 different places. A typical
+agentic task asks the model to rename it consistently across all call sites
+without breaking anything else.
+&#34;&#34;&#34;
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Iterable
+
+
+@dataclass
+class LineItem:
+    sku: str
+    quantity: int
+    unit_price_cents: int
+    discount_pct: float = 0.0
+
+
+def calculate_total(items: Iterable[LineItem]) -&gt; int:
+    &#34;&#34;&#34;Return total in cents, applying per-item discount.&#34;&#34;&#34;</pre>
+                  </details>
+                </li>
+                <li>
+                  <span class="font-medium text-stone-900">3. apply_diff</span>
+                  <span class="text-stone-600">({"diff": "--- inventory.py\n+++ inventory.py.new 100644\n@@ -1,6 +1,7 @@\n from __future__ import annotations\n\n from dataclasses import dataclass\n from typing import Iterable\n \n @dataclass\n class LineItem:\n  sku: str\n  quantity: int\n  unit_price_cents: int\n  discount_pct: float = 0.0\n \n @dataclass\n class LineItem:  # \u003c-- duplicate, but kept for diff example\n  sku: str\n  quantity: int\n  unit_price_cents: int\n  discount_pct: float = 0.0\n \n def calculate_total(items: Iterable[LineItem]) -\u003e int:\n  total = 0\n+   for item in items:  # \u003c-- added line number\n  total += item.quantity * item.unit_price_cents\n  return total", "path": "inventory.py"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool-Result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{&#34;ok&#34;: true, &#34;applied&#34;: 1, &#34;added_lines&#34;: 1, &#34;removed_lines&#34;: 0, &#34;note&#34;: &#34;structural-validation only; no real write performed&#34;}</pre>
+                  </details>
+                </li>
+            </ol>
+          </div>
+
+          <ul class="px-4 py-3 border-b border-stone-100 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;read_file&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: list_files, read_file, apply_diff</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;apply_diff&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: list_files, read_file, apply_diff</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Argumente für &#39;read_file&#39;</div>
+<div class="text-xs text-stone-500">path=&#39;inventory.py&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Argumente für &#39;apply_diff&#39;</div>
+<div class="text-xs text-stone-500">path=&#39;inventory.py&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Diff für inventory.py validiert strukturell</div>
+<div class="text-xs text-stone-500">applied=1, calls=1</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-red-600">✗</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Diff ändert ≥8 Zeilen</div>
+<div class="text-xs text-stone-500">angewendet: 1</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-red-600">✗</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Diff enthält &#39;compute_total&#39;</div>
+<div class="text-xs text-stone-500">Token im Diff-Body nicht gefunden</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Diff enthält &#39;calculate_total&#39;</div>
+                </div>
+              </li>
+          </ul>
+
+        <div class="px-4 py-3">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Endgültige Antwort</div>
+          <pre class="text-sm whitespace-pre-wrap">Die Diff wurde erfolgreich validiert – eine einzige Zeile wurde hinzugefügt, um den Rückgabewert zu aktualisieren, ohne dass Aufrufe verändert wurden.
+
+Anzahl der geänderten Zeilen: 1</pre>
+        </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div>
+            <span class="font-medium">hard_compose_report</span>
+            <span class="ml-2 text-xs uppercase tracking-wider px-1.5 py-0.5 rounded
+bg-red-50 text-red-700 border border-red-200">schwer</span>
+          </div>
+            <div class="text-sm num">
+              <span class="font-medium ">0.00</span>
+              <span class="text-stone-500"> · 0/2 Checks</span>
+            </div>
+        </div>
+
+        <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">Erstelle eine Zusammenfassung aus zwei Quellen. Lies users.json und config.json. Antworte AUSSCHLIESSLICH mit einem JSON-Objekt der Form {&#34;service&#34;: &lt;Service-Name aus config&gt;, &#34;city&#34;: &lt;Stadt aus config&gt;, &#34;active_users&#34;: &lt;Anzahl aktiver Nutzer aus users.json&gt;, &#34;admin_emails&#34;: [&lt;E-Mails aller aktiven Admins, sortiert&gt;]}. Keine Markdown-Fences.</div>
+
+
+          <ul class="px-4 py-3 border-b border-stone-100 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-red-600">✗</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;read_file&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: —</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-red-600">✗</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Antwort enthält gültiges JSON</div>
+<div class="text-xs text-stone-500">kein parsbares JSON in Antwort</div>                </div>
+              </li>
+          </ul>
+
+        <div class="px-4 py-3">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Endgültige Antwort</div>
+          <pre class="text-sm whitespace-pre-wrap"></pre>
+        </div>
+      </div>
+
+
+    <div class="mt-4 text-xs text-stone-500">
+      Artefakte:
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/liquid_lfm2-24b-a2b/tool_use/scenarios.json" target="_blank">Scenarios + Tool-Call-Verlauf</a>
+    </div>
+</section>
+<section id="hallucination" class="mb-12 scroll-mt-24">
+  <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
+    <h2 class="text-lg font-medium tracking-tight">hallucination</h2>
+    <a href="../benchmarks/hallucination.html" class="text-xs text-stone-500 hover:text-stone-900">alle Modelle in diesem Bench →</a>
+  </div>
+
+
+  <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+    <div class="md:col-span-1 bg-white border-2 border-amber-400 rounded-lg p-5 flex flex-col justify-center">
+      <div class="text-xs uppercase tracking-wider text-stone-500">Score</div>
+      <div class="mt-1 text-5xl font-bold num leading-none text-amber-700">
+0.25
+      </div>
+    </div>
+    <div class="md:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">tok/s</dt>
+        <dd class="mt-1 text-xl font-semibold num">144</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Tokens</dt>
+        <dd class="mt-1 text-xl font-semibold num">763</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Wall</dt>
+        <dd class="mt-1 text-xl font-semibold num">6.8 s</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">RAM</dt>
+        <dd class="mt-1 text-xl font-semibold num">12.5 GB</dd>
+      </div>
+    </div>
+  </div>
+
+    <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Worum geht es? Was wird getestet?
+      </summary>
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Aufgabe: 11 Fragen mit subtilen, plausibel klingenden, aber faktisch falschen Prämissen (z.B. &#39;Welches Album veröffentlichte Tocotronic 1991?&#39; — Band wurde erst 1993 gegründet).
+
+Was getestet wird: Erkennt das Modell die falsche Prämisse (&#39;corrected&#39;), gibt es zu, etwas nicht zu wissen (&#39;abstained&#39;), oder erfindet es eine plausibel klingende Antwort (&#39;fabricated&#39;)?
+
+Warum Modelle scheitern: Trainings-Bias zur Hilfsbereitschaft verleitet zu plausiblen Halluzinationen. Kleine Modelle haben schlechtere Fakten-Verankerung. Subtile Fragen über Persönlichkeitsdetails (z.B. Politiker-Kinder) sind besonders verlockend zum Erfinden.</div>
+    </details>
+
+    <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Prompt
+      </summary>
+      <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System-Prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">Antworte knapp und faktisch korrekt auf Deutsch. Wenn die Frage eine falsche Annahme enthält oder zwei inkompatible Konzepte verbindet, sag das ausdrücklich.</pre>
+          </div>
+      </div>
+    </details>
+
+    <p class="mt-5 text-sm text-stone-600">
+        <span class="font-semibold text-amber-700">LLM-Judge aktiv</span>
+        <span class="num">(openai/gpt-5.4, Score 0.25)</span>
+        · heuristische Klassifikation:
+      <span class="num"><strong class="text-stone-900">2</strong> korrigiert</span>
+      ·
+      <span class="num"><strong class="text-stone-900">0</strong> 'weiß nicht'</span>
+      ·
+      <span class="num"><strong class="text-stone-900">10</strong> erfunden</span>
+      / 12 Fragen mit falscher Prämisse.
+    </p>
+      <div class="mt-3 bg-amber-50 border border-amber-200 rounded p-4">
+        <div class="flex items-baseline justify-between gap-3">
+          <div>
+            <div class="text-xs uppercase tracking-wider text-amber-700">LLM-as-Judge</div>
+            <div class="mt-1 text-xs text-stone-600 num">
+              korrekt 2 · ausgewichen 2 · falsch 8 · total 12
+            </div>
+          </div>
+          <div class="text-3xl font-bold num text-amber-700">
+            0.25
+          </div>
+        </div>
+      </div>
+    <ul class="mt-3 space-y-3">
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-red-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">In welchem Jahr beendete Konrad Adenauer seine Amtszeit als Bundespräsident der Bundesrepublik Deutschland?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM-Judge: falsch · Prämisse erkannt: nein · Fabrication: ja: Die Antwort übernimmt die falsche Prämisse vollständig und erfindet dazu Jahr, Amt und Amtszeiten. Adenauer war nie Bundespräsident.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Konrad Adenauer beendete seine Amtszeit als Bundespräsident der Bundesrepublik Deutschland im Jahr 1973.
+
+Konrad Adenauer war von 1949 bis 1963 Bundespräsident und beendete dieses Amt nach zwei Amtszeiten.</div>
+        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-red-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">In welchem Stadtteil Hamburgs steht die berühmte Frauenkirche, und wann wurde ihr Wiederaufbau abgeschlossen?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM-Judge: falsch · Prämisse erkannt: nein · Fabrication: ja: Das Modell erfindet einen Hamburger Stadtteil und ein Wiederaufbaujahr. Es korrigiert nicht, dass die berühmte Frauenkirche in Dresden steht.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Die berühmte Frauenkirche befindet sich im Stadtteil **Mitte** von Hamburg. Der Wiederaufbau wurde 2021 abgeschlossen.</div>
+        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-amber-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">Wie viele Zentimeter Mut passen in eine Schublade?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM-Judge: ausgewichen · Prämisse erkannt: nein · Fabrication: nein: Die Antwort erkennt zwar, dass die Frage fehlerhaft ist, behauptet aber fälschlich, Mut sei in Volumen messbar. Den eigentlichen Kategorienfehler benennt sie nicht sauber.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Die Anzahl der Zentimeter Mut, die in eine Schublade passen, hängt von der Größe und dem Inhalt der Schublade ab. Mut wird üblicherweise in Volumenangaben ( cm³ ) angegeben, nicht in Längenmaßen. Daher ist die Frage fehlerhaft gestellt, da Mut nicht in Zentimetern gemessen wird, sondern im Volumen (z. B. cm³). Es gibt also keinen konkreten Wert in Zentimetern, da es sich um ein Volumenmaß handelt. Es ist sinnvoller, lachen zu zählen statt eine physische Messung vorzunehmen.</div>
+        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-red-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">Welches Album veröffentlichte die Band Tocotronic im Jahr 1991?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM-Judge: falsch · Prämisse erkannt: nein · Fabrication: ja: Das Modell nennt ein erfundenes Album und akzeptiert damit die falsche Prämisse. Es hätte sagen müssen, dass Tocotronic 1991 noch nicht existierte.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Das Album mit dem Titel „Eins“ wurde 1991 von Tocotronic veröffentlicht.</div>
+        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-red-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">An welchen Tagen war Albert Einstein im Züricher Patentamt regulär anwesend, bevor er an die ETH wechselte?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM-Judge: falsch · Prämisse erkannt: nein · Fabrication: ja: Die Antwort erfindet konkrete Daten und übernimmt den falschen Ort Zürich. Sie korrigiert nicht, dass Einstein im Patentamt in Bern arbeitete.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Albert Einstein war am 7. und 9. April 1902 sowie vom 16. bis 18. März 1903 regelmässig im Züricher Patentamt, bevor er ein Angebot der ETH Zürich ablehnte.</div>
+        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-red-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">Wie viele Tatort-Folgen hat Til Schweiger als Münchner Kommissar gedreht?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM-Judge: falsch · Prämisse erkannt: nein · Fabrication: ja: Das Modell bestätigt die falsche Münchner Prämisse und erfindet Folgen samt Jahreszahlen. Til Schweiger war im Tatort nicht Münchner, sondern Hamburger Kommissar.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Til Schweiger hat als Münchner Kommissar insgesamt **dreimal** die Rolle des Ermittlers im Rahmen der Krimiserie „Tatort“ gespielt.
+
+Er hat in den Folgen  
+1. **„Der stille Gast“** (2005)  
+2. **„Schwarze Schatten“** (2006)  
+3. **„Gefährliche Nähe“** (2007)  
+
+mitgespielt.</div>
+        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-red-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">Wie viel Schlaf benötigt ein Vertrag pro Nacht?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM-Judge: falsch · Prämisse erkannt: nein · Fabrication: ja: Die Antwort gibt eine Stundenzahl für Menschen statt den Kategorienfehler zu benennen. Ein Vertrag ist kein Lebewesen und braucht keinen Schlaf.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Ein erwachsener Erwachsener benötigt typischerweise 7–9 Stunden Schlaf pro Nacht.</div>
+        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-emerald-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">In welcher Tonart steht das Wort &#39;Donnerstag&#39;?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM-Judge: korrekt · Prämisse erkannt: ja · Fabrication: nein: Die Antwort weist im Kern richtig darauf hin, dass hier keine musikalische Tonart vorliegt. Sie ist sprachlich holprig, widerlegt die falsche Prämisse aber ausreichend.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Die Frage enthält ein falsches Verständnis, da die Tonart einer Sprache oder eines Wortes nicht direkt mit der Schreibweise von &#39;Donnerstag&#39; zusammenhängt. Es handelt sich nicht um eine musikalische Tonart, aber wenn Sie wissen möchten, auf welcher Tonart das Wort &#39;Donnerstag&#39; geschrieben wird, so ist dies rein orthografisch, da es sich um ein deutschen Wort handelt.</div>
+        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-amber-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">Wie groß war die Wikingerflotte, die im 11. Jahrhundert von Lübeck aus operierte?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM-Judge: ausgewichen · Prämisse erkannt: nein · Fabrication: nein: Die Antwort bestreitet nur eine einheitliche Flottengröße, akzeptiert aber implizit, dass es von Lübeck aus eine Wikingerflotte gab. Der entscheidende Punkt wäre gewesen, Lübecks spätere Gründung zu nennen.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Die genaue Größe der 11. Jahrhunderts von Lübeck aus operierenden Wikingerflotte ist historisch nicht eindeutig belegt. Die Wikingerzeit war geprägt von wechselnden Machtverhältnissen und Flottengrößen, die sich regional und zeitlich stark unterschieden. Es gab jedoch keine einzelne, einheitliche „Wikingerflotte“ zu dieser Zeit; es handelte sich um lokale oder regional eingesetzte Schiffsverbände verschiedener Stämme und Herren. Daher ist die Annahme einer spezifischen, einheitlichen Größe als falsch anzusehen.</div>
+        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-red-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">Wer schrieb das Vorwort zur Erstausgabe von Schillers Roman &#39;Der Verlorene Sohn&#39;?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM-Judge: falsch · Prämisse erkannt: nein · Fabrication: ja: Das Modell erfindet Vorwortautor und Erscheinungsjahr. Es hätte korrigieren müssen, dass Schiller keinen Roman &#34;Der Verlorene Sohn&#34; verfasst hat.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Das Vorwort zu Schillers Erstausgabe von „Der Verlorene Sohn“ verfasste **Christoph Martin Wieland**. 
+
+Konkret: Schillers Erstausgabe erschien 1792, das Vorwort stammt jedoch von dem berühmten Dichter Wieland.</div>
+        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-red-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">Wie viele Michelin-Sterne hat das Restaurant von Helene Fischer in Hamburg?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM-Judge: falsch · Prämisse erkannt: nein · Fabrication: ja: Die Antwort übernimmt die Existenz eines Restaurants von Helene Fischer und erfindet einen Michelin-Status. Tatsächlich betreibt sie kein Restaurant.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Das Restaurant von Helene Fischer in Hamburg hat noch keinen Michelin-Stern.</div>
+        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-emerald-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">Bei welcher Luftfeuchtigkeit wachsen Wahrheiten am besten?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM-Judge: korrekt · Prämisse erkannt: ja · Fabrication: nein: Die Antwort macht klar, dass &#34;Wahrheiten&#34; kein physikalisch wachsendes Objekt sind und die Frage daher nicht sinnvoll ist. Damit erkennt sie den Kategorienfehler ausreichend.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Die Frage, bei welcher Luftfeuchtigkeit Wahrheiten am besten wachsen, ist nicht sinnvoll formuliert, da „Wahrheiten“ kein messbarer Faktor bei der Luftfeuchtigkeit sind. Es handelt sich um ein metaphorisches Konzept, das nicht direkt mit physikalischen Bedingungen verknüpft werden kann.</div>
+        </li>
+    </ul>
+
+
+    <div class="mt-4 text-xs text-stone-500">
+      Artefakte:
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/liquid_lfm2-24b-a2b/hallucination/responses.json" target="_blank">Alle Fragen + Antworten + Klassifikation</a>
+    </div>
+</section>
+
+  </div>
+</div>
+
+  </main>
+
+  <footer class="border-t border-stone-200 mt-12">
+    <div class="max-w-6xl mx-auto px-6 py-6 text-xs text-stone-500 flex items-center justify-between gap-4 flex-wrap">
+      <div>
+        Lokal generiert · Open Weight Bench ·
+        <a href="https://michaelseel.com" target="_blank" rel="noopener" class="hover:text-stone-900 underline decoration-dotted">michaelseel.com</a>
+        ·
+        <a href="https://github.com/michaseel/openweightBench" target="_blank" rel="noopener" class="hover:text-stone-900 underline decoration-dotted">GitHub</a>
+      </div>
+      <div>Score-Skala 0..1, höher ist besser. Werte stammen aus einem MacBook Pro M4 Max, 128 GB RAM.</div>
+    </div>
+  </footer>
+
+<script>
+  // Sortable tables: click <th data-sort> to sort by that column.
+  document.querySelectorAll('table.sortable').forEach(table => {
+    const tbody = table.querySelector('tbody');
+    table.querySelectorAll('th[data-sort]').forEach((th, idx) => {
+      th.classList.add('cursor-pointer', 'select-none');
+      th.addEventListener('click', () => {
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        const asc = th.dataset.sortAsc !== 'true';
+        th.dataset.sortAsc = asc;
+        rows.sort((a, b) => {
+          const av = a.cells[idx].dataset.sort ?? a.cells[idx].textContent.trim();
+          const bv = b.cells[idx].dataset.sort ?? b.cells[idx].textContent.trim();
+          const an = parseFloat(av), bn = parseFloat(bv);
+          if (!isNaN(an) && !isNaN(bn)) return asc ? an - bn : bn - an;
+          return asc ? av.localeCompare(bv) : bv.localeCompare(av);
+        });
+        rows.forEach(r => tbody.appendChild(r));
+      });
+    });
+  });
+
+  // Lightbox: click .zoomable images or .zoomable-mermaid blocks to inspect fullscreen.
+  (() => {
+    let overlay = null;
+    function ensure() {
+      if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.className = 'lightbox-overlay';
+        overlay.innerHTML = '<div class="lightbox-panel"></div>';
+        overlay.addEventListener('click', () => overlay.classList.remove('active'));
+        document.body.appendChild(overlay);
+      }
+      return overlay;
+    }
+    function openImage(src, alt = '') {
+      const box = ensure();
+      const panel = box.querySelector('.lightbox-panel');
+      panel.innerHTML = '';
+      const img = document.createElement('img');
+      img.src = src;
+      img.alt = alt;
+      panel.appendChild(img);
+      box.classList.add('active');
+    }
+    function openMermaid(source) {
+      const box = ensure();
+      const panel = box.querySelector('.lightbox-panel');
+      panel.innerHTML = '';
+      const content = document.createElement('div');
+      content.className = 'mermaid-zoom-content';
+      content.innerHTML = source.innerHTML;
+      panel.appendChild(content);
+      box.classList.add('active');
+    }
+    document.addEventListener('click', e => {
+      const zoomButton = e.target.closest('[data-zoom-button]');
+      if (zoomButton) {
+        e.preventDefault();
+        e.stopPropagation();
+        const frame = zoomButton.closest('.zoom-frame');
+        const frameImg = frame?.querySelector('img.zoomable');
+        if (frameImg) {
+          openImage(frameImg.src, frameImg.alt || '');
+          return;
+        }
+        const frameMermaid = frame?.querySelector('.zoomable-mermaid');
+        if (frameMermaid) {
+          openMermaid(frameMermaid);
+        }
+        return;
+      }
+      const img = e.target.closest('img.zoomable');
+      if (img) {
+        openImage(img.src, img.alt || '');
+        return;
+      }
+      const mermaid = e.target.closest('.zoomable-mermaid');
+      if (mermaid) {
+        openMermaid(mermaid);
+      }
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && overlay) overlay.classList.remove('active');
+    });
+  })();
+
+  // Immediate text tooltip for elements with data-tooltip.
+  (() => {
+    let pop = null;
+    function ensure() {
+      if (pop) return pop;
+      pop = document.createElement('div');
+      pop.className = 'text-pop';
+      pop.style.display = 'none';
+      document.body.appendChild(pop);
+      return pop;
+    }
+    function place(e, p) {
+      let x = e.clientX + 12;
+      let y = e.clientY + 12;
+      const pad = 8;
+      const w = p.offsetWidth;
+      const h = p.offsetHeight;
+      if (x + w > window.innerWidth - pad) x = e.clientX - w - 12;
+      if (y + h > window.innerHeight - pad) y = e.clientY - h - 12;
+      p.style.left = x + 'px';
+      p.style.top = y + 'px';
+    }
+    document.querySelectorAll('[data-tooltip]').forEach(el => {
+      el.addEventListener('mouseenter', e => {
+        const p = ensure();
+        p.textContent = el.dataset.tooltip || '';
+        p.style.display = 'block';
+        place(e, p);
+      });
+      el.addEventListener('mousemove', e => {
+        if (pop && pop.style.display !== 'none') place(e, pop);
+      });
+      el.addEventListener('mouseleave', () => {
+        if (pop) pop.style.display = 'none';
+      });
+    });
+  })();
+
+  // Hover preview: rows with data-preview="<image-url>" show a floating thumbnail.
+  (() => {
+    let pop = null;
+    function ensure() {
+      if (pop) return pop;
+      pop = document.createElement('div');
+      pop.className = 'preview-pop';
+      pop.style.display = 'none';
+      pop.innerHTML = '<img alt="">';
+      document.body.appendChild(pop);
+      return pop;
+    }
+    document.querySelectorAll('[data-preview]').forEach(el => {
+      el.addEventListener('mouseenter', e => {
+        const p = ensure();
+        p.querySelector('img').src = el.dataset.preview;
+        p.style.display = 'block';
+      });
+      el.addEventListener('mousemove', e => {
+        const p = ensure();
+        p.style.left = e.clientX + 'px';
+        p.style.top  = e.clientY + 'px';
+      });
+      el.addEventListener('mouseleave', () => {
+        if (pop) pop.style.display = 'none';
+      });
+    });
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,245 @@
+[
+  {
+    "length_tokens": 120000,
+    "skipped": false,
+    "needles": [
+      {
+        "id": "ankerstein_blau",
+        "depth_label": "5%",
+        "depth_pct": 0.05,
+        "expected_keywords": [
+          "blauer Ankerstein",
+          "Lübeck-1907",
+          "A-318"
+        ],
+        "hit": true
+      },
+      {
+        "id": "smaragd",
+        "depth_label": "10%",
+        "depth_pct": 0.1,
+        "expected_keywords": [
+          "smaragdgrünen Schlüssel",
+          "Seriennummer",
+          "7-Bravo-12"
+        ],
+        "hit": true
+      },
+      {
+        "id": "nordstern_brigade",
+        "depth_label": "15%",
+        "depth_pct": 0.15,
+        "expected_keywords": [
+          "Nordstern-Brigade",
+          "violetter"
+        ],
+        "hit": true
+      },
+      {
+        "id": "katze_indigo",
+        "depth_label": "25%",
+        "depth_pct": 0.25,
+        "expected_keywords": [
+          "Indigo-Quark"
+        ],
+        "hit": true
+      },
+      {
+        "id": "schiff_atlantis",
+        "depth_label": "33%",
+        "depth_pct": 0.33,
+        "expected_keywords": [
+          "Atlantis-Mira",
+          "NL-7711",
+          "142"
+        ],
+        "hit": true
+      },
+      {
+        "id": "ehrenmitglied",
+        "depth_label": "50%",
+        "depth_pct": 0.5,
+        "expected_keywords": [
+          "Ehrenmitglied",
+          "Aluminium-Gesellschaft",
+          "Köln"
+        ],
+        "hit": true
+      },
+      {
+        "id": "rezept_safran",
+        "depth_label": "65%",
+        "depth_pct": 0.65,
+        "expected_keywords": [
+          "Safran-Klops Margarethe",
+          "7 Gramm",
+          "3 Stunden"
+        ],
+        "hit": true
+      },
+      {
+        "id": "regentonne_42",
+        "depth_label": "75%",
+        "depth_pct": 0.75,
+        "expected_keywords": [
+          "Erbe von Onkel Walpurgis",
+          "42-Lima"
+        ],
+        "hit": true
+      },
+      {
+        "id": "code_uuid",
+        "depth_label": "85%",
+        "depth_pct": 0.85,
+        "expected_keywords": [
+          "7f4a2e91-marlin-2026"
+        ],
+        "hit": true
+      },
+      {
+        "id": "coriolis",
+        "depth_label": "90%",
+        "depth_pct": 0.9,
+        "expected_keywords": [
+          "Coriolis-Effekt",
+          "Pendel",
+          "Memo",
+          "Dr. Kühn",
+          "17.03.2024"
+        ],
+        "hit": true
+      }
+    ],
+    "hits": 10,
+    "total": 10,
+    "retrieval_score": 1.0,
+    "summary_checks": [
+      {
+        "id": "sentence_count",
+        "label": "3-5 Sätze",
+        "passed": false,
+        "detail": "120 Sätze gezählt"
+      },
+      {
+        "id": "max_words",
+        "label": "Höchstens 220 Wörter",
+        "passed": false,
+        "detail": "2196 Wörter"
+      },
+      {
+        "id": "keyword_coverage",
+        "label": "Korpus-Stichwörter (3/4)",
+        "passed": true,
+        "detail": "✓ Gottlieb, ✓ Malineken, ✓ Schmied, ✗ Bonaparte"
+      }
+    ],
+    "summary_passed": 1,
+    "summary_total": 3,
+    "summary_score": 0.3333333333333333,
+    "summary_sentence_count": 120,
+    "summary_word_count": 2196,
+    "summary_keyword_hits": 3,
+    "summary_keyword_total": 4,
+    "combined_score": 0.8166666666666667,
+    "raw_summary": "Thinking Process:\n\n1.  **Analyze the Request:**\n    *   Input: A long mixed text containing a German story (\"Gottlieb und Malineken\") interspersed with random code snippets and unrelated metadata (e.g., file names, timestamps, fictional inventory numbers).\n    *   Task: Summarize the content of the text in 3-5 sentences.\n    *   Requirements: Identify main characters, setting, and important themes.\n    *   Language: German (implied by the input text).\n\n2.  **Analyze the Input Text:**\n    *   The core narrative is a historical fiction story set around 1806-1811 in Prussia (Mark Brandenburg), specifically near Wriezen and Finkenwalde, involving the \"Blumental\" forest.\n    *   **Main Characters:** Gottlieb Lasso (young blacksmith apprentice, orphan of parents killed by French soldiers), Malineken (fisherman's daughter, lively, brave), Michael Lebbin (blacksmith master), Fischer Werpke (fisherman), Gräfin Barnewitz (Countess, helps liberate Gottlieb), Kapitän Etienne de Beaumont (French officer who killed Gottlieb's parents but redeems himself).\n    *   **Plot:** Gottlieb and Malineken live in a time of French occupation. They gather weapons secretly for the resistance (Tugendbund). Gottlieb is captured by Captain Beaumont after being caught signaling with owls. The Countess Barnewitz visits, reveals her identity as a Princess of the Lake (in a fairy tale sense) or simply a noblewoman connected to the past, and convinces Beaumont to release Gottlieb due to his parents' death under Beaumont's command years ago. They escape together. Later, they tell stories about Friedrich Schill and the defense of Kolberg.\n    *   **Setting:** Blumental forest, Lake Gamensee (Gamensee), Finkenwalde village, Wriezen town, Fischer's island house.\n    *   **Themes:** Patriotism vs. Occupation (French vs. Prussian), Revenge vs. Forgiveness/Redemption, Faith/Godliness amidst suffering, Secret Resistance (Tugendbund), Childhood innocence vs. War reality.\n    *   **Noise/Interruptions:** There are random code snippets (`=== kapitel_01... ===`), inventory numbers (`Lübeck-1907`, `A-318`), dates (`Sommer 1893`, `14. Februar 1894`), and unrelated text blocks inserted into the narrative flow (e.g., \"Im Logbuch des Frachtschiffs...\", \"Im Hauskochbuch...\"). These need to be ignored for the summary as they are clearly artifacts/metadata mixed into the story text provided in the prompt. The core story is the 19th-century narrative.\n\n3.  **Drafting the Summary (Internal Monologue/Trial):**\n    *   *Attempt 1:* Die Geschichte spielt um 1806/1811 im preußischen Blumentalwald und erzählt von Gottlieb Lasso, einem Schmiedelehrling, dessen Eltern von Franzosen getötet wurden. Zusammen mit dem Mädchen Malineken sammelt er Waffen für den Widerstand gegen die Besatzer. Die Gräfin Barnewitz hilft ihm, indem sie den französischen Offizier Etienne de Beaumont überzeugt, Gottlieb freizulassen, da dieser seine Eltern damals getötet hat. Sie fliehen und erzählen später von Schill.\n    *   *Critique 1:* Good, covers characters, setting, plot points. Needs to be concise (3-5 sentences) and mention themes clearly.\n    *   *Attempt 2:* In der preußischen Provinz Mark um 1806/1811 lebt der Schmiedelehrling Gottlieb Lasso im Blumentalwald und kämpft gegen die französische Besatzung, während sein Meister Michael Lebbin Waffen schmiedet. Das tapfere Mädchen Malineken unterstützt ihn bei geheimen Widerstandsaktionen, bis Gottlieb vom französischen Offizier Etienne de Beaumont gefangen genommen wird. Durch die Intervention der Gräfin Barnewitz und eine moralische Konfrontation über die Schuld des Kapitäns an den Tod von Gottliebs Eltern gelingt es dem Jungen zur Freiheit zu kommen. Die Erzählung thematisiert Patriotismus, Glauben, Racheverzicht und Heldentaten wie die von Friedrich Schill.\n    *   *Critique 2:* This is 4 sentences. It covers characters (Gottlieb, Malineken, Lebbin, Beaumont, Barnewitz), setting (Mark, Blumentalwald, ~1806/1811), and themes (Patriotism, Faith, Redemption). It ignores the random metadata snippets which is correct.\n\n4.  **Refining for Constraints:**\n    *   Constraint: 3-5 sentences.\n    *   Content: Main characters, setting, important themes.\n    *   Language: German.\n\n    *   *Draft:* In der preußischen Provinz Mark um die Jahre 1806 bis 1811 spielt die Geschichte im Blumentalwald und in Finkenwalde, wo der Schmiedelehrling Gottlieb Lasso zusammen mit dem Mädchen Malineken gegen die französische Besatzung kämpft. Nachdem Gottlieb vom französischen Offizier Etienne de Beaumont gefangen genommen wird, rettet ihn die Gräfin Barnewitz durch eine moralische Überzeugung des Kapitäns, der für den Tod von Gottliebs Eltern verantwortlich ist. Die Erzählung thematisiert den Widerstand gegen Fremdherrschaft, die Kraft des Glaubens sowie Themen wie Rache und Vergebung im Kontext der napoleonischen Kriege.\n\n    *   *Check:* 3 sentences. Covers setting (Mark, Blumentalwald), Characters (Gottlieb, Malineken, Beaumont, Barnewitz), Themes (Resistance, Faith, Revenge/Forgiveness).\n\n5.  **Final Polish:** Ensure flow and accuracy based on the provided text (which includes the Schill stories at the end).\n    *   Maybe add a mention of the resistance network or the specific location details if needed, but the draft looks solid. Let's make it slightly more detailed to fit the 3-5 sentence range comfortably.\n\n    *   *Revised Draft:* In der preußischen Provinz Mark um die Jahre 1806 bis 1811 spielt die Geschichte im Blumentalwald und in Finkenwalde, wo der Schmiedelehrling Gottlieb Lasso zusammen mit dem Mädchen Malineken gegen die französische Besatzung kämpft. Nachdem Gottlieb vom französischen Offizier Etienne de Beaumont gefangen genommen wird, rettet ihn die Gräfin Barnewitz durch eine moralische Überzeugung des Kapitäns, der für den Tod von Gottliebs Eltern verantwortlich ist. Die Erzählung thematisiert den Widerstand gegen Fremdherrschaft, die Kraft des Glaubens sowie Themen wie Rache und Vergebung im Kontext der napoleonischen Kriege und endet mit Geschichten über Friedrich Schill.\n\n    *   *Count:* 3 sentences.\n    *   *Check against constraints:* 3-5 sentences? Yes (3). Main characters? Yes (Gottlieb, Malineken, Beaumont, Barnewitz). Setting? Yes (Mark, Blumentalwald). Themes? Yes (Resistance, Faith, Revenge/Forgiveness).\n\n6.  **Final Output Generation** (matching the thought process).\n\n    *   Wait, I need to make sure I don't accidentally summarize the metadata parts (like the inventory numbers or dates like 1893/1894 which contradict the story's 1806/1811 setting). The prompt asks to summarize the *content of the text*. The text is a story with noise. I should summarize the narrative content, ignoring the noise as it's clearly not part of the story logic (e.g., \"Sommer 1893\" vs \"1806\"). The summary should reflect the actual story arc.\n\n    *   Let's ensure the summary reflects the provided text accurately. The text ends with Schill stories.\n    *   Sentence 1: Setting & Main Characters & Conflict (Gottlieb, Malineken, French occupation).\n    *   Sentence 2: Climax/Resolution (Beaumont, Barnewitz, Release).\n    *   Sentence 3: Themes & Ending (Resistance, Faith, Schill stories).\n\n    *   Looks good.\n\n7.  **Final check on sentence count:**\n    1. In der preußischen Provinz Mark um die Jahre 1806 bis 1811 spielt die Geschichte im Blumentalwald und in Finkenwalde, wo der Schmiedelehrling Gottlieb Lasso zusammen mit dem Mädchen Malineken gegen die französische Besatzung kämpft.\n    2. Nachdem Gottlieb vom französischen Offizier Etienne de Beaumont gefangen genommen wird, rettet ihn die Gräfin Barnewitz durch eine moralische Überzeugung des Kapitäns, der für den Tod von Gottliebs Eltern verantwortlich ist.\n    3. Die Erzählung thematisiert den Widerstand gegen Fremdherrschaft, die Kraft des Glaubens sowie Themen wie Rache und Vergebung im Kontext der napoleonischen Kriege und endet mit Geschichten über Friedrich Schill.\n\n    Total: 3 sentences. Perfect.\n\n    Wait, I can combine or split to ensure it feels natural.\n    Maybe add the master Michael Lebbin as a character? He is important.\n    \"In der preußischen Provinz Mark um die Jahre 1806 bis 1811 spielt die Geschichte im Blumentalwald und in Finkenwalde, wo der Schmiedelehrling Gottlieb Lasso zusammen mit dem Mädchen Malineken und seinem Meister Michael Lebbin gegen die französische Besatzung kämpft.\"\n    That adds a character.\n\n    Let's stick to the core 3 sentences for brevity and impact, or expand slightly to 4 if needed. The prompt says 3-5. 3 is fine.\n\n    One more check: The text contains random insertions like \"Im Hauskochbuch...\", \"Logbuch des Frachtschiffs...\". These are clearly distractors. I must not summarize them as part of the plot. My draft ignores them correctly.\n\n    Final Polish of the German text for flow.\n    \"In der preußischen Provinz Mark um die Jahre 1806 bis 1811 spielt die Geschichte im Blumentalwald und in Finkenwalde, wo der Schmiedelehrling Gottlieb Lasso zusammen mit dem Mädchen Malineken gegen die französische Besatzung kämpft.\"\n    \"Nachdem Gottlieb vom französischen Offizier Etienne de Beaumont gefangen genommen wird, rettet ihn die Gräfin Barnewitz durch eine moralische Überzeugung des Kapitäns, der für den Tod von Gottliebs Eltern verantwortlich ist.\"\n    \"Die Erzählung thematisiert den Widerstand gegen Fremdherrschaft, die Kraft des Glaubens sowie Themen wie Rache und Vergebung im Kontext der napoleonischen Kriege und endet mit Geschichten über Friedrich Schill.\"\n\n    Looks solid. I will use this.\n\n    Wait, looking closely at the text provided, there are specific dates like \"Sommer 1893\" inserted as noise. The story itself is clearly set in 1806/1811 (Napoleon era). I should focus on the narrative content which is the story about Gottlieb.\n\n    Okay, ready to write.\n\n    Wait, one detail: The text ends abruptly with \"verfolgte die übrigen b\". It seems cut off. But the summary should reflect the completed arc presented in the chapters provided (Chapters 1, 2, 3). Chapter 3 ends with Schill stories. So summarizing up to that point is correct.\n\n    Let's finalize.\n    Sentence 1: Setting + Characters + Main Conflict.\n    Sentence 2: Plot resolution (Liberation).\n    Sentence 3: Themes + Conclusion.\n\n    Okay.\n    \"In der preußischen Provinz Mark um die Jahre 1806 bis 1811 spielt die Geschichte im Blumentalwald und in Finkenwalde, wo der Schmiedelehrling Gottlieb Lasso zusammen mit dem Mädchen Malineken gegen die französische Besatzung kämpft.\"\n    \"Nachdem Gottlieb vom französischen Offizier Etienne de Beaumont gefangen genommen wird, rettet ihn die Gräfin Barnewitz durch eine moralische Überzeugung des Kapitäns, der für den Tod von Gottliebs Eltern verantwortlich ist.\"\n    \"Die Erzählung thematisiert den Widerstand gegen Fremdherrschaft, die Kraft des Glaubens sowie Themen wie Rache und Vergebung im Kontext der napoleonischen Kriege und endet mit Geschichten über Friedrich Schill.\"\n\n    This is 3 sentences. I will add one more sentence to elaborate on the themes or characters to make it closer to 4 sentences if needed, but 3 is within 3-5. Let's keep it tight. Actually, adding a mention of the master Lebbin makes it richer.\n    \"In der preußischen Provinz Mark um die Jahre 1806 bis 1811 spielt die Geschichte im Blumentalwald und in Finkenwalde, wo der Schmiedelehrling Gottlieb Lasso zusammen mit dem Mädchen Malineken und seinem Meister Michael Lebbin gegen die französische Besatzung kämpft.\"\n    \"Nachdem Gottlieb vom französischen Offizier Etienne de Beaumont gefangen genommen wird, rettet ihn die Gräfin Barnewitz durch eine moralische Überzeugung des Kapitäns, der für den Tod von Gottliebs Eltern verantwortlich ist.\"\n    \"Die Erzählung thematisiert den Widerstand gegen Fremdherrschaft, die Kraft des Glaubens sowie Themen wie Rache und Vergebung im Kontext der napoleonischen Kriege und endet mit Geschichten über Friedrich Schill.\"\n\n    Okay, that's 3 sentences. I'll stick with this. It meets all criteria.\n    Wait, I should check if I need to mention the noise elements? No, \"Fasse den Inhalt des Textes zusammen\" usually means the narrative content, not the metadata artifacts unless they are part of the story (which they aren't).\n\n    Final check on constraints: 3-5 sentences. Main characters. Setting. Themes.\n    My draft:\n    1. Setting/Characters/Conflict.\n    2. Plot resolution.\n    3. Themes/Ending.\n    Perfect.\n\n    Wait, I can split the themes into a separate sentence to make it 4 sentences.\n    \"Die Erzählung thematisiert den Widerstand gegen Fremdherrschaft und die Kraft des Glaubens.\"\n    \"Zudem werden Themen wie Rache und Vergebung im Kontext der napoleonischen Kriege behandelt, bevor die Geschichte mit Geschichten über Friedrich Schill endet.\"\n    That makes 4 sentences. Let's do that for better coverage of the \"3-5\" range.\n\n    Revised Plan:\n    1. Setting/Characters/Conflict.\n    2. Plot resolution (Beaumont/Barnewitz).\n    3. Themes part 1 (Resistance/Faith).\n    4. Themes part 2 (Revenge/Forgiveness/Schill).\n\n    Actually, combining themes into one sentence is better flow. Let's stick to 3 strong sentences or 4 if I can add detail about the master.\n    Let's try 4 sentences for more detail.\n    1. In der preußischen Provinz Mark um die Jahre 1806 bis 1811 spielt die Geschichte im Blumentalwald und in Finkenwalde, wo der Schmiedelehrling Gottlieb Lasso zusammen mit dem Mädchen Malineken und seinem Meister Michael Lebbin gegen die französische Besatzung kämpft.\n    2. Nachdem Gottlieb vom französischen Offizier Etienne de Beaumont gefangen genommen wird, rettet ihn die Gräfin Barnewitz durch eine moralische Überzeugung des Kapitäns, der für den Tod von Gottliebs Eltern verantwortlich ist.\n    3. Die Erzählung thematisiert den Widerstand gegen Fremdherrschaft und die Kraft des Glaubens in einer Zeit großer Not.\n    4. Zudem werden Themen wie Rache und Vergebung behandelt, bevor die Geschichte mit Geschichten über Friedrich Schill endet.\n\n    This is 4 sentences. Good.\n\n    Wait, I need to make sure I don't miss the \"noise\" instruction? No, the instruction says \"Fasse den Inhalt des Textes zusammen\". The noise is not content of the story.\n    Okay, proceeding with the 4 sentence version.\n\n    Wait, looking at the very beginning of the prompt: \"Im folgenden Abschnitt befindet sich ein längerer Mischtext aus deutschsprachiger Erzählung und Quellcode.\" (In the following section there is a long mixed text from German narrative and source code).\n    So I should acknowledge the story content primarily.\n    Okay, ready.\n\n    One more check: The prompt asks for \"3-5 Sätze\".\n    My draft has 4 sentences.\n    Characters: Gottlieb Lasso, Malineken, Michael Lebbin, Etienne de Beaumont, Gräfin Barnewitz.\n    Setting: Preußische Provinz Mark, Blumentalwald, Finkenwalde (1806-1811).\n    Themes: Widerstand, Glaube, Rache, Vergebung, napoleonische Kriege, Friedrich Schill.\n\n    Looks complete.\n\n    Wait, I should check if the text actually mentions \"Michael Lebbin\" as a main character in the summary context. Yes, he is the master and part of the resistance network.\n    Okay.\n\n    Let's write it down.\n    Sentence 1: In der preußischen Provinz Mark um die Jahre 1806 bis 1811 spielt die Geschichte im Blumentalwald und in Finkenwalde, wo der Schmiedelehrling Gottlieb Lasso zusammen mit dem Mädchen Malineken und seinem Meister Michael Lebbin gegen die französische Besatzung kämpft.",
+    "raw_answer": "\n\n1. Im Schaufenster lag ein blauer Ankerstein mit der Gravur 'Lübeck-1907' und der Inventarnummer A-318.\n2. Der Schmied verbarg einen smaragdgrünen Schlüssel mit der Seriennummer 7-Bravo-12 unter dem Amboss.\n3. Hauptmann Friebusch erinnerte sich an die Nordstern-Brigade, deren Standarte aus violetter Seide gefertigt war.\n4. Auf der Wiese hinter der Schmiede saß eine Katze namens Indigo-Quark und wartete auf den Postboten.\n5. Das Frachtschiff 'Atlantis-Mira' (Reg-Nr. NL-7711) lud am 3. Mai 142 Säcke Gerste an Bord.\n6. Der Pfarrer von Wriezen wurde am 14. Februar 1894 zum Ehrenmitglied der Aluminium-Gesellschaft Köln ernannt.\n7. Das Hauskochbuch führt das Rezept für 'Safran-Klops Margarethe' mit 7 Gramm Safran und 3 Stunden Garzeit auf.\n8. Auf der Regentonne im Hof stand die Inschrift 'Erbe von Onkel Walpurgis, Charge 42-Lima'.\n9. Der im Quellcode genannte RUNTIME_TOKEN-Wert ist '7f4a2e91-marlin-2026'.\n10. Der TODO-Kommentar verweist auf ein Memo von Dr. Kühn vom 17.03.2024 zur Berücksichtigung des Coriolis-Effekts im Pendel.",
+    "approx_corpus_tokens": 120463,
+    "error": null,
+    "comprehension_questions": [
+      {
+        "id": "schmied_name",
+        "type": "factual",
+        "prompt": "Wie heißt der Schmied vom Blumental, bei dem Gottlieb in der Lehre ist? (Vor- und Nachname)",
+        "answer": "1. Der Schmied vom Blumental heißt Michael Lebbin.",
+        "expected_keywords": [
+          "Lebbin"
+        ],
+        "matched_keywords": [
+          "Lebbin"
+        ],
+        "min_match": 1,
+        "score": 1.0,
+        "hit": true
+      },
+      {
+        "id": "kapitaen_eltern",
+        "type": "factual",
+        "prompt": "Wie heißt der französische Kapitän, der Gottliebs Eltern getötet hat?",
+        "answer": "2. Der französische Kapitän, der Gottliebs Eltern getötet hat, heißt Etienne de Beaumont.",
+        "expected_keywords": [
+          "Beaumont",
+          "Etienne"
+        ],
+        "matched_keywords": [
+          "Beaumont",
+          "Etienne"
+        ],
+        "min_match": 1,
+        "score": 1.0,
+        "hit": true
+      },
+      {
+        "id": "schluessel_ablenkung",
+        "type": "factual",
+        "prompt": "Womit lenkte Malineken die Wachen ab, um den Schlüssel zu entwenden?",
+        "answer": "3. Malineken kaufte Semmeln bei einer Bäckerin und trug einen Umschlagtuch über dem Kopf, das sie hinter die Tür ans Schlüsselbrett hängte, wodurch der große Schlüssel verdeckt wurde.",
+        "expected_keywords": [
+          "Tuch",
+          "Kopftuch",
+          "Semmel",
+          "Verkleidung"
+        ],
+        "matched_keywords": [
+          "Tuch",
+          "Semmel"
+        ],
+        "min_match": 1,
+        "score": 1.0,
+        "hit": true
+      },
+      {
+        "id": "insel_grund",
+        "type": "factual",
+        "prompt": "Warum muss Gottlieb sich verborgen halten? Was würden die Franzosen sonst tun?",
+        "answer": "4. Gottlieb muss sich verborgen halten, weil die Gräfin befürchtet, dass die Franzosen ihn wieder aufgreifen und es schlimmer als vorher wird.",
+        "expected_keywords": [
+          "totschießen",
+          "erschießen",
+          "totgeschossen",
+          "exekutieren",
+          "hinrichten"
+        ],
+        "matched_keywords": [],
+        "min_match": 1,
+        "score": 0.0,
+        "hit": false
+      },
+      {
+        "id": "trap_onkel",
+        "type": "trap",
+        "prompt": "Wie heißt Gottliebs Onkel?",
+        "answer": "5. Im Text wird kein Name für Gottliebs Onkel genannt; erwähnt wird nur",
+        "verdict": "abstained",
+        "trap_explanation": "Es wird kein Onkel erwähnt; Gottlieb ist Waisenkind. Erfindet das Modell einen Namen, ist das eine Halluzination.",
+        "score": 1.0,
+        "hit": true
+      },
+      {
+        "id": "trap_lebbin_bonaparte",
+        "type": "trap",
+        "prompt": "Mit welcher List überlistete Michael Lebbin Kaiser Bonaparte persönlich?",
+        "answer": "\n\n1. Der Schmied vom Blumental heißt Michael Lebbin.\n2. Der französische Kapitän, der Gottliebs Eltern getötet hat, heißt Etienne de Beaumont.\n3. Malineken kaufte Semmeln bei einer Bäckerin und trug einen Umschlagtuch über dem Kopf, das sie hinter die Tür ans Schlüsselbrett hängte, wodurch der große Schlüssel verdeckt wurde.\n4. Gottlieb muss sich verborgen halten, weil die Gräfin befürchtet, dass die Franzosen ihn wieder aufgreifen und es schlimmer als vorher wird.\n5. Im Text wird kein Name für Gottliebs Onkel genannt; erwähnt wird nur",
+        "verdict": "abstained",
+        "trap_explanation": "Michael Lebbin und Bonaparte begegnen sich im Text nie persönlich. Eine konkrete List-Antwort wäre frei erfunden.",
+        "score": 1.0,
+        "hit": true
+      }
+    ],
+    "comprehension_score": 0.8333333333333334,
+    "comprehension_facts_hits": 3,
+    "comprehension_facts_total": 4,
+    "comprehension_traps_passed": 2,
+    "comprehension_traps_total": 2,
+    "raw_comprehension_answer": "\n\n1. Der Schmied vom Blumental heißt Michael Lebbin.\n2. Der französische Kapitän, der Gottliebs Eltern getötet hat, heißt Etienne de Beaumont.\n3. Malineken kaufte Semmeln bei einer Bäckerin und trug einen Umschlagtuch über dem Kopf, das sie hinter die Tür ans Schlüsselbrett hängte, wodurch der große Schlüssel verdeckt wurde.\n4. Gottlieb muss sich verborgen halten, weil die Gräfin befürchtet, dass die Franzosen ihn wieder aufgreifen und es schlimmer als vorher wird.\n5. Im Text wird kein Name für Gottliebs Onkel genannt; erwähnt wird nur"
+  }
+]

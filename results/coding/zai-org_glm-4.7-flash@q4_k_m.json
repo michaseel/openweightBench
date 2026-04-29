@@ -1,0 +1,201 @@
+{
+  "task": "coding",
+  "model_id": "zai-org/glm-4.7-flash@q4_k_m",
+  "model_info": {
+    "id": "zai-org/glm-4.7-flash@q4_k_m",
+    "type": "llm",
+    "publisher": "zai-org",
+    "arch": "glm4_moe_lite",
+    "compatibility_type": "mlx",
+    "quantization": "q4_k_m",
+    "state": "not-loaded",
+    "max_context_length": 202752,
+    "capabilities": [
+      "tool_use"
+    ],
+    "loaded_context_length": null
+  },
+  "started_at": "2026-04-29T10:19:37.147411Z",
+  "completed_at": "2026-04-29T10:21:59.980664Z",
+  "metrics": {
+    "wall_seconds": 142.8298769579269,
+    "tokens_generated": 7746,
+    "tokens_per_second": 69.01268331237858,
+    "time_to_first_token_ms": 371.0,
+    "peak_rss_mb": 17292.7
+  },
+  "score": 0.9166666666666667,
+  "score_breakdown": {
+    "looks_like_html": true,
+    "html_length": 25523,
+    "raw_length": 25537,
+    "lint_checks": [
+      {
+        "id": "col_backlog",
+        "label": "Spalte 'Backlog'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_in_progress",
+        "label": "Spalte 'In Progress'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_review",
+        "label": "Spalte 'Review'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_done",
+        "label": "Spalte 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "drag_drop",
+        "label": "HTML5 Drag&Drop oder Sortable-Lib",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "local_storage",
+        "label": "localStorage-Persistenz",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "tailwind_cdn",
+        "label": "Tailwind via CDN",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "confetti",
+        "label": "Confetti-Animation auf 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Add-Card-Button",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "vanilla_js",
+        "label": "Vanilla JS (kein React/Vue/Angular/Svelte)",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_alert_prompt",
+        "label": "Keine window.alert/prompt für CRUD",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "editable_cards",
+        "label": "Editierbare Karten (contenteditable / input)",
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "lint_passed": 12,
+    "lint_total": 12,
+    "lint_score": 1.0,
+    "e2e_checks": [
+      {
+        "id": "renders",
+        "label": "Seite lädt mit allen 4 Spalten",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Karte hinzufügen via Button",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_double_add",
+        "label": "Karte wird genau 1× angelegt (kein Doppel-Submit)",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "delete_card",
+        "label": "Karte löschen via Button + Bestätigung",
+        "passed": false,
+        "detail": "Locator.click: Timeout 2000ms exceeded.\nCall log:\n  - waiting for locator(\"[data-testid=\\\"delete-card\\\"]\").first\n    - locator resolved to <button data-testid=\"delete-card\" class=\"absolute top-2 right"
+      },
+      {
+        "id": "persistence",
+        "label": "Karten überleben einen Reload",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_console_errors",
+        "label": "Keine JS-Konsolen-Fehler",
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "e2e_passed": 5,
+    "e2e_total": 6,
+    "e2e_score": 0.8333333333333334,
+    "judge": {
+      "scored_at": "2026-04-29T10:22:12.591756+00:00",
+      "judge_model": "openai/gpt-5.4",
+      "scores": {
+        "board_renders": 1.0,
+        "column_completeness": 1.0,
+        "cards_present": 1.0,
+        "ui_affordances": 0.7,
+        "design_quality": 0.82,
+        "code_structure": 0.72,
+        "dom_safety": 0.55,
+        "robustness": 0.3,
+        "code_quality": 0.62,
+        "render_matches_code": 0.95
+      },
+      "judge_score": 0.748,
+      "comment_visual": "Das Board rendert vollständig mit allen vier Spalten, sichtbaren Karten und gut erkennbaren Add-Task-Buttons. Optisch ist es sauber, hell und konsistent, wenn auch eher zurückhaltend als wirklich außergewöhnlich; Drag-and-drop ist nur indirekt über Cursor/Struktur angedeutet.",
+      "comment_code": "Der Code ist ordentlich in Funktionsblöcke gegliedert und die Kernlogik für Rendern, DnD, Add/Delete ist nachvollziehbar. Positiv ist die Nutzung von textContent für Kartentitel, aber deleteBtn nutzt innerHTML für SVG-Markup und die App verlässt sich weitgehend auf implizit funktionierende DOM-/Storage-Zugriffe ohne Schutzschicht.",
+      "comment_consistency": "Screenshot und Code passen insgesamt sehr gut zusammen: dieselben vier Spalten, dieselben Dummy-Karten und dieselbe visuelle Struktur sind sichtbar. Kleine Abweichungen zwischen versprochener Interaktivität und statischem Screenshot sind normal, kein Hinweis auf Laufzeitbruch."
+    }
+  },
+  "raw_response": "\n\n```html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Modern Kanban Board</title>\n    <!-- Tailwind CSS via CDN -->\n    <script src=\"https://cdn.tailwindcss.com\"></script>\n    <!-- Canvas Confetti for the \"Done\" celebration -->\n    <script src=\"https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js\"></script>\n    \n    <script>\n        tailwind.config = {\n            theme: {\n                extend: {\n                    colors: {\n                        brand: {\n                            50: '#eff6ff',\n                            100: '#dbeafe',\n                            500: '#3b82f6',\n                            600: '#2563eb',\n                            900: '#1e3a8a',\n                        }\n                    },\n                    animation: {\n                        'fade-in': 'fadeIn 0.3s ease-out',\n                        'slide-up': 'slideUp 0.3s ease-out'\n                    },\n                    keyframes: {\n                        fadeIn: {\n                            '0%': { opacity: '0' },\n                            '100%': { opacity: '1' },\n                        },\n                        slideUp: {\n                            '0%': { transform: 'translateY(10px)', opacity: '0' },\n                            '100%': { transform: 'translateY(0)', opacity: '1' },\n                        }\n                    }\n                }\n            }\n        }\n    </script>\n\n    <style>\n        /* Custom scrollbar for a polished look */\n        ::-webkit-scrollbar {\n            width: 8px;\n            height: 8px;\n        }\n        ::-webkit-scrollbar-track {\n            background: #f1f5f9; \n        }\n        ::-webkit-scrollbar-thumb {\n            background: #cbd5e1; \n            border-radius: 4px;\n        }\n        ::-webkit-scrollbar-thumb:hover {\n            background: #94a3b8; \n        }\n\n        /* Drag and ",
+  "artifacts": [
+    {
+      "kind": "html",
+      "label": "Generierte App",
+      "path": "artifacts/zai-org_glm-4.7-flash@q4_k_m/coding/output.html",
+      "mime": "text/html"
+    },
+    {
+      "kind": "text",
+      "label": "Roh-Antwort des Modells",
+      "path": "artifacts/zai-org_glm-4.7-flash@q4_k_m/coding/raw_response.txt",
+      "mime": "text/plain"
+    },
+    {
+      "kind": "image",
+      "label": "Screenshot der gerenderten App",
+      "path": "artifacts/zai-org_glm-4.7-flash@q4_k_m/coding/screenshot.png",
+      "mime": "image/png"
+    }
+  ],
+  "error": null,
+  "hardware": {
+    "platform": "macOS-26.4.1-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "ram_total_gb": 128.0,
+    "cpu_count": 16
+  },
+  "bench_version": "0.1.0"
+}

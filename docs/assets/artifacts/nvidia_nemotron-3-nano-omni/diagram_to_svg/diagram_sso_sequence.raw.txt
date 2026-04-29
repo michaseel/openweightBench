@@ -1,0 +1,79 @@
+
+<svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#000"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="600" y="50" text-anchor="middle" font-size="24">SSO - Ablaufdiagramm</text>
+
+  <!-- Stick Figure (Benutzer) -->
+  <g id="user">
+    <circle cx="150" cy="350" r="10" fill="black"/>
+    <line x1="150" y1="360" x2="150" y2="400" stroke="black" stroke-width="2"/>
+    <line x1="150" y1="370" x2="130" y2="380" stroke="black" stroke-width="2"/>
+    <line x1="150" y1="370" x2="170" y2="380" stroke="black" stroke-width="2"/>
+    <line x1="150" y1="400" x2="130" y2="420" stroke="black" stroke-width="2"/>
+    <line x1="150" y1="400" x2="170" y2="420" stroke="black" stroke-width="2"/>
+  </g>
+  <text x="160" y="380" font-size="14">Benutzer</text>
+
+  <!-- Box: Zugriff gewünscht -->
+  <rect x="270" y="630" width="150" height="80" rx="5" ry="5" fill="white" stroke="black"/>
+  <text x="345" y="660" text-anchor="middle" font-size="14">Zugriff gewünscht</text>
+
+  <!-- Box: App / Service Provider -->
+  <g id="app-box">
+    <rect x="380" y="270" width="150" height="80" rx="5" ry="5" fill="white" stroke="black"/>
+    <text x="455" y="300" text-anchor="middle" font-size="14">App /<tspan>Service Provider</tspan></text>
+  </g>
+
+  <!-- Box: Identity Provider (IdP) -->
+  <g id="idp-box">
+    <rect x="680" y="270" width="150" height="80" rx="5" ry="5" fill="white" stroke="black"/>
+    <text x="755" y="300" text-anchor="middle" font-size="14">Identity Provider<tspan>(IdP)</tspan></text>
+  </g>
+
+  <!-- Box: Login-Seite -->
+  <g id="login-box">
+    <rect x="620" y="400" width="150" height="80" rx="5" ry="5" fill="white" stroke="black"/>
+    <text x="705" y="430" text-anchor="middle" font-size="14">Login-Seite</text>
+  </g>
+
+  <!-- Diamond: Anmeldeabgabe korrekt? -->
+  <polygon points="650,520 690,580 650,640 610,580" fill="white" stroke="black"/>
+  <text x="650" y="590" text-anchor="middle" font-size="13">Anmeldeabgabe korrekt?</text>
+
+  <!-- Connections -->
+  
+  <!-- Step 1: User -> App -->
+  <line x1="170" y1="400" x2="550" y2="300" stroke="black" marker-end="url(#arrow)"/>
+  <text x="360" y="380" font-size="12">1. Zugang zur App</text>
+
+  <!-- Step 2: App -> IdP -->
+  <line x1="550" y1="300" x2="750" y2="300" stroke="black" marker-end="url(#arrow)"/>
+  <text x="660" y="320" font-size="12">2. Weiterleitung der Login-Seite</text>
+
+  <!-- Step 3: IdP -> Login-Seite -->
+  <line x1="750" y1="300" x2="750" y2="480" stroke="black" marker-end="url(#arrow)"/>
+  <text x="760" y="460" font-size="12">3. Login Seite weiterleiten</text>
+
+  <!-- Step 4: Dashed arrow (Login-Seite -> App contextually) -->
+  <path d="M705 430 L550 280" stroke="black" stroke-dasharray="5,5"/>
+  <text x="680" y="380" font-size="12">4. Authentifizierung</text>
+
+  <!-- Step 5: Login-Seite -> Diamond -->
+  <line x1="705" y1="480" x2="650" y2="530" stroke="black" marker-end="url(#arrow)"/>
+  <text x="660" y="550" font-size="12">5. Token / Assertion (SSO Response)</text>
+
+  <!-- Step 6: Diamond -> App -->
+  <line x1="650" y1="640" x2="550" y2="300" stroke="black" marker-end="url(#arrow)"/>
+  <text x="600" y="580" font-size="12">6. Rückmeldung durch App und Token</text>
+
+  <!-- Step 7: Zugriff gewünscht -> App -->
+  <line x1="345" y1="690" x2="455" y2="300" stroke="black" marker-end="url(#arrow)"/>
+  <text x="380" y="600" font-size="12">7. Zugriff auf Ressource</text>
+
+</svg>

@@ -1,0 +1,457 @@
+[
+  {
+    "id": "handwriting_easy",
+    "label": "Handschrift OCR – leicht",
+    "prompt": "Auf dem Bild siehst du eine handschriftliche Meeting-Notiz mit klarer Struktur und gut lesbarer Schrift. Transkribiere den gesamten lesbaren Text. Behalte die Anordnung bei (Überschrift, Spalten, To-Dos). Bei unleserlichen Stellen schreibe '[unleserlich]'. Gib ausschließlich den puren OCR-Text im Markdown-Format zurück — keine Vorbemerkung, keine Erklärungen, kein Code-Fence.",
+    "image_paths": [
+      "artifacts/qwen_qwen3.6-35b-a3b@q8_0/vision/handwriting_easy.jpg"
+    ],
+    "answer": "\n\nMeetingnotizen Website-Relaunch\n12.06.25, 09:30 Uhr\nAnwesend:\nAnna, Ben, Mira, Jonas, Ece\nCMS langsam?\nThemen:\n- Startseite\n- Texte\n- Bildauswahl\n- Launch-Termin\n- offene Fragen\nStand:\n- Design fast final ✓\n- Texte für Über-uns fehlen noch\n- Bilder vom Team noch nicht komplett\n- Mobile Ansicht prüfen\n↑ bitte kurz\nhalten\nTo-Dos:\n- Ben → Bilder anfragen\n- Mira → Startseite anpassen\n- Jonas → Feedback Kunde\n- Anna → SEO-Check\nOffen:\n- Rechtstexte final?\n- Freigabe Kunde bis Freitag\n- Wer testet Kontaktformular?\nNächstes Meeting:\n17.06., 10 Uhr\nsss",
+    "ground_truth": "Meetingnotizen Website-Relaunch\n12.06.25, 09:30 Uhr\n\nAnwesend:\nAnna, Ben, Mira, Jonas, Ece\n\nCMS langsam?\n\nThemen:\nStartseite\nTexte\nBildauswahl\nLaunch-Termin\noffene Fragen\n\nStand:\nDesign fast final\nTexte für Über-uns fehlen noch\nBilder vom Team noch nicht komplett\nMobile Ansicht prüfen\n\nbitte kurz halten\n\nTo-Dos:\nBen Bilder anfragen\nMira Startseite anpassen\nJonas Feedback Kunde\nAnna SEO-Check\n\nOffen:\nRechtstexte final?\nFreigabe Kunde bis Freitag\nWer testet Kontaktformular?\n\nNächstes Meeting: 17.06., 10 Uhr",
+    "expected_keywords": [],
+    "ocr": {
+      "recall": 1.0,
+      "precision": 0.9871794871794872,
+      "f1": 0.9935483870967742,
+      "matched": 77,
+      "ordered_matched": 77,
+      "relocated_matched": 0,
+      "fuzzy_matched": 0,
+      "missed": 0,
+      "extra": 1,
+      "gt_total": 77,
+      "pred_total": 78,
+      "opcodes": [
+        {
+          "tag": "equal",
+          "gt": "meetingnotizen website relaunch 12 06 25 09 30 uhr anwesend anna ben mira jonas ece cms langsam themen startseite texte bildauswahl launch termin offene fragen stand design fast final texte für über uns fehlen noch bilder vom team noch nicht komplett mobile ansicht prüfen bitte kurz halten to dos ben bilder anfragen mira startseite anpassen jonas feedback kunde anna seo check offen rechtstexte final freigabe kunde bis freitag wer testet kontaktformular nächstes meeting 17 06 10 uhr",
+          "pred": "meetingnotizen website relaunch 12 06 25 09 30 uhr anwesend anna ben mira jonas ece cms langsam themen startseite texte bildauswahl launch termin offene fragen stand design fast final texte für über uns fehlen noch bilder vom team noch nicht komplett mobile ansicht prüfen bitte kurz halten to dos ben bilder anfragen mira startseite anpassen jonas feedback kunde anna seo check offen rechtstexte final freigabe kunde bis freitag wer testet kontaktformular nächstes meeting 17 06 10 uhr"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "sss"
+        }
+      ]
+    },
+    "score": 0.9935483870967742,
+    "error": null,
+    "wall_seconds": 11.819649165961891,
+    "tokens_per_second": 68.33965120338283
+  },
+  {
+    "id": "handwriting_medium",
+    "label": "Handschrift OCR – mittel",
+    "prompt": "Auf dem Bild siehst du ein handschriftliches Meeting-Protokoll mit organisierter Struktur, aber kleinerer und teils flüchtiger Schrift. Transkribiere den lesbaren Text und behalte die Gliederung bei (Datum, Themen, Einzelpunkte). Bei unleserlichen Stellen '[unleserlich]'. Gib ausschließlich den puren OCR-Text im Markdown-Format zurück — keine Vorbemerkung, keine Erklärungen, kein Code-Fence.",
+    "image_paths": [
+      "artifacts/qwen_qwen3.6-35b-a3b@q8_0/vision/handwriting_medium.jpg"
+    ],
+    "answer": "\n\nMeeting protokoll\n21.05.25\n11 Uhr\n\nTeilnehmer: M. Schulz, T. Wagner, L. Becker,\nS. Klein (später), H. Jf.\n\nThemen: - Projektstatus / Update\n- Budget -> ist zu hoch\n- Timeline / Meilenstein\n- Risiken\n\nProjektstatus: - Modul A fertig (Team S.)\nDetails\nin Jira\n- Modul B verzögert sich :(\n- Testphase startet nächste Woche (hoffentlich)\n- Kundenfeedback steht noch aus\n\nBudget: ~ 20% über Plan !\nUrsache: unklare Anforderungen\n-> Nachbessern nötig\nnächstes Mal genauer kalkulieren !!\nbitte\nReport bis\n28.05.\n\nOffene Punkte: - Freigabe von Kunde fehlt noch -> T.W. kümmert sich\n- Schnittstelle zu System X unklar -> Rücksprache mit IT\n- Schulung für neues Tool? -> noch nicht geplant\nwer macht das?\n\nTo-Dos: - T.W.: Budget-Report -> 28.05.\n- L.B.: Kunden anstupsen wg. Feedback\n- Dokumentation aktualisieren\n\nNächstes Meeting:\n04.06.25, 10 Uhr\n(Raum 2.15?)\n\nRückfragen: - Wie gehen wir mit dem Risiko um?\n- Priorisierung der Features nochmal prüfen\n- ...",
+    "ground_truth": "Meetingprotokoll\n21.05.25\n11 Uhr\n\nTeilnehmer: M. Schulz, T. Wagner, L. Becker, S. Klein (später), H. Jt.\n\nThemen:\nProjektstatus / Update\nBudget — ist zu hoch\nTimeline / Meilenstein!\nRisiken\n\nProjektstatus:\nModul A fertig (Team S.)\nModul B verzögert sich\nTestphase startet nächste Woche (hoffentlich)\nKundenfeedback steht noch aus\n\nDetails in Jira\n\nBudget:\n20% über Plan\nUrsache: unklare Anforderungen\nNachbessern nötig\nnächstes Mal genauer kalkulieren\n\nbitte Report bis 28.05.\n\nOffene Punkte:\nFreigabe von Kunde fehlt noch (T.W. kümmert sich)\nSchnittstelle zu System X unklar — Rücksprache mit IT\nSchulung für neues Tool? noch nicht geplant — wer macht das?\n\nTo-Dos:\nT.W.: Budget-Report — 28.05.\nL.B.: Kunden anstupsen wg. Feedback\nDokumentation aktualisieren\n\nNächstes Meeting: 04.06.25, 10 Uhr (Raum 2.15?)\n\nRückfragen:\nWie gehen wir mit dem Risiko um?\nPriorisierung der Features nochmal prüfen\n...",
+    "expected_keywords": [],
+    "ocr": {
+      "recall": 0.9779411764705882,
+      "precision": 0.9708029197080292,
+      "f1": 0.9743589743589743,
+      "matched": 133,
+      "ordered_matched": 131,
+      "relocated_matched": 2,
+      "fuzzy_matched": 0,
+      "missed": 3,
+      "extra": 4,
+      "gt_total": 136,
+      "pred_total": 137,
+      "opcodes": [
+        {
+          "tag": "delete",
+          "gt": "meetingprotokoll",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "meeting protokoll"
+        },
+        {
+          "tag": "equal",
+          "gt": "21 05 25 11 uhr teilnehmer m schulz t wagner l becker s klein später h",
+          "pred": "21 05 25 11 uhr teilnehmer m schulz t wagner l becker s klein später h"
+        },
+        {
+          "tag": "delete",
+          "gt": "jt",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "jf"
+        },
+        {
+          "tag": "equal",
+          "gt": "themen projektstatus update budget ist zu hoch timeline meilenstein risiken projektstatus modul a fertig team s",
+          "pred": "themen projektstatus update budget ist zu hoch timeline meilenstein risiken projektstatus modul a fertig team s"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "in"
+        },
+        {
+          "tag": "equal",
+          "gt": "modul b verzögert sich testphase startet nächste woche hoffentlich kundenfeedback steht noch aus",
+          "pred": "modul b verzögert sich testphase startet nächste woche hoffentlich kundenfeedback steht noch aus"
+        },
+        {
+          "tag": "moved",
+          "gt": "details",
+          "pred": "details"
+        },
+        {
+          "tag": "delete",
+          "gt": "in",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "jira",
+          "pred": "jira"
+        },
+        {
+          "tag": "equal",
+          "gt": "budget 20 über plan ursache unklare anforderungen nachbessern nötig nächstes mal genauer kalkulieren bitte report bis 28 05 offene punkte freigabe von kunde fehlt noch t w kümmert sich schnittstelle zu system x unklar rücksprache mit it schulung für neues tool noch nicht geplant wer macht das to dos t w budget report 28 05 l b kunden anstupsen wg feedback dokumentation aktualisieren nächstes meeting 04 06 25 10 uhr raum 2 15 rückfragen wie gehen wir mit dem risiko um priorisierung der features nochmal prüfen",
+          "pred": "budget 20 über plan ursache unklare anforderungen nachbessern nötig nächstes mal genauer kalkulieren bitte report bis 28 05 offene punkte freigabe von kunde fehlt noch t w kümmert sich schnittstelle zu system x unklar rücksprache mit it schulung für neues tool noch nicht geplant wer macht das to dos t w budget report 28 05 l b kunden anstupsen wg feedback dokumentation aktualisieren nächstes meeting 04 06 25 10 uhr raum 2 15 rückfragen wie gehen wir mit dem risiko um priorisierung der features nochmal prüfen"
+        }
+      ]
+    },
+    "score": 0.9743589743589743,
+    "error": null,
+    "wall_seconds": 40.062288417015225,
+    "tokens_per_second": 68.24604180288661
+  },
+  {
+    "id": "handwriting_hard",
+    "label": "Handschrift OCR – schwer",
+    "prompt": "Auf dem Bild siehst du eine handschriftliche Notiz mit unleserlicher, geknitterter Schrift und vielen Abkürzungen. Versuche so viel wie möglich zu transkribieren. Behalte die räumliche Anordnung bei. Markiere unleserliche Stellen mit '[unleserlich]'. Wenn du gar nichts erkennen kannst, sag das ausdrücklich. Gib ausschließlich den puren OCR-Text im Markdown-Format zurück — keine Vorbemerkung, keine Erklärungen, kein Code-Fence.",
+    "image_paths": [
+      "artifacts/qwen_qwen3.6-35b-a3b@q8_0/vision/handwriting_hard.jpg"
+    ],
+    "answer": "\n\nBesprechung Sommerfest ☺\n23.05.24 10:15 Uhr (Konfi)\nChef fragen!!\n\nTeilnehmer:\n- Max\n- Jule\n- Tobi\n- Leni\n- Simon (konnte nur kurz)\n\nZiel: entspanntes\nBeisammensein\n& Spaß haben\n\nOrt?\n- Park am See?\n  -> Genehmigung?\n- Firmenhof / Terrasse? -> wer macht das?\n  Terrasse reservieren ?? Leni?\n\nNächster Termin:\nDo, 30.05.\n11 Uhr\nkurzes Update\nan HR schicken\n\nEssen / Trinken:\n- Grillen evtl.\n- Vegetarische Optionen\n  Vergessen?\n- Getränkeliste machen!\n- Bier, Limo, Wasser, was noch?\n  (Aperol? zu teuer?)\n\nGrill wer?\n(Tobi fragen)\n\n-> Kuchen?\nJule macht was ☺\n\nMusik:\n- Musikbox organisieren\n- Playlist?\n\nWetter-Backup:\n- Pavillon? Wer bringt mit?\n  Max hat einen?\n- Zelt mieten -> zu teuer\n- Plan B: Kantine?\n\nSpiele / Programm:\n- Volleyball / Federball\n- evtl. Cornhole oder Wikingerschach?\n- Fotoecke Idee? Requisiten?\n\nDeko:\n- unnötig?\n- evtl. Luftballons? neee\n\nBudget:\nca. 15€ p.P.?\nKosten noch offen!\n\nEinladung:\n-> Einladung bis Ende Woche raus!\n-> Text: Leni?\n-> Liste an Simon\n-> Versand: Jule\n\nOffene Fragen:\n- Wer grilt? (muss jemand\n  Schulung haben?)\n- Gibt's Strom im Park?\n- Müll / Reinigung klären!",
+    "ground_truth": "Besprechung Sommerfest\n23.05.24 10:15 Uhr (Konfi)\n\nChef fragen!!\n\nTeilnehmer:\nMax\nJule\nTobi\nLeni\nSimon (konnte nur kurz)\n\nZiel: entspanntes Beisammensein & Spaß haben\n\nNächster Termin:\nDo, 30.05.\n11 Uhr\nkurzes Update\nan HR schicken\n\nOrt?:\nPark am See?\nGenehmigung?\nFirmenhof / Terrasse?\nTerrasse reservieren?? — wer macht das? Leni?\n\nEssen / Trinken:\nGrillen evtl.\nvegetarische Optionen vergessen?\nGetränkeliste machen!\nBier, Limo, Wasser, was noch? (Aperol? zu teuer?)\nGrill wer? (Tobi fragen)\nKuchen? Jule macht was\n\nWetter / Backup:\nPavillon? Wer bringt mit?\nMax hat einen?\nZelt mieten → zu teuer\nPlan B: Kantine?\n\nMusik:\nMusikbox organisieren\nPlaylist?\n\nDeko:\nunnötig?\nevtl. Luftballons? neee\n\nBudget:\nca. 15€ p.P.?\nKosten noch offen!\n\nSpiele / Programm:\nVolleyball / Federball\nevtl. Cornhole oder Wikingerschach?\nFotoecke Idee? Requisiten?\n\nEinladung:\nEinladung bis Ende Woche raus!\nText: Leni?\nListe an Simon\nVersand: Jule\n\nOffene Fragen:\nWer grillt? (muss jemand Schulung haben?)\nGibt's Strom im Park?\nMüll / Reinigung klären",
+    "expected_keywords": [],
+    "ocr": {
+      "recall": 0.9594594594594594,
+      "precision": 0.9594594594594594,
+      "f1": 0.9594594594594594,
+      "matched": 142,
+      "ordered_matched": 119,
+      "relocated_matched": 22,
+      "fuzzy_matched": 1,
+      "missed": 6,
+      "extra": 6,
+      "gt_total": 148,
+      "pred_total": 148,
+      "opcodes": [
+        {
+          "tag": "equal",
+          "gt": "besprechung sommerfest 23 05 24 10 15 uhr konfi chef fragen teilnehmer max jule tobi leni simon konnte nur kurz ziel entspanntes beisammensein spaß haben",
+          "pred": "besprechung sommerfest 23 05 24 10 15 uhr konfi chef fragen teilnehmer max jule tobi leni simon konnte nur kurz ziel entspanntes beisammensein spaß haben"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "ort am see wer das"
+        },
+        {
+          "tag": "equal",
+          "gt": "nächster termin do 30 05 11 uhr kurzes update an hr schicken",
+          "pred": "nächster termin do 30 05 11 uhr kurzes update an hr schicken"
+        },
+        {
+          "tag": "delete",
+          "gt": "ort",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "park",
+          "pred": "park"
+        },
+        {
+          "tag": "delete",
+          "gt": "am see",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "genehmigung firmenhof terrasse terrasse reservieren",
+          "pred": "genehmigung firmenhof terrasse terrasse reservieren"
+        },
+        {
+          "tag": "delete",
+          "gt": "wer",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "macht",
+          "pred": "macht"
+        },
+        {
+          "tag": "delete",
+          "gt": "das",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "leni",
+          "pred": "leni"
+        },
+        {
+          "tag": "equal",
+          "gt": "essen trinken grillen evtl vegetarische optionen vergessen getränkeliste machen bier limo wasser was noch aperol zu teuer grill wer tobi fragen kuchen jule macht was wetter backup pavillon wer bringt mit max hat einen zelt mieten zu teuer plan b kantine",
+          "pred": "essen trinken grillen evtl vegetarische optionen vergessen getränkeliste machen bier limo wasser was noch aperol zu teuer grill wer tobi fragen kuchen jule macht was wetter backup pavillon wer bringt mit max hat einen zelt mieten zu teuer plan b kantine"
+        },
+        {
+          "tag": "moved",
+          "gt": "musik musikbox organisieren playlist",
+          "pred": "musik musikbox organisieren playlist"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "oder"
+        },
+        {
+          "tag": "equal",
+          "gt": "deko unnötig evtl luftballons neee budget ca 15 p p kosten noch offen",
+          "pred": "deko unnötig evtl luftballons neee budget ca 15 p p kosten noch offen"
+        },
+        {
+          "tag": "moved",
+          "gt": "spiele programm volleyball federball evtl cornhole",
+          "pred": "spiele programm volleyball federball evtl cornhole"
+        },
+        {
+          "tag": "delete",
+          "gt": "oder",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "wikingerschach fotoecke idee requisiten",
+          "pred": "wikingerschach fotoecke idee requisiten"
+        },
+        {
+          "tag": "equal",
+          "gt": "einladung einladung bis ende woche raus text leni liste an simon versand jule offene fragen wer",
+          "pred": "einladung einladung bis ende woche raus text leni liste an simon versand jule offene fragen wer"
+        },
+        {
+          "tag": "fuzzy",
+          "gt": "grillt",
+          "pred": "grilt"
+        },
+        {
+          "tag": "equal",
+          "gt": "muss jemand schulung haben gibt s strom im park müll reinigung klären",
+          "pred": "muss jemand schulung haben gibt s strom im park müll reinigung klären"
+        }
+      ]
+    },
+    "score": 0.9594594594594594,
+    "error": null,
+    "wall_seconds": 14.515853875083849,
+    "tokens_per_second": 68.78232139999201
+  },
+  {
+    "id": "fraktur_ocr",
+    "label": "Fraktur OCR",
+    "prompt": "Auf dem Bild siehst du eine Buchseite aus einer alten deutschen Erzählung in Frakturschrift (Seite 14). Transkribiere den gesamten Fließtext der Seite in moderne Antiqua-Schreibweise. Behalte die Absatzstruktur. Schreibe 'ß' wo es im Text steht. Bei unklaren Stellen [unleserlich]. Gib ausschließlich den puren OCR-Text im Markdown-Format zurück — keine Vorbemerkung, keine Erklärungen, kein Code-Fence.",
+    "image_paths": [
+      "artifacts/qwen_qwen3.6-35b-a3b@q8_0/vision/fraktur_innerpage.jpg"
+    ],
+    "answer": "\n\n— 14 —\ndeiner Großmutter wohl nur geträumt haben.\" „Nein,\" meinte\nMalineken hartnäckig, „sie hat ja auch die Prinzessin vom See\ngesehen, und das ist etwas ganz Besonderes.\" „Davon habe ich\nnoch nie gehört,\" antwortete Gottlieb. „So kann sie es dir\nerzählen, frag sie nur aus, sie weiß alles.\"\nDer Kahn war mittlerweile der Insel ganz nahe ge-\nkommen; die Kinder landeten an einer dazu geeigneten Stelle\nund befestigten ihn an einem aus dem Wasser ragenden Pflock.\nSie erstiegen die kleine Anhöhe, auf der sich das Gehüft be-\nsand. In dem kurzen, feinen Grase, welches den Boden be-\ndeckte, blühte der Thymian; ein festgetretener Weg führte gerade\nauf die Schilfhütte zu, die lag heimlich unter den Weiden. Das\nmächtige Geäst der majestätischen Bäume, mit silbergrauem,\nspitzblättrigem Laube beladen, breitete sich weit und wuchtig\nüber das niedere Dach, welches sich der Erde zuneigte. Da-\nhinter erblickte man ein Stück Garten und Ackerland, von Rohr\nund Schilf wie mit einem Wall umschlossen. Eine alte Frau\nsaß vor der Tür des Hüttchens und spann. Ihr Haar war\nso weiß wie das Gewebe der Spinnen, welches im Herbst über\ndie Stoppeln fliegt, um ihren Wocken hatte sie ein schwarzes\nBand gebunden. Gottlieb und Malineken kamen mit dem Korbe\nund blieben vor ihr stehen. „Großmutter,\" sagte letztere, „er\nwill nicht glauben, daß du die Seejungfern gesehen hast, und\ner weiß nichts von der Prinzessin vom See.\" Sie neigte ihren\nFaden. „Geht ihr man eures Weges,\" gab sie ihnen zur Ant-\nwort. „Großmutter, du könntest ihm die Geschichte von der\nPrinzessin vom See wohl erzählen,\" bat Malineken, „sie läßt\nsich schön anhören, und man muß sie doch wissen, wenn man\nüber den See fährt und in dem Blumental Tag für Tag herum-\nwandert.\" „Ich meine, ihr könntet euer Vesper brauchen,\"\nsagte die Großmutter, „es hat eben vier Uhr geschlagen.\" „Ach\nja,\" rief Malineken inbrünstig, „Erdbeeren mit Milch und ein\nStück Brot dazu; und dieweil wir das aufzehren, erzählt Ihr\ndem Gottlieb die Geschichte.\" Sie ließ nicht nach, sie mußte\nihren Willen haben. Ein Weilchen danach saßen die Kinder auf\neinem Baumstamm vor der Hütte und hatten zwischen sich einen\nNapf mit süßer Milch, in der schwammen die Erdbeeren so\ndick, daß man nicht wußte, war das Milch mit Erdbeeren, oder\nErdbeeren mit Milch; doch es mochte wohl auf eins heraus-\nkommen. Die Großmutter blickte zuweilen nach ihnen hin-",
+    "ground_truth": "deiner Großmutter wohl nur geträumt haben. „Nein,\" meinte Malineken hartnäckig, „sie hat ja auch die Prinzessin vom See gesehen, und das ist etwas ganz Besonderes.\" „Davon habe ich noch nie gehört,\" antwortete Gottlieb. „So kann sie es dir erzählen, frag sie nur aus, sie weiß alles.\"\n\nDer Kahn war mittlerweile der Insel ganz nahe gekommen; die Kinder landeten an einer dazu geeigneten Stelle und befestigten ihn an einem aus dem Wasser ragenden Pflock. Sie erstiegen die kleine Anhöhe, auf der sich das Gehöft befand. In dem kurzen, feinen Grase, welches den Boden bedeckte, blühte der Thymian; ein festgetretener Weg führte gerade auf die Schilfhütte zu, die lag heimlich unter den Weiden. Das mächtige Geäst der majestätischen Bäume, mit silbergrauem, spitzblättrigem Laube beladen, breitete sich weit und wuchtig über das niedere Dach, welches sich der Erde zuneigte. Dahinter erblickte man ein Stück Garten und Ackerland, von Rohr und Schilf wie mit einem Wall umschlossen. Eine alte Frau saß vor der Thür des Hüttchens und spann. Ihr Haar war so weiß wie das Gewebe der Spinnen, welches im Herbst über die Stoppeln fliegt, um ihren Rocken hatte sie ein schwarzes Band gebunden. Gottlieb und Malineken kamen mit dem Korbe und blieben vor ihr stehen. „Großmutter,\" sagte letztere, „er will nicht glauben, daß du die Seejungfern gesehen hast, und er weiß nichts von der Prinzessin vom See.\" Sie netzte ihren Faden. „Geht ihr man eures Weges,\" gab sie ihnen zur Antwort. „Großmutter, du könntest ihm die Geschichte von der Prinzessin vom See wohl erzählen,\" bat Malineken, „sie läßt sich schön anhören, und man muß sie doch wissen, wenn man über den See fährt und in dem Blumental Tag für Tag herumwandert.\" „Ich meine, ihr könntet euer Vesper brauchen,\" sagte die Großmutter, „es hat eben vier Uhr geschlagen.\" „Ach ja,\" rief Malineken inbrünstig, „Erdbeeren mit Milch und ein Stück Brot dazu; und dieweil wir das aufzehren, erzählt Ihr dem Gottlieb die Geschichte.\" Sie ließ nicht nach, sie mußte ihren Willen haben. Ein Weilchen danach saßen die Kinder auf einem Baumstamm vor der Hütte und hatten zwischen sich einen Napf mit süßer Milch, in der schwammen die Erdbeeren so dick, daß man nicht wußte, war das Milch mit Erdbeeren, oder Erdbeeren mit Milch; doch es mochte wohl auf eins herauskommen. Die Großmutter blickte zuweilen nach ihnen hin",
+    "expected_keywords": [],
+    "ocr": {
+      "recall": 0.9790575916230366,
+      "precision": 0.958974358974359,
+      "f1": 0.9689119170984456,
+      "matched": 374,
+      "ordered_matched": 371,
+      "relocated_matched": 0,
+      "fuzzy_matched": 3,
+      "missed": 8,
+      "extra": 16,
+      "gt_total": 382,
+      "pred_total": 390,
+      "opcodes": [
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "14"
+        },
+        {
+          "tag": "equal",
+          "gt": "deiner großmutter wohl nur geträumt haben nein meinte malineken hartnäckig sie hat ja auch die prinzessin vom see gesehen und das ist etwas ganz besonderes davon habe ich noch nie gehört antwortete gottlieb so kann sie es dir erzählen frag sie nur aus sie weiß alles der kahn war mittlerweile der insel ganz nahe",
+          "pred": "deiner großmutter wohl nur geträumt haben nein meinte malineken hartnäckig sie hat ja auch die prinzessin vom see gesehen und das ist etwas ganz besonderes davon habe ich noch nie gehört antwortete gottlieb so kann sie es dir erzählen frag sie nur aus sie weiß alles der kahn war mittlerweile der insel ganz nahe"
+        },
+        {
+          "tag": "fuzzy",
+          "gt": "gekommen",
+          "pred": "kommen"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "ge"
+        },
+        {
+          "tag": "equal",
+          "gt": "die kinder landeten an einer dazu geeigneten stelle und befestigten ihn an einem aus dem wasser ragenden pflock sie erstiegen die kleine anhöhe auf der sich das",
+          "pred": "die kinder landeten an einer dazu geeigneten stelle und befestigten ihn an einem aus dem wasser ragenden pflock sie erstiegen die kleine anhöhe auf der sich das"
+        },
+        {
+          "tag": "delete",
+          "gt": "gehöft befand",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "gehüft be sand"
+        },
+        {
+          "tag": "equal",
+          "gt": "in dem kurzen feinen grase welches den boden",
+          "pred": "in dem kurzen feinen grase welches den boden"
+        },
+        {
+          "tag": "fuzzy",
+          "gt": "bedeckte",
+          "pred": "deckte"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "be"
+        },
+        {
+          "tag": "equal",
+          "gt": "blühte der thymian ein festgetretener weg führte gerade auf die schilfhütte zu die lag heimlich unter den weiden das mächtige geäst der majestätischen bäume mit silbergrauem spitzblättrigem laube beladen breitete sich weit und wuchtig über das niedere dach welches sich der erde zuneigte",
+          "pred": "blühte der thymian ein festgetretener weg führte gerade auf die schilfhütte zu die lag heimlich unter den weiden das mächtige geäst der majestätischen bäume mit silbergrauem spitzblättrigem laube beladen breitete sich weit und wuchtig über das niedere dach welches sich der erde zuneigte"
+        },
+        {
+          "tag": "fuzzy",
+          "gt": "dahinter",
+          "pred": "hinter"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "da"
+        },
+        {
+          "tag": "equal",
+          "gt": "erblickte man ein stück garten und ackerland von rohr und schilf wie mit einem wall umschlossen eine alte frau saß vor der",
+          "pred": "erblickte man ein stück garten und ackerland von rohr und schilf wie mit einem wall umschlossen eine alte frau saß vor der"
+        },
+        {
+          "tag": "delete",
+          "gt": "thür",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "tür"
+        },
+        {
+          "tag": "equal",
+          "gt": "des hüttchens und spann ihr haar war so weiß wie das gewebe der spinnen welches im herbst über die stoppeln fliegt um ihren",
+          "pred": "des hüttchens und spann ihr haar war so weiß wie das gewebe der spinnen welches im herbst über die stoppeln fliegt um ihren"
+        },
+        {
+          "tag": "delete",
+          "gt": "rocken",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "wocken"
+        },
+        {
+          "tag": "equal",
+          "gt": "hatte sie ein schwarzes band gebunden gottlieb und malineken kamen mit dem korbe und blieben vor ihr stehen großmutter sagte letztere er will nicht glauben daß du die seejungfern gesehen hast und er weiß nichts von der prinzessin vom see sie",
+          "pred": "hatte sie ein schwarzes band gebunden gottlieb und malineken kamen mit dem korbe und blieben vor ihr stehen großmutter sagte letztere er will nicht glauben daß du die seejungfern gesehen hast und er weiß nichts von der prinzessin vom see sie"
+        },
+        {
+          "tag": "delete",
+          "gt": "netzte",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "neigte"
+        },
+        {
+          "tag": "equal",
+          "gt": "ihren faden geht ihr man eures weges gab sie ihnen zur",
+          "pred": "ihren faden geht ihr man eures weges gab sie ihnen zur"
+        },
+        {
+          "tag": "delete",
+          "gt": "antwort",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "ant wort"
+        },
+        {
+          "tag": "equal",
+          "gt": "großmutter du könntest ihm die geschichte von der prinzessin vom see wohl erzählen bat malineken sie läßt sich schön anhören und man muß sie doch wissen wenn man über den see fährt und in dem blumental tag für tag",
+          "pred": "großmutter du könntest ihm die geschichte von der prinzessin vom see wohl erzählen bat malineken sie läßt sich schön anhören und man muß sie doch wissen wenn man über den see fährt und in dem blumental tag für tag"
+        },
+        {
+          "tag": "delete",
+          "gt": "herumwandert",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "herum wandert"
+        },
+        {
+          "tag": "equal",
+          "gt": "ich meine ihr könntet euer vesper brauchen sagte die großmutter es hat eben vier uhr geschlagen ach ja rief malineken inbrünstig erdbeeren mit milch und ein stück brot dazu und dieweil wir das aufzehren erzählt ihr dem gottlieb die geschichte sie ließ nicht nach sie mußte ihren willen haben ein weilchen danach saßen die kinder auf einem baumstamm vor der hütte und hatten zwischen sich einen napf mit süßer milch in der schwammen die erdbeeren so dick daß man nicht wußte war das milch mit erdbeeren oder erdbeeren mit milch doch es mochte wohl auf eins",
+          "pred": "ich meine ihr könntet euer vesper brauchen sagte die großmutter es hat eben vier uhr geschlagen ach ja rief malineken inbrünstig erdbeeren mit milch und ein stück brot dazu und dieweil wir das aufzehren erzählt ihr dem gottlieb die geschichte sie ließ nicht nach sie mußte ihren willen haben ein weilchen danach saßen die kinder auf einem baumstamm vor der hütte und hatten zwischen sich einen napf mit süßer milch in der schwammen die erdbeeren so dick daß man nicht wußte war das milch mit erdbeeren oder erdbeeren mit milch doch es mochte wohl auf eins"
+        },
+        {
+          "tag": "delete",
+          "gt": "herauskommen",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "heraus kommen"
+        },
+        {
+          "tag": "equal",
+          "gt": "die großmutter blickte zuweilen nach ihnen hin",
+          "pred": "die großmutter blickte zuweilen nach ihnen hin"
+        }
+      ]
+    },
+    "score": 0.9689119170984456,
+    "error": null,
+    "wall_seconds": 49.84158933290746,
+    "tokens_per_second": 68.06219597624991
+  }
+]

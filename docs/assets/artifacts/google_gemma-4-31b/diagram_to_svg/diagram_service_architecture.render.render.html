@@ -1,0 +1,167 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html,body{margin:0;background:#fff;font-family:system-ui,-apple-system,sans-serif}
+  .wrap{padding:24px;display:inline-block;background:#fff}
+  /* Force a concrete render box: many model-emitted SVGs only set viewBox.
+     Without a width here, an inline-block parent collapses the SVG to its
+     intrinsic ~300x150 (or smaller) and the screenshot becomes a tiny
+     blank tile. Fixed width + auto height uses viewBox aspect-ratio. */
+  .wrap svg{display:block;width:1200px;height:auto;max-width:none}
+</style></head><body><div class="wrap"><svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1200" height="800" fill="#ffffff" />
+
+  <!-- Definitions for markers and styles -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="200" y="60" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#333">System Architecture</text>
+
+  <!-- Legend -->
+  <g id="legend" transform="translate(900, 50)">
+    <line x1="0" y1="0" x2="40" y2="0" stroke="#333" stroke-width="2" />
+    <text x="50" y="5" font-family="Arial, sans-serif" font-size="14" fill="#333">Sync</text>
+    
+    <line x1="0" y1="30" x2="40" y2="30" stroke="#333" stroke-width="2" stroke-dasharray="5,5" />
+    <text x="50" y="35" font-family="Arial, sans-serif" font-size="14" fill="#333">Async</text>
+    
+    <rect x="0" y="60" width="40" height="20" fill="none" stroke="red" stroke-width="2" />
+    <text x="50" y="75" font-family="Arial, sans-serif" font-size="14" fill="#333">External</text>
+  </g>
+
+  <!-- Goals Section -->
+  <g id="goals" transform="translate(180, 200)">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#333">Goals:</text>
+    <text x="0" y="30" font-family="Arial, sans-serif" font-size="16" fill="#555">- Scalability</text>
+    <text x="0" y="55" font-family="Arial, sans-serif" font-size="16" fill="#555">- Reliability</text>
+    <text x="0" y="80" font-family="Arial, sans-serif" font-size="16" fill="#555">- Security</text>
+    <text x="0" y="105" font-family="Arial, sans-serif" font-size="16" fill="#555">- Maintainability</text>
+  </g>
+
+  <!-- Notes Section -->
+  <g id="notes" transform="translate(180, 420)">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#333">Notes:</text>
+    <text x="0" y="30" font-family="Arial, sans-serif" font-size="16" fill="#555">- Use Docker for all services</text>
+    <text x="0" y="55" font-family="Arial, sans-serif" font-size="16" fill="#555">- CI/CD with Github Actions</text>
+    <text x="0" y="80" font-family="Arial, sans-serif" font-size="16" fill="#555">- Logs → ELK Stack</text>
+  </g>
+
+  <!-- Components -->
+  
+  <!-- Frontend -->
+  <g id="frontend">
+    <rect x="320" y="240" width="120" height="60" rx="5" fill="#f9f9f9" stroke="#333" stroke-width="2" />
+    <text x="380" y="265" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#333">Frontend</text>
+    <text x="380" y="285" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#666">(React)</text>
+  </g>
+
+  <!-- API Gateway -->
+  <g id="api_gateway">
+    <rect x="480" y="240" width="120" height="60" rx="5" fill="#f9f9f9" stroke="#333" stroke-width="2" />
+    <text x="540" y="265" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#333">API Gateway</text>
+    <text x="540" y="285" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#666">(Kong)</text>
+  </g>
+
+  <!-- Auth Service -->
+  <g id="auth_service">
+    <rect x="640" y="170" width="120" height="60" rx="5" fill="#f9f9f9" stroke="#333" stroke-width="2" />
+    <text x="700" y="195" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#333">Auth Service</text>
+    <text x="700" y="215" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#666">(JWT)</text>
+  </g>
+
+  <!-- User DB -->
+  <g id="user_db">
+    <path d="M800 170 a 20 10 0 0 0 40 0 v 50 a 20 10 0 0 0 -40 0 Z" fill="#f9f9f9" stroke="#333" stroke-width="2" />
+    <ellipse cx="820" cy="170" rx="20" ry="10" fill="#f9f9f9" stroke="#333" stroke-width="2" />
+    <text x="820" y="205" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#333">User DB</text>
+    <text x="820" y="220" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#666">(PostgreSQL)</text>
+  </g>
+
+  <!-- Backend -->
+  <g id="backend">
+    <rect x="640" y="310" width="120" height="60" rx="5" fill="#f9f9f9" stroke="#333" stroke-width="2" />
+    <text x="700" y="335" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#333">Backend</text>
+    <text x="700" y="355" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#666">(Python/FastAPI)</text>
+  </g>
+
+  <!-- Database -->
+  <g id="database">
+    <path d="M800 310 a 20 10 0 0 0 40 0 v 50 a 20 10 0 0 0 -40 0 Z" fill="#f9f9f9" stroke="#333" stroke-width="2" />
+    <ellipse cx="820" cy="310" rx="20" ry="10" fill="#f9f9f9" stroke="#333" stroke-width="2" />
+    <text x="820" y="345" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#333">Database</text>
+    <text x="820" y="360" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#666">(PostgreSQL)</text>
+  </g>
+
+  <!-- Message Queue -->
+  <g id="message_queue">
+    <rect x="640" y="450" width="120" height="60" rx="5" fill="#f9f9f9" stroke="#333" stroke-width="2" />
+    <text x="700" y="475" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#333">Message Queue</text>
+    <text x="700" y="495" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#666">(RabbitMQ)</text>
+  </g>
+
+  <!-- Worker Service -->
+  <g id="worker_service">
+    <rect x="800" y="450" width="120" height="60" rx="5" fill="#f9f9f9" stroke="#333" stroke-width="2" />
+    <text x="860" y="475" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#333">Worker Service</text>
+    <text x="860" y="495" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#666">(Python)</text>
+  </g>
+
+  <!-- File Storage -->
+  <g id="file_storage">
+    <path d="M940 450 a 20 10 0 0 0 40 0 v 50 a 20 10 0 0 0 -40 0 Z" fill="#f9f9f9" stroke="#333" stroke-width="2" />
+    <ellipse cx="960" cy="450" rx="20" ry="10" fill="#f9f9f9" stroke="#333" stroke-width="2" />
+    <text x="960" y="485" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#333">File Storage</text>
+    <text x="960" y="500" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#666">(S3)</text>
+  </g>
+
+  <!-- External API -->
+  <g id="external_api">
+    <rect x="340" y="450" width="140" height="60" rx="5" fill="#f9f9f9" stroke="red" stroke-width="2" />
+    <text x="410" y="475" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#333">External API</text>
+    <text x="410" y="495" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#666">(Payment Provider)</text>
+  </g>
+
+  <!-- Monitoring -->
+  <g id="monitoring">
+    <rect x="640" y="580" width="120" height="60" rx="5" fill="#f9f9f9" stroke="#333" stroke-width="2" />
+    <text x="700" y="605" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#333">Monitoring</text>
+    <text x="700" y="625" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#666">(Prometheus + Grafana)</text>
+  </g>
+
+  <!-- Connections -->
+  
+  <!-- Frontend -> API Gateway -->
+  <line x1="440" y1="270" x2="480" y2="270" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+  <text x="450" y="260" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#333">HTTPS</text>
+
+  <!-- API Gateway -> Auth Service -->
+  <polyline points="560,240 580,240 580,200 640,200" fill="none" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+
+  <!-- Auth Service -> User DB -->
+  <line x1="760" y1="200" x2="800" y2="200" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+
+  <!-- API Gateway -> Backend -->
+  <polyline points="560,300 580,300 580,340 640,340" fill="none" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+
+  <!-- Backend <-> Database -->
+  <line x1="760" y1="340" x2="800" y2="340" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+  <line x1="800" y1="350" x2="760" y2="350" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+
+  <!-- Backend -> Message Queue -->
+  <line x1="700" y1="370" x2="700" y2="450" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+
+  <!-- Message Queue -> Worker Service (Async) -->
+  <line x1="760" y1="480" x2="800" y2="480" stroke="#333" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead)" />
+
+  <!-- Worker Service -> File Storage -->
+  <line x1="920" y1="480" x2="940" y2="480" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+
+  <!-- Message Queue -> Monitoring (Async) -->
+  <line x1="700" y1="510" x2="700" y2="580" stroke="#333" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead)" />
+
+</svg></div></body></html>

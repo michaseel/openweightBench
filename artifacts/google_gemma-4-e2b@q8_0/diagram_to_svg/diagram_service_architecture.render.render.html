@@ -1,0 +1,126 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html,body{margin:0;background:#fff;font-family:system-ui,-apple-system,sans-serif}
+  .wrap{padding:24px;display:inline-block;background:#fff}
+  /* Force a concrete render box: many model-emitted SVGs only set viewBox.
+     Without a width here, an inline-block parent collapses the SVG to its
+     intrinsic ~300x150 (or smaller) and the screenshot becomes a tiny
+     blank tile. Fixed width + auto height uses viewBox aspect-ratio. */
+  .wrap svg{display:block;width:1200px;height:auto;max-width:none}
+</style></head><body><div class="wrap"><svg width="100%" height="600" viewBox="0 0 1200 600" xmlns="http://www.w3.org/2000/svg">
+    <style>
+        .node {
+            fill: #f9f9f9;
+            stroke: #333;
+            stroke-width: 2;
+        }
+        .label {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            fill: #333;
+        }
+        .title {
+            font-family: Arial, sans-serif;
+            font-size: 20px;
+            font-weight: bold;
+            fill: #0056b3;
+        }
+        .connection {
+            stroke: #007bff;
+            stroke-width: 2;
+        }
+        .goal-list {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            fill: #555;
+        }
+    </style>
+
+    <!-- Title -->
+    <text x="600" y="30" text-anchor="middle" class="title">System Architecture</text>
+
+    <!-- Goals/Notes Section (Left Side) -->
+    <g id="goals_notes" transform="translate(50, 50)">
+        <text x="0" y="20" class="label" font-weight="bold">Goals:</text>
+        <text x="0" y="40" class="goal-list">• Scalability</text>
+        <text x="0" y="60" class="goal-list">• Reliability</text>
+        <text x="0" y="80" class="goal-list">• Security</text>
+        <text x="0" y="100" class="goal-list">• Maintainability</text>
+        <text x="0" y="120" class="goal-list">• Logs (Docker, GitHub, ELK Stack)</text>
+    </g>
+
+    <!-- Define Arrow Marker -->
+    <defs>
+        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#007bff" />
+        </marker>
+    </defs>
+
+    <!-- Component Definitions -->
+
+    <!-- Frontend (React) -->
+    <rect x="100" y="200" width="150" height="80" rx="8" class="node" id="frontend"/>
+    <text x="175" y="240" text-anchor="middle" class="label">Frontend (React)</text>
+
+    <!-- API Gateway (Kong) -->
+    <rect x="350" y="200" width="150" height="80" rx="8" class="node" id="api_gateway"/>
+    <text x="425" y="240" text-anchor="middle" class="label">API Gateway (Kong)</text>
+
+    <!-- External API (Payment Provider) -->
+    <rect x="550" y="200" width="150" height="80" rx="8" class="node" id="external_api"/>
+    <text x="625" y="240" text-anchor="middle" class="label">External API (Payment Provider)</text>
+
+    <!-- Backend (Python/FastAPI) -->
+    <rect x="350" y="320" width="150" height="80" rx="8" class="node" id="backend"/>
+    <text x="425" y="360" text-anchor="middle" class="label">Backend (Python/FastAPI)</text>
+
+    <!-- Message Queue (RabbitMQ) -->
+    <rect x="550" y="320" width="150" height="80" rx="8" class="node" id="message_queue"/>
+    <text x="625" y="360" text-anchor="middle" class="label">Message Queue (RabbitMQ)</text>
+
+    <!-- Worker Service (Python) -->
+    <rect x="750" y="320" width="150" height="80" rx="8" class="node" id="worker_service"/>
+    <text x="825" y="360" text-anchor="middle" class="label">Worker Service (Python)</text>
+
+    <!-- User DB (PostgreSQL) -->
+    <rect x="750" y="440" width="150" height="80" rx="8" class="node" id="user_db"/>
+    <text x="825" y="480" text-anchor="middle" class="label">User DB (PostgreSQL)</text>
+
+    <!-- File Storage (S3) -->
+    <rect x="950" y="440" width="150" height="80" rx="8" class="node" id="file_storage"/>
+    <text x="1025" y="480" text-anchor="middle" class="label">File Storage (S3)</text>
+
+    <!-- Monitoring (Prometheus + Grafana) -->
+    <rect x="600" y="480" width="200" height="80" rx="8" class="node" id="monitoring"/>
+    <text x="700" y="520" text-anchor="middle" class="label">Monitoring (Prometheus + Grafana)</text>
+
+    <!-- Connections -->
+
+    <!-- Frontend -> API Gateway -->
+    <line x1="250" y1="240" x2="350" y2="240" class="connection" marker-end="url(#arrowhead)"/>
+    <text x="300" y="210" class="label" fill="#007bff">HTTPS</text>
+
+    <!-- API Gateway -> External API -->
+    <line x1="500" y1="240" x2="550" y2="240" class="connection" marker-end="url(#arrowhead)"/>
+
+    <!-- API Gateway -> Backend -->
+    <line x1="500" y1="320" x2="425" y2="320" class="connection" marker-end="url(#arrowhead)"/>
+
+    <!-- Backend -> Message Queue -->
+    <line x1="500" y1="360" x2="625" y2="360" class="connection" marker-end="url(#arrowhead)"/>
+
+    <!-- Message Queue -> Worker Service -->
+    <line x1="625" y1="360" x2="825" y2="360" class="connection" marker-end="url(#arrowhead)"/>
+
+    <!-- Worker Service -> User DB -->
+    <line x1="825" y1="400" x2="825" y2="440" class="connection" marker-end="url(#arrowhead)"/>
+
+    <!-- Worker Service -> File Storage (S3) -->
+    <line x1="825" y1="440" x2="1025" y2="440" class="connection" marker-end="url(#arrowhead)"/>
+
+    <!-- Monitoring Connections (Implied monitoring of all services - simplified connections for visual flow) -->
+    <line x1="350" y1="280" x2="600" y2="480" class="connection" stroke-dasharray="5,5"/>
+    <line x1="750" y1="360" x2="600" y2="480" class="connection" stroke-dasharray="5,5"/>
+
+</svg></div></body></html>

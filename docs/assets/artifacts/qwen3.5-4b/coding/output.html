@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vibrant Kanban Board</title>
+    
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Styles for Confetti and Dragging -->
+    <style>
+        /* Smooth transitions for cards */
+        .card {
+            transition: all 0.2s ease-in-out;
+        }
+
+        /* Visual feedback during drag */
+        .dragging {
+            opacity: 0.5;
+            cursor: grabbing !important;
+        }
+
+        /* Confetti Canvas Positioning */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* Custom Scrollbar for columns */
+        .column-list {
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 transparent;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 h-screen overflow-hidden font-sans text-slate-800">
+
+    <!-- Confetti Canvas -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <div class="flex h-full p-6 gap-6 items-start justify-center">
+        
+        <!-- 
+            CANVAS CONTAINER 
+            Used to render the board. 
+        -->
+        <div id="kanban-board" class="flex flex-col md:flex-row w-full max-w-[1200px] gap-4 h-full overflow-x-auto overflow-y-hidden pb-4">
+
+            <!-- Column 1: Backlog -->
+            <div data-testid="column-backlog" 
+                 class="bg-white rounded-lg shadow-md w-80 flex flex-col h-full border border-slate-200 transition-colors duration-300"
+                 style="background: linear-gradient(145deg, #eef2ff 0%, #dbeafe 100%);">
+                
+                <div class="p-4 border-b border-blue-100 bg-white rounded-t-lg shadow-sm flex justify-between items-center">
+                    <h3 class="font-bold text-slate-700 uppercase tracking-wider text-sm">Backlog</h3>
+                    <!-- Add Card Button -->
+                    <button data-testid="add-card" onclick="app.addColumnCard('backlog')" 
+                            class="p-1 hover:bg-blue-50 text-blue-600 rounded-md transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    </button>
+                </div>
+
+                <!-- Card Container -->
+                <ul id="list-backlog" class="flex-1 p-3 overflow-y-auto column-list space-y-3">
+                    <!-- Cards injected here via JS -->
+                </ul>
+            </div>
+
+            <!-- Column 2: In Progress -->
+            <div data-testid="column-in-progress" 
+                 class="bg-white rounded-lg shadow-md w-80 flex flex-col h-full border border-slate-200 transition-colors duration-300"
+                 style="background: linear-gradient(145deg, #fff7ed 0%, #fed7aa 100%);">
+                
+                <div class="p-4 border-b border-orange-100 bg-white rounded-t-lg shadow-sm flex justify-between items-center">
+                    <h3 class="font-bold text-slate-700 uppercase tracking-wider text-sm">In Progress</h3>
+                    <!-- Add Card Button -->
+                    <button data-testid="add-card" onclick="app.addColumnCard('in-progress')" 
+                            class="p-1 hover:bg-orange-50 text-orange-600 rounded-md transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    </button>
+                </div>
+
+                <ul id="list-in-progress" class="flex-1 p-3 overflow-y-auto column-list space-y-3">
+                    <!-- Cards injected here via JS -->
+                </ul>
+            </div>
+
+            <!-- Column 3: Review -->
+            <div data-testid="column-review" 
+                 class="bg-white rounded-lg shadow-md w-80 flex flex-col h-full border border-slate-200 transition-colors duration-300"
+                 style="background: linear-gradient(145deg, #f0fdf4 0%, #dcfce7 100%);">
+                
+                <div class="p-4 border-b border-green-100 bg-white rounded-t-lg shadow-sm flex justify-between items-center">
+                    <h3 class="font-bold text-slate-700 uppercase tracking-wider text-sm">Review</h3>
+                    <!-- Add Card Button -->
+                    <button data-testid="add-card" onclick="app.addColumnCard('review')" 
+                            class="p-1 hover:bg-green-50 text-green-600 rounded-md transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    </button>
+                </div>
+
+                <ul id="list-review" class="flex-1 p-3 overflow-y-auto column-list space-y-3">
+                    <!-- Cards injected here via JS -->
+                </ul>
+            </div>
+
+            <!-- Column 4: Done -->
+            <div data-testid="column-done" 
+                 class="bg-white rounded-lg shadow-md w-80 flex flex-col h-full border border-slate-200 transition-colors duration-300"
+                 style="background: linear-gradient(145deg, #f3e8ff 0%, #ddd6fe 100%);">
+                
+                <div class="p-4 border-b border-purple-100 bg-white rounded-t-lg shadow-sm flex justify-between items-center">
+                    <h3 class="font-bold text-slate-700 uppercase tracking-wider text-sm">Done</h3>
+                    <!-- Add Card Button -->
+                    <button data-testid="add-card" onclick="app.addColumnCard('done')" 
+                            class="p-1 hover:bg-purple-50 text-purple-600 rounded-md transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </button>
+                </div>
+
+                <ul id="list-done" class="flex-1 p-3 overflow-y-auto column-list space-y-3">
+                    <!-- Cards injected here via JS -->
+                </ul>
+            </div>
+
+        </div>
+
+        <!-- Custom Delete Confirmation Modal (Hidden by default) -->
+        <div id="delete-modal-overlay" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 backdrop-blur-sm">
+            <div class="bg-white rounded-xl shadow-2xl p-6 w-96 transform transition-all scale-100">
+                <h3 class="text-lg font-bold text-slate-800 mb-4">Delete Card?</h3>
+                <p class="text-slate-600 mb-6">Are you sure you want to remove this task? This action cannot be undone.</p>
+                
+                <div class="flex justify-end gap-3">
+                    <button data-testid="confirm-delete" onclick="app.confirmDelete()" 
+                            class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm">
+                        Delete
+                    </button>
+                    <button onclick="document.getElementById('delete-modal-overlay').classList.add('hidden')" 
+                            class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-medium transition-colors">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        /**
+         * Kanban Board Application Logic
+         * Namespace: kanbanApp
+         */
+        const app = {
+            // Configuration
+            columns: ['backlog', 'in-progress', 'review', 'done'],
+            storageKey: 'kanban_app_state_v1',
+            
+            // State Management
+            state: [],
+
+            /**
+             * Initialize the application
+             */
+            init() {
+                this.loadState();
+                
+                // If no cards exist, generate dummy data
+                if (this.state.length === 0) {
+                    this.generateDummyData();
+                }
+
+                // Render initial state
+                this.renderBoard();
+
+                // Setup Drag and Drop Listeners on container
+                const boardContainer = document.getElementById('kanban-board');
+                boardContainer.addEventListener('dragover', this.handleDragOver.bind(this));
+                boardContainer.addEventListener('drop', this.handleDrop.bind(this));
+                
+                // Handle Window Resize for Canvas
+                window.addEventListener('resize', () => {
+                    const canvas = document.getElementById('confetti-canvas');
+                    if(canvas) canvas.width = window.innerWidth;
+                });
+            },
+
+            /**
+             * Load state from LocalStorage or use default
+             */
+            loadState() {
+                try {
+                    const stored = localStorage.getItem(this.storageKey);
+                    this.state = JSON.parse(stored);
+                } catch (e) {
+                    console.error("Failed to load state", e);
+                    this.generateDummyData();
+                }
+            },
+
+            /**
+             * Save state to LocalStorage
+             */
+            saveState() {
+                localStorage.setItem(this.storageKey, JSON.stringify(this.state));
+            },
+
+            /**
+             * Generate Dummy Data if empty
+             */
+            generateDummyData() {
+                this.state = [
+                    { id: Date.now(), title: "Research Competitors", status: 'backlog' },
+                    { id: Date.now() + 1, title: "Draft Design Specs", status: 'in-progress' },
+                    { id: Date.now() + 2, title: "Code Review PR #402", status: 'review' },
+                    { id: Date.now() + 3, title: "Deploy to Staging", status: 'done' }
+                ];
+                this.saveState();
+            },
+
+            /**
+             * Render the board based on current state
+             */
+            renderBoard() {
+                // Clear existing lists (except buttons)
+                this.columns.forEach(col => {
+                    const list = document.getElementById(`list-${col}`);
+                    list.innerHTML = '';
+                    
+                    // Filter tasks for this column
+                    const colTasks = this.state.filter(t => t.status === col);
+                    
+                    colTasks.forEach(task => {
+                        const cardElement = document.createElement('div');
+                        cardElement.className = 'card bg-white p-3 rounded shadow-sm border-l-4 border-blue-500 hover:shadow-md cursor-move group relative';
+                        cardElement.setAttribute('data-testid', 'card');
+                        
+                        // Drag Attributes (HTML5 Native)
+                        cardElement.draggable = true;
+                        cardElement.dataset.id = task.id;
+
+                        // Inner HTML Structure
+                        let htmlContent = `
+                            <div class="flex justify-between items-start mb-2">
+                                <!-- Drag Handle Icon -->
+                                <button class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-blue-600 transition-opacity" 
+                                        onclick="event.stopPropagation(); this.parentElement.classList.add('dragging')">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="5" r="1"></circle><circle cx="9" cy="12" r="1"></circle><circle cx="9" cy="19" r="1"></circle><circle cx="15" cy="5" r="1"></circle><circle cx="15" cy="12" r="1"></circle><circle cx="15" cy="19" r="1"></circle></svg>
+                                </button>
+
+                                <!-- Delete Trigger -->
+                                <button data-testid="delete-card" onclick="app.showDeleteModal(this)" 
+                                        class="text-slate-400 hover:text-red-500 transition-colors p-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                </button>
+
+                                <!-- Edit Button (Simple trigger) -->
+                                <button onclick="app.toggleEdit(this)" class="text-slate-300 hover:text-blue-500 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                </button>
+                            </div>
+                            
+                            <!-- Editable Content -->
+                            <input type="text" 
+                                    data-testid="card-input" 
+                                    value="${task.title}" 
+                                    class="w-full bg-transparent text-slate-700 font-medium focus:outline-none border-b border-transparent focus:border-blue-300 transition-colors px-1 py-0.5"
+                                    onblur="app.saveCard(this)"
+                                    onkeydown="app.handleInputKey(event, this)">
+
+                            <!-- Hidden Input for Dragging -->
+                            <input type="hidden" id="drag-id-${task.id}" value="${task.id}">
+                        `;
+                        
+                        cardElement.innerHTML = htmlContent;
+                        list.appendChild(cardElement);
+                    });
+                });
+            },
+
+            /**
+             * Handle Drag Over (Calculate Drop Zone)
+             */
+            handleDragOver(e) {
+                e.preventDefault(); // Necessary to allow dropping
+                
+                const dragItem = document.querySelector('.dragging');
+                if (!dragItem) return;
+
+                const afterElement = this.getDragAfterElement(document.getElementById('list-done'));
+                
+                if (afterElement) {
+                    document.insertBefore(dragItem, afterElement);
+                } else {
+                    // Drop at end of column
+                    dragItem.parentElement.appendChild(dragItem);
+                }
+            },
+
+            /**
+             * Handle Drop (Update State & Storage)
+             */
+            handleDrop(e) {
+                e.preventDefault();
+                
+                // Find the card being dragged
+                const cardToMove = document.querySelector('.dragging');
+                if (!cardToMove) return;
+
+                const taskId = parseInt(cardToMove.dataset.id);
+                const currentStatus = cardToMove.parentElement.id.split('-')[1]; // e.g., 'list-done' -> 'done'
+                
+                // Determine new status based on column ID (backlog, in-progress, etc.)
+                const listId = cardToMove.parentElement.id; 
+                const targetCol = listId.replace('list-', '');
+
+                // Move task to new state
+                this.state.forEach(task => {
+                    if (task.id === taskId) {
+                        task.status = targetCol;
+                    }
+                });
+
+                // Save and Re-render
+                this.saveState();
+                this.renderBoard();
+                
+                // Trigger Confetti if moving TO Done
+                if (targetCol === 'done') {
+                    fireConfetti(cardToMove.getBoundingClientRect());
+                }
+            },
+
+            /**
+             * Helper to find element below cursor for drop position
+             */
+            getDragAfterElement(container) {
+                const draggableElements = [...container.querySelectorAll('.card:not(.dragging)')];
+
+                return draggableElements.reduce((mostRecent, child) => {
+                    const childBottom = child.offsetTop + child.offsetHeight;
+                    return (childBottom > mostRecentBottom) ? (mostRecentBottom = childBottom, child) : null;
+                }, null);
+            },
+
+            /**
+             * Edit Card Logic
+             */
+            toggleEdit(btn) {
+                // Find the closest input within this card
+                const card = btn.closest('[data-testid="card"]');
+                const input = card.querySelector('input[data-testid="card-input"]');
+                
+                if (input.value === ' ') {
+                    input.focus();
+                    input.select();
+                } else {
+                    // If it's already focused, blur to save
+                    document.activeElement.blur();
+                }
+            },
+
+            /**
+             * Handle Enter Key in Input
+             */
+            handleInputKey(event, input) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    this.saveCard(input);
+                }
+            },
+
+            saveCard(inputElement) {
+                const card = inputElement.closest('[data-testid="card"]');
+                // Find the task ID in state
+                const taskId = parseInt(card.dataset.id);
+                
+                const newTitle = inputElement.value.trim();
+                
+                if (newTitle && this.state.some(t => t.id === taskId)) {
+                    const index = this.state.findIndex(t => t.id === taskId);
+                    this.state[index].title = newTitle;
+                    this.saveState();
+                    
+                    // Update DOM text only (no full re-render for performance)
+                    card.querySelector('input[data-testid="card-input"]').value = newTitle;
+                } else {
+                    inputElement.value = ''; // Clear if empty or invalid
+                }
+            },
+
+            /**
+             * Delete Logic
+             */
+            showDeleteModal(btnElement) {
+                const modal = document.getElementById('delete-modal-overlay');
+                btnElement.closest('[data-testid="card"]').remove(); // Remove from DOM immediately
+                
+                // Update state to remove
+                this.state = this.state.filter(t => t.id !== parseInt(btnElement.closest('.card').dataset.id));
+                
+                // Save changes
+                this.saveState();
+
+                // Show Modal Overlay (Manual implementation instead of window.confirm)
+                modal.classList.remove('hidden');
+            },
+
+            confirmDelete() {
+                document.getElementById('delete-modal-overlay').classList.add('hidden');
+            },
+
+            /**
+             * Add Card Logic
+             */
+            addColumnCard(colIndex) {
+                // Determine the column ID from index or element
+                const colId = this.columns[colIndex];
+                
+                // Create new task object
+                const newTask = {
+                    id: Date.now(),
+                    title: "New Task",
+                    status: colId
+                };
+
+                this.state.push(newTask);
+                this.saveState();
+                this.renderBoard();
+            }
+        };
+
+        /**
+         * Confetti Animation System (Vanilla JS)
+         */
+        function fireConfetti(rect) {
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Resize canvas to full screen but keep aspect ratio logic if needed, 
+            // for simplicity we just make it fullscreen and cover everything
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            let particles = [];
+            const particleCount = 100;
+
+            function createParticle() {
+                return {
+                    x: Math.random() * canvas.width,
+                    y: rect.top + Math.random() * (rect.bottom - rect.top), // Start from card position roughly
+                    w: Math.random() * 10 + 5,
+                    h: Math.random() * 5 + 5,
+                    color: `hsl(${Math.random() * 360}, 70%, 50%)`,
+                    vx: (Math.random() - 0.5) * 2, // Slight horizontal movement
+                    vy: Math.random() * 3 + 1, // Downward velocity
+                    gravity: 0.1
+                };
+            }
+
+            for(let i=0; i<particleCount; i++) {
+                particles.push(createParticle());
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                particles.forEach((p, index) => {
+                    p.x += p.vx;
+                    p.y += p.vy + p.gravity;
+                    p.rotation = (p.rotation || 0) + 2; // Spin effect
+
+                    if (p.y > canvas.height) {
+                        particles.splice(index, 1);
+                    } else {
+                        ctx.save();
+                        ctx.translate(p.x, p.y);
+                        ctx.rotate(p.rotation * Math.PI / 180);
+                        ctx.fillStyle = p.color;
+                        ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+                        ctx.restore();
+                    }
+                });
+
+                if (particles.length > 0) {
+                    requestAnimationFrame(animate);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+
+            animate();
+        }
+
+        // Start App
+        document.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html,body{margin:0;background:#fff;font-family:system-ui,-apple-system,sans-serif}
+  .wrap{padding:24px;display:inline-block;background:#fff}
+  /* Force a concrete render box: many model-emitted SVGs only set viewBox.
+     Without a width here, an inline-block parent collapses the SVG to its
+     intrinsic ~300x150 (or smaller) and the screenshot becomes a tiny
+     blank tile. Fixed width + auto height uses viewBox aspect-ratio. */
+  .wrap svg{display:block;width:1200px;height:auto;max-width:none}
+</style></head><body><div class="wrap"><svg viewBox="0 0 1100 800" xmlns="http://www.w3.org/2000/svg">
+  <!-- Definitions for markers and styles -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+    </marker>
+    <style>
+      .box { fill: white; stroke: #333; stroke-width: 2; }
+      .external-box { fill: white; stroke: #d9534f; stroke-width: 2; }
+      .text-main { font-family: sans-serif; font-size: 14px; font-weight: bold; text-anchor: middle; }
+      .text-sub { font-family: sans-serif; font-size: 12px; text-anchor: middle; fill: #555; }
+      .text-label { font-family: sans-serif; font-size: 12px; fill: #333; }
+      .text-title { font-family: sans-serif; font-size: 24px; font-weight: bold; fill: #333; }
+      .text-list { font-family: sans-serif; font-size: 14px; fill: #333; }
+      .line-sync { stroke: #333; stroke-width: 2; fill: none; }
+      .line-async { stroke: #333; stroke-width: 2; stroke-dasharray: 5,5; fill: none; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1100" height="800" fill="#ffffff" />
+
+  <!-- Title and Sidebar Content -->
+  <text x="50" y="60" class="text-title">System Architecture</text>
+  
+  <g id="goals">
+    <text x="50" y="180" class="text-list" font-weight="bold">Goals:</text>
+    <text x="50" y="210" class="text-list">- Scalability</text>
+    <text x="50" y="235" class="text-list">- Reliability</text>
+    <text x="50" y="260" class="text-list">- Security</text>
+    <text x="50" y="285" class="text-list">- Maintainability</text>
+  </g>
+
+  <g id="notes">
+    <text x="50" y="450" class="text-list" font-weight="bold">Notes:</text>
+    <text x="50" y="480" class="text-list">- Use Docker for all services</text>
+    <text x="50" y="505" class="text-list">- CI/CD with Github Actions</text>
+    <text x="50" y="530" class="text-list">- Logs → ELK Stack</text>
+  </g>
+
+  <!-- Legend -->
+  <g id="legend" transform="translate(850, 50)">
+    <line x1="0" y1="0" x2="30" y2="0" class="line-sync" marker-end="url(#arrowhead)" />
+    <text x="40" y="5" class="text-label">Sync</text>
+    <line x1="0" y1="30" x2="30" y2="30" class="line-async" marker-end="url(#arrowhead)" />
+    <text x="40" y="35" class="text-label">Async</text>
+    <rect x="0" y="55" width="30" height="20" class="external-box" />
+    <text x="40" y="70" class="text-label">External</text>
+  </g>
+
+  <!-- Connections (drawn before boxes to be behind them) -->
+  <g id="connections">
+    <!-- Frontend to Gateway -->
+    <line x1="220" y1="230" x2="300" y2="230" class="line-sync" marker-end="url(#arrowhead)" />
+    <text x="260" y="225" class="text-label" text-anchor="middle">HTTPS</text>
+
+    <!-- Gateway to Auth Service -->
+    <path d="M 420 210 L 550 180" class="line-sync" marker-end="url(#arrowhead)" />
+
+    <!-- Auth Service to User DB -->
+    <line x1="670" y1="180" x2="750" y2="180" class="line-sync" marker-end="url(#arrowhead)" />
+
+    <!-- Gateway to Backend -->
+    <path d="M 360 260 L 550 300" class="line-sync" marker-end="url(#arrowhead)" />
+
+    <!-- Backend to Database -->
+    <line x1="670" y1="330" x2="750" y2="330" class="line-sync" marker-end="url(#arrowhead)" />
+
+    <!-- Gateway to External API (Async) -->
+    <path d="M 360 260 L 360 450" class="line-async" marker-end="url(#arrowhead)" />
+
+    <!-- Gateway to Message Queue (Async) -->
+    <path d="M 420 230 L 550 450" class="line-async" marker-end="url(#arrowhead)" />
+
+    <!-- Message Queue to Worker Service (Async) -->
+    <line x1="670" y1="480" x2="750" y2="480" class="line-async" marker-end="url(#arrowhead)" />
+
+    <!-- Worker Service to File Storage -->
+    <line x1="870" y1="480" x2="900" y2="480" class="line-sync" marker-end="url(#arrowhead)" />
+
+    <!-- Message Queue to Monitoring (Async) -->
+    <line x1="610" y1="510" x2="610" y2="650" class="line-async" marker-end="url(#arrowhead)" />
+  </g>
+
+  <!-- Nodes/Boxes -->
+  <g id="nodes">
+    <!-- Frontend -->
+    <g transform="translate(100, 200)">
+      <rect width="120" height="60" class="box" />
+      <text x="60" y="25" class="text-main">Frontend</text>
+      <text x="60" y="45" class="text-sub">(React)</text>
+    </g>
+
+    <!-- API Gateway -->
+    <g transform="translate(300, 200)">
+      <rect width="120" height="60" class="box" />
+      <text x="60" y="25" class="text-main">API Gateway</text>
+      <text x="60" y="45" class="text-sub">(Kong)</text>
+    </g>
+
+    <!-- Auth Service -->
+    <g transform="translate(550, 150)">
+      <rect width="120" height="60" class="box" />
+      <text x="60" y="25" class="text-main">Auth Service</text>
+      <text x="60" y="45" class="text-sub">(JWT)</text>
+    </g>
+
+    <!-- User DB -->
+    <g transform="translate(750, 155)">
+      <rect width="120" height="50" class="box" />
+      <text x="60" y="25" class="text-main">User DB</text>
+      <text x="60" y="40" class="text-sub">(PostgreSQL)</text>
+    </g>
+
+    <!-- Backend -->
+    <g transform="translate(550, 300)">
+      <rect width="120" height="60" class="box" />
+      <text x="60" y="25" class="text-main">Backend</text>
+      <text x="60" y="45" class="text-sub">(Python/FastAPI)</text>
+    </g>
+
+    <!-- Database -->
+    <g transform="translate(750, 310)">
+      <rect width="120" height="50" class="box" />
+      <text x="60" y="25" class="text-main">Database</text>
+      <text x="60" y="40" class="text-sub">(PostgreSQL)</text>
+    </g>
+
+    <!-- External API -->
+    <g transform="translate(300, 450)">
+      <rect width="120" height="60" class="external-box" />
+      <text x="60" y="25" class="text-main">External API</text>
+      <text x="60" y="45" class="text-sub">(Payment Provider)</text>
+    </g>
+
+    <!-- Message Queue -->
+    <g transform="translate(550, 450)">
+      <rect width="120" height="60" class="box" />
+      <text x="60" y="25" class="text-main">Message Queue</text>
+      <text x="60" y="45" class="text-sub">(RabbitMQ)</text>
+    </g>
+
+    <!-- Worker Service -->
+    <g transform="translate(750, 450)">
+      <rect width="120" height="60" class="box" />
+      <text x="60" y="25" class="text-main">Worker Service</text>
+      <text x="60" y="45" class="text-sub">(Python)</text>
+    </g>
+
+    <!-- File Storage -->
+    <g transform="translate(900, 450)">
+      <rect width="120" height="60" class="box" />
+      <text x="60" y="25" class="text-main">File Storage</text>
+      <text x="60" y="45" class="text-sub">(S3)</text>
+    </g>
+
+    <!-- Monitoring -->
+    <g transform="translate(550, 650)">
+      <rect width="120" height="60" class="box" />
+      <text x="60" y="25" class="text-main">Monitoring</text>
+      <text x="60" y="45" class="text-sub">(Prometheus + Grafana)</text>
+    </g>
+  </g>
+</svg></div></body></html>

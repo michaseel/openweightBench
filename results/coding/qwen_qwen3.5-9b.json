@@ -1,0 +1,201 @@
+{
+  "task": "coding",
+  "model_id": "qwen/qwen3.5-9b",
+  "model_info": {
+    "id": "qwen/qwen3.5-9b",
+    "type": "vlm",
+    "publisher": "qwen",
+    "arch": "qwen35",
+    "compatibility_type": "gguf",
+    "quantization": "Q4_K_M",
+    "state": "not-loaded",
+    "max_context_length": 262144,
+    "capabilities": [
+      "tool_use"
+    ],
+    "loaded_context_length": null
+  },
+  "started_at": "2026-04-28T18:16:03.170299Z",
+  "completed_at": "2026-04-28T18:18:12.229676Z",
+  "metrics": {
+    "wall_seconds": 129.05757762503345,
+    "tokens_generated": 6976,
+    "tokens_per_second": 59.29534872953723,
+    "time_to_first_token_ms": 536.0,
+    "peak_rss_mb": 6245.5
+  },
+  "score": 0.6666666666666666,
+  "score_breakdown": {
+    "looks_like_html": true,
+    "html_length": 24953,
+    "raw_length": 24967,
+    "lint_checks": [
+      {
+        "id": "col_backlog",
+        "label": "Spalte 'Backlog'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_in_progress",
+        "label": "Spalte 'In Progress'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_review",
+        "label": "Spalte 'Review'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_done",
+        "label": "Spalte 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "drag_drop",
+        "label": "HTML5 Drag&Drop oder Sortable-Lib",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "local_storage",
+        "label": "localStorage-Persistenz",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "tailwind_cdn",
+        "label": "Tailwind via CDN",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "confetti",
+        "label": "Confetti-Animation auf 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Add-Card-Button",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "vanilla_js",
+        "label": "Vanilla JS (kein React/Vue/Angular/Svelte)",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_alert_prompt",
+        "label": "Keine window.alert/prompt für CRUD",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "editable_cards",
+        "label": "Editierbare Karten (contenteditable / input)",
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "lint_passed": 12,
+    "lint_total": 12,
+    "lint_score": 1.0,
+    "e2e_checks": [
+      {
+        "id": "renders",
+        "label": "Seite lädt mit allen 4 Spalten",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Karte hinzufügen via Button",
+        "passed": false,
+        "detail": "Page.wait_for_selector: Timeout 2000ms exceeded.\nCall log:\n  - waiting for locator(\"[data-testid=\\\"card-input\\\"]\") to be visible\n"
+      },
+      {
+        "id": "no_double_add",
+        "label": "Karte wird genau 1× angelegt (kein Doppel-Submit)",
+        "passed": false,
+        "detail": "übersprungen — Add-Flow ist gescheitert"
+      },
+      {
+        "id": "delete_card",
+        "label": "Karte löschen via Button + Bestätigung",
+        "passed": false,
+        "detail": "keine Karten zum Löschen vorhanden"
+      },
+      {
+        "id": "persistence",
+        "label": "Karten überleben einen Reload",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_console_errors",
+        "label": "Keine JS-Konsolen-Fehler",
+        "passed": false,
+        "detail": "pageerror: Cannot read properties of null (reading 'addEventListener'); pageerror: Cannot read properties of null (reading 'addEventListener')"
+      }
+    ],
+    "e2e_passed": 2,
+    "e2e_total": 6,
+    "e2e_score": 0.3333333333333333,
+    "judge": {
+      "scored_at": "2026-04-28T21:46:01.410153+00:00",
+      "judge_model": "openai/gpt-5.4",
+      "scores": {
+        "board_renders": 0.7,
+        "column_completeness": 1.0,
+        "cards_present": 0.0,
+        "ui_affordances": 0.7,
+        "design_quality": 0.75,
+        "code_structure": 0.45,
+        "dom_safety": 0.55,
+        "robustness": 0.2,
+        "code_quality": 0.2,
+        "render_matches_code": 0.0
+      },
+      "judge_score": 0.445,
+      "comment_visual": "Das Board rendert sichtbar und die vier Spalten sind klar beschriftet, mit ordentlichen Add-Card-Buttons und sauberem Grundlayout. Allerdings sind keinerlei Karten sichtbar, obwohl der Screen ansonsten wie ein fertiges Kanban-Board wirkt.",
+      "comment_code": "Optisch ambitionierter Single-File-Code, aber die JS-Logik ist fehlerhaft: Der State nutzt teils `inProgress`, teils `in-progress`, Karten bekommen keine `id`/`data-card-id`, und Drag/Edit/Restore sind inkonsistent implementiert. DOM-Sicherheit ist gemischt: Kartentexte nutzen `textContent`, Buttons setzen SVG jedoch per `innerHTML`; Robustheit ist schwach, weil `localStorage`/`JSON.parse` ohne Schutz und mehrere Null-/State-Fehler möglich sind.",
+      "comment_consistency": "Starke Diskrepanz zwischen Code und Render: Der Code verspricht mehrere Dummy-Karten in Backlog, In Progress und Done, der Screenshot zeigt aber alle Spalten leer. Das spricht klar für einen Laufzeit-/State-Bug beim Initial-Render, daher ist diese Achse ein Totalausfall."
+    }
+  },
+  "raw_response": "\n\n```html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Vibrant Kanban Board</title>\n    <!-- Tailwind CSS via CDN -->\n    <script src=\"https://cdn.tailwindcss.com\"></script>\n    <style>\n        /* Custom Drag and Drop Styles */\n        .draggable-card {\n            cursor: grab;\n            transition: all 0.2s ease-in-out;\n        }\n\n        .draggable-card:active {\n            cursor: grabbing;\n        }\n\n        /* Visual feedback when dragging over a column */\n        .column-list.drag-over {\n            background-color: rgba(0, 0, 0, 0.03);\n            border-radius: 0.5rem;\n        }\n\n        /* Modal Transitions */\n        .modal-overlay {\n            transition: opacity 0.2s ease-in-out;\n        }\n        \n        /* Confetti Animation */\n        @keyframes confetti-fall {\n            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }\n            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }\n        }\n        .confetti-piece {\n            position: absolute;\n            width: 10px;\n            height: 10px;\n            animation: confetti-fall 3s ease-out forwards;\n        }\n\n        /* Custom Scrollbar for columns */\n        .custom-scrollbar::-webkit-scrollbar {\n            width: 6px;\n        }\n        .custom-scrollbar::-webkit-scrollbar-track {\n            background: #f1f1f1; \n        }\n        .custom-scrollbar::-webkit-scrollbar-thumb {\n            background: #cbd5e1; \n            border-radius: 4px;\n        }\n        .custom-scrollbar::-webkit-scrollbar-thumb:hover {\n            background: #94a3b8; \n        }\n    </style>\n</head>\n<body class=\"bg-slate-100 text-slate-800 h-screen flex flex-col font-sans\">\n\n    <!-- Header -->\n    <header class=\"bg-white border-b border-slate-200 px-6 py-4 shadow-sm z-10 flex justify-between items-center\">\n        <h1 class=\"text-xl font-bold text-indigo-600 tracking-tight\">Tas",
+  "artifacts": [
+    {
+      "kind": "html",
+      "label": "Generierte App",
+      "path": "artifacts/qwen_qwen3.5-9b/coding/output.html",
+      "mime": "text/html"
+    },
+    {
+      "kind": "text",
+      "label": "Roh-Antwort des Modells",
+      "path": "artifacts/qwen_qwen3.5-9b/coding/raw_response.txt",
+      "mime": "text/plain"
+    },
+    {
+      "kind": "image",
+      "label": "Screenshot der gerenderten App",
+      "path": "artifacts/qwen_qwen3.5-9b/coding/screenshot.png",
+      "mime": "image/png"
+    }
+  ],
+  "error": null,
+  "hardware": {
+    "platform": "macOS-26.4.1-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "ram_total_gb": 128.0,
+    "cpu_count": 16
+  },
+  "bench_version": "0.1.0"
+}

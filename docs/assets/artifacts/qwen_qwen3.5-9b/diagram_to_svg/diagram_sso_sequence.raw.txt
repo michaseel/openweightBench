@@ -1,0 +1,112 @@
+
+
+<svg viewBox="0 0 1000 650" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Marker für Pfeile -->
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="black" />
+    </marker>
+    <marker id="arrowhead-dashed" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="black" stroke-dasharray="4" />
+    </marker>
+  </defs>
+
+  <!-- Titel -->
+  <g id="title-group">
+    <text x="500" y="60" font-family="Comic Sans MS, 'Chalkboard SE', sans-serif" font-size="32" text-anchor="middle" fill="#1a1a1a">SSO - Ablaufdiagramm</text>
+  </g>
+
+  <!-- Gruppe: Benutzer -->
+  <g id="actor-group" transform="translate(50, 120)">
+    <!-- Stickfigur -->
+    <circle cx="30" cy="10" r="8" fill="black"/>
+    <line x1="30" y1="18" x2="30" y2="40" stroke="black" stroke-width="2"/>
+    <line x1="25" y1="40" x2="35" y2="40" stroke="black" stroke-width="2"/>
+    <line x1="28" y1="40" x2="28" y2="60" stroke="black" stroke-width="2"/>
+    <line x1="25" y1="60" x2="35" y2="60" stroke="black" stroke-width="2"/>
+    <!-- Label -->
+    <text x="30" y="80" font-family="Comic Sans MS, 'Chalkboard SE', sans-serif" font-size="18" text-anchor="middle">Benutzer</text>
+  </g>
+
+  <!-- Gruppe: App / Service Provider -->
+  <g id="app-sp-group" transform="translate(250, 140)">
+    <rect x="0" y="-30" width="200" height="60" fill="white" stroke="black" stroke-width="2"/>
+    <text x="100" y="0" font-family="Comic Sans MS, 'Chalkboard SE', sans-serif" font-size="20" text-anchor="middle">App /</text>
+    <text x="100" y="25" font-family="Comic Sans MS, 'Chalkboard SE', sans-serif" font-size="20" text-anchor="middle">Service Provider</text>
+  </g>
+
+  <!-- Gruppe: Identity Provider (IdP) -->
+  <g id="idp-group" transform="translate(650, 140)">
+    <rect x="0" y="-30" width="200" height="60" fill="white" stroke="black" stroke-width="2"/>
+    <text x="100" y="0" font-family="Comic Sans MS, 'Chalkboard SE', sans-serif" font-size="20" text-anchor="middle">Identity Provider</text>
+    <text x="100" y="25" font-family="Comic Sans MS, 'Chalkboard SE', sans-serif" font-size="20" text-anchor="middle">(IdP)</text>
+  </g>
+
+  <!-- Gruppe: Login-Seite -->
+  <g id="login-group" transform="translate(650, 340)">
+    <rect x="0" y="-30" width="200" height="60" fill="white" stroke="black" stroke-width="2"/>
+    <text x="100" y="0" font-family="Comic Sans MS, 'Chalkboard SE', sans-serif" font-size="20" text-anchor="middle">Login-Seite</text>
+  </g>
+
+  <!-- Gruppe: Entscheidung -->
+  <g id="decision-group" transform="translate(580, 470)">
+    <polygon points="-30,-10 30,-10 30,20 -30,20" fill="white" stroke="black" stroke-width="2"/>
+    <text x="0" y="0" font-family="Comic Sans MS, 'Chalkboard SE', sans-serif" font-size="18" text-anchor="middle">Anmeldedaten</text>
+    <text x="0" y="25" font-family="Comic Sans MS, 'Chalkboard SE', sans-serif" font-size="18" text-anchor="middle">korrekt?</text>
+  </g>
+
+  <!-- Gruppe: Zugriff gewährt -->
+  <g id="access-group" transform="translate(200, 560)">
+    <rect x="0" y="-30" width="140" height="60" fill="white" stroke="black" stroke-width="2"/>
+    <text x="70" y="0" font-family="Comic Sans MS, 'Chalkboard SE', sans-serif" font-size="20" text-anchor="middle">Zugriff</text>
+    <text x="70" y="25" font-family="Comic Sans MS, 'Chalkboard SE', sans-serif" font-size="20" text-anchor="middle">gewährt</text>
+  </g>
+
+  <!-- Verbindungen und Beschriftungen -->
+
+  <!-- 1. Zugang zu App -->
+  <path d="M 80 150 L 230 150" stroke="black" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="155" y="140" font-family="Comic Sans MS, 'Chalkboard SE', sans-serif" font-size="16" text-anchor="middle">1. Zugang zu App</text>
+
+  <!-- 2. Weiterleitung zur Login-Seite -->
+  <path d="M 450 150 L 630 150" stroke="black" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="540" y="130" font-family="Comic Sans MS, 'Chalkboard SE', sans-serif" font-size="16" text-anchor="middle">2. Weiterleitung</text>
+  <text x="540" y="150" font-family="Comic Sans MS, 'Chalkboard SE', sans-serif" font-size="16" text-anchor="middle">zur Login-Seite</text>
+
+  <!-- 3. Login-Seite anzeigen -->
+  <path d="M 750 210 L 750 310" stroke="black" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="760" y="260" font-family="Comic Sans MS, 'Chalkboard SE', sans-serif" font-size="16" text-anchor="start">3. Login-Seite</text>
+  <text x="760" y="280" font-family="Comic Sans MS, 'Chalkboard SE', sans-serif" font-size="16" text-anchor="start">anzeigen</text>
+
+  <!-- Benutzer gibt Anmeldedaten ein (gestrichelt) -->
+  <path d="M 950 340 L 850 340" stroke="black" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead-dashed)"/>
+  <text x="900" y="310" font-family="Comic Sans MS, 'Chalkboard SE', sans-serif" font-size="16" text-anchor="start">Benutzer gibt</text>
+  <text x="900" y="330" font-family="Comic Sans MS, 'Chalkboard SE', sans-serif" font-size="16" text-anchor="start">Anmeldedaten ein</text>
+
+  <!-- 4. Authentifizierung -->
+  <path d="M 750 400 L 680 430" stroke="black" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="710" y="420" font-family="Comic Sans MS, 'Chalkboard SE', sans-serif" font-size="16" text-anchor="start">4. Authentifizierung</text>
+
+  <!-- Nein (zurück zur Login-Seite) -->
+  <path d="M 750 480 L 750 390" stroke="black" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="760" y="440" font-family="Comic Sans MS, 'Chalkboard SE', sans-serif" font-size="16" text-anchor="start">Nein</text>
+
+  <!-- Ja (Token Response) -->
+  <path d="M 650 520 L 650 580" stroke="black" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="660" y="510" font-family="Comic Sans MS, 'Chalkboard SE', sans-serif" font-size="16" text-anchor="start">Ja</text>
+  
+  <!-- 5. Token / Assertion -->
+  <text x="630" y="620" font-family="Comic Sans MS, 'Chalkboard SE', sans-serif" font-size="18" text-anchor="middle">5. Token / Assertion</text>
+  <text x="630" y="645" font-family="Comic Sans MS, 'Chalkboard SE', sans-serif" font-size="18" text-anchor="middle">(SSO-Response)</text>
+
+  <!-- 6. Redirect zurück zur App mit Token -->
+  <path d="M 450 520 L 350 190" stroke="black" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="400" y="360" font-family="Comic Sans MS, 'Chalkboard SE', sans-serif" font-size="16" text-anchor="middle">6. Redirect zurück</text>
+  <text x="400" y="385" font-family="Comic Sans MS, 'Chalkboard SE', sans-serif" font-size="16" text-anchor="middle">zur App mit Token</text>
+
+  <!-- 7. Zugriff auf Ressourcen -->
+  <path d="M 350 240 L 350 520" stroke="black" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="180" y="400" font-family="Comic Sans MS, 'Chalkboard SE', sans-serif" font-size="16" text-anchor="middle">7. Zugriff</text>
+  <text x="180" y="425" font-family="Comic Sans MS, 'Chalkboard SE', sans-serif" font-size="16" text-anchor="middle">auf Ressourcen</text>
+
+</svg>

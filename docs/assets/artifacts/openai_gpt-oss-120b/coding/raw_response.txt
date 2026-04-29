@@ -1,0 +1,316 @@
+```html
+<!DOCTYPE html>
+<html lang="en" data-testid="kanban-root">
+<head>
+  <meta charset="UTF-8">
+  <title>Vanilla JS Kanban Board</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Simple confetti library (canvas‑confetti) -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    /* Subtle transition for cards */
+    .card {
+      @apply bg-white rounded shadow-md p-3 mb-2 cursor-move select-none;
+      transition: transform 0.15s ease, background-color 0.2s;
+    }
+    .card:hover { background-color:#f9fafb; }
+
+    /* Drag‑over highlight */
+    .column.drag-over {
+      @apply bg-blue-50 border-dashed border-2 border-blue-300;
+    }
+
+    /* Simple modal backdrop */
+    #modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.4);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+    #modal {
+      @apply bg-white rounded-lg p-6 w-80 shadow-xl;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex items-start justify-center pt-10">
+
+  <!-- Kanban Columns -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 w-full max-w-7xl px-2">
+    
+    <!-- Backlog Column -->
+    <section data-testid="column-backlog" class="column bg-gray-200 rounded p-3 flex flex-col h-[80vh] overflow-y-auto">
+      <h2 class="text-xl font-semibold mb-2">Backlog</h2>
+      <div class="flex-1 space-y-2" id="backlog-cards"></div>
+      <button data-testid="add-card"
+              class="mt-2 bg-blue-500 text-white py-1 rounded hover:bg-blue-600 transition"
+              data-column="backlog">Add card</button>
+    </section>
+
+    <!-- In Progress Column -->
+    <section data-testid="column-in-progress" class="column bg-gray-200 rounded p-3 flex flex-col h-[80vh] overflow-y-auto">
+      <h2 class="text-xl font-semibold mb-2">In Progress</h2>
+      <div class="flex-1 space-y-2" id="inprogress-cards"></div>
+      <button data-testid="add-card"
+              class="mt-2 bg-blue-500 text-white py-1 rounded hover:bg-blue-600 transition"
+              data-column="in-progress">Add card</button>
+    </section>
+
+    <!-- Review Column -->
+    <section data-testid="column-review" class="column bg-gray-200 rounded p-3 flex flex-col h-[80vh] overflow-y-auto">
+      <h2 class="text-xl font-semibold mb-2">Review</h2>
+      <div class="flex-1 space-y-2" id="review-cards"></div>
+      <button data-testid="add-card"
+              class="mt-2 bg-blue-500 text-white py-1 rounded hover:bg-blue-600 transition"
+              data-column="review">Add card</button>
+    </section>
+
+    <!-- Done Column -->
+    <section data-testid="column-done" class="column bg-gray-200 rounded p-3 flex flex-col h-[80vh] overflow-y-auto">
+      <h2 class="text-xl font-semibold mb-2">Done</h2>
+      <div class="flex-1 space-y-2" id="done-cards"></div>
+      <button data-testid="add-card"
+              class="mt-2 bg-blue-500 text-white py-1 rounded hover:bg-blue-600 transition"
+              data-column="done">Add card</button>
+    </section>
+
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="modal-backdrop">
+    <div id="modal">
+      <p class="mb-4">Delete this card?</p>
+      <div class="flex justify-end space-x-2">
+        <button id="cancel-delete" class="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400 transition">Cancel</button>
+        <button data-testid="confirm-delete"
+                id="confirm-delete"
+                class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition">Delete</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ---------- CONSTANTS & HELPERS ---------- */
+const STORAGE_KEY = 'kanbanBoard_v1'; // our own namespace
+
+// Retrieve stored board data or initialise with dummy cards
+function loadData() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (raw) return JSON.parse(raw);
+
+  // Dummy data – one card per column
+  return {
+    backlog: [{id: generateId(), text: 'Plan sprint'}],
+    'in-progress': [{id: generateId(), text: 'Develop feature X'}],
+    review: [{id: generateId(), text: 'Code review for Y'}],
+    done: [{id: generateId(), text: 'Release v1.0'}]
+  };
+}
+
+// Persist current board state
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(board));
+}
+
+// Simple unique id generator
+function generateId() { return '_' + Math.random().toString(36).substr(2,9); }
+
+/* ---------- STATE ---------- */
+let board = loadData();          // holds arrays of cards per column
+let dragSrcEl = null;            // element being dragged
+let cardToDelete = null;         // reference for delete confirmation
+
+/* ---------- RENDERING ---------- */
+function render() {
+  // Clear all columns first
+  ['backlog','in-progress','review','done'].forEach(col => {
+    const container = document.getElementById(`${col.replace('-', '')}-cards`);
+    container.innerHTML = '';
+    board[col].forEach(cardData => {
+      const cardEl = createCardElement(cardData);
+      container.appendChild(cardEl);
+    });
+  });
+}
+
+/* Create a single card DOM element */
+function createCardElement({id, text}) {
+  const div = document.createElement('div');
+  div.className = 'card';
+  div.draggable = true;
+  div.dataset.id = id;                     // keep id for later lookup
+  div.setAttribute('data-testid','card');
+
+  // Editable title – we use a <p> with contenteditable
+  const p = document.createElement('p');
+  p.contentEditable = true;
+  p.className = 'outline-none';
+  p.textContent = text;
+  p.addEventListener('blur', () => updateCardText(div));
+  p.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); p.blur(); }
+  });
+  div.appendChild(p);
+
+  // Delete button (icon)
+  const del = document.createElement('button');
+  del.innerHTML = '&times;';
+  del.className = 'float-right text-red-500 hover:text-red-700';
+  del.setAttribute('data-testid','delete-card');
+  del.addEventListener('click', () => openDeleteModal(div));
+  div.appendChild(del);
+
+  // Drag events
+  div.addEventListener('dragstart', handleDragStart);
+  div.addEventListener('dragend', handleDragEnd);
+  return div;
+}
+
+/* Update stored text after editing */
+function updateCardText(cardEl) {
+  const col = cardEl.closest('[data-testid]').dataset.testid.split('-')[1]; // column name
+  const id = cardEl.dataset.id;
+  const newText = cardEl.querySelector('p').textContent.trim();
+
+  board[col] = board[col].map(c => c.id===id ? {...c, text:newText} : c);
+  saveData();
+}
+
+/* ---------- DRAG & DROP LOGIC ---------- */
+function handleDragStart(e) {
+  dragSrcEl = this;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', this.dataset.id);
+  setTimeout(() => this.classList.add('opacity-50'),0);
+}
+function handleDragEnd() { this.classList.remove('opacity-50'); }
+
+function allowDrop(e){ e.preventDefault(); }
+function dragEnterColumn(e){
+  if (e.currentTarget.classList.contains('column')) {
+    e.currentTarget.classList.add('drag-over');
+  }
+}
+function dragLeaveColumn(e){
+  e.currentTarget.classList.remove('drag-over');
+}
+function dropOnColumn(e){
+  e.preventDefault();
+  const colEl = e.currentTarget;
+  colEl.classList.remove('drag-over');
+
+  const cardId = e.dataTransfer.getData('text/plain');
+  const srcCol = dragSrcEl.closest('[data-testid]').dataset.testid.split('-')[1];
+  const dstCol = colEl.dataset.testid.split('-')[1];
+
+  if (srcCol === dstCol) return; // no move
+
+  // Find card data
+  const cardData = board[srcCol].find(c=>c.id===cardId);
+  if (!cardData) return;
+
+  // Remove from source and add to destination (push at end)
+  board[srcCol] = board[srcCol].filter(c=>c.id!==cardId);
+  board[dstCol].push(cardData);
+  saveData();
+  render();
+
+  // Confetti when moved to Done
+  if (dstCol === 'done') launchConfetti();
+}
+
+/* ---------- ADD CARD UI ---------- */
+function openAddInput(columnName, buttonEl) {
+  // Prevent multiple inputs
+  if (buttonEl.previousElementSibling?.dataset.testid === 'card-input') return;
+
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.placeholder = 'Card title';
+  input.className = 'border rounded w-full p-1 mb-2';
+  input.setAttribute('data-testid','card-input');
+
+  // Commit on Enter
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      const txt = input.value.trim();
+      if (txt) addCard(columnName, txt);
+      buttonEl.parentNode.removeChild(input);
+    }
+    if (e.key === 'Escape') { buttonEl.parentNode.removeChild(input); }
+  });
+
+  // Insert just before the Add button
+  buttonEl.parentNode.insertBefore(input, buttonEl);
+  input.focus();
+}
+
+/* Persist a new card */
+function addCard(columnName, text) {
+  const newCard = {id: generateId(), text};
+  board[columnName].push(newCard);
+  saveData();
+  render();
+}
+
+/* ---------- DELETE CARD MODAL ---------- */
+const modalBackdrop = document.getElementById('modal-backdrop');
+const cancelBtn = document.getElementById('cancel-delete');
+const confirmBtn = document.getElementById('confirm-delete');
+
+function openDeleteModal(cardEl) {
+  cardToDelete = cardEl;
+  modalBackdrop.style.display = 'flex';
+}
+function closeDeleteModal() {
+  modalBackdrop.style.display = 'none';
+  cardToDelete = null;
+}
+cancelBtn.addEventListener('click', closeDeleteModal);
+confirmBtn.addEventListener('click', () => {
+  if (!cardToDelete) return;
+  const col = cardToDelete.closest('[data-testid]').dataset.testid.split('-')[1];
+  const id = cardToDelete.dataset.id;
+  board[col] = board[col].filter(c=>c.id!==id);
+  saveData();
+  render();
+  closeDeleteModal();
+});
+
+/* ---------- CONFETTI ---------- */
+function launchConfetti() {
+  confetti({
+    particleCount: 80,
+    spread: 70,
+    origin: { y: 0.6 }
+  });
+}
+
+/* ---------- INITIAL SETUP ---------- */
+// Attach drag‑over listeners to each column container
+document.querySelectorAll('.column').forEach(col => {
+  col.addEventListener('dragover', allowDrop);
+  col.addEventListener('dragenter', dragEnterColumn);
+  col.addEventListener('dragleave', dragLeaveColumn);
+  col.addEventListener('drop', dropOnColumn);
+});
+
+// Add‑card button handling
+document.querySelectorAll('[data-testid="add-card"]').forEach(btn => {
+  const column = btn.dataset.column; // matches keys in board object
+  btn.addEventListener('click', () => openAddInput(column, btn));
+});
+
+render(); // initial render
+</script>
+
+</body>
+</html>
+```

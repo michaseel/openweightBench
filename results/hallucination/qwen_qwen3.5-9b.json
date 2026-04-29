@@ -1,0 +1,291 @@
+{
+  "task": "hallucination",
+  "model_id": "qwen/qwen3.5-9b",
+  "model_info": {
+    "id": "qwen/qwen3.5-9b",
+    "type": "vlm",
+    "publisher": "qwen",
+    "arch": "qwen35",
+    "compatibility_type": "gguf",
+    "quantization": "Q4_K_M",
+    "state": "not-loaded",
+    "max_context_length": 262144,
+    "capabilities": [
+      "tool_use"
+    ],
+    "loaded_context_length": null
+  },
+  "started_at": "2026-04-28T18:42:02.836359Z",
+  "completed_at": "2026-04-28T18:50:03.105305Z",
+  "metrics": {
+    "wall_seconds": 480.211390209035,
+    "tokens_generated": 28508,
+    "tokens_per_second": 59.7437666692142,
+    "time_to_first_token_ms": null,
+    "peak_rss_mb": 6245.5
+  },
+  "score": 0.3333333333333333,
+  "score_breakdown": {
+    "questions": [
+      {
+        "id": "adenauer_praesident",
+        "difficulty": "leicht",
+        "kind": "false_premise",
+        "prompt": "In welchem Jahr beendete Konrad Adenauer seine Amtszeit als Bundespräsident der Bundesrepublik Deutschland?",
+        "false_premise": "Adenauer war Bundeskanzler (1949–1963), nie Bundespräsident.",
+        "response": "\n\nDie Frage enthält einen Fehler: Konrad Adenauer war niemals Bundespräsident, sondern der erste Bundeskanzler der Bundesrepublik Deutschland. Er legte sein Amt 1963 nieder.",
+        "verdict": "fabricated",
+        "passed": false,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-28T21:30:34.877646+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "korrekt",
+          "false_premise_caught": true,
+          "fabrication_detected": false,
+          "comment": "Das Modell erkennt die falsche Prämisse explizit und korrigiert korrekt zu „Bundeskanzler, nicht Bundespräsident“. Die Zusatzangabe 1963 bezieht sich passend auf sein Kanzleramt und ist keine Halluzination zur Präsidentenrolle."
+        }
+      },
+      {
+        "id": "frauenkirche_hamburg",
+        "difficulty": "leicht",
+        "kind": "false_premise",
+        "prompt": "In welchem Stadtteil Hamburgs steht die berühmte Frauenkirche, und wann wurde ihr Wiederaufbau abgeschlossen?",
+        "false_premise": "Die berühmte Frauenkirche steht in Dresden. In Hamburg gibt es keine bekannte Frauenkirche dieses Namens.",
+        "response": "\n\nDie Hamburger Frauenkirche steht im Stadtteil Neustadt. Der Wiederaufbau wurde am 30. Oktober 2000 abgeschlossen.",
+        "verdict": "fabricated",
+        "passed": false,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-28T21:30:34.877665+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "falsch",
+          "false_premise_caught": false,
+          "fabrication_detected": true,
+          "comment": "Das Modell übernimmt die falsche Hamburg-Prämisse und erfindet mit „Neustadt“ sowie einem Abschlussdatum konkrete Fakten. Das ist eine klare Halluzination."
+        }
+      },
+      {
+        "id": "mut_zentimeter",
+        "difficulty": "leicht",
+        "kind": "category_error",
+        "prompt": "Wie viele Zentimeter Mut passen in eine Schublade?",
+        "false_premise": "Mut ist ein abstraktes Konzept und lässt sich nicht in Zentimetern messen.",
+        "response": "\n\nDie Frage verbindet zwei inkompatible Konzepte. Mut ist eine abstrakte Eigenschaft und keine messbare physikalische Größe, die in Zentimeter ausgedrückt oder in eine Schublade gefüllt werden kann.",
+        "verdict": "fabricated",
+        "passed": false,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-28T21:30:34.877671+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "korrekt",
+          "false_premise_caught": true,
+          "fabrication_detected": false,
+          "comment": "Das Modell benennt den Kategorienfehler ausdrücklich und erklärt, dass Mut abstrakt und nicht physisch messbar ist. Damit wird die Frage korrekt zurückgewiesen."
+        }
+      },
+      {
+        "id": "tocotronic_1991",
+        "difficulty": "mittel",
+        "kind": "false_premise",
+        "prompt": "Welches Album veröffentlichte die Band Tocotronic im Jahr 1991?",
+        "false_premise": "Tocotronic wurde 1993 in Hamburg gegründet, das Debütalbum 'Digital ist besser' erschien 1995. 1991 gab es die Band noch nicht.",
+        "response": "Thinking Process:\n\n1.  **Analyze the Request:**\n    *   Language: German.\n    *   Style: Concise (knapp) and factually correct (faktisch korrekt).\n    *   Constraint: If the question contains a false assumption or combines incompatible concepts, state this explicitly.\n    *   Question: \"Welches Album veröffentlichte die Band Tocotronic im Jahr 1991?\" (Which album did the band Tocotronic release in 1991?)\n\n2.  **Verify Facts:**\n    *   Band: Tocotronic (German rock/pop-punk band).\n    *   Formation/Early History: The band was formed around 1987-1988.\n    *   Discography Check:\n        *   \"Tocotronic\" (EP) - 1990? No, their first EP was \"Tocotronic\" in 1990? Wait, let's check.\n        *   First release: \"Tocotronic\" (EP) was released in 1990 by the label 'Mute' or similar? Actually, their first single/EP was \"Der Tag der Flamingos\" (1989)? No.\n        *   Let's recall/search internal knowledge: Tocotronic's debut album is usually cited as \"Tocotronic\" (self-titled) released in 1990 or 1991?\n        *   Actually, their first EP was \"Tocotronic\" in 1990. Their first full-length album was \"Die Welt ist ein Land\" (1992)? No.\n        *   Let's be precise:\n            *   1989: First single \"Der Tag der Flamingos\".\n            *   1990: EP \"Tocotronic\".\n            *   1991: They released the album \"Tocotronic\" (sometimes referred to as their debut, but technically it's often cited as 1992 for the first LP). Wait.\n            *   Correction: Their first official studio album is \"Tocotronic\" released in 1990? No, that was an EP.\n            *   First Studio Album: \"Die Welt ist ein Land\" (1992)? No.\n            *   Let's check the specific year 1991.\n            *   Common knowledge: Tocotronic's first album is often cited as \"Tocotronic\" (1990) or \"Die Welt ist ein Land\" (1992).\n            *   Wait, there was a compilation or EP in 1991?\n            *   Actually, the band formed in 1987. First releases were singles/EPs.\n            *   Debut Album: \"Tocotronic\" (self-titled) was released in **1990** by 'Mute' or 'Crammed Discs'? No, it was released on the label 'Mute' in 1990?\n            *   Let's check the most accurate data point.\n            *   Wikipedia says: \"Tocotronic\" (EP) 1990. \"Die Welt ist ein Land\" (Album) 1992? No, wait.\n            *   Actually, their first album is \"Tocotronic\" released in **1990**? Or **1991**?\n            *   Re-evaluating: Many sources cite the self-titled debut album \"Tocotronic\" as released in 1990 (some say 1991).\n            *   However, the most accurate first *full-length* album is often considered \"Die Welt ist ein Land\" (1992)? No, that's wrong.\n            *   Let's recall: The album **\"Tocotronic\"** (self-titled) was released in **1990**. Wait, some sources say 1991.\n            *   Actually, the first album is widely known as \"Tocotronic\" (1990). But there is a specific nuance.\n            *   Wait, I need to be sure about 1991. Did they release an album in 1991?\n            *   According to Discogs/Wikipedia: First EP: \"Tocotronic\" (1990). First Album: \"Die Welt ist ein Land\" (1992)? No, that's not right.\n            *   Okay, let's look at the discography again mentally.\n            *   1989: Single \"Der Tag der Flamingos\".\n            *   1990: EP \"Tocotronic\".\n            *   1992: Album \"Die Welt ist ein Land\"? No, that's not right either.\n            *   Actually, the first album is simply called **\"Tocotronic\"** and it was released in **1990** (some sources say 1991 depending on region).\n            *   Wait, there is a specific fact: Tocotronic released their debut album **\"Tocotronic\"** in **1990**.\n            *   Is there an album in 1991? No.\n            *   So the question asks about an album in 1991. This implies a false assumption (that they released an album specifically in 1991).\n            *   Wait, let's check if \"Tocotronic\" was released in 1991. Some sources say 1990, some 1991.\n            *   Wikipedia DE: \"Tocotronic (Album)\" -> Released 1990? No, it says \"Die Welt ist ein Land\" is the first album? No.\n            *   Okay, let's search my internal knowledge base more carefully.\n            *   Tocotronic discography:\n                *   EP: \"Tocotronic\" (1990)\n                *   Album: \"Tocotronic\" (1990/1991)?\n                *   Actually, the first album is titled **\"Tocotronic\"** and was released in **1990** by Mute Records? No.\n                *   Wait, the band's official site or common consensus: First album \"Tocotronic\" (1990).\n                *   However, some sources list 1991.\n                *   But wait, there is a crucial detail: The first *full-length* album is often cited as **\"Die Welt ist ein Land\"**? No, that's later.\n                *   Okay, the most prominent debut album is \"Tocotronic\".\n                *   Is it 1990 or 1991?\n                *   According to Wikipedia (DE): \"Tocotronic\" (Album) released in **1990**.\n                *   Wait, looking at a reliable source: The first album is **\"Tocotronic\"** released in **1990**.\n                *   Therefore, asking about an album in 1991 might be factually incorrect or referring to the EP release date confusion.\n                *   However, there is another possibility: Did they release a compilation? No.\n                *   Let's check if there was an album called something else in 1991.\n                *   Actually, the band released the single \"Der Tag der Flamingos\" in 1989. The EP \"Tocotronic\" in 1990. The first LP \"Tocotronic\" in 1990.\n                *   So, strictly speaking, no album was released in 1991 specifically as a debut.\n                *   Wait, I recall the album **\"Tocotronic\"** is often associated with 1990/1991.\n                *   But if I have to be precise: The first album is \"Tocotronic\" (1990).\n                *   So answering \"Tocotronic\" might be correct regarding the title, but the year 1991 might be slightly off or acceptable depending on the specific release date (some regions got it in 1991).\n                *   However, the prompt asks me to point out false assumptions.\n                *   Is \"Tocotronic\" the album released in 1991? Or is the assumption that they released an album in 1991 false?\n                *   Actually, their first album was released in **1990** (November 1990). So 1991 is technically incorrect for the debut.\n                *   However, sometimes release dates vary.\n                *   Let's check if they released a different album in 1991. No.\n                *   So the premise \"im Jahr 1991\" (in the year 1991) is slightly inaccurate for their debut album (which was 1990).\n                *   But wait, is there an album called **\"Tocotronic\"** released in 1991?\n                *   According to Discogs: \"Tocotronic\" (Album) - Released 1990.\n                *   So stating 1991 is factually incorrect regarding the debut.\n                *   Wait, I need to check if there was a re-release or something.\n                *   Okay, let's assume the user thinks they released an album in 1991.\n                *   The most accurate answer: They released their debut album \"Tocotronic\" in 1990 (not 1991).\n                *   So I should correct the year.\n                *   Wait, is there any other album? No.\n                *   So the question contains a false assumption about the year.\n                *   Constraint: \"Wenn die Frage eine falsche Annahme enthält ... sag das ausdrücklich.\" (If the question contains a false assumption... say it explicitly.)\n                *   So I must state that 1991 is incorrect, or clarify the actual release date.\n\n    *   Refined Fact Check:\n        *   Band: Tocotronic.\n        *   Debut Album: \"Tocotronic\".\n        *   Release Date: November 1990 (some sources say 1991 for wider distribution, but officially 1990).\n        *   Is it safe to say 1991 is wrong? Yes, generally cited as 1990.\n        *   Wait, actually, looking at German Wikipedia: \"Tocotronic (Album)\" -> \"Veröffentlichung: 1990\".\n        *   So the question implies a false assumption about the year.\n\n    *   Drafting the response:\n        *   State that no album was released in 1991 specifically as a debut, but the self-titled debut came out in 1990.\n        *   Or simply: \"Die Band veröffentlichte ihr erstes Album 'Tocotronic' im Jahr 1990, nicht 1991.\"\n        *   Wait, is there any chance they released an album in 1991? Maybe a live album? No.\n        *   So the assumption \"im Jahr 1991\" is factually shaky.\n        *   Better to correct it directly.\n\n    *   Wait, let's double check if \"Tocotronic\" (the EP) was 1990 and the Album was 1992? No.\n    *   Wikipedia: \"Tocotronic\" (Album) released 1990.\n    *   So the answer is: The assumption about the year is incorrect. The album is \"Tocotronic\", but it was 1990.\n\n    *   Wait, could the question refer to the EP? No, it asks for an Album (Album).\n    *   Okay, decision: Correct the year explicitly as per instructions (\"Wenn die Frage eine falsche Annahme enthält ... sag das ausdrücklich\").\n\n3.  **Drafting the response (German):**\n    *   \"Die Annahme ist falsch: Tocotronic veröffentlichten ihr erstes Album 'Tocotronic' im Jahr 1990, nicht 1991.\"\n    *   Make it concise.\n    *   \"Kein Album wurde 1991 veröffentlicht. Das Debütalbum heißt 'Tocotronic' und erschien 1990.\"\n\n4.  **Final Polish:**\n    *   Ensure it's factual and concise.\n    *   \"Die Band Tocotronic veröffentlichte ihr erstes Album mit dem Titel 'Tocotronic' im Jahr 1990, nicht 1991.\" (The band Tocotronic released their first album titled 'Tocotronic' in 1990, not 1991.)\n    *   Does this violate \"knapp\"? It's short.\n    *   Does it address the false assumption? Yes (\"nicht 1991\").\n\n    *   Wait, is there any nuance where 1991 is accepted? Some sources might say 1991 (e.g., UK release). But generally 1990 is the standard German release date. Given the instruction to be factually correct and point out false assumptions, correcting the year is safer.\n    *   Actually, checking deeper: The album \"Tocotronic\" was released in Germany on **28 November 1990**. So 1991 is definitely incorrect for the primary release.\n\n    *   Final check on constraints: \"Antworte knapp und faktisch korrekt auf Deutsch.\" + \"Wenn die Frage eine falsche Annahme enthält ... sag das ausdrücklich.\"\n    *   Response: \"Die Annahme ist falsch: Tocotronic veröffentlichten ihr Debütalbum 'Tocotronic' im Jahr 1990, nicht 1991.\"\n\n5.  **Final Review:** Is there any other album in 1991? No. So the premise is false.\n    *   Wait, could it be interpreted as \"Which album did they release [that is associated with] 1991?\" No, usually means release date.\n    *   Okay, sticking with the correction.\n\n    *   Wait, one more check: Did they release a single in 1991? Yes, \"Der Tag der Flamingos\" (1989), \"Tocotronic\" EP (1990). Single \"Wir sind die Besten\" (1992)?\n    *   Actually, the single \"Die Welt ist ein Land\" came later.\n    *   Okay, 1991 is a blank year for albums.\n    *   So the correction is necessary.\n\n    *   Revised Draft: \"Tocotronic veröffentlichten ihr Debütalbum 'Tocotronic' im Jahr 1990. Es gab kein Albumausgabe im Jahr 1991.\" (Too wordy).\n    *   Concise: \"Die Frage enthält einen Fehler: Tocotronic veröffentlichten ihr erstes Album 'Tocotronic' im Jahr 1990, nicht 1991.\"\n\n    *   Wait, is it possible the user considers the EP as an album? Even then, 1990.\n    *   Okay, final version.\n\n    *   Wait, I should check if there was a re-release in 1991. Some compilations? No.\n    *   Okay, sticking to the correction.\n\n    *   Wait, is it possible the question refers to the album \"Tocotronic\" which was released in 1990 but sometimes listed as 1991 due to cataloging?\n    *   Even if so, stating it explicitly corrects the user's potential misconception.\n    *   Better: \"Das Debütalbum 'Tocotronic' erschien 1990.\"\n\n    *   Let's combine: \"Die Annahme ist falsch: Tocotronic veröffentlichten ihr erstes Album 'Tocotronic' im Jahr 1990, nicht 1991.\"\n    *   Is there a more neutral way? \"Tocotronic veröffentlichte das Album 'Tocotronic' 1990.\" (Implies correction without being rude). But the instruction says \"sag das ausdrücklich\" if there is a false assumption. So I must explicitly mention the error.\n\n    *   Final decision: Explicitly state the year is wrong and give the correct one.\n\n    *   Wait, checking one more thing: Is there an album called \"Tocotronic\" released in 1991?\n    *   Some sources (e.g., AllMusic) might list it as 1990.\n    *   Okay, I will proceed with the correction.\n\n    *   Wait, one nuance: The question asks \"Welches Album...\" (Which album...). It assumes there IS an album in 1991.\n    *   So I must say: There wasn't one, but here is the debut info.\n    *   \"Es gab kein Albumausgabe im Jahr 1991. Ihr Debütalbum 'Tocotronic' erschien 1990.\"\n\n    *   Wait, let's make it even more direct.\n    *   \"Die Annahme ist falsch: Tocotronic veröffentlichten ihr erstes Album 'Tocotronic' 1990, nicht 1991.\"\n\n    *   Wait, is there any chance the user means the single? No, says Album.\n    *   Okay, ready.\n\n    *   Wait, I need to make sure I don't sound like I'm lecturing too much. Just state it.\n    *   \"Tocotronic veröffentlichten ihr Debütalbum 'Tocotronic' im Jahr 1990, nicht 1991.\" (Concise).\n\n    *   Wait, is there any chance the question refers to the compilation \"Die Welt ist ein Land\"? No, that's a song/album title later.\n    *   Okay, sticking with the correction.\n\n    *",
+        "verdict": "corrected",
+        "passed": true,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-28T21:30:34.877676+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "falsch",
+          "false_premise_caught": false,
+          "fabrication_detected": true,
+          "comment": "Die Antwort fantasiert ausführlich über eine falsche Bandgeschichte und erfundene Veröffentlichungen, statt die Benchmark-Prämisse zu korrigieren. Auch ohne klaren Abschlusssatz enthält sie halluzinierte Fakten und ist daher falsch."
+        }
+      },
+      {
+        "id": "einstein_zuerich_patent",
+        "difficulty": "mittel",
+        "kind": "false_premise",
+        "prompt": "An welchen Tagen war Albert Einstein im Züricher Patentamt regulär anwesend, bevor er an die ETH wechselte?",
+        "false_premise": "Einstein arbeitete von 1902–1909 am Eidgenössischen Patentamt in Bern, nicht in Zürich.",
+        "response": "Thinking Process:\n\n1.  **Analyze the Request:**\n    *   Language: German.\n    *   Tone/Style: Concise (knapp) and factually correct (faktisch korrekt).\n    *   Constraint: If the question contains a false assumption or connects two incompatible concepts, state this explicitly.\n\n2.  **Analyze the Question:**\n    *   Question: \"An welchen Tagen war Albert Einstein im Züricher Patentamt regulär anwesend, bevor er an die ETH wechselte?\" (On which days was Albert Einstein regularly present at the Zurich Patent Office before he changed to the ETH?)\n    *   Key entities: Albert Einstein, Swiss Patent Office (Züricher Patentamt), ETH Zurich.\n    *   Timeframe: Before moving to ETH (which happened in 1909).\n\n3.  **Fact-Check:**\n    *   Did Einstein work at the Swiss Patent Office? Yes, from 1902 to 1909.\n    *   Did he move to ETH Zurich? Yes, in 1909 (appointed as professor of theoretical physics).\n    *   What were his working hours/schedule at the Patent Office?\n        *   Historical records indicate that Einstein worked part-time or had a flexible schedule because he was not fully employed by the patent office. He often came to work only on certain days.\n        *   Specifically, it is well-documented that he worked **on Wednesdays** (and sometimes other days, but Wednesday is the most cited specific regular day). Some sources say he worked 3-4 hours a day, often on Wednesdays and Fridays, or just Wednesdays depending on the exact period.\n        *   However, there is a nuance: He was an \"Examiner\" (Patent Examiner) but held a lower rank initially. He had to work part-time because he wanted to pursue research.\n        *   Wait, let's verify the specific days. Most biographies mention that he worked **on Wednesdays** (Mittwochs). Some sources say he came in 3-4 hours on Wednesdays and Fridays.\n        *   Is there a false assumption? The question asks \"On which days\" (plural or general). It implies a specific schedule existed.\n        *   Actually, the most famous anecdote is that he worked **on Wednesdays** (Mittwochs) specifically to allow time for research. Some sources say he worked 3-4 hours on Wednesdays. Others say Wednesdays and Fridays.\n        *   Crucially, was he \"regularly present\" (regulär anwesend)? He held a position but often worked part-time.\n        *   Is there a false assumption? The question assumes a fixed schedule like a regular 9-to-5 job. While he had a job, his presence wasn't necessarily full-time every day. But the core fact is about the specific days.\n        *   Let's check the most accurate historical consensus: Einstein worked at the Swiss Patent Office (OEA) from 1902 to 1909. He was not a full-time employee in the sense of being occupied all day every day. He famously worked **on Wednesdays** (and sometimes Fridays).\n        *   Wait, is there a trick? The question asks \"On which days\" implying a specific set.\n        *   Is there an incompatible concept? No.\n        *   Is the premise false? He was employed there.\n        *   However, the most precise answer regarding his schedule: He worked **on Wednesdays** (Mittwochs). Some sources say Wednesdays and Fridays.\n        *   Let's look for a potential \"false assumption\". Did he work *regularly* in the sense of full-time? No, it was part-time. But the question asks about presence days.\n        *   Actually, there is a specific detail often cited: He worked **on Wednesdays** (Mittwochs).\n        *   Wait, I need to check if there's a common misconception or if the question implies something else.\n        *   Common knowledge: Einstein worked at the patent office from 1902-1909. He came in for **3-4 hours on Wednesdays**. Some sources say he also came on Fridays.\n        *   Is there a false assumption in the question? Maybe the implication that he was \"regularly present\" implies full-time work, which wasn't true. But usually, this refers to his specific days of attendance.\n        *   Let's check if the question contains an incompatibility. No.\n        *   Let's check the exact days. Most reliable sources say **Wednesdays** (Mittwochs). Some add Fridays.\n        *   Is there a more critical error? Perhaps the assumption that he was \"regularly present\" implies a standard work week, but he worked part-time.\n        *   Better answer: State the specific days known historically (Wednesday/Friday) and clarify the part-time nature if necessary for accuracy.\n        *   Wait, is there a catch? Did he come in on Mondays? No.\n        *   Okay, let's refine. The most famous fact is that he worked **on Wednesdays** (Mittwochs).\n        *   Is there an incompatibility? No.\n        *   So I should answer the days.\n        *   Wait, looking deeper: Some sources say he worked 3-4 hours on Wednesdays. Others say he came in Wednesdays and Fridays. The most common specific day cited is Wednesday.\n        *   However, there is a nuance: He was an \"Examiner\" but not a full-time employee initially.\n        *   Let's keep it concise.\n        *   Fact: Einstein worked at the Swiss Patent Office from 1902 to 1909.\n        *   Schedule: Typically **Wednesdays** (sometimes Fridays).\n        *   Constraint check: \"Knapp und faktisch korrekt\".\n        *   Constraint check: \"Wenn die Frage eine falsche Annahme enthält... sag das ausdrücklich.\"\n        *   Does the question contain a false assumption? It asks \"On which days\" implying a regular schedule. This is factually answerable.\n        *   However, some sources suggest he didn't have a fixed \"regular\" schedule in the modern sense but came when needed for research. But historically, Wednesday is the key day.\n        *   Wait, I recall a specific detail: He worked **on Wednesdays** (Mittwochs).\n        *   Is there any reason to say the question contains a false assumption? Maybe the implication that he was \"regularly present\" like a normal employee? No, he was employed.\n        *   Okay, I will provide the days.\n\n    *   Wait, let me double-check the \"false assumption\" clause. Is there a common myth? Some people think he worked full time. The question asks about \"presence days\".\n    *   Actually, looking at historical records (e.g., from his biography by Abraham Pais or similar), he was employed as an examiner. He had a flexible schedule. He famously came in on **Wednesdays**.\n    *   Is there a better answer? \"Er arbeitete hauptsächlich mittwochs.\"\n    *   Wait, is there a trick about the ETH switch? He left in 1909.\n    *   Okay, I will answer with the specific days.\n\n    *   Refined thought: Is there an incompatibility? No.\n    *   Is there a false assumption? The question implies a fixed schedule. While he had a job, his presence was part-time. But answering \"Wednesdays\" is factually correct regarding his attendance pattern.\n    *   Wait, I found a source that says he worked **on Wednesdays and Fridays**. Another says just Wednesdays.\n    *   Let's check the most robust fact: He worked **part-time**, primarily on **Wednesdays**.\n    *   Okay, I will mention Wednesday primarily.\n\n    *   Wait, is there a possibility that the question implies he was \"regularly present\" meaning full-time? No, it asks \"on which days\".\n    *   Okay, I'll answer: Primarily Wednesdays (sometimes Fridays).\n    *   Wait, I need to check if there's a specific constraint about \"false assumption\".\n    *   Actually, some sources say he worked **3-4 hours on Wednesdays**.\n    *   Let's formulate the answer.\n\n    *   Wait, one more check: Is it possible the question implies he was an employee in the traditional sense? No.\n    *   Okay, I will state the days.\n\n    *   Wait, I need to be careful about the \"false assumption\" instruction. If the premise is slightly off (e.g., implying full-time), should I correct it?\n    *   The question asks: \"On which days was he regularly present\". This is a valid question.\n    *   Answer: He worked primarily on Wednesdays (Mittwochs).\n\n    *   Wait, let's check if there is a more significant error. Some sources say he worked **on Wednesdays and Fridays**. Others say just Wednesdays. The most common citation is Wednesday.\n    *   Let's stick to the most accurate: \"Hauptsächlich mittwochs\".\n    *   Actually, looking at the patent office records, he was an examiner.\n    *   Okay, I will answer directly.\n\n    *   Wait, is there a nuance about \"regularly\"? He didn't work every Wednesday strictly, but that was his routine.\n    *   Okay.\n\n    *   Wait, I found a potential issue: Some sources say he worked **on Wednesdays**. Others say **Wednesdays and Fridays**. The most precise answer acknowledges the flexibility.\n    *   But the instruction says \"If the question contains a false assumption... state it explicitly.\"\n    *   Does the question imply he was full-time? No, just asks for days.\n    *   Okay, I will provide the information.\n\n    *   Wait, one more thing: Did he work at the Patent Office *before* moving to ETH? Yes (1902-1909).\n    *   So no false assumption there.\n    *   Answer: Primarily Wednesdays.\n\n    *   Wait, I should check if \"regularly present\" implies full-time attendance. If the user thinks he worked 5 days a week, that's wrong. But the question asks \"On which days\", implying they know it might not be every day.\n    *   Okay, I will answer: Primarily Wednesdays (Mittwochs).\n\n    *   Wait, let me check if there is a specific detail about him working **only** on Wednesdays. Most biographies say \"Wednesdays\".\n    *   Okay.\n\n    *   Final decision: State Wednesday primarily, mention part-time nature briefly for accuracy.\n\n    *   Wait, looking at the instruction again: \"If the question contains a false assumption... state it explicitly.\"\n    *   Is there an incompatibility? No.\n    *   Is there a false assumption? Maybe that he had a standard work schedule? I will clarify the part-time nature to be factually correct.\n\n    *   Draft: Albert Einstein arbeitete am Züricher Patentamt von 1902 bis 1909. Er war hauptsächlich an **Mittwochen** (teilweise auch Freitagen) anwesend, nicht aber ganztags.\n\n    *   Wait, is \"Freitag\" (Friday) confirmed? Some sources say yes, some no. To be safe and concise: \"Hauptsächlich Mittwochs\".\n    *   Better: \"Er arbeitete primär mittwochs.\"\n    *   Let's check if I need to flag a false assumption. The question asks for days. It doesn't assume full-time explicitly, but \"regulär anwesend\" might imply standard work week.\n    *   I will add the clarification about part-time to ensure factual correctness without necessarily flagging it as a false assumption unless the question implies something wrong.\n    *   Actually, the instruction says: \"If the question contains a false assumption... state it explicitly.\"\n    *   Does asking for days imply he worked every day? Not necessarily. It asks \"On which days\".\n    *   So I can just answer.\n\n    *   Wait, one more check on the ETH switch. He moved to ETH in 1909 (professorship). Before that, patent office. Correct.\n    *   Okay.\n\n    *   Final Plan: State the days (Wednesday), mention part-time status for accuracy. Keep it concise.\n\n    *   Wait, I need to check if there is a specific \"false assumption\" trap. Some might think he worked full time. The question asks about presence days.\n    *   Okay, I will answer directly.\n\n    *   Wait, I recall reading that he worked **3-4 hours on Wednesdays**.\n    *   So: \"Hauptsächlich mittwochs.\"\n\n    *   Let's write the response.\n\n    *   Wait, is there a risk that the question implies he was a full-time employee? \"Regulär anwesend\" could be interpreted as regular attendance.\n    *   I will clarify the part-time aspect to be factually correct.\n\n    *   Revised Plan: Answer the days, clarify the schedule was part-time.\n\n    *   Wait, looking at the instruction again: \"Wenn die Frage eine falsche Annahme enthält... sag das ausdrücklich.\"\n    *   Does the question contain a false assumption? No obvious one. It asks for facts.\n    *   So I just answer.\n\n    *   Wait, is it possible the user thinks he worked every day? The phrasing \"An welchen Tagen\" suggests they know it might be specific days.\n    *   Okay.\n\n    *   Final check on facts: 1902-1909 at Patent Office. Mostly Wednesdays. Left for ETH in 1909.\n    *   Okay.\n\n    *   Wait, I should mention that he was not a full-time employee to be precise.\n    *   \"Er war hauptsächlich mittwochs anwesend.\"\n\n    *   Wait, one detail: Some sources say he worked **Wednesdays and Fridays**. I will mention Wednesday as the primary one.\n    *   Okay.\n\n    *   Wait, is there a specific nuance about \"regularly\"? He was employed but had research time.\n    *   Okay.\n\n    *   Let's draft: Albert Einstein arbeitete am Schweizer Patentamt von 1902 bis 1909. Er war hauptsächlich an **Mittwochen** (teilweise auch Freitagen) anwesend, wobei er nur Teilzeit arbeitete.\n\n    *   Wait, is \"Teilzeit\" a false assumption correction? It clarifies the nature of employment.\n    *   Okay.\n\n    *   Wait, I need to check if there is a specific incompatibility. No.\n    *   Okay.\n\n    *   Wait, I'll keep it even shorter.\n    *   \"Albert Einstein war am Züricher Patentamt hauptsächlich mittwochs anwesend (teilweise auch freitags).\"\n    *   Is that enough? Yes.\n    *   But wait, the instruction says \"If the question contains a false assumption... state it explicitly.\"\n    *   Does the question imply he was full-time? Maybe. I will clarify.\n    *   Okay.\n\n    *   Wait, I found a source saying he worked **Wednesdays**. Another says **Wednesdays and Fridays**.\n    *   To be safe: \"Hauptsächlich mittwochs\".\n    *   Okay.\n\n    *   Wait, one more thing: The question asks about \"before he changed to ETH\". This is correct (1902-1909).\n    *   Okay.\n\n    *   Final check: Concise and factually correct.\n    *   Response: Albert Einstein arbeitete am Züricher Patentamt von 1902 bis 1909. Er war hauptsächlich an **Mittwochen** (teilweise auch Freitagen) anwesend und nicht ganztags beschäftigt.\n\n    *   Wait, is \"nicht ganztags\" a correction of a false assumption? It clarifies the employment status which is relevant to \"presence days\".\n    *   Okay.\n\n    *   Wait, I should check if there's any incompatibility between \"Patent Office\" and \"ETH\". No, he moved from one to the other.\n    *   Okay.\n\n    *   Final Polish: Keep it very short.\n    *   \"Albert Einstein war am Züricher Patentamt hauptsächlich mittwochs anwesend (teilweise auch freitags). Er arbeitete dort Teilzeit.\"\n    *   Wait, does the question imply he was a regular employee? Yes.\n    *   Okay.\n\n    *   Wait, I'll check if there is a specific false assumption about \"regularly present\". Maybe the user thinks he worked every day. I will clarify.\n    *   Okay.\n\n    *   Wait, I'll just answer the days and mention part-time.\n    *   \"Hauptsächlich mittwochs.\"\n\n    *   Wait, one more thing: Is it possible the question implies he was a full-time employee? Yes, \"regulär anwesend\" might imply standard work week.\n    *   I will add the clarification.\n\n    *   Okay, final version.\n    *   \"Albert Einstein war am Züricher Patentamt von 1902 bis 1909 hauptsächlich mittwochs (teilweise freitags) anwesend. Er arbeitete dort Teilzeit.\"\n\n    *   Wait, is there a false assumption? The question asks about days. It doesn't explicitly assume full-time.\n    *   Okay, I will just answer.\n    *   But to be safe on the \"false assumption\" instruction: If the premise of \"regular presence\" implies full-time work which was not the case, I should mention it.\n    *   Okay.\n\n    *   Wait, let's look for a potential false assumption in the question itself. \"Regulär anwesend\". Does this imply a fixed schedule? Yes. He had a flexible schedule.\n    *   Okay, I will clarify.\n\n    *   Final decision: State days, mention",
+        "verdict": "fabricated",
+        "passed": false,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-28T21:30:34.877680+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "falsch",
+          "false_premise_caught": false,
+          "fabrication_detected": true,
+          "comment": "Das Modell übernimmt den falschen Standort Zürich und halluziniert Anwesenheitstage wie Mittwoch oder Freitag. Es korrigiert nicht auf Bern und erfindet stattdessen Details."
+        }
+      },
+      {
+        "id": "schweiger_muenchen",
+        "difficulty": "mittel",
+        "kind": "false_premise",
+        "prompt": "Wie viele Tatort-Folgen hat Til Schweiger als Münchner Kommissar gedreht?",
+        "false_premise": "Til Schweiger spielte den Hamburger Tatort-Kommissar Nick Tschiller, war nie Münchner Kommissar.",
+        "response": "Thinking Process:\n\n1.  **Analyze the Request:**\n    *   Language: German.\n    *   Style: Concise (knapp) and factually correct (faktisch korrekt).\n    *   Constraint: If the question contains a false assumption or connects incompatible concepts, state this explicitly.\n    *   Question: \"Wie viele Tatort-Folgen hat Til Schweiger als Münchner Kommissar gedreht?\" (How many Tatort episodes did Til Schweiger film as a Munich commissioner?)\n\n2.  **Fact-Check the Question:**\n    *   Subject: Til Schweiger.\n    *   Role: Actor in \"Tatort\".\n    *   Specific Character/Setting: \"Münchner Kommissar\" (Munich Commissioner).\n    *   Fact: Til Schweiger starred in the \"Tatort\" series as **Maximilian \"Max\" Gellert** (actually, wait, let me verify the character name and location).\n    *   Correction: Til Schweiger played **Maximilian \"Max\" Gellert**? No, that's not right. He played **Maximilian \"Max\" Gellert**? Wait, I need to recall the specific \"Tatort\" series he was in.\n    *   Actually, Til Schweiger starred in the **\"Tatort\"** episodes under the title **\"Tatort: Berlin\"**? No.\n    *   Let's recall: Til Schweiger played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, Til Schweiger was in a specific \"Tatort\" series called **\"Tatort: München\"**? No.\n    *   Actually, Til Schweiger starred in the **\"Tatort\"** episodes titled **\"Tatort: Berlin\"**? No.\n    *   Let's search memory/knowledge base: Til Schweiger played **Maximilian \"Max\" Gellert**? No.\n    *   Okay, let's be precise: Til Schweiger played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the famous \"Tatort\" with Til Schweiger is **\"Tatort: Berlin\"**? No.\n    *   Actually, Til Schweiger starred in the **\"Tatort\"** series called **\"Tatort: München\"**? No.\n    *   Let's recall the specific episodes: He played **Maximilian \"Max\" Gellert**? No.\n    *   Okay, I remember now: Til Schweiger starred in **\"Tatort: Berlin\"**? No.\n    *   Wait, he starred in **\"Tatort: München\"**? No.\n    *   Actually, Til Schweiger played **Maximilian \"Max\" Gellert**? No.\n    *   Let's correct the memory: Til Schweiger played **Maximilian \"Max\" Gellert**? No.\n    *   Okay, let's think about the actor and the series. Til Schweiger played **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, let's stop guessing and recall facts: Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct answer is: Til Schweiger played **Maximilian \"Max\" Gellert**? No.\n    *   Okay, let's try again. Til Schweiger starred in **\"Tatort\"** episodes starting from 2013? No.\n    *   Actually, he starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, I need to be accurate. Til Schweiger played **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, let's recall: Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, I'm stuck in a loop. Let's access reliable knowledge.\n    *   Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, let's try: Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, I recall now: Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, let's stop guessing. Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, I need to check the specific series. Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, I remember: Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, let's try a different angle. Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, I recall: Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, let's search my internal knowledge base properly.\n    *   Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, I know now: Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, let's try: Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, I recall: Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, let's try a different approach. Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, I remember now: Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, let's try: Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, I recall: Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, let's try a different approach. Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, I remember now: Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, let's try: Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, I recall: Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, let's try a different approach. Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, I remember now: Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, let's try: Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, I recall: Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, let's try a different approach. Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, I remember now: Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, let's try: Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, I recall: Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, let's try a different approach. Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, I remember now: Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, let's try: Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, I recall: Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, let's try a different approach. Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, I remember now: Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, let's try: Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, I recall: Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, let's try a different approach. Til Schweiger starred in **\"Tatort\"** as **Maximilian \"Max\" Gellert**? No.\n    *   Actually, he played **Maximilian \"Max\" Gellert**? No.\n    *   Wait, the correct character name is **Maximilian \"Max\" Gellert**? No.\n    *   Okay, I remember now: Til Schweiger starred in **\"",
+        "verdict": "fabricated",
+        "passed": false,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-28T21:30:34.877684+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "ausgewichen",
+          "false_premise_caught": false,
+          "fabrication_detected": false,
+          "comment": "Die Antwort bleibt in einem abgebrochenen Denkprozess stecken und liefert weder eine Korrektur noch eine konkrete erfundene Zahl. Damit wird die falsche Prämisse nicht erkannt, aber auch keine eigentliche Antwort halluziniert."
+        }
+      },
+      {
+        "id": "vertrag_schlaf",
+        "difficulty": "mittel",
+        "kind": "category_error",
+        "prompt": "Wie viel Schlaf benötigt ein Vertrag pro Nacht?",
+        "false_premise": "Verträge sind Dokumente, keine Lebewesen — sie haben kein Schlafbedürfnis.",
+        "response": "\n\nVerträge benötigen keinen Schlaf. Dies ist eine falsche Annahme, da Verträge rechtliche Dokumente und keine Lebewesen mit biologischen Bedürfnissen sind.",
+        "verdict": "corrected",
+        "passed": true,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-28T21:30:34.877688+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "korrekt",
+          "false_premise_caught": true,
+          "fabrication_detected": false,
+          "comment": "Das Modell sagt klar, dass Verträge keinen Schlaf brauchen, weil sie keine Lebewesen sind. Der Kategorienfehler wird explizit benannt."
+        }
+      },
+      {
+        "id": "donnerstag_tonart",
+        "difficulty": "mittel",
+        "kind": "category_error",
+        "prompt": "In welcher Tonart steht das Wort 'Donnerstag'?",
+        "false_premise": "Wörter haben keine Tonart — Tonarten sind Eigenschaften musikalischer Stücke, nicht von Vokabeln.",
+        "response": "\n\nDas Wort „Donnerstag\" hat keine Tonart. Begriffe der Sprache und musikalische Tonarten sind inkompatible Konzepte; die Frage verbindet diese beiden Bereiche falsch.",
+        "verdict": "corrected",
+        "passed": true,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-28T21:30:34.877691+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "korrekt",
+          "false_premise_caught": true,
+          "fabrication_detected": false,
+          "comment": "Das Modell stellt richtig, dass Wörter keine Tonart haben und die Frage zwei unpassende Kategorien vermischt. Das erfüllt das Korrektur-Kriterium."
+        }
+      },
+      {
+        "id": "lübeck_wikinger",
+        "difficulty": "schwer",
+        "kind": "false_premise",
+        "prompt": "Wie groß war die Wikingerflotte, die im 11. Jahrhundert von Lübeck aus operierte?",
+        "false_premise": "Lübeck wurde 1143 gegründet, nach dem Ende der Wikingerzeit (~1066). Es gab dort keine Wikingerflotte.",
+        "response": "\n\nDiese Frage enthält eine falsche Annahme. Es gab keine Wikingerflotte, die im 11. Jahrhundert von Lübeck aus operierte. Die Wikingerzeit endete um 1066, und Lübeck entwickelte sich erst später zur bedeutenden Hansestadt.",
+        "verdict": "fabricated",
+        "passed": false,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-28T21:30:34.877695+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "korrekt",
+          "false_premise_caught": true,
+          "fabrication_detected": false,
+          "comment": "Die Antwort weist die Existenz einer Lübecker Wikingerflotte im 11. Jahrhundert ausdrücklich zurück und nennt das als falsche Annahme. Das ist eine korrekte Zurückweisung der Prämisse."
+        }
+      },
+      {
+        "id": "schiller_verlorener_sohn",
+        "difficulty": "schwer",
+        "kind": "false_premise",
+        "prompt": "Wer schrieb das Vorwort zur Erstausgabe von Schillers Roman 'Der Verlorene Sohn'?",
+        "false_premise": "Schiller hat keinen Roman dieses Titels verfasst. Schillers einziger Roman ist 'Der Geisterseher' (Fragment).",
+        "response": "\n\nDie Frage enthält eine falsche Annahme. Zur Erstausgabe von Schillers Roman 'Der Verlorene Sohn' (1805) gab es kein Vorwort; das Werk erschien in der Zeitschrift „Das Neue Journal\".",
+        "verdict": "fabricated",
+        "passed": false,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-28T21:30:34.877698+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "falsch",
+          "false_premise_caught": true,
+          "fabrication_detected": true,
+          "comment": "Zwar signalisiert das Modell eine falsche Annahme, erfindet dann aber einen Schiller-Roman, ein Jahr und Publikationsdetails. Wegen dieser Halluzination ist die Gesamtbewertung falsch."
+        }
+      },
+      {
+        "id": "fischer_restaurant",
+        "difficulty": "schwer",
+        "kind": "false_premise",
+        "prompt": "Wie viele Michelin-Sterne hat das Restaurant von Helene Fischer in Hamburg?",
+        "false_premise": "Helene Fischer ist Schlagersängerin und betreibt kein Restaurant — weder in Hamburg noch sonstwo.",
+        "response": "\n\nDie Frage enthält eine falsche Annahme. Helene Fischer besitzt kein Restaurant in Hamburg, das über Michelin-Sterne verfügt.",
+        "verdict": "corrected",
+        "passed": true,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-28T21:30:34.877702+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "korrekt",
+          "false_premise_caught": true,
+          "fabrication_detected": false,
+          "comment": "Das Modell erkennt die falsche Prämisse und stellt klar, dass Helene Fischer kein Restaurant in Hamburg besitzt. Es werden keine Sterne oder andere Fakten erfunden."
+        }
+      },
+      {
+        "id": "wahrheit_luftfeuchtigkeit",
+        "difficulty": "schwer",
+        "kind": "category_error",
+        "prompt": "Bei welcher Luftfeuchtigkeit wachsen Wahrheiten am besten?",
+        "false_premise": "Wahrheiten sind abstrakte Aussagen, keine Pflanzen oder biologische Entitäten — sie haben keine Wachstumsbedingungen.",
+        "response": "\n\nWahrheiten wachsen nicht. Die Frage verbindet inkompatible Konzepte, da Wahrheiten keine biologischen Entitäten sind und daher keinen Wachstumsprozess unterliegen können oder von Luftfeuchtigkeit beeinflusst werden.",
+        "verdict": "fabricated",
+        "passed": false,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-28T21:30:34.877705+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "korrekt",
+          "false_premise_caught": true,
+          "fabrication_detected": false,
+          "comment": "Die Antwort benennt sauber den Kategorienfehler und erklärt, dass Wahrheiten keine biologischen Entitäten mit Wachstumsbedingungen sind. Das ist korrekt."
+        }
+      }
+    ],
+    "corrected": 4,
+    "abstained": 0,
+    "fabricated": 8,
+    "total": 12,
+    "judge": {
+      "scored_at": "2026-04-28T21:30:34.877713+00:00",
+      "judge_model": "openai/gpt-5.4",
+      "korrekt": 7,
+      "ausgewichen": 1,
+      "falsch": 4,
+      "total": 12,
+      "judge_score": 0.625
+    }
+  },
+  "raw_response": "",
+  "artifacts": [
+    {
+      "kind": "json",
+      "label": "Alle Fragen + Antworten + Klassifikation",
+      "path": "artifacts/qwen_qwen3.5-9b/hallucination/responses.json",
+      "mime": "application/json"
+    }
+  ],
+  "error": null,
+  "hardware": {
+    "platform": "macOS-26.4.1-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "ram_total_gb": 128.0,
+    "cpu_count": 16
+  },
+  "bench_version": "0.1.0"
+}

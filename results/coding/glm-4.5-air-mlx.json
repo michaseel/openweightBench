@@ -1,0 +1,201 @@
+{
+  "task": "coding",
+  "model_id": "glm-4.5-air-mlx",
+  "model_info": {
+    "id": "glm-4.5-air-mlx",
+    "type": "llm",
+    "publisher": "lmstudio-community",
+    "arch": "glm4_moe",
+    "compatibility_type": "mlx",
+    "quantization": "4bit",
+    "state": "not-loaded",
+    "max_context_length": 131072,
+    "capabilities": [
+      "tool_use"
+    ],
+    "loaded_context_length": null
+  },
+  "started_at": "2026-04-29T10:13:19.514452Z",
+  "completed_at": "2026-04-29T10:19:31.873847Z",
+  "metrics": {
+    "wall_seconds": 372.368932084064,
+    "tokens_generated": 10321,
+    "tokens_per_second": 35.18884380111053,
+    "time_to_first_token_ms": 1719.0,
+    "peak_rss_mb": 57373.2
+  },
+  "score": 1.0,
+  "score_breakdown": {
+    "looks_like_html": true,
+    "html_length": 28087,
+    "raw_length": 28100,
+    "lint_checks": [
+      {
+        "id": "col_backlog",
+        "label": "Spalte 'Backlog'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_in_progress",
+        "label": "Spalte 'In Progress'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_review",
+        "label": "Spalte 'Review'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_done",
+        "label": "Spalte 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "drag_drop",
+        "label": "HTML5 Drag&Drop oder Sortable-Lib",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "local_storage",
+        "label": "localStorage-Persistenz",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "tailwind_cdn",
+        "label": "Tailwind via CDN",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "confetti",
+        "label": "Confetti-Animation auf 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Add-Card-Button",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "vanilla_js",
+        "label": "Vanilla JS (kein React/Vue/Angular/Svelte)",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_alert_prompt",
+        "label": "Keine window.alert/prompt für CRUD",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "editable_cards",
+        "label": "Editierbare Karten (contenteditable / input)",
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "lint_passed": 12,
+    "lint_total": 12,
+    "lint_score": 1.0,
+    "e2e_checks": [
+      {
+        "id": "renders",
+        "label": "Seite lädt mit allen 4 Spalten",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Karte hinzufügen via Button",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_double_add",
+        "label": "Karte wird genau 1× angelegt (kein Doppel-Submit)",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "delete_card",
+        "label": "Karte löschen via Button + Bestätigung",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "persistence",
+        "label": "Karten überleben einen Reload",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_console_errors",
+        "label": "Keine JS-Konsolen-Fehler",
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "e2e_passed": 6,
+    "e2e_total": 6,
+    "e2e_score": 1.0,
+    "judge": {
+      "scored_at": "2026-04-29T10:19:42.985144+00:00",
+      "judge_model": "openai/gpt-5.4",
+      "scores": {
+        "board_renders": 1.0,
+        "column_completeness": 1.0,
+        "cards_present": 1.0,
+        "ui_affordances": 0.7,
+        "design_quality": 0.8,
+        "code_structure": 0.8,
+        "dom_safety": 1.0,
+        "robustness": 0.4,
+        "code_quality": 0.7,
+        "render_matches_code": 0.9
+      },
+      "judge_score": 0.8100000000000002,
+      "comment_visual": "Das Board rendert vollständig mit allen vier Spalten, sichtbaren Karten und klaren Add-Card-Buttons. Optisch ist es sauber und gut lesbar, wenn auch eher schlicht als wirklich produktreif. Drag-and-drop ist textlich angekündigt, aber eine starke visuelle Drag-Affordance ist im Screenshot nur begrenzt erkennbar.",
+      "comment_code": "Der Code ist ordentlich in Funktionen gegliedert und verwendet für Karteninhalte durchgängig sichere DOM-APIs wie textContent und createElement. Schwächer ist die Robustheit: localStorage und JSON.parse werden ohne try/catch verwendet, und es gibt einige fragilere Stellen in der Event-Logik.",
+      "comment_consistency": "Screenshot und Code passen weitgehend zusammen: die Dummy-Karten, vier Spalten und Add-Buttons erscheinen wie im HTML/JS vorgesehen. Kleine funktionale Zweifel bleiben, etwa bei der Add-Card-Zuordnung über dataset.testid, aber ein gravierender Laufzeitbruch ist visuell nicht erkennbar."
+    }
+  },
+  "raw_response": "\n```html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Kanban Board</title>\n    <!-- Tailwind CSS via CDN -->\n    <script src=\"https://cdn.tailwindcss.com\"></script>\n    <!-- Custom styles for transitions and animations -->\n    <style>\n        /* Card drag styling */\n        .dragging {\n            opacity: 0.5;\n        }\n        \n        /* Drop zone styling */\n        .drag-over {\n            background-color: rgba(199, 210, 254, 0.3);\n        }\n        \n        /* Transition animations */\n        .card {\n            transition: transform 0.2s, box-shadow 0.2s;\n        }\n        \n        .card:hover {\n            transform: translateY(-3px);\n            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);\n        }\n        \n        /* Confetti animation container */\n        #confetti-container {\n            position: fixed;\n            top: 0;\n            left: 0;\n            width: 100%;\n            height: 100%;\n            pointer-events: none;\n            z-index: 9999;\n        }\n        \n        /* Confetti particle */\n        .confetti {\n            position: absolute;\n            width: 10px;\n            height: 10px;\n            background-color: #f0f;\n            animation: confetti-fall 3s linear forwards;\n        }\n        \n        /* Confetti falling animation */\n        @keyframes confetti-fall {\n            to {\n                transform: translateY(100vh) rotate(360deg);\n                opacity: 0;\n            }\n        }\n    </style>\n</head>\n<body class=\"bg-gray-100 min-h-screen p-4\">\n    <!-- Main container -->\n    <div class=\"max-w-7xl mx-auto\">\n        <!-- Header -->\n        <header class=\"mb-8\">\n            <h1 class=\"text-3xl font-bold text-gray-800\">Kanban Board</h1>\n            <p class=\"text-gray-600 mt-2\">Drag and drop cards to move them between columns</p>\n        </header>\n\n        <!-- Columns conta",
+  "artifacts": [
+    {
+      "kind": "html",
+      "label": "Generierte App",
+      "path": "artifacts/glm-4.5-air-mlx/coding/output.html",
+      "mime": "text/html"
+    },
+    {
+      "kind": "text",
+      "label": "Roh-Antwort des Modells",
+      "path": "artifacts/glm-4.5-air-mlx/coding/raw_response.txt",
+      "mime": "text/plain"
+    },
+    {
+      "kind": "image",
+      "label": "Screenshot der gerenderten App",
+      "path": "artifacts/glm-4.5-air-mlx/coding/screenshot.png",
+      "mime": "image/png"
+    }
+  ],
+  "error": null,
+  "hardware": {
+    "platform": "macOS-26.4.1-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "ram_total_gb": 128.0,
+    "cpu_count": 16
+  },
+  "bench_version": "0.1.0"
+}

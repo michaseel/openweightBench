@@ -1,0 +1,252 @@
+{
+  "task": "diagram_to_svg",
+  "model_id": "qwen3.5-122b-a10b",
+  "model_info": {
+    "id": "qwen3.5-122b-a10b",
+    "type": "vlm",
+    "publisher": "lmstudio-community",
+    "arch": "qwen35moe",
+    "compatibility_type": "gguf",
+    "quantization": "Q4_K_M",
+    "state": "not-loaded",
+    "max_context_length": 262144,
+    "capabilities": [
+      "tool_use"
+    ],
+    "loaded_context_length": null
+  },
+  "started_at": "2026-04-29T06:00:47.774871Z",
+  "completed_at": "2026-04-29T06:21:17.600210Z",
+  "metrics": {
+    "wall_seconds": 563.2941629990237,
+    "tokens_generated": 20840,
+    "tokens_per_second": 38.853340383002156,
+    "time_to_first_token_ms": null,
+    "peak_rss_mb": 71640.5
+  },
+  "score": 0.6597222222222222,
+  "score_breakdown": {
+    "diagrams": [
+      {
+        "id": "diagram_eisenhower",
+        "image_name": "diagram_eisenhower.png",
+        "image_path": "artifacts/qwen3.5-122b-a10b/diagram_to_svg/diagram_eisenhower.png",
+        "svg_path": "artifacts/qwen3.5-122b-a10b/diagram_to_svg/diagram_eisenhower.svg",
+        "render_path": "artifacts/qwen3.5-122b-a10b/diagram_to_svg/diagram_eisenhower.render.png",
+        "raw_length": 8884,
+        "svg_length": 8882,
+        "grade": {
+          "score": 0.9791666666666667,
+          "parsed": true,
+          "has_root": true,
+          "element_count": 107,
+          "text_count": 37,
+          "matched_terms": [
+            "Wichtig",
+            "Dringend",
+            "Nicht wichtig",
+            "Nicht dringend",
+            "Content-Strategie",
+            "Brand schärfen",
+            "SEO",
+            "Zielgruppen",
+            "Kampagne retten",
+            "Shitstorm",
+            "Newsletter",
+            "falschem Link",
+            "viral gehen",
+            "Merch-Ideen",
+            "Glitzer",
+            "Buzzword-Bingo",
+            "TikTok",
+            "Maskottchen",
+            "Hashtag",
+            "Last-Minute-Meeting",
+            "Logo größer",
+            "LinkedIn-Post",
+            "Folie 27"
+          ],
+          "missing_terms": [
+            "Weltag der Büroklammer"
+          ],
+          "parse_error": null
+        },
+        "score": 0.9791666666666667,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-29T06:21:29.187635+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "scores": {
+            "completeness": 0.88,
+            "labels": 0.9,
+            "grouping": 0.96,
+            "layout_readability": 0.72,
+            "diagram_kind_match": 0.98,
+            "aesthetic_quality": 0.68
+          },
+          "judge_score": 0.8285714285714285,
+          "comment": "Die 2×2-Eisenhower-Matrix mit Titel, Achsen, Quadranten und fast allen Textinhalten ist klar vorhanden; auch Randnotizen und Deko-Elemente wurden größtenteils übernommen. Beschriftungen sind überwiegend semantisch korrekt, aber einige Details sind vereinfacht oder leicht entstellt: z.B. fehlt beim Kaffee-Kommentar das „Aber“, die Herz-Notiz ist schlecht platziert/überlagert, und mehrere Zeichnungen weichen deutlich vom Original ab (Zielscheibe, Megafon, Einhorn). Die Gruppierung der vier Quadranten ist sehr gut getroffen, aber das Layout ist links an der y-Achse/Herz-Notiz kollidierend und einige dekorative Symbole wirken roh oder falsch rekonstruiert."
+        }
+      },
+      {
+        "id": "diagram_service_architecture",
+        "image_name": "diagram_service_architecture.png",
+        "image_path": "artifacts/qwen3.5-122b-a10b/diagram_to_svg/diagram_service_architecture.png",
+        "svg_path": "artifacts/qwen3.5-122b-a10b/diagram_to_svg/diagram_service_architecture.svg",
+        "render_path": "artifacts/qwen3.5-122b-a10b/diagram_to_svg/diagram_service_architecture.render.png",
+        "raw_length": 8165,
+        "svg_length": 8163,
+        "grade": {
+          "score": 1.0,
+          "parsed": true,
+          "has_root": true,
+          "element_count": 77,
+          "text_count": 36,
+          "matched_terms": [
+            "Frontend",
+            "React",
+            "API Gateway",
+            "Kong",
+            "Auth Service",
+            "JWT",
+            "User DB",
+            "Backend",
+            "FastAPI",
+            "Database",
+            "External API",
+            "Payment Provider",
+            "Message Queue",
+            "RabbitMQ",
+            "Worker Service",
+            "File Storage",
+            "S3",
+            "Monitoring",
+            "Prometheus",
+            "Grafana"
+          ],
+          "missing_terms": [],
+          "parse_error": null
+        },
+        "score": 1.0,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-29T06:21:47.333473+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "scores": {
+            "completeness": 0.98,
+            "labels": 0.97,
+            "connections": 0.78,
+            "direction": 0.72,
+            "layout_readability": 0.9,
+            "diagram_kind_match": 0.98,
+            "aesthetic_quality": 0.87
+          },
+          "judge_score": 0.88375,
+          "comment": "Fast alle zentralen Elemente aus dem Whiteboard sind vorhanden, inklusive Goals/Notes, Frontend, API Gateway, Auth Service, Backend, Message Queue, Worker, Monitoring sowie der drei Speicher-/DB-Knoten. Die Beschriftungen sind semantisch sehr nah am Original; nur kleine Abweichungen wie die Legende oben rechts und leicht vereinheitlichte Typografie fallen auf. Mehrere Verbindungen sind jedoch topologisch bzw. richtungsmäßig nicht ganz originalgetreu: User DB, Database und File Storage sind im Original bidirektional angebunden, im Render aber nur einseitig; zusätzlich wirkt die Legende für Async/Synch vertauscht und die Verbindung vom Worker zum Monitoring ist im Render als doppelte/ungewöhnliche gestrichelte Führung dargestellt. Insgesamt ist das Layout sehr sauber und gut lesbar, nur in der Verbindungslogik etwas zu stark vereinfacht bzw. verändert."
+        }
+      },
+      {
+        "id": "diagram_sso_sequence",
+        "image_name": "diagram_sso_sequence.png",
+        "image_path": "artifacts/qwen3.5-122b-a10b/diagram_to_svg/diagram_sso_sequence.png",
+        "svg_path": "artifacts/qwen3.5-122b-a10b/diagram_to_svg/diagram_sso_sequence.svg",
+        "render_path": null,
+        "raw_length": 6769,
+        "svg_length": 6767,
+        "grade": {
+          "score": 0.0,
+          "parsed": false,
+          "has_root": false,
+          "element_count": 0,
+          "text_count": 0,
+          "matched_terms": [],
+          "missing_terms": [
+            "Benutzer",
+            "App",
+            "Service Provider",
+            "Identity Provider",
+            "IdP",
+            "Login-Seite",
+            "Anmeldedaten",
+            "Authentifizierung",
+            "Token",
+            "Assertion",
+            "SSO-Response",
+            "Zugriff",
+            "Ressourcen",
+            "Nein",
+            "Ja"
+          ],
+          "parse_error": "not well-formed (invalid token): line 18, column 9"
+        },
+        "score": 0.0,
+        "error": null
+      }
+    ],
+    "judge": {
+      "scored_at": "2026-04-29T06:21:47.333508+00:00",
+      "judge_model": "openai/gpt-5.4",
+      "judge_score": 0.8561607142857143
+    }
+  },
+  "raw_response": "",
+  "artifacts": [
+    {
+      "kind": "image",
+      "label": "Quelle diagram_eisenhower",
+      "path": "artifacts/qwen3.5-122b-a10b/diagram_to_svg/diagram_eisenhower.png",
+      "mime": "image/jpeg"
+    },
+    {
+      "kind": "text",
+      "label": "SVG diagram_eisenhower",
+      "path": "artifacts/qwen3.5-122b-a10b/diagram_to_svg/diagram_eisenhower.svg",
+      "mime": "image/svg+xml"
+    },
+    {
+      "kind": "image",
+      "label": "Render diagram_eisenhower",
+      "path": "artifacts/qwen3.5-122b-a10b/diagram_to_svg/diagram_eisenhower.render.png",
+      "mime": "image/png"
+    },
+    {
+      "kind": "image",
+      "label": "Quelle diagram_service_architecture",
+      "path": "artifacts/qwen3.5-122b-a10b/diagram_to_svg/diagram_service_architecture.png",
+      "mime": "image/jpeg"
+    },
+    {
+      "kind": "text",
+      "label": "SVG diagram_service_architecture",
+      "path": "artifacts/qwen3.5-122b-a10b/diagram_to_svg/diagram_service_architecture.svg",
+      "mime": "image/svg+xml"
+    },
+    {
+      "kind": "image",
+      "label": "Render diagram_service_architecture",
+      "path": "artifacts/qwen3.5-122b-a10b/diagram_to_svg/diagram_service_architecture.render.png",
+      "mime": "image/png"
+    },
+    {
+      "kind": "image",
+      "label": "Quelle diagram_sso_sequence",
+      "path": "artifacts/qwen3.5-122b-a10b/diagram_to_svg/diagram_sso_sequence.png",
+      "mime": "image/jpeg"
+    },
+    {
+      "kind": "text",
+      "label": "SVG diagram_sso_sequence",
+      "path": "artifacts/qwen3.5-122b-a10b/diagram_to_svg/diagram_sso_sequence.svg",
+      "mime": "image/svg+xml"
+    }
+  ],
+  "error": null,
+  "hardware": {
+    "platform": "macOS-26.4.1-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "ram_total_gb": 128.0,
+    "cpu_count": 16
+  },
+  "bench_version": "0.1.0"
+}

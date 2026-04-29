@@ -1,0 +1,35 @@
+[project]
+name = "openweight-bench"
+version = "0.1.0"
+description = "Local Open-Weight LLM benchmark for LM Studio."
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [{ name = "Michael Seel", email = "michael.seel@innoq.com" }]
+dependencies = [
+    "typer>=0.15",
+    "questionary>=2.0",
+    "httpx>=0.27",
+    "jinja2>=3.1",
+    "pydantic>=2.9",
+    "pyyaml>=6.0",
+    "playwright>=1.49",
+    "psutil>=6.1",
+    "pillow>=11.0",
+    "rich>=13.9",
+    "lmstudio>=1.0",
+    "python-dotenv>=1.2.2",
+]
+
+[project.scripts]
+owb = "owb.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/owb"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"

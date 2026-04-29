@@ -1,0 +1,123 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html,body{margin:0;background:#fff;font-family:system-ui,-apple-system,sans-serif}
+  .wrap{padding:24px;display:inline-block;background:#fff}
+  /* Force a concrete render box: many model-emitted SVGs only set viewBox.
+     Without a width here, an inline-block parent collapses the SVG to its
+     intrinsic ~300x150 (or smaller) and the screenshot becomes a tiny
+     blank tile. Fixed width + auto height uses viewBox aspect-ratio. */
+  .wrap svg{display:block;width:1200px;height:auto;max-width:none}
+</style></head><body><div class="wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 650" width="100%" height="100%">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#000" />
+    </marker>
+    <marker id="arrowhead-dashed" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#000" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#ffffff" />
+
+  <!-- Title -->
+  <text x="450" y="50" font-family="Arial, sans-serif" font-size="28" font-weight="bold" text-anchor="middle" fill="#000">SSO - Ablaufdiagramm</text>
+
+  <!-- Entities -->
+  
+  <!-- Benutzer (User) -->
+  <g id="user" transform="translate(100, 180)">
+    <circle cx="0" cy="-40" r="20" fill="none" stroke="#000" stroke-width="3" />
+    <line x1="0" y1="-20" x2="0" y2="30" stroke="#000" stroke-width="3" />
+    <line x1="-25" y1="0" x2="25" y2="0" stroke="#000" stroke-width="3" />
+    <line x1="0" y1="30" x2="-20" y2="60" stroke="#000" stroke-width="3" />
+    <line x1="0" y1="30" x2="20" y2="60" stroke="#000" stroke-width="3" />
+    <text x="0" y="90" font-family="Arial, sans-serif" font-size="18" text-anchor="middle" fill="#000">Benutzer</text>
+  </g>
+
+  <!-- App / Service Provider -->
+  <g id="app-box">
+    <rect x="250" y="150" width="160" height="90" fill="#fff" stroke="#000" stroke-width="3" />
+    <text x="330" y="185" font-family="Arial, sans-serif" font-size="18" text-anchor="middle" fill="#000">App /</text>
+    <text x="330" y="215" font-family="Arial, sans-serif" font-size="18" text-anchor="middle" fill="#000">Service Provider</text>
+  </g>
+
+  <!-- Identity Provider -->
+  <g id="idp-box">
+    <rect x="550" y="150" width="180" height="90" fill="#fff" stroke="#000" stroke-width="3" />
+    <text x="640" y="185" font-family="Arial, sans-serif" font-size="18" text-anchor="middle" fill="#000">Identity Provider</text>
+    <text x="640" y="215" font-family="Arial, sans-serif" font-size="18" text-anchor="middle" fill="#000">(IdP)</text>
+  </g>
+
+  <!-- Login-Seite -->
+  <g id="login-box">
+    <rect x="550" y="300" width="180" height="70" fill="#fff" stroke="#000" stroke-width="3" />
+    <text x="640" y="345" font-family="Arial, sans-serif" font-size="20" text-anchor="middle" fill="#000">Login-Seite</text>
+  </g>
+
+  <!-- Decision Diamond -->
+  <g id="decision-box">
+    <polygon points="640,400 760,470 640,540 520,470" fill="#fff" stroke="#000" stroke-width="3" />
+    <text x="640" y="465" font-family="Arial, sans-serif" font-size="16" text-anchor="middle" fill="#000">Anmeldedaten</text>
+    <text x="640" y="485" font-family="Arial, sans-serif" font-size="16" text-anchor="middle" fill="#000">korrekt?</text>
+  </g>
+
+  <!-- Zugriff gewährt -->
+  <g id="access-box">
+    <rect x="250" y="520" width="160" height="70" fill="#fff" stroke="#000" stroke-width="3" />
+    <text x="330" y="555" font-family="Arial, sans-serif" font-size="18" text-anchor="middle" fill="#000">Zugriff</text>
+    <text x="330" y="580" font-family="Arial, sans-serif" font-size="18" text-anchor="middle" fill="#000">gewährt</text>
+  </g>
+
+  <!-- Connections -->
+
+  <!-- 1. Zugang zu App -->
+  <line x1="130" y1="180" x2="240" y2="190" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)" />
+  <text x="180" y="170" font-family="Arial, sans-serif" font-size="14" fill="#000">1. Zugang zu App</text>
+
+  <!-- 2. Weiterleitung zur Login-Seite -->
+  <line x1="410" y1="195" x2="540" y2="195" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)" />
+  <text x="475" y="180" font-family="Arial, sans-serif" font-size="14" fill="#000">2. Weiterleitung</text>
+  <text x="475" y="198" font-family="Arial, sans-serif" font-size="14" fill="#000">zur Login-Seite</text>
+
+  <!-- 3. Login-Seite anzeigen -->
+  <line x1="640" y1="240" x2="640" y2="290" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)" />
+  <text x="660" y="270" font-family="Arial, sans-serif" font-size="14" fill="#000">3. Login-Seite</text>
+  <text x="660" y="288" font-family="Arial, sans-serif" font-size="14" fill="#000">anzeigen</text>
+
+  <!-- 4. Authentifizierung -->
+  <line x1="640" y1="370" x2="640" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)" />
+  <text x="660" y="385" font-family="Arial, sans-serif" font-size="14" fill="#000">4. Authentifizierung</text>
+
+  <!-- 5. Token / Assertion -->
+  <line x1="640" y1="540" x2="640" y2="590" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)" />
+  <text x="660" y="570" font-family="Arial, sans-serif" font-size="14" fill="#000">5. Token / Assertion</text>
+  <text x="660" y="588" font-family="Arial, sans-serif" font-size="14" fill="#000">(SSO-Response)</text>
+
+  <!-- 6. Redirect zurück zur App mit Token -->
+  <!-- Path: From bottom of diamond (640, 540) -> Left -> Up -> Into bottom of App (330, 240) -->
+  <path d="M 640 540 L 330 540 L 330 240" fill="none" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)" />
+  <text x="380" y="480" font-family="Arial, sans-serif" font-size="14" fill="#000">6. Redirect zurück</text>
+  <text x="380" y="498" font-family="Arial, sans-serif" font-size="14" fill="#000">zur App mit Token</text>
+
+  <!-- 7. Zugriff auf Ressourcen -->
+  <!-- Path: From bottom of App (330, 240) -> Down to Access Box (330, 520) -->
+  <line x1="330" y1="240" x2="330" y2="520" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)" />
+  <text x="280" y="480" font-family="Arial, sans-serif" font-size="14" fill="#000">7. Zugriff</text>
+  <text x="280" y="498" font-family="Arial, sans-serif" font-size="14" fill="#000">auf Ressourcen</text>
+
+  <!-- Benutzer gibt Anmeldedaten ein -->
+  <line x1="820" y1="335" x2="730" y2="335" stroke="#000" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead-dashed)" />
+  <text x="820" y="315" font-family="Arial, sans-serif" font-size="14" fill="#000">Benutzer gibt</text>
+  <text x="820" y="333" font-family="Arial, sans-serif" font-size="14" fill="#000">Anmeldedaten ein</text>
+
+  <!-- Nein Loop -->
+  <!-- Path: From left of diamond (520, 470) -> Left -> Up -> Right -> Into Login Box (550, 335) -->
+  <path d="M 520 470 L 480 470 L 480 335 L 550 335" fill="none" stroke="#000" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead-dashed)" />
+  <text x="500" y="460" font-family="Arial, sans-serif" font-size="14" fill="#000">Nein</text>
+
+  <!-- Ja Label (Implicit) -->
+  <text x="660" y="520" font-family="Arial, sans-serif" font-size="14" fill="#000">Ja</text>
+
+</svg></div></body></html>

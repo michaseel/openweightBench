@@ -1,0 +1,117 @@
+<svg viewBox="0 0 1000 800" xmlns="http://www.w3.org/2000/svg">
+  <!-- Styles -->
+  <style>
+    .box { fill: white; stroke: black; stroke-width: 2; }
+    .text-box { font-family: Arial, sans-serif; font-size: 16px; text-anchor: middle; dominant-baseline: middle; fill: black; }
+    .label-text { font-family: Arial, sans-serif; font-size: 14px; fill: blue; }
+    .title-text { font-family: 'Comic Sans MS', 'Arial', sans-serif; font-size: 32px; text-anchor: middle; dominant-baseline: auto; fill: black; }
+    .decision-text { font-family: Arial, sans-serif; font-size: 16px; text-anchor: middle; dominant-baseline: middle; fill: black; }
+    .arrow-line { stroke: black; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+    .dashed-arrow { stroke: black; stroke-width: 2; fill: none; stroke-dasharray: 5,5; marker-end: url(#dashed-arrow); }
+  </style>
+
+  <!-- Definitions for Markers -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="black" />
+    </marker>
+    <marker id="dashed-arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="black" />
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="500" y="40" class="title-text">SSO - Ablaufdiagramm</text>
+  <line x1="200" y1="60" x2="800" y2="60" stroke="black" stroke-width="2"/>
+
+  <!-- Group: User -->
+  <g id="user-group">
+    <!-- Stickman -->
+    <circle cx="80" cy="150" r="15" fill="none" stroke="black" stroke-width="2"/>
+    <line x1="80" y1="165" x2="80" y2="230" stroke="black" stroke-width="2"/>
+    <line x1="70" y1="230" x2="90" y2="230" stroke="black" stroke-width="2"/>
+    <line x1="80" y1="230" x2="80" y2="245" stroke="black" stroke-width="2"/>
+    <!-- Label -->
+    <text x="80" y="270" class="text-box">Benutzer</text>
+  </g>
+
+  <!-- Group: App / Service Provider -->
+  <g id="app-group">
+    <rect x="250" y="130" width="200" height="80" class="box"/>
+    <text x="350" y="170" class="text-box">App /</text>
+    <text x="350" y="195" class="text-box">Service Provider</text>
+  </g>
+
+  <!-- Group: Identity Provider -->
+  <g id="idp-group">
+    <rect x="600" y="130" width="200" height="80" class="box"/>
+    <text x="700" y="170" class="text-box">Identity Provider</text>
+    <text x="700" y="195" class="text-box">(IdP)</text>
+  </g>
+
+  <!-- Group: Login Page -->
+  <g id="login-group">
+    <rect x="600" y="320" width="200" height="80" class="box"/>
+    <text x="700" y="350" class="text-box">Login-Seite</text>
+  </g>
+
+  <!-- Group: Decision Diamond -->
+  <g id="decision-group">
+    <polygon points="700,480 620,560 700,640 780,560" class="box"/>
+    <text x="700" y="530" class="decision-text">Anmeldedaten</text>
+    <text x="700" y="550" class="decision-text">korrekt?</text>
+  </g>
+
+  <!-- Group: Access Granted -->
+  <g id="access-group">
+    <rect x="250" y="630" width="200" height="80" class="box"/>
+    <text x="350" y="660" class="text-box">Zugriff</text>
+    <text x="350" y="685" class="text-box">gewährt</text>
+  </g>
+
+  <!-- Connections -->
+
+  <!-- 1. Zugang zu App -->
+  <line x1="120" y1="170" x2="250" y2="170" class="arrow-line"/>
+  <text x="185" y="160" class="label-text">1. Zugang zu App</text>
+
+  <!-- 2. Weiterleitung zur Login-Seite -->
+  <line x1="450" y1="170" x2="600" y2="170" class="arrow-line"/>
+  <text x="525" y="160" class="label-text">2. Weiterleitung</text>
+  <text x="525" y="180" class="label-text">zur Login-Seite</text>
+
+  <!-- 3. Login-Seite anzeigen -->
+  <line x1="700" y1="210" x2="700" y2="320" class="arrow-line"/>
+  <text x="715" y="265" class="label-text">3. Login-Seite</text>
+  <text x="715" y="285" class="label-text">anzeigen</text>
+
+  <!-- 4. Authentifizierung -->
+  <line x1="700" y1="400" x2="700" y2="480" class="arrow-line"/>
+  <text x="715" y="440" class="label-text">4. Authentifizierung</text>
+
+  <!-- Schleife: Nein (Benutzer gibt Daten ein) -->
+  <path d="M 780,560 L 820,560 L 820,360 L 620,360" class="dashed-arrow"/>
+  <text x="840" y="460" class="label-text">Benutzer gibt</text>
+  <text x="840" y="480" class="label-text">Anmeldedaten ein</text>
+
+  <!-- Ja Pfad -->
+  <line x1="700" y1="640" x2="700" y2="700" class="arrow-line"/>
+  <text x="715" y="610" class="label-text">Ja</text>
+
+  <!-- 5. Token / Assertion (SSO-Response) -->
+  <line x1="700" y1="700" x2="700" y2="780" class="arrow-line"/>
+  <text x="715" y="740" class="label-text">5. Token / Assertion</text>
+  <text x="715" y="760" class="label-text">(SSO-Response)</text>
+
+  <!-- 6. Redirect zurück zur App mit Token -->
+  <line x1="700" y1="780" x2="350" y2="780" class="arrow-line"/>
+  <line x1="350" y1="780" x2="350" y2="630" class="arrow-line"/>
+  <text x="450" y="720" class="label-text">6. Redirect zurück</text>
+  <text x="450" y="740" class="label-text">zur App mit Token</text>
+
+  <!-- 7. Zugriff auf Ressourcen -->
+  <line x1="350" y1="210" x2="350" y2="630" class="arrow-line"/>
+  <text x="280" y="420" class="label-text">7. Zugriff</text>
+  <text x="280" y="440" class="label-text">auf Ressourcen</text>
+
+</svg>

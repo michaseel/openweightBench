@@ -1,0 +1,102 @@
+<svg width="100%" height="auto" viewBox="0 0 1000 650" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Arrowhead marker for X-axis (Dringlichkeit) -->
+    <marker id="arrowheadX" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+    </marker>
+    <!-- Arrowhead marker for Y-axis (Wichtigkeit) -->
+    <marker id="arrowheadY" markerWidth="7" markerHeight="10" refX="3.5" refY="0" orient="auto">
+      <polygon points="0 0, 7 10, 0 20" fill="#333"/>
+    </marker>
+  </defs>
+
+  <!-- Main Matrix Container -->
+  <g id="eisenhower-matrix" transform="translate(50, 50)">
+
+    <!-- Title -->
+    <text x="475" y="25" font-family="Arial, sans-serif" font-size="30" text-anchor="middle" fill="#111">Eisenhower - Matrix - Marketing</text>
+
+    <!-- Axes Lines (Center point: 450, 325) -->
+    <line x1="0" y1="325" x2="900" y2="325" stroke="#333" stroke-width="2"/>
+    <line x1="450" y1="0" x2="450" y2="650" stroke="#333" stroke-width="2"/>
+
+    <!-- Axis Labels -->
+    <text x="-50" y="380" font-family="Arial, sans-serif" font-size="18" text-anchor="middle" fill="#333">Wichtigkeit</text>
+    <text x="500" y="900" font-family="Arial, sans-serif" font-size="18" text-anchor="middle" fill="#333">Dringlichkeit</text>
+
+    <!-- Axis Ticks and Labels -->
+    <g id="y-axis-labels">
+      <text x="-20" y="625" font-family="Arial, sans-serif" font-size="14" text-anchor="end" fill="#333">niedrig</text>
+      <line x1="450" y1="625" x2="450" y2="630" stroke="#333" stroke-width="1"/>
+
+      <text x="-20" y="15" font-family="Arial, sans-serif" font-size="14" text-anchor="end" fill="#333">hoch</text>
+      <line x1="450" y1="10" x2="450" y2="15" stroke="#333" stroke-width="1"/>
+    </g>
+
+    <g id="x-axis-labels">
+      <text x="0" y="90" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#333">nicht dringend</text>
+      <line x1="0" y1="325" x2="10" y2="325" stroke="#333" stroke-width="1"/>
+
+      <text x="900" y="90" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#333">dringend</text>
+      <line x1="890" y1="325" x2="900" y2="325" stroke="#333" stroke-width="1"/>
+    </g>
+
+    <!-- Quadrant 1: Top Left (Wichtig + Nicht dringend) -->
+    <g id="quadrant-q2">
+      <rect x="0" y="0" width="450" height="325" fill="#f9f9f9" stroke="#333" stroke-width="1"/>
+      <text x="225" y="35" font-family="Arial, sans-serif" font-size="18" text-anchor="middle" fill="#000">Wichtig + Nicht dringend</text>
+
+      <!-- Content -->
+      <g transform="translate(40, 70)">
+        <text x="0" y="0" font-family="Arial, sans-serif" font-size="14">• Content - Strategie</text>
+        <text x="0" y="25" font-family="Arial, sans-serif" font-size="14">• Brand schärfen</text>
+        <text x="0" y="50" font-family="Arial, sans-serif" font-size="14">• SEO aufräumen</text>
+        <text x="0" y="75" font-family="Arial, sans-serif" font-size="14">• Zielgruppen verstehen</text>
+      </g>
+    </g>
+
+    <!-- Quadrant 2: Top Right (Wichtig + Dringend) -->
+    <g id="quadrant-q1">
+      <rect x="450" y="0" width="450" height="325" fill="#f9f9f9" stroke="#333" stroke-width="1"/>
+      <text x="675" y="35" font-family="Arial, sans-serif" font-size="18" text-anchor="middle" fill="#000">Wichtig + Dringend</text>
+
+      <!-- Content -->
+      <g transform="translate(470, 70)">
+        <text x="0" y="0" font-family="Arial, sans-serif" font-size="14">• Kampagne retten</text>
+        <text x="0" y="25" font-family="Arial, sans-serif" font-size="14">• Shitstorm beantworten <tspan font-style="italic">VIRAL??</tspan></text>
+        <text x="0" y="50" font-family="Arial, sans-serif" font-size="14">• Newsletter mit falschem Link fixen</text>
+        <text x="0" y="75" font-family="Arial, sans-serif" font-size="14">• Chef will bis 14 Uhr "viral gehen"</text>
+      </g>
+    </g>
+
+    <!-- Quadrant 3: Bottom Left (Nicht wichtig + Nicht dringend) -->
+    <g id="quadrant-q4">
+      <rect x="0" y="325" width="450" height="325" fill="#f9f9f9" stroke="#333" stroke-width="1"/>
+      <text x="225" y="355" font-family="Arial, sans-serif" font-size="18" text-anchor="middle" fill="#000">Nicht wichtig + Nicht dringend</text>
+
+      <!-- Content -->
+      <g transform="translate(40, 370)">
+        <text x="0" y="0" font-family="Arial, sans-serif" font-size="14">• Merch-Ideen mit Glitzer</text>
+        <text x="0" y="25" font-family="Arial, sans-serif" font-size="14">• Buzzword - Bingo</text>
+        <text x="0" y="50" font-family="Arial, sans-serif" font-size="14">• TikTok-Tanz mit dem Maskottchen</text>
+        <text x="0" y="75" font-family="Arial, sans-serif" font-size="14">• Hashtag brainstormen #innovation #synergy #wow</text>
+      </g>
+    </g>
+
+    <!-- Quadrant 4: Bottom Right (Nicht wichtig + Dringend) -->
+    <g id="quadrant-q3">
+      <rect x="450" y="325" width="450" height="325" fill="#f9f9f9" stroke="#333" stroke-width="1"/>
+      <text x="675" y="355" font-family="Arial, sans-serif" font-size="18" text-anchor="middle" fill="#000">Nicht wichtig + Dringend</text>
+
+      <!-- Content -->
+      <g transform="translate(470, 370)">
+        <text x="0" y="0" font-family="Arial, sans-serif" font-size="14">• Noch ein Last-Minute - Meeting</text>
+        <text x="0" y="25" font-family="Arial, sans-serif" font-size="14">• Kann das Logo größer?</text>
+        <text x="0" y="50" font-family="Arial, sans-serif" font-size="14">• LinkedIn=Post für</text>
+        <text x="0" y="75" font-family="Arial, sans-serif" font-size="14">• "Wettag der Büroklammer"</text>
+        <text x="0" y="100" font-family="Arial, sans-serif" font-size="14">• Folie 27 schöner machen</text>
+      </g>
+    </g>
+
+  </g>
+</svg>

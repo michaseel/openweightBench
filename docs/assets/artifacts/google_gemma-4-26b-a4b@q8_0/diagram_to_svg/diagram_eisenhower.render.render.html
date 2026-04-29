@@ -1,0 +1,118 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html,body{margin:0;background:#fff;font-family:system-ui,-apple-system,sans-serif}
+  .wrap{padding:24px;display:inline-block;background:#fff}
+  /* Force a concrete render box: many model-emitted SVGs only set viewBox.
+     Without a width here, an inline-block parent collapses the SVG to its
+     intrinsic ~300x150 (or smaller) and the screenshot becomes a tiny
+     blank tile. Fixed width + auto height uses viewBox aspect-ratio. */
+  .wrap svg{display:block;width:1200px;height:auto;max-width:none}
+</style></head><body><div class="wrap"><svg viewBox="0 0 1000 850" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1000" height="850" fill="#fdfdfd" />
+
+  <!-- Definitions for Arrows -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="500" y="50" font-family="sans-serif" font-size="28" text-anchor="middle" font-weight="bold" fill="#333">Eisenhower - Matrix - Marketing</text>
+
+  <!-- Axes -->
+  <g id="axes" stroke="#333" stroke-width="2">
+    <!-- Y Axis (Wichtigkeit) -->
+    <line x1="150" y1="750" x2="150" y2="100" marker-end="url(#arrowhead)" />
+    <!-- X Axis (Dringlichkeit) -->
+    <line x1="150" y1="750" x2="850" y2="750" marker-end="url(#arrowhead)" />
+  </g>
+
+  <!-- Axis Labels -->
+  <g font-family="sans-serif" font-size="16" fill="#333">
+    <text x="130" y="425" text-anchor="end" transform="rotate(-90, 130, 425)">Wichtigkeit</text>
+    <text x="500" y="790" text-anchor="middle">Dringlichkeit</text>
+    <text x="130" y="120" text-anchor="end">hoch</text>
+    <text x="130" y="740" text-anchor="end">niedrig</text>
+    <text x="165" y="770" text-anchor="start">niedrig</text>
+    <text x="835" y="770" text-anchor="end">hoch</text>
+  </g>
+
+  <!-- Matrix Grid -->
+  <g id="grid" stroke="#999" stroke-width="1.5">
+    <line x1="150" y1="425" x2="850" y2="425" /> <!-- Horizontal divider -->
+    <line x1="500" y1="100" x2="500" y2="750" /> <!-- Vertical divider -->
+  </g>
+
+  <!-- Quadrant 1: Wichtig + Nicht dringend (Top Left) -->
+  <g id="quadrant-top-left">
+    <text x="325" y="140" font-family="sans-serif" font-size="18" font-weight="bold" text-anchor="middle">Wichtig + Nicht dringend</text>
+    <g font-family="sans-serif" font-size="15" fill="#333">
+      <text x="170" y="190">• Content - Strategie</text>
+      <text x="170" y="225">• Brand schärfen</text>
+      <text x="170" y="260">• SEO aufräumen</text>
+      <text x="170" y="295">• Zielgruppen verstehen</text>
+    </g>
+  </g>
+
+  <!-- Quadrant 2: Wichtig + Dringend (Top Right) -->
+  <g id="quadrant-top-right">
+    <text x="675" y="140" font-family="sans-serif" font-size="18" font-weight="bold" text-anchor="middle">Wichtig + Dringend</text>
+    <g font-family="sans-serif" font-size="15" fill="#333">
+      <text x="520" y="190">• Kampagne retten</text>
+      <text x="520" y="225">• Shitstorm beantworten</text>
+      <text x="520" y="260">• Newsletter mit falschem Link fixen</text>
+      <text x="520" y="295">• Chef will bis 14 Uhr "viral gehen"</text>
+    </g>
+    <!-- Visuals for Q2 -->
+    <path d="M780,230 L800,210 L820,230 L800,250 Z" fill="#ffeb3b" stroke="#333" /> <!-- Starburst placeholder -->
+    <text x="790" y="240" font-family="sans-serif" font-size="12" font-weight="bold">VIRAL??</text>
+    <!-- Megaphone icon simplified -->
+    <path d="M730,350 L760,330 L760,370 Z" fill="#ddd" stroke="#333" />
+  </g>
+
+  <!-- Quadrant 3: Nicht wichtig + Nicht dringend (Bottom Left) -->
+  <g id="quadrant-bottom-left">
+    <text x="325" y="470" font-family="sans-serif" font-size="18" font-weight="bold" text-anchor="middle">Nicht wichtig + Nicht dringend</text>
+    <g font-family="sans-serif" font-size="15" fill="#333">
+      <text x="170" y="520">• Merch-Ideen mit Glitzer</text>
+      <text x="170" y="555">• Buzzword-Bingo</text>
+      <text x="170" y="590">• TikTok-Tanz mit dem Maskottchen</text>
+      <text x="170" y="630" font-size="14">#innovation #synergy #wow</text>
+    </g>
+    <!-- Unicorn placeholder -->
+    <path d="M350,680 Q370,640 390,680 Z" fill="#fce4ec" stroke="#333" />
+  </g>
+
+  <!-- Quadrant 4: Nicht wichtig + Dringend (Bottom Right) -->
+  <g id="quadrant-bottom-right">
+    <text x="675" y="470" font-family="sans-serif" font-size="18" font-weight="bold" text-anchor="middle">Nicht wichtig + Dringend</text>
+    <g font-family="sans-serif" font-size="15" fill="#333">
+      <text x="520" y="520">• Noch ein Last-Minute-Meeting</text>
+      <text x="520" y="555">• Kann das Logo größer?</text>
+      <text x="520" y="590">• LinkedIn-Post für "Welttag der Büroklammer"</text>
+      <text x="520" y="630">• Folie 27 schöner machen</text>
+    </g>
+    <!-- Exclamation marks -->
+    <text x="780" y="710" font-family="sans-serif" font-size="24" fill="#333">!!!</text>
+  </g>
+
+  <!-- Side Elements -->
+  <g id="side-notes" font-family="sans-serif">
+    <!-- Left Heart Note -->
+    <path d="M60,650 Q60,640 70,640 Q80,640 80,650 Q80,665 70,675 Q60,665 60,650" fill="none" stroke="#333" />
+    <text x="100" y="690" font-size="14" text-anchor="start">Erledigen, wenn das</text>
+    <text x="100" y="710" font-size="14" text-anchor="start">Internet wieder da ist.</text>
+
+    <!-- Right Coffee Note -->
+    <g transform="translate(820, 160)">
+      <path d="M0,0 Q15,-20 30,0 L30,30 Q15,40 0,30 Z" fill="#ddd" stroke="#333" /> <!-- Cup -->
+      <path d="M30,10 Q40,10 40,20 Q40,30 30,30" fill="none" stroke="#333" /> <!-- Handle -->
+      <path d="M5,-10 Q10,-20 15,-10" fill="none" stroke="#333" /> <!-- Steam -->
+    </g>
+    <text x="820" y="220" font-size="14" text-anchor="start">Kaffee zählt nicht.</text>
+    <text x="820" y="240" font-size="14" text-anchor="start">Aber hilft. :)</text>
+  </g>
+</svg></div></body></html>

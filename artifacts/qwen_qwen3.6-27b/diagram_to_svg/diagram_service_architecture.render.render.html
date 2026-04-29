@@ -1,0 +1,196 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html,body{margin:0;background:#fff;font-family:system-ui,-apple-system,sans-serif}
+  .wrap{padding:24px;display:inline-block;background:#fff}
+  /* Force a concrete render box: many model-emitted SVGs only set viewBox.
+     Without a width here, an inline-block parent collapses the SVG to its
+     intrinsic ~300x150 (or smaller) and the screenshot becomes a tiny
+     blank tile. Fixed width + auto height uses viewBox aspect-ratio. */
+  .wrap svg{display:block;width:1200px;height:auto;max-width:none}
+</style></head><body><div class="wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="100%" height="100%">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#333" />
+    </marker>
+    <marker id="arrow-dashed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#333" />
+    </marker>
+    <style>
+      .title { font-size: 24px; font-weight: bold; fill: #333; font-family: sans-serif; }
+      .subtitle { font-size: 18px; font-weight: bold; fill: #333; font-family: sans-serif; }
+      .text { font-size: 14px; fill: #333; font-family: sans-serif; }
+      .small-text { font-size: 12px; fill: #555; font-family: sans-serif; }
+      .box { fill: #fff; stroke: #333; stroke-width: 2; }
+      .box-external { fill: #fff; stroke: #d32f2f; stroke-width: 2; }
+      .db { fill: #fff; stroke: #333; stroke-width: 2; }
+      .line { stroke: #333; stroke-width: 2; fill: none; }
+      .line-dashed { stroke: #333; stroke-width: 2; fill: none; stroke-dasharray: 6,6; }
+      .label { font-size: 12px; fill: #333; font-family: sans-serif; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="800" fill="#f9f9f9" />
+
+  <!-- Title -->
+  <text x="50" y="60" class="title">System Architecture</text>
+  <line x1="50" y1="70" x2="250" y2="70" stroke="#333" stroke-width="1" />
+
+  <!-- Legend -->
+  <g id="legend" transform="translate(950, 50)">
+    <line x1="0" y1="0" x2="30" y2="0" stroke="#333" stroke-width="2" />
+    <text x="40" y="4" class="text">Sync</text>
+    
+    <line x1="0" y1="25" x2="30" y2="25" stroke="#333" stroke-width="2" stroke-dasharray="5,5" />
+    <text x="40" y="29" class="text">Async</text>
+    
+    <rect x="0" y="45" width="30" height="15" fill="none" stroke="#d32f2f" stroke-width="2" />
+    <text x="40" y="57" class="text">External</text>
+  </g>
+
+  <!-- Left Sidebar: Goals & Notes -->
+  <g id="sidebar" transform="translate(50, 120)">
+    <text x="0" y="0" class="subtitle">Goals:</text>
+    <text x="10" y="30" class="text">- Scalability</text>
+    <text x="10" y="55" class="text">- Reliability</text>
+    <text x="10" y="80" class="text">- Security</text>
+    <text x="10" y="105" class="text">- Maintainability</text>
+
+    <text x="0" y="160" class="subtitle">Notes:</text>
+    <text x="10" y="190" class="text">- Use Docker for</text>
+    <text x="20" y="210" class="text">all services</text>
+    <text x="10" y="240" class="text">- CI/CD with GitHub</text>
+    <text x="20" y="260" class="text">Actions</text>
+    <text x="10" y="290" class="text">- Logs → ELK Stack</text>
+  </g>
+
+  <!-- Main Diagram Area -->
+  <g id="diagram" transform="translate(0, 0)">
+    
+    <!-- Connections (Drawn first so they are behind boxes) -->
+    
+    <!-- Frontend to API Gateway -->
+    <line x1="370" y1="230" x2="450" y2="230" class="line" marker-end="url(#arrow)" />
+    <text x="395" y="220" class="label" text-anchor="middle">HTTPS</text>
+
+    <!-- API Gateway to Auth Service -->
+    <path d="M 570 200 L 650 200 L 650 150" class="line" marker-end="url(#arrow)" />
+
+    <!-- Auth Service to User DB -->
+    <line x1="770" y1="150" x2="850" y2="150" class="line" marker-end="url(#arrow)" />
+    <line x1="850" y1="170" x2="770" y2="170" class="line" marker-end="url(#arrow)" />
+
+    <!-- API Gateway to Backend -->
+    <path d="M 570 230 L 650 230 L 650 310" class="line" marker-end="url(#arrow)" />
+
+    <!-- Backend to Database -->
+    <line x1="770" y1="310" x2="850" y2="310" class="line" marker-end="url(#arrow)" />
+    <line x1="850" y1="330" x2="770" y2="330" class="line" marker-end="url(#arrow)" />
+
+    <!-- API Gateway to Message Queue -->
+    <path d="M 570 230 L 650 230 L 650 470" class="line" marker-end="url(#arrow)" />
+
+    <!-- Backend to Message Queue -->
+    <line x1="710" y1="340" x2="710" y2="440" class="line" marker-end="url(#arrow)" />
+
+    <!-- API Gateway to External API (Async) -->
+    <path d="M 450 260 L 450 350 L 360 350 L 360 440" class="line-dashed" marker-end="url(#arrow-dashed)" />
+
+    <!-- Message Queue to Worker Service (Async) -->
+    <line x1="770" y1="470" x2="850" y2="470" class="line-dashed" marker-end="url(#arrow-dashed)" />
+
+    <!-- Worker Service to File Storage -->
+    <line x1="970" y1="470" x2="1050" y2="470" class="line" marker-end="url(#arrow)" />
+    <line x1="1050" y1="490" x2="970" y2="490" class="line" marker-end="url(#arrow)" />
+
+    <!-- Message Queue to Monitoring (Async) -->
+    <line x1="710" y1="500" x2="710" y2="600" class="line-dashed" marker-end="url(#arrow-dashed)" />
+
+    <!-- Worker Service to Monitoring (Async) -->
+    <path d="M 910 500 L 910 550 L 770 550 L 770 600" class="line-dashed" marker-end="url(#arrow-dashed)" />
+
+    <!-- Nodes -->
+
+    <!-- Frontend -->
+    <g id="frontend" transform="translate(250, 200)">
+      <rect width="120" height="60" class="box" rx="4" />
+      <text x="60" y="25" class="text" text-anchor="middle">Frontend</text>
+      <text x="60" y="45" class="small-text" text-anchor="middle">(React)</text>
+    </g>
+
+    <!-- API Gateway -->
+    <g id="api-gateway" transform="translate(450, 200)">
+      <rect width="120" height="60" class="box" rx="4" />
+      <text x="60" y="25" class="text" text-anchor="middle">API Gateway</text>
+      <text x="60" y="45" class="small-text" text-anchor="middle">(Kong)</text>
+    </g>
+
+    <!-- Auth Service -->
+    <g id="auth-service" transform="translate(650, 120)">
+      <rect width="120" height="60" class="box" rx="4" />
+      <text x="60" y="25" class="text" text-anchor="middle">Auth Service</text>
+      <text x="60" y="45" class="small-text" text-anchor="middle">(JWT)</text>
+    </g>
+
+    <!-- User DB -->
+    <g id="user-db" transform="translate(850, 120)">
+      <path d="M 0 15 L 0 45 A 40 10 0 0 0 80 45 L 80 15 A 40 10 0 0 1 0 15 Z" class="db" />
+      <ellipse cx="40" cy="15" rx="40" ry="10" class="db" />
+      <text x="40" y="35" class="text" text-anchor="middle">User DB</text>
+      <text x="40" y="50" class="small-text" text-anchor="middle">(PostgreSQL)</text>
+    </g>
+
+    <!-- Backend -->
+    <g id="backend" transform="translate(650, 280)">
+      <rect width="120" height="60" class="box" rx="4" />
+      <text x="60" y="25" class="text" text-anchor="middle">Backend</text>
+      <text x="60" y="45" class="small-text" text-anchor="middle">(Python/FastAPI)</text>
+    </g>
+
+    <!-- Database -->
+    <g id="database" transform="translate(850, 280)">
+      <path d="M 0 15 L 0 45 A 40 10 0 0 0 80 45 L 80 15 A 40 10 0 0 1 0 15 Z" class="db" />
+      <ellipse cx="40" cy="15" rx="40" ry="10" class="db" />
+      <text x="40" y="35" class="text" text-anchor="middle">Database</text>
+      <text x="40" y="50" class="small-text" text-anchor="middle">(PostgreSQL)</text>
+    </g>
+
+    <!-- Message Queue -->
+    <g id="message-queue" transform="translate(650, 440)">
+      <rect width="120" height="60" class="box" rx="4" />
+      <text x="60" y="25" class="text" text-anchor="middle">Message Queue</text>
+      <text x="60" y="45" class="small-text" text-anchor="middle">(RabbitMQ)</text>
+    </g>
+
+    <!-- External API -->
+    <g id="external-api" transform="translate(300, 440)">
+      <rect width="120" height="60" class="box-external" rx="4" />
+      <text x="60" y="25" class="text" text-anchor="middle">External API</text>
+      <text x="60" y="45" class="small-text" text-anchor="middle">(Payment Provider)</text>
+    </g>
+
+    <!-- Worker Service -->
+    <g id="worker-service" transform="translate(850, 440)">
+      <rect width="120" height="60" class="box" rx="4" />
+      <text x="60" y="25" class="text" text-anchor="middle">Worker Service</text>
+      <text x="60" y="45" class="small-text" text-anchor="middle">(Python)</text>
+    </g>
+
+    <!-- File Storage -->
+    <g id="file-storage" transform="translate(1050, 440)">
+      <path d="M 0 15 L 0 45 A 40 10 0 0 0 80 45 L 80 15 A 40 10 0 0 1 0 15 Z" class="db" />
+      <ellipse cx="40" cy="15" rx="40" ry="10" class="db" />
+      <text x="40" y="35" class="text" text-anchor="middle">File Storage</text>
+      <text x="40" y="50" class="small-text" text-anchor="middle">(S3)</text>
+    </g>
+
+    <!-- Monitoring -->
+    <g id="monitoring" transform="translate(650, 600)">
+      <rect width="120" height="60" class="box" rx="4" />
+      <text x="60" y="25" class="text" text-anchor="middle">Monitoring</text>
+      <text x="60" y="45" class="small-text" text-anchor="middle">(Prometheus + Grafana)</text>
+    </g>
+
+  </g>
+</svg></div></body></html>

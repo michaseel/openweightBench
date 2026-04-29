@@ -1,0 +1,201 @@
+{
+  "task": "coding",
+  "model_id": "qwen/qwen3-coder-30b",
+  "model_info": {
+    "id": "qwen/qwen3-coder-30b",
+    "type": "llm",
+    "publisher": "qwen",
+    "arch": "qwen3_moe",
+    "compatibility_type": "mlx",
+    "quantization": "4bit",
+    "state": "not-loaded",
+    "max_context_length": 262144,
+    "capabilities": [
+      "tool_use"
+    ],
+    "loaded_context_length": null
+  },
+  "started_at": "2026-04-29T06:27:54.129391Z",
+  "completed_at": "2026-04-29T06:29:17.359337Z",
+  "metrics": {
+    "wall_seconds": 83.228776083095,
+    "tokens_generated": 5402,
+    "tokens_per_second": 94.98199075889153,
+    "time_to_first_token_ms": 365.0,
+    "peak_rss_mb": 16394.6
+  },
+  "score": 0.9166666666666667,
+  "score_breakdown": {
+    "looks_like_html": true,
+    "html_length": 25678,
+    "raw_length": 26959,
+    "lint_checks": [
+      {
+        "id": "col_backlog",
+        "label": "Spalte 'Backlog'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_in_progress",
+        "label": "Spalte 'In Progress'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_review",
+        "label": "Spalte 'Review'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_done",
+        "label": "Spalte 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "drag_drop",
+        "label": "HTML5 Drag&Drop oder Sortable-Lib",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "local_storage",
+        "label": "localStorage-Persistenz",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "tailwind_cdn",
+        "label": "Tailwind via CDN",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "confetti",
+        "label": "Confetti-Animation auf 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Add-Card-Button",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "vanilla_js",
+        "label": "Vanilla JS (kein React/Vue/Angular/Svelte)",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_alert_prompt",
+        "label": "Keine window.alert/prompt für CRUD",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "editable_cards",
+        "label": "Editierbare Karten (contenteditable / input)",
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "lint_passed": 12,
+    "lint_total": 12,
+    "lint_score": 1.0,
+    "e2e_checks": [
+      {
+        "id": "renders",
+        "label": "Seite lädt mit allen 4 Spalten",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Karte hinzufügen via Button",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_double_add",
+        "label": "Karte wird genau 1× angelegt (kein Doppel-Submit)",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "delete_card",
+        "label": "Karte löschen via Button + Bestätigung",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "persistence",
+        "label": "Karten überleben einen Reload",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_console_errors",
+        "label": "Keine JS-Konsolen-Fehler",
+        "passed": false,
+        "detail": "console.error: Error: <svg> attribute viewBox: Expected number, \"0 0 2/x 24\".; console.error: Error: <svg> attribute viewBox: Expected number, \"0 0 2/x 24\".; console.error: Error: <svg> attribute viewBox: Expected number, \"0 0 2/x 24\"."
+      }
+    ],
+    "e2e_passed": 5,
+    "e2e_total": 6,
+    "e2e_score": 0.8333333333333334,
+    "judge": {
+      "scored_at": "2026-04-29T06:29:28.712182+00:00",
+      "judge_model": "openai/gpt-5.4",
+      "scores": {
+        "board_renders": 1.0,
+        "column_completeness": 1.0,
+        "cards_present": 1.0,
+        "ui_affordances": 0.7,
+        "design_quality": 0.78,
+        "code_structure": 0.72,
+        "dom_safety": 0.45,
+        "robustness": 0.58,
+        "code_quality": 0.63,
+        "render_matches_code": 0.92
+      },
+      "judge_score": 0.756,
+      "comment_visual": "Das Board rendert klar und vollständig mit allen vier erwarteten Spalten sowie mehreren gut lesbaren Karten. Add-Card-Buttons sind sichtbar, das Layout wirkt sauber und modern; Drag-and-Drop ist visuell aber nur indirekt über den Untertitel und das Kartenlayout angedeutet.",
+      "comment_code": "Der Code ist insgesamt ordentlich in Funktionen für Init, Render, Storage und Drag-and-Drop gegliedert. Positiv sind textContent für Kartentitel/-inhalt und ein try/catch beim JSON-Parse; gleichzeitig gibt es Schwächen durch innerHTML für das Delete-Icon, fehlendes Fehlerhandling bei localStorage/setItem und kleinere Qualitätsmängel wie mehrfach verwendete data-testid-Werte und ein fehlerhaftes SVG-Attribut.",
+      "comment_consistency": "Screenshot und Code passen weitgehend zusammen: Die vier Spalten, Beispielkarten und Add-Buttons erscheinen wie im HTML/JS vorgesehen. Kleinere Abweichungen sind unkritisch; es gibt keinen Hinweis auf einen Init- oder Renderbruch."
+    }
+  },
+  "raw_response": "# Kanban Board Implementation\n\nI'll create a fully functional Kanban board with all the requested features in a single HTML file. The solution will include draggable cards, local storage persistence, and a vibrant design with Tailwind CSS.\n\n```html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Vanilla Kanban Board</title>\n    <script src=\"https://cdn.tailwindcss.com\"></script>\n    <script src=\"https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js\"></script>\n    <script>\n        tailwind.config = {\n            theme: {\n                extend: {\n                    colors: {\n                        primary: '#6366f1',\n                        secondary: '#8b5cf6',\n                        accent: '#ec4899',\n                        dark: '#1e293b',\n                        light: '#f8fafc'\n                    }\n                }\n            }\n        }\n    </script>\n    <style type=\"text/tailwindcss\">\n        @layer base {\n            body {\n                @apply bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen p-4 md:p-8;\n            }\n        }\n        \n        @layer components {\n            .kanban-column {\n                @apply bg-white rounded-xl shadow-md p-4 min-h-[500px] max-w-xs;\n            }\n            \n            .kanban-card {\n                @apply bg-white rounded-lg shadow-sm p-4 mb-3 border-l-4 border-primary transition-all duration-200 hover:shadow-md hover:-translate-y-1;\n            }\n            \n            .kanban-card-title {\n                @apply font-semibold text-gray-800 mb-2;\n            }\n            \n            .kanban-card-content {\n                @apply text-gray-600 text-sm;\n            }\n            \n            .kanban-column-header {\n                @apply flex justify-between items-center mb-4;\n            }\n            \n            .kanban-column-title {\n                @apply font-bold t",
+  "artifacts": [
+    {
+      "kind": "html",
+      "label": "Generierte App",
+      "path": "artifacts/qwen_qwen3-coder-30b/coding/output.html",
+      "mime": "text/html"
+    },
+    {
+      "kind": "text",
+      "label": "Roh-Antwort des Modells",
+      "path": "artifacts/qwen_qwen3-coder-30b/coding/raw_response.txt",
+      "mime": "text/plain"
+    },
+    {
+      "kind": "image",
+      "label": "Screenshot der gerenderten App",
+      "path": "artifacts/qwen_qwen3-coder-30b/coding/screenshot.png",
+      "mime": "image/png"
+    }
+  ],
+  "error": null,
+  "hardware": {
+    "platform": "macOS-26.4.1-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "ram_total_gb": 128.0,
+    "cpu_count": 16
+  },
+  "bench_version": "0.1.0"
+}

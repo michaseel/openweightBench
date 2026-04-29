@@ -1,0 +1,119 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html,body{margin:0;background:#fff;font-family:system-ui,-apple-system,sans-serif}
+  .wrap{padding:24px;display:inline-block;background:#fff}
+  /* Force a concrete render box: many model-emitted SVGs only set viewBox.
+     Without a width here, an inline-block parent collapses the SVG to its
+     intrinsic ~300x150 (or smaller) and the screenshot becomes a tiny
+     blank tile. Fixed width + auto height uses viewBox aspect-ratio. */
+  .wrap svg{display:block;width:1200px;height:auto;max-width:none}
+</style></head><body><div class="wrap"><svg viewBox="0 0 1200 900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Pfeilmarker -->
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#000"/>
+    </marker>
+    <!-- Gestrichelter Pfeilmarker -->
+    <marker id="arrowhead-dashed" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#000"/>
+    </marker>
+  </defs>
+
+  <!-- Hintergrund (Whiteboard Look) -->
+  <rect width="1200" height="900" fill="#f4f4f4" rx="10" ry="10"/>
+
+  <!-- Titel -->
+  <text x="600" y="50" font-family="Arial, sans-serif" font-size="28" text-anchor="middle" font-weight="bold">SSO - Ablaufdiagramm</text>
+
+  <!-- Gruppe: Benutzer (Akteur) -->
+  <g id="benutzer" transform="translate(150, 350)">
+    <!-- Stickfiguren Symbol -->
+    <circle cx="0" cy="-20" r="15" fill="#fff" stroke="#000" stroke-width="2"/>
+    <line x1="0" y1="-5" x2="0" y2="30" stroke="#000" stroke-width="2"/>
+    <path d="M-8 30 L8 30 M-6 30 L6 30 M-4 30 L4 30" stroke="#000" stroke-width="2"/>
+    <!-- Label -->
+    <text x="-15" y="70" font-family="Arial, sans-serif" font-size="18" text-anchor="end">Benutzer</text>
+  </g>
+
+  <!-- Gruppe: App / Service Provider -->
+  <g id="app_sp" transform="translate(420, 150)">
+    <rect x="-60" y="-30" width="120" height="60" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="0" y="5" font-family="Arial, sans-serif" font-size="14" text-anchor="middle">App /</text>
+    <text x="0" y="30" font-family="Arial, sans-serif" font-size="14" text-anchor="middle">Service Provider</text>
+  </g>
+
+  <!-- Gruppe: Identity Provider (IdP) -->
+  <g id="idp" transform="translate(850, 120)">
+    <rect x="-60" y="-30" width="120" height="60" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="0" y="5" font-family="Arial, sans-serif" font-size="14" text-anchor="middle">Identity</text>
+    <text x="0" y="30" font-family="Arial, sans-serif" font-size="14" text-anchor="middle">Provider (IdP)</text>
+  </g>
+
+  <!-- Gruppe: Login-Seite -->
+  <g id="login_seite" transform="translate(750, 280)">
+    <rect x="-60" y="-30" width="120" height="60" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="0" y="5" font-family="Arial, sans-serif" font-size="14" text-anchor="middle">Login-Seite</text>
+  </g>
+
+  <!-- Gruppe: Entscheidung (Rhombus) -->
+  <g id="entscheidung" transform="translate(820, 430)">
+    <path d="M-50,-30 L50,-30 L60,10 L-60,10 Z" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="0" y="-10" font-family="Arial, sans-serif" font-size="14" text-anchor="middle">Anmeldedaten</text>
+    <text x="0" y="5" font-family="Arial, sans-serif" font-size="12" text-anchor="middle">korrekt?</text>
+  </g>
+
+  <!-- Gruppe: Zugriff gewährt -->
+  <g id="zugriff_gewaehrt" transform="translate(340, 600)">
+    <rect x="-50" y="-30" width="100" height="60" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="0" y="5" font-family="Arial, sans-serif" font-size="14" text-anchor="middle">Zugriff</text>
+    <text x="0" y="30" font-family="Arial, sans-serif" font-size="14" text-anchor="middle">gewährt</text>
+  </g>
+
+  <!-- Verbindungen & Pfeile -->
+
+  <!-- 1. Zugang zu App (Benutzer -> App/SP) -->
+  <path d="M200 350 L420 350" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="300" y="360" font-family="Arial, sans-serif" font-size="14" text-anchor="middle">1. Zugang zu App</text>
+
+  <!-- 2. Weiterleitung zur Login-Seite (App/SP -> IdP) -->
+  <path d="M580 270 L830 270" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="690" y="240" font-family="Arial, sans-serif" font-size="14" text-anchor="middle">2. Weiterleitung zur Login-Seite</text>
+
+  <!-- 3. Login-Seite anzeigen (IdP -> Login-Seite) -->
+  <path d="M850 270 L850 360" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="840" y="310" font-family="Arial, sans-serif" font-size="14" text-anchor="end">3. Login-Seite anzeigen</text>
+
+  <!-- 4. Authentifizierung (Login-Seite -> Entscheidung) -->
+  <path d="M790 360 L820 450" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="780" y="410" font-family="Arial, sans-serif" font-size="14" text-anchor="end">4. Authentifizierung</text>
+
+  <!-- Ja / Nein Verzweigung -->
+  <!-- Ja Pfad (Entscheidung -> Token) -->
+  <path d="M820 530 L820 620" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="810" y="570" font-family="Arial, sans-serif" font-size="14" text-anchor="end">Ja</text>
+
+  <!-- Nein Pfad (Entscheidung -> Benutzer) -->
+  <path d="M690 480 L320 480 L320 550 L790 550" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)" fill="none"/>
+  <!-- Die Linie ist komplex, da sie zurückgeht. Vereinfacht als zwei Segmente für den Text -->
+  <path d="M820 490 L650 490" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="730" y="480" font-family="Arial, sans-serif" font-size="14" text-anchor="end">Nein</text>
+
+  <!-- 5. Token / Assertion (Token -> App/SP) -->
+  <!-- Der Pfeil im Original zeigt von unten nach oben zur App -->
+  <path d="M820 630 L420 630" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="590" y="610" font-family="Arial, sans-serif" font-size="14" text-anchor="middle">5. Token / Assertion (SSO-Response)</text>
+
+  <!-- 6. Redirect zurück zur App mit Token -->
+  <path d="M420 630 L420 270" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="410" y="450" font-family="Arial, sans-serif" font-size="14" text-anchor="end">6. Redirect zurück zur App mit Token</text>
+
+  <!-- 7. Zugriff auf Ressourcen (App/SP -> Zugriff gewährt) -->
+  <path d="M380 270 L380 590" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="360" y="410" font-family="Arial, sans-serif" font-size="14" text-anchor="end">7. Zugriff auf Ressourcen</text>
+
+  <!-- Benutzer gibt Anmeldedaten ein (Gestrichelt) -->
+  <path d="M820 530 L950 530 L950 360" stroke="#000" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead-dashed)" fill="none"/>
+  <text x="1000" y="470" font-family="Arial, sans-serif" font-size="14" text-anchor="start">Benutzer gibt Anmeldedaten ein</text>
+
+</svg></div></body></html>

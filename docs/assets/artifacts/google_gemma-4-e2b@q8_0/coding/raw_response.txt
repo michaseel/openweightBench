@@ -1,0 +1,527 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vanilla JS Kanban Board</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for drag and drop feedback */
+        .dragging {
+            opacity: 0.5;
+            border: 2px dashed #3b82f6; /* Blue border when dragging */
+        }
+
+        .drag-over {
+            background-color: rgba(59, 130, 246, 0.1); /* Light blue background when hovering over a drop zone */
+            border: 2px dashed #3b82f6;
+        }
+
+        /* Style for the in-place editing state */
+        .editing {
+            border: 1px solid #ef4444; /* Red border when editing */
+            background-color: #fffbeb; /* Light yellow background */
+        }
+
+        /* Custom scrollbar for aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #9ca3af;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen p-8 font-sans">
+
+    <!-- Confetti Container (Hidden by default) -->
+    <div id="confetti-container" class="fixed inset-0 pointer-events-none z-50"></div>
+
+    <header class="text-center mb-10">
+        <h1 class="text-4xl font-extrabold text-gray-800 border-b pb-2">Project Kanban Board</h1>
+        <p class="text-gray-500 mt-2">Drag cards, edit titles, and track progress.</p>
+    </header>
+
+    <!-- Kanban Board Container -->
+    <main class="flex gap-6 justify-center">
+
+        <!-- Column: Backlog -->
+        <div id="column-backlog" data-testid="column-backlog" class="w-80 bg-white p-4 rounded-xl shadow-lg transition duration-300 hover:shadow-xl flex-shrink-0">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700 border-b pb-2">Backlog</h2>
+            <!-- Add Card Button -->
+            <button data-testid="add-card" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-150 mb-4">
+                + Add Card
+            </button>
+            <!-- Card Drop Zone -->
+            <div class="min-h-[100px] space-y-3 p-2 bg-gray-50 rounded-lg" data-status="Backlog">
+                <!-- Cards will be inserted here by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Column: In Progress -->
+        <div id="column-in-progress" data-testid="column-in-progress" class="w-80 bg-white p-4 rounded-xl shadow-lg transition duration-300 hover:shadow-xl flex-shrink-0">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700 border-b pb-2">In Progress</h2>
+            <!-- Add Card Button -->
+            <button data-testid="add-card" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded transition duration-150 mb-4">
+                + Add Card
+            </button>
+            <!-- Card Drop Zone -->
+            <div class="min-h-[100px] space-y-3 p-2 bg-gray-50 rounded-lg" data-status="In Progress">
+                <!-- Cards will be inserted here by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Column: Review -->
+        <div id="column-review" data-testid="column-review" class="w-80 bg-white p-4 rounded-xl shadow-lg transition duration-300 hover:shadow-xl flex-shrink-0">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700 border-b pb-2">Review</h2>
+            <!-- Add Card Button -->
+            <button data-testid="add-card" class="w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded transition duration-150 mb-4">
+                + Add Card
+            </button>
+            <!-- Card Drop Zone -->
+            <div class="min-h-[100px] space-y-3 p-2 bg-gray-50 rounded-lg" data-status="Review">
+                <!-- Cards will be inserted here by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Column: Done -->
+        <div id="column-done" data-testid="column-done" class="w-80 bg-white p-4 rounded-xl shadow-lg transition duration-300 hover:shadow-xl flex-shrink-0">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700 border-b pb-2">Done</h2>
+            <!-- Add Card Button -->
+            <button data-testid="add-card" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition duration-150 mb-4">
+                + Add Card
+            </button>
+            <!-- Card Drop Zone -->
+            <div class="min-h-[100px] space-y-3 p-2 bg-gray-50 rounded-lg" data-status="Done">
+                <!-- Cards will be inserted here by JavaScript -->
+            </div>
+        </div>
+
+    </main>
+
+
+    <!-- Custom Modal for Deletion Confirmation (Replaces window.confirm) -->
+    <div id="delete-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center z-[100]">
+        <div class="bg-white p-6 rounded-lg shadow-2xl w-full max-w-sm transform transition-all scale-100">
+            <h3 class="text-xl font-bold mb-4 text-red-600">Confirm Deletion</h3>
+            <p class="mb-6 text-gray-700">Are you sure you want to delete this card? This action cannot be undone.</p>
+            <div class="flex justify-end space-x-3">
+                <button id="cancel-delete" class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition duration-150">Cancel</button>
+                <button id="confirm_delete" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition duration-150" data-testid="confirm_delete">Delete</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // =====================================================================
+        // JAVASCRIPT CORE LOGIC
+        // =====================================================================
+
+        // --- 1. STATE MANAGEMENT AND LOCAL STORAGE ---
+        const STORAGE_KEY = 'kanban_board_state';
+        let kanbanState = [];
+        let draggedCardId = null; // Tracks the ID of the card currently being dragged
+
+        /**
+         * Loads the state from localStorage or initializes with dummy data.
+         */
+        function loadState() {
+            const storedState = localStorage.getItem(STORAGE_KEY);
+            if (storedState) {
+                try {
+                    kanbanState = JSON.parse(storedState);
+                    console.log('Kanban state loaded successfully.');
+                } catch (e) {
+                    console.error("Error parsing stored state:", e);
+                    // Fallback to empty array on corruption
+                    kanbanState = [];
+                }
+            } else {
+                // Initialize with dummy data if no state is found
+                initializeDummyData();
+            }
+        }
+
+        /**
+         * Saves the current state to localStorage.
+         */
+        function saveState() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(kanbanState));
+        }
+
+        /**
+         * Creates initial dummy cards if the state is empty.
+         */
+        function initializeDummyData() {
+            kanbanState = [
+                { id: Date.now() + 1, title: "Setup Project Structure", status: "Backlog" },
+                { id: Date.now() + 2, title: "Implement Drag & Drop Feature", status: "In Progress" },
+                { id: Date.now() + 3, title: "Design UI/UX Mockups", status: "Review" }
+            ];
+            saveState();
+        }
+
+        // --- 2. RENDERING FUNCTIONS ---
+
+        /**
+         * Creates the HTML element for a single card.
+         * @param {object} card - The card data object.
+         * @returns {HTMLElement} The fully constructed card DOM element.
+         */
+        function createCardElement(card) {
+            const cardEl = document.createElement('div');
+            // Apply required test ID and base styling
+            cardEl.className = 'card bg-white p-3 rounded-lg shadow-md cursor-grab hover:shadow-lg transition duration-200 border-l-4';
+            cardEl.setAttribute('data-testid', 'card');
+            cardEl.setAttribute('draggable', true);
+            cardEl.setAttribute('data-id', card.id);
+
+            // Add content and edit functionality
+            const titleSpan = document.createElement('span');
+            titleSpan.className = 'font-medium text-gray-800 cursor-pointer select-none';
+            titleSpan.textContent = card.title;
+            titleSpan.setAttribute('data-testid', 'card-title');
+
+            // Delete Trigger Button
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'ml-3 text-red-400 hover:text-red-600 transition duration-150 p-1 rounded';
+            deleteBtn.setAttribute('data-testid', 'delete-card');
+            deleteBtn.innerHTML = '&#128465;'; // Trash icon
+
+            cardEl.appendChild(titleSpan);
+            cardEl.appendChild(deleteBtn);
+
+            // --- Edit Functionality (In-Place Editing) ---
+            titleSpan.addEventListener('click', () => startEdit(card, titleSpan));
+
+            // --- Delete Functionality ---
+            deleteBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent card click events from firing
+                showDeleteModal(card.id);
+            });
+
+            return cardEl;
+        }
+
+        /**
+         * Renders all cards into the specified column container.
+         */
+        function renderBoard() {
+            // Clear existing content in all columns first
+            document.querySelectorAll('[data-status]').forEach(col => col.innerHTML = '');
+
+            kanbanState.forEach(card => {
+                const columnContainer = document.querySelector(`[data-status="${card.status}"]`);
+                if (columnContainer) {
+                    const cardEl = createCardElement(card);
+                    columnContainer.appendChild(cardEl);
+                }
+            });
+        }
+
+        // --- 3. CARD ACTIONS (CRUD) ---
+
+        /**
+         * Starts the in-place editing mode for a card title.
+         * @param {object} card - The card object being edited.
+         * @param {HTMLElement} titleEl - The span element holding the title text.
+         */
+        function startEdit(card, titleEl) {
+            if (titleEl.classList.contains('editing')) return;
+
+            // Replace span with input field
+            const originalTitle = card.title;
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = originalTitle;
+            input.className = 'w-full p-1 border border-blue-400 rounded focus:outline-none';
+            input.setAttribute('data-testid', 'card-input');
+
+            // Replace the title span with the input field
+            titleEl.classList.add('editing');
+            titleEl.style.display = 'none'; // Hide original text
+
+            titleEl.parentNode.insertBefore(input, titleEl);
+            input.focus();
+
+            const commitEdit = () => {
+                const newTitle = input.value.trim();
+                if (newTitle && newTitle !== originalTitle) {
+                    // Update state and save
+                    const cardIndex = kanbanState.findIndex(c => c.id === card.id);
+                    if (cardIndex > -1) {
+                        kanbanState[cardIndex].title = newTitle;
+                        saveState();
+                        renderBoard(); // Re-render the board to reflect the change
+                    }
+                }
+                // Reset UI state
+                resetEdit(titleEl, input);
+            };
+
+            // Commit on Enter key press
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    commitEdit();
+                }
+            });
+
+            // Commit on blur (losing focus)
+            input.addEventListener('blur', commitEdit);
+        }
+
+        /**
+         * Resets the UI after editing is complete (success or cancel).
+         */
+        function resetEdit(titleEl, inputEl) {
+            if (!titleEl || !inputEl) return;
+            titleEl.classList.remove('editing');
+            titleEl.style.display = 'inline'; // Show original text
+            inputEl.remove(); // Remove the input element
+        }
+
+        /**
+         * Handles the creation of a new card from user input.
+         */
+        function addCard(title) {
+            if (!title.trim()) return;
+
+            const newCard = {
+                id: Date.now(),
+                title: title.trim(),
+                status: 'Backlog' // New cards always start in Backlog
+            };
+
+            kanbanState.push(newCard);
+            saveState();
+            renderBoard();
+        }
+
+        /**
+         * Deletes a card after confirmation.
+         * @param {number} id - The ID of the card to delete.
+         */
+        function deleteCard(id) {
+            // Remove from state
+            kanbanState = kanbanState.filter(card => card.id !== id);
+            saveState();
+            renderBoard();
+        }
+
+        // --- 4. MODAL HANDLING (Custom Confirmation Dialog) ---
+
+        const deleteModal = document.getElementById('delete-modal');
+        const confirmDeleteBtn = document.getElementById('confirm_delete');
+        const cancelDeleteBtn = document.getElementById('cancel-delete');
+
+        /**
+         * Displays the custom modal for deletion confirmation.
+         * @param {number} cardId - The ID of the card being deleted.
+         */
+        function showDeleteModal(cardId) {
+            // Find the card data to get the title for better context (optional)
+            const card = kanbanState.find(c => c.id === cardId);
+            if (!card) return;
+
+            // Update modal content if needed (though we only need the ID here)
+            console.log(`Confirming deletion of card: ${card.title}`);
+
+            deleteModal.classList.remove('hidden');
+            deleteModal.classList.add('flex');
+        }
+
+        /**
+         * Hides the custom modal.
+         */
+        function hideDeleteModal() {
+            deleteModal.classList.add('hidden');
+            deleteModal.classList.remove('flex');
+        }
+
+        // --- 5. DRAG AND DROP HANDLERS ---
+
+        /**
+         * Handles the start of a drag operation.
+         * @param {DragEvent} e
+         */
+        function handleDragStart(e) {
+            draggedCardId = e.target.getAttribute('data-id');
+            e.dataTransfer.setData('text/plain', draggedCardId);
+            // Add visual feedback for the card being dragged
+            setTimeout(() => {
+                e.target.classList.add('dragging');
+            }, 0);
+        }
+
+        /**
+         * Handles drag over events to enable dropping and visual feedback.
+         * @param {DragEvent} e
+         * @param {HTMLElement} targetColumn - The column container being hovered over.
+         */
+        function handleDragOver(e, targetColumn) {
+            e.preventDefault(); // Necessary to allow dropping
+            targetColumn.classList.add('drag-over');
+        }
+
+        /**
+         * Handles drag leave events to remove visual feedback.
+         * @param {DragEvent} e
+         * @param {HTMLElement} targetColumn - The column container being left.
+         */
+        function handleDragLeave(e, targetColumn) {
+            targetColumn.classList.remove('drag-over');
+        }
+
+        /**
+         * Handles the drop operation, updating state and triggering animations.
+         * @param {DragEvent} e
+         * @param {HTMLElement} targetColumn - The column container where the card is dropped.
+         */
+        function handleDrop(e, targetColumn) {
+            e.preventDefault();
+            targetColumn.classList.remove('drag-over');
+
+            const cardId = parseInt(e.dataTransfer.getData('text/plain'));
+            const newStatus = targetColumn.getAttribute('data-status');
+
+            if (!cardId || !newStatus) return;
+
+            // 1. Update State
+            const cardIndex = kanbanState.findIndex(c => c.id === cardId);
+            if (cardIndex > -1 && kanbanState[cardIndex].status !== newStatus) {
+                kanbanState[cardIndex].status = newStatus;
+                saveState();
+
+                // 2. Trigger Confetti if moved to Done
+                if (newStatus === 'Done') {
+                    triggerConfetti();
+                }
+            }
+
+            // 3. Re-render the board to update the DOM structure
+            renderBoard();
+        }
+
+
+        // --- 6. CONFETTI ANIMATION ---
+
+        /**
+         * Simple function to trigger a confetti effect on screen.
+         */
+        function triggerConfetti() {
+            const container = document.getElementById('confetti-container');
+            const colors = ['#f472b6', '#3b82f6', '#10b981', '#f59e0b'];
+
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.style.position = 'absolute';
+                confetti.style.width = `${Math.random() * 10 + 5}px`;
+                confetti.style.height = `${Math.random() * 10 + 5}px`;
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.top = `${Math.random() * 100}%`;
+                confetti.style.opacity = '1';
+                confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+
+                container.appendChild(confetti);
+
+                // Animate the confetti falling
+                const startX = Math.random() * window.innerWidth;
+                const endX = startX + (Math.random() - 0.5) * 400; // Slight horizontal drift
+                const duration = Math.random() * 3000 + 1000;
+                const delay = Math.random() * 500;
+
+                confetti.animate([
+                    { transform: `translate(0, 0) rotate(${Math.random() * 360}deg)`, opacity: 1 },
+                    { transform: `translate(${endX}px, ${window.innerHeight + 50}px) rotate(${Math.random() * 720}deg)`, opacity: 0 }
+                ], {
+                    duration: duration,
+                    easing: 'ease-out',
+                    delay: delay
+                });
+
+                // Clean up confetti after animation finishes
+                setTimeout(() => {
+                    confetti.remove();
+                }, duration);
+            }
+        }
+
+
+        // --- 7. INITIALIZATION AND EVENT LISTENERS ---
+
+        function setupEventListeners() {
+            // Setup Drag and Drop Listeners for Columns (Drop Zones)
+            document.querySelectorAll('[data-status]').forEach(column => {
+                // Drag events on the column itself
+                column.addEventListener('dragover', (e) => handleDragOver(e, column));
+                column.addEventListener('dragleave', (e) => handleDragLeave(e, column));
+                column.addEventListener('drop', (e) => handleDrop(e, column));
+            });
+
+            // Setup Add Card Listeners
+            document.querySelectorAll('[data-testid="add-card"]').forEach(button => {
+                button.addEventListener('click', () => {
+                    const input = prompt("Enter the title for the new card:");
+                    if (input) {
+                        addCard(input);
+                    }
+                });
+            });
+
+            // Setup Delete Modal Listeners
+            confirmDeleteBtn.addEventListener('click', () => {
+                const cardIdToDelete = parseInt(confirmDeleteBtn.getAttribute('data-card-id')); // Assuming we pass ID via data attribute or context
+                deleteCard(cardIdToDelete);
+                hideDeleteModal();
+            });
+
+            cancelDeleteBtn.addEventListener('click', hideDeleteModal);
+
+
+            // Setup Global Listeners for Card Input (Enter key)
+            document.addEventListener('keypress', (e) => {
+                // Check if the pressed key is Enter and if it's inside an active card input field
+                const activeInput = document.querySelector('[data-testid="card-input"]:focus');
+                if (activeInput && e.key === 'Enter') {
+                    e.preventDefault(); // Stop default form submission if any
+                    const cardId = parseInt(activeInput.closest('.card').getAttribute('data-id'));
+                    const newTitle = activeInput.value.trim();
+
+                    if (newTitle) {
+                        // Manually simulate the addCard function logic for quick entry
+                        const cardIndex = kanbanState.findIndex(c => c.id === cardId);
+                        if (cardIndex > -1) {
+                            kanbanState[cardIndex].title = newTitle;
+                            saveState();
+                            renderBoard();
+                        }
+                        activeInput.value = ''; // Clear input
+                        resetEdit(activeInput.closest('.card').querySelector('[data-testid="card-title"]'), activeInput);
+                    }
+                }
+            });
+
+        }
+
+
+        /**
+         * Main initialization function.
+         */
+        function init() {
+            loadState();
+            renderBoard();
+            setupEventListeners();
+        }
+
+        // Start the application
+        init();
+
+    </script>
+</body>
+</html>
+```

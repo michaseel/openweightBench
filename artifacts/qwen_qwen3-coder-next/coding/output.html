@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Kanban Board</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Confetti Library for Done Column -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        /* Custom styles for smoother drag and drop experience */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Tailwind gray-100 */
+        }
+
+        .dragging {
+            opacity: 0.5;
+            transform: scale(1.05);
+        }
+
+        .column {
+            transition: background-color 0.3s ease;
+        }
+
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d1d5db; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af; 
+        }
+
+        /* Fade in animation for new cards */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        /* Modal transition */
+        .modal-overlay {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden text-gray-800">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm py-6 px-8 flex justify-between items-center z-10">
+        <div>
+            <h1 class="text-3xl font-bold text-indigo-600 tracking-tight">Kanban Board</h1>
+            <p class="text-sm text-gray-500 mt-1">Drag, drop, and manage your tasks efficiently.</p>
+        </div>
+        <button onclick="clearAllData()" class="text-xs text-red-500 hover:text-red-700 underline transition-colors">
+            Reset Data
+        </button>
+    </header>
+
+    <!-- Main Board Container (Scrollable) -->
+    <main class="flex-1 overflow-x-auto overflow-y-hidden p-8">
+        <!-- Flex Container for Columns -->
+        <div class="flex gap-6 min-w-full h-full items-start">
+            
+            <!-- Column: Backlog -->
+            <div class="flex-1 min-w-[300px] bg-gray-100 rounded-xl shadow-lg flex flex-col h-full overflow-hidden" data-testid="column-backlog">
+                <div class="p-4 bg-gray-200/50 border-b border-gray-300 flex justify-between items-center">
+                    <h2 class="font-bold text-gray-700 uppercase text-sm tracking-wider">Backlog</h2>
+                    <span class="bg-gray-300 text-gray-600 px-2 py-1 rounded-full text-xs font-semibold" id="count-backlog">0</span>
+                </div>
+                <div class="flex-1 overflow-y-auto p-4 space-y-3" id="backlog">
+                    <!-- Cards will be injected here -->
+                </div>
+                <button data-testid="add-card" class="m-4 p-2 text-sm font-medium text-indigo-600 bg-indigo-100 hover:bg-indigo-200 rounded-lg transition-colors w-full text-center border border-dashed border-indigo-300" onclick="openAddCardModal('backlog')">
+                    + Add a card
+                </button>
+            </div>
+
+            <!-- Column: In Progress -->
+            <div class="flex-1 min-w-[300px] bg-blue-50 rounded-xl shadow-lg flex flex-col h-full overflow-hidden" data-testid="column-in-progress">
+                <div class="p-4 bg-blue-100/50 border-b border-blue-200 flex justify-between items-center">
+                    <h2 class="font-bold text-blue-700 uppercase text-sm tracking-wider">In Progress</h2>
+                    <span class="bg-blue-200 text-blue-700 px-2 py-1 rounded-full text-xs font-semibold" id="count-in-progress">0</span>
+                </div>
+                <div class="flex-1 overflow-y-auto p-4 space-y-3" id="in-progress">
+                    <!-- Cards will be injected here -->
+                </div>
+                <button data-testid="add-card" class="m-4 p-2 text-sm font-medium text-blue-600 bg-blue-100 hover:bg-blue-200 rounded-lg transition-colors w-full text-center border border-dashed border-blue-300" onclick="openAddCardModal('in-progress')">
+                    + Add a card
+                </button>
+            </div>
+
+            <!-- Column: Review -->
+            <div class="flex-1 min-w-[300px] bg-purple-50 rounded-xl shadow-lg flex flex-col h-full overflow-hidden" data-testid="column-review">
+                <div class="p-4 bg-purple-100/50 border-b border-purple-200 flex justify-between items-center">
+                    <h2 class="font-bold text-purple-700 uppercase text-sm tracking-wider">Review</h2>
+                    <span class="bg-purple-200 text-purple-700 px-2 py-1 rounded-full text-xs font-semibold" id="count-review">0</span>
+                </div>
+                <div class="flex-1 overflow-y-auto p-4 space-y-3" id="review">
+                    <!-- Cards will be injected here -->
+                </div>
+                <button data-testid="add-card" class="m-4 p-2 text-sm font-medium text-purple-600 bg-purple-100 hover:bg-purple-200 rounded-lg transition-colors w-full text-center border border-dashed border-purple-300" onclick="openAddCardModal('review')">
+                    + Add a card
+                </button>
+            </div>
+
+            <!-- Column: Done -->
+            <div class="flex-1 min-w-[300px] bg-green-50 rounded-xl shadow-lg flex flex-col h-full overflow-hidden" data-testid="column-done">
+                <div class="p-4 bg-green-100/50 border-b border-green-200 flex justify-between items-center">
+                    <h2 class="font-bold text-green-700 uppercase text-sm tracking-wider">Done</h2>
+                    <span class="bg-green-200 text-green-700 px-2 py-1 rounded-full text-xs font-semibold" id="count-done">0</span>
+                </div>
+                <div class="flex-1 overflow-y-auto p-4 space-y-3" id="done">
+                    <!-- Cards will be injected here -->
+                </div>
+                <button data-testid="add-card" class="m-4 p-2 text-sm font-medium text-green-600 bg-green-100 hover:bg-green-200 rounded-lg transition-colors w-full text-center border border-dashed border-green-300" onclick="openAddCardModal('done')">
+                    + Add a card
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Add/Edit Card Modal -->
+    <div id="card-modal" class="modal-overlay fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md transform transition-all scale-100">
+            <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+                <h3 id="modal-title" class="text-xl font-bold text-gray-800">Add New Card</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6">
+                <!-- Input for Card Title -->
+                <textarea 
+                    id="card-input" 
+                    data-testid="card-input"
+                    placeholder="Enter card title..." 
+                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none resize-none text-gray-700 placeholder-gray-400 transition-all"
+                    rows="3"
+                ></textarea>
+                <div class="mt-4 flex justify-end space-x-2">
+                    <button onclick="closeModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                        Cancel
+                    </button>
+                    <button id="save-card-btn" onclick="handleAddCard()" class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                        Add Card
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="modal-overlay fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 text-center">
+            <div class="mb-4 flex justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-red-500 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">Delete Card?</h3>
+            <p class="text-gray-600 mb-8">Are you sure you want to delete this card? This action cannot be undone.</p>
+            
+            <div class="flex justify-center space-x-4">
+                <button onclick="closeDeleteModal()" class="px-5 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                    Cancel
+                </button>
+                <button id="confirm-delete" data-testid="confirm-delete" onclick="confirmDelete()" class="px-5 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors">
+                    Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- Configuration & State ---
+        
+        const STORAGE_KEY = 'kanban_board_app_v1';
+        const COLUMNS = ['backlog', 'in-progress', 'review', 'done'];
+        
+        // Initial State
+        let boardState = {
+            backlog: [],
+            'in-progress': [],
+            review: [],
+            done: []
+        };
+
+        // Current Context Variables
+        let draggedCardId = null;
+        let currentDeleteTarget = { id: null, columnId: null };
+
+        // --- Initialization ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadState();
+            
+            // If no data, seed some dummy cards
+            if (isEmpty(boardState)) {
+                seedDummyData();
+            }
+            
+            renderBoard();
+            setupDragAndDrop();
+        });
+
+        // Helper to check if state is empty
+        function isEmpty(state) {
+            return Object.values(state).every(arr => arr.length === 0);
+        }
+
+        // Seed Data
+        function seedDummyData() {
+            const dummyCards = [
+                { id: 'c1', title: 'Research Competitors' },
+                { id: 'c2', title: 'Design System Draft' },
+                { id: 'c3', title: 'Setup Repository' },
+                { id: 'c4', title: 'Implement Auth Module' },
+                { id: 'c5', title: 'Create Landing Page' },
+                { id: 'c6', title: 'Fix Responsive Issues on Mobile' }
+            ];
+
+            // Distribute dummy cards
+            boardState['backlog'] = [dummyCards[0], dummyCards[1]];
+            boardState['in-progress'] = [dummyCards[3]];
+            boardState['review'] = [dummyCards[2]];
+            boardState['done'] = [dummyCards[4], dummyCards[5]];
+
+            saveState();
+        }
+
+        // --- State Management ---
+
+        function loadState() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                try {
+                    boardState = JSON.parse(stored);
+                } catch (e) {
+                    console.error("Failed to parse state, resetting.", e);
+                }
+            }
+        }
+
+        function saveState() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(boardState));
+            updateColumnCounts();
+        }
+
+        function clearAllData() {
+            if(confirm("Are you sure you want to reset the board? All data will be lost.")) {
+                localStorage.removeItem(STORAGE_KEY);
+                location.reload();
+            }
+        }
+
+        // --- Rendering ---
+
+        function renderBoard() {
+            COLUMNS.forEach(columnId => {
+                const columnElement = document.getElementById(columnId);
+                // Clear existing cards
+                columnElement.innerHTML = '';
+
+                const cards = boardState[columnId] || [];
+
+                // Sort: In Progress first, then Backlog, etc. (Optional logic, keeping simple for now)
+                // cards.sort((a,b) => a.id.localeCompare(b.id));
+
+                cards.forEach(cardData => {
+                    const cardEl = createCardElement(cardData, columnId);
+                    columnElement.appendChild(cardEl);
+                });
+            });
+            updateColumnCounts();
+        }
+
+        function createCardElement(cardData, columnId) {
+            const card = document.createElement('div');
+            card.className = 'bg-white p-4 rounded-lg shadow-md border border-gray-200 cursor-grab active:cursor-grabbing hover:shadow-lg transition-all duration-200 group relative fade-in';
+            card.draggable = true;
+            card.dataset.id = cardData.id;
+            card.dataset.column = columnId; // Store current column for reference
+            card.setAttribute('data-testid', 'card');
+
+            // Card Content Container
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'pr-8'; // Space for delete button
+
+            const title = document.createElement('h3');
+            title.className = 'text-gray-800 font-medium break-words leading-relaxed';
+            title.contentEditable = true;
+            title.addEventListener('blur', (e) => handleTitleEdit(e, cardData.id));
+            title.innerText = cardData.title;
+            
+            // Prevent newline on Enter in contentEditable (optional preference, usually Enter commits edit)
+            title.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    title.blur();
+                }
+            });
+
+            contentDiv.appendChild(title);
+            card.appendChild(contentDiv);
+
+            // Delete Button
+            const deleteBtn = document.createElement('button');
+            deleteBtn.setAttribute('data-testid', 'delete-card');
+            deleteBtn.className = 'absolute top-2 right-2 text-gray-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100';
+            deleteBtn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>`;
+            
+            deleteBtn.onclick = (e) => {
+                e.stopPropagation(); // Prevent drag start
+                openDeleteModal(cardData.id, columnId);
+            };
+
+            card.appendChild(deleteBtn);
+
+            // Drag Events on Card
+            card.addEventListener('dragstart', handleDragStart);
+            card.addEventListener('dragend', handleDragEnd);
+
+            return card;
+        }
+
+        function updateColumnCounts() {
+            COLUMNS.forEach(col => {
+                const countSpan = document.getElementById(`count-${col}`);
+                if (countSpan) {
+                    countSpan.innerText = boardState[col].length;
+                }
+            });
+        }
+
+        // --- Drag and Drop Logic ---
+
+        function setupDragAndDrop() {
+            // Add dragover listeners to columns (the drop zones)
+            const columns = document.querySelectorAll('[data-testid^="column-"]');
+            
+            columns.forEach(column => {
+                column.addEventListener('dragover', (e) => {
+                    e.preventDefault(); // Necessary to allow dropping
+                    column.classList.add('bg-gray-200/50'); // Visual feedback
+                    
+                    const afterElement = getDragAfterElement(column, e.clientY);
+                    if (draggedCardId) {
+                        const card = document.querySelector(`[data-id="${draggedCardId}"]`);
+                        if (afterElement) {
+                            column.insertBefore(card, afterElement);
+                        } else {
+                            column.appendChild(card);
+                        }
+                    }
+                });
+
+                column.addEventListener('dragleave', (e) => {
+                    // Remove highlight if mouse leaves the specific column container
+                    if (!column.contains(e.relatedTarget)) {
+                        column.classList.remove('bg-gray-200/50');
+                    }
+                });
+
+                column.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    column.classList.remove('bg-gray-200/50');
+
+                    if (draggedCardId) {
+                        const card = document.querySelector(`[data-id="${draggedCardId}"]`);
+                        
+                        // Determine new column ID
+                        const newColumnId = card.parentElement.id;
+                        const oldColumnId = card.dataset.column;
+
+                        // Update Data Model
+                        if (oldColumnId !== newColumnId) {
+                            const cardIndex = boardState[oldColumnId].findIndex(c => c.id === draggedCardId);
+                            if (cardIndex > -1) {
+                                const [cardObj] = boardState[oldColumnId].splice(cardIndex, 1);
+                                boardState[newColumnId].push(cardObj);
+                                
+                                // Trigger Confetti if moved to Done
+                                if (newColumnId === 'done') {
+                                    triggerConfetti();
+                                }
+                            }
+                        }
+
+                        // Update DOM data-column attribute
+                        card.dataset.column = newColumnId;
+                        
+                        saveState();
+                    }
+                });
+            });
+        }
+
+        // Helper to calculate position for inserting element
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll('[data-testid="card"]:not(.dragging)')];
+
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2; // Distance to center of child
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        function handleDragStart(e) {
+            draggedCardId = e.target.dataset.id;
+            e.target.classList.add('dragging');
+            
+            // Set drag image to the element itself for better UX
+            e.dataTransfer.effectAllowed = 'move';
+            // Optional: setDragImage logic if we wanted a custom ghost image
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+            draggedCardId = null;
+            
+            // Clean up any highlight classes left over
+            document.querySelectorAll('[data-testid^="column-"]').forEach(col => {
+                col.classList.remove('bg-gray-200/50');
+            });
+        }
+
+        // --- Modal Logic (Add/Edit) ---
+
+        const modal = document.getElementById('card-modal');
+        const modalInput = document.getElementById('card-input');
+        let currentModalMode = 'add'; // 'add' or 'edit'
+        let currentEditingCardId = null;
+        let currentModalColumnId = null;
+
+        function openAddCardModal(columnId) {
+            currentModalMode = 'add';
+            currentModalColumnId = columnId;
+            modalInput.value = '';
+            document.getElementById('modal-title').innerText = 'Add New Card';
+            document.getElementById('save-card-btn').innerText = 'Add Card';
+            
+            modal.classList.add('active');
+            setTimeout(() => modalInput.focus(), 100); // Small delay for transition
+        }
+
+        function openEditCardModal(cardId, columnId) {
+            currentModalMode = 'edit';
+            currentEditingCardId = cardId;
+            currentModalColumnId = columnId;
+
+            // Find card data
+            const cards = boardState[columnId];
+            const cardIndex = cards.findIndex(c => c.id === cardId);
+            if (cardIndex === -1) return;
+
+            modalInput.value = cards[cardId].title; // Note: This logic assumes unique IDs across columns or specific lookup
+            // Actually, we need to find the card object first
+            const targetCard = cards.find(c => c.id === cardId);
+            
+            modalInput.value = targetCard ? targetCard.title : '';
+            document.getElementById('modal-title').innerText = 'Edit Card';
+            document.getElementById('save-card-btn').innerText = 'Update Card';
+
+            modal.classList.add('active');
+            setTimeout(() => modalInput.focus(), 100);
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+            // Clear inputs
+            modalInput.value = '';
+        }
+
+        function handleAddCard() {
+            const title = modalInput.value.trim();
+            if (!title) return;
+
+            const newCard = {
+                id: `card_${Date.now()}`, // Simple unique ID
+                title: title
+            };
+
+            if (currentModalMode === 'add') {
+                boardState[currentModalColumnId].push(newCard);
+            } else if (currentModalMode === 'edit') {
+                // Find and update
+                const colCards = boardState[currentModalColumnId];
+                const cardIndex = colCards.findIndex(c => c.id === currentEditingCardId);
+                if (cardIndex > -1) {
+                    colCards[cardIndex].title = title;
+                }
+            }
+
+            saveState();
+            renderBoard(); // Re-render to show changes
+            closeModal();
+        }
+
+        // Allow Enter key in input to commit
+        modalInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleAddCard();
+            }
+        });
+
+        // --- Edit Title Logic (In Place) ---
+
+        function handleTitleEdit(event, cardId) {
+            const newTitle = event.target.innerText.trim();
+            
+            if (!newTitle) {
+                // If empty, restore old text or handle gracefully
+                event.target.innerText = "Untitled Card";
+                return;
+            }
+
+            // Find card in all columns
+            let found = false;
+            COLUMNS.forEach(colId => {
+                const cardIndex = boardState[colId].findIndex(c => c.id === cardId);
+                if (cardIndex > -1) {
+                    boardState[colId][cardIndex].title = newTitle;
+                    found = true;
+                }
+            });
+
+            if (found) {
+                saveState();
+            }
+        }
+
+        // --- Delete Logic ---
+
+        const deleteModal = document.getElementById('delete-modal');
+
+        function openDeleteModal(cardId, columnId) {
+            currentDeleteTarget = { id: cardId, columnId: columnId };
+            deleteModal.classList.add('active');
+        }
+
+        function closeDeleteModal() {
+            deleteModal.classList.remove('active');
+            currentDeleteTarget = { id: null, columnId: null };
+        }
+
+        function confirmDelete() {
+            if (currentDeleteTarget.id) {
+                const { id, columnId } = currentDeleteTarget;
+                
+                // Filter out the card
+                boardState[columnId] = boardState[columnId].filter(c => c.id !== id);
+                
+                saveState();
+                renderBoard();
+            }
+            closeDeleteModal();
+        }
+
+        // --- Confetti Animation (Canvas Confetti) ---
+
+        function triggerConfetti() {
+            const duration = 3 * 1000; // 3 seconds
+            const animationEnd = Date.now() + duration;
+            let defaults = { startVelocity: 30, spread: 360, origin: { x: 0.5, y: 0.5 } };
+
+            function randomInOut(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            const interval = setInterval(function() {
+                const timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+
+                const particleCount = 50 * (timeLeft / duration);
+                
+                // Since particles fall down, start a bit higher than random
+                confetti(Object.assign({}, defaults, { 
+                    particleCount, 
+                    origin: { x: randomInOut(0.1, 0.9), y: Math.random() - 0.2 } 
+                }));
+            }, 250);
+        }
+
+    </script>
+</body>
+</html>

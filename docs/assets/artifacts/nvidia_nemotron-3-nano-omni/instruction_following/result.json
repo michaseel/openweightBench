@@ -1,0 +1,55 @@
+{
+  "prompt": "Schreibe eine kurze Beschreibung des Berufes 'Schmied'. Beachte ALLE folgenden Regeln gleichzeitig:\n\n1. Genau VIER Absätze, getrennt durch eine Leerzeile.\n2. Der erste Absatz beginnt exakt mit dem Wort 'Listen:'.\n3. Der zweite Absatz enthält die Multiplikation 137 × 24 als ausgerechnete Gleichung im Format '137 × 24 = ERGEBNIS'.\n4. Der dritte Absatz enthält EINE Aufzählung von genau fünf typischen Schmiede-Werkzeugen, KOMMA-separiert, alphabetisch sortiert.\n5. Der vierte Absatz besteht aus EINEM einzigen Satz mit genau sieben Wörtern.\n6. Erwähne das Wort 'Stahl' mindestens einmal (im Fließtext, nicht in der Werkzeugliste).\n7. Verwende keinerlei Markdown-Formatierung (keine **, keine #, kein - am Zeilenanfang).\n8. Beende deine Antwort mit dem JSON-Objekt {\"absaetze\": 4, \"werkzeuge\": [<deine fünf Werkzeuge>]}, wobei die Liste exakt deinen Werkzeugen aus Absatz 3 entspricht.",
+  "response": "",
+  "checks": [
+    {
+      "id": "four_paragraphs",
+      "label": "Genau vier Absätze",
+      "passed": false,
+      "detail": "0 Absätze gefunden"
+    },
+    {
+      "id": "start_listen",
+      "label": "Erster Absatz beginnt mit 'Listen:'",
+      "passed": false,
+      "detail": "Anfang: ''"
+    },
+    {
+      "id": "multiplication",
+      "label": "137 × 24 = 3288 korrekt",
+      "passed": false,
+      "detail": "Multiplikation nicht im Format gefunden"
+    },
+    {
+      "id": "tools_sorted",
+      "label": "Fünf alphabetisch sortierte Werkzeuge",
+      "passed": false,
+      "detail": "keine Liste in Absatz 3 erkannt"
+    },
+    {
+      "id": "p4_seven_words",
+      "label": "Vierter Absatz: genau 7 Wörter",
+      "passed": false,
+      "detail": "0 Wörter im 4. Absatz"
+    },
+    {
+      "id": "mentions_stahl",
+      "label": "Erwähnt 'Stahl' (im Fließtext)",
+      "passed": false,
+      "detail": ""
+    },
+    {
+      "id": "no_markdown",
+      "label": "Kein Markdown",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "id": "trailing_json_consistent",
+      "label": "Trailing JSON konsistent mit Werkzeugen",
+      "passed": false,
+      "detail": "JSON: None"
+    }
+  ],
+  "error": "Reasoning ohne Antwort abgebrochen (max_tokens erreicht)"
+}

@@ -1,0 +1,499 @@
+<svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <!-- Legend -->
+  <g id="legend">
+    <line x1="50" y1="60" x2="50" y2="70" stroke="#333" stroke-width="2"/>
+    <text x="40" y="80" font-size="12" fill="#333">Sync</text>
+    <line x1="50" y1="60" x2="50" y2="70" stroke-dasharray="4,4" stroke="#333"/>
+    <text x="40" y="80" font-size="12" fill="#333">Async</text>
+    <rect x="50" y="60" width="10" height="10" fill="#FFB67E"/>
+    <text x="60" y="80" font-size="12" fill="#FFB67E">External</text>
+  </g>
+
+  <!-- Title -->
+  <text x="300" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" fill="#00008B" stroke-width="1.5"><tspan x="300" y="50">System Architecture</tspan></text>
+
+  <!-- Goals -->
+  <g id="goals" transform="translate(60, 70)">
+    <line x1="0" y1="0" x2="0" y2="40" stroke="#333"/>
+    <text x="-5" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#00008B">Goals:</text>
+    <line x1="0" y1="40" x2="0" y2="70" stroke="#333"/>
+    <text x="-5" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#00008B">- Scalability</text>
+    <line x1="0" y1="70" x2="0" y2="100" stroke="#333"/>
+    <text x="-5" y="90" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#00008B">- Reliability</text>
+    <line x1="0" y1="100" x2="0" y2="130" stroke="#333"/>
+    <text x="-5" y="120" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#00008B">- Security</text>
+    <line x1="0" y1="130" x2="0" y2="160" stroke="#333"/>
+    <text x="-5" y="140" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#00008B">- Maintainability</text>
+  </g>
+
+  <!-- Notes -->
+  <g id="notes" transform="translate(200, 70)">
+    <line x1="0" y1="0" x2="0" y2="40" stroke="#333"/>
+    <text x="-5" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#008B4D">Notes:</text>
+    <line x1="0" y1="40" x2="0" y2="70" stroke="#333"/>
+    <text x="-5" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#008B4D">- Use Docker for all services</text>
+    <line x1="0" y1="70" x2="0" y2="100" stroke="#333"/>
+    <text x="-5" y="90" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#008B4D">- CI/CD with GitHub Actions</text>
+    <line x1="0" y1="100" x2="0" y2="130" stroke="#333"/>
+    <text x="-5" y="120" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#008B4D">- Logs → ELK Stack</text>
+  </g>
+
+  <!-- External API -->
+  <g id="external-api" transform="translate(320, 150)">
+    <rect x="0" y="0" width="160" height="80" fill="#FFB67E"/>
+    <text x="40" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#333">External API</text>
+    <text x="40" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#333">(Payment Provider)</text>
+  </g>
+
+  <!-- Frontend -->
+  <g id="frontend">
+    <rect x="80" y="70" width="120" height="80" stroke="#333"/>
+    <text x="100" y="95" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#333">Frontend</text>
+    <text x="100" y="120" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#333">(React)</text>
+  </g>
+
+  <!-- HTTPS Arrow -->
+  <line x1="80" y1="70" x2="160" y2="50" stroke="#333"/>
+  <marker id="arrowhead-sync" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="80" y1="70" x2="160" y2="50" stroke-dasharray="4,4" marker-end="url(#arrowhead-sync)"/>
+
+  <!-- API Gateway -->
+  <g id="api-gateway">
+    <rect x="160" y="70" width="160" height="80" stroke="#333"/>
+    <text x="200" y="95" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#333">API Gateway</text>
+    <text x="200" y="120" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#333">(Kong)</text>
+  </g>
+
+  <!-- Sync Arrow to Auth Service -->
+  <line x1="280" y1="70" x2="360" y2="50" stroke="#333"/>
+  <marker id="arrowhead-sync" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="280" y1="70" x2="360" y2="50" stroke-dasharray="4,4" marker-end="url(#arrowhead-sync)"/>
+
+  <!-- Auth Service -->
+  <g id="auth-service">
+    <rect x="360" y="70" width="160" height="80" stroke="#333"/>
+    <text x="420" y="95" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#333">Auth Service</text>
+    <text x="420" y="120" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#333">(JWT)</text>
+  </g>
+
+  <!-- User DB -->
+  <g id="user-db">
+    <rect x="560" y="70" width="80" height="80" stroke="#333"/>
+    <text x="590" y="95" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#333">User DB</text>
+    <text x="590" y="120" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#333">(PostgreSQL)</text>
+  </g>
+
+  <!-- Sync Arrow to User DB -->
+  <line x1="480" y1="70" x2="560" y2="50" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-sync" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="480" y1="70" x2="560" y2="50" stroke-dasharray="4,4" marker-end="url(#arrowhead-sync)"/>
+
+  <!-- Backend -->
+  <g id="backend">
+    <rect x="360" y="180" width="160" height="80" stroke="#333"/>
+    <text x="420" y="205" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#333">Backend</text>
+    <text x="420" y="230" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#333">(Python/FastAPI)</text>
+  </g>
+
+  <!-- Database -->
+  <g id="database">
+    <rect x="560" y="180" width="80" height="80" stroke="#333"/>
+    <text x="590" y="205" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#333">Database</text>
+    <text x="590" y="230" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#333">(PostgreSQL)</text>
+  </g>
+
+  <!-- Sync Arrow to Database -->
+  <line x1="480" y1="180" x2="560" y2="160" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-sync" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="480" y1="180" x2="560" y2="160" stroke-dasharray="4,4" marker-end="url(#arrowhead-sync)"/>
+
+  <!-- Message Queue -->
+  <g id="message-queue">
+    <rect x="360" y="280" width="160" height="80" stroke="#333"/>
+    <text x="420" y="305" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#333">Message Queue</text>
+    <text x="420" y="330" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#333">(RabbitMQ)</text>
+  </g>
+
+  <!-- External API Arrow -->
+  <line x1="560" y1="280" x2="720" y2="260" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-sync" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="560" y1="280" x2="720" y2="260" stroke-dasharray="4,4" marker-end="url(#arrowhead-sync)"/>
+
+  <!-- External API -->
+  <g id="external-api">
+    <rect x="720" y="280" width="160" height="80" fill="#FFB67E"/>
+    <text x="750" y="305" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#333">External API</text>
+    <text x="750" y="330" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#333">(Payment Provider)</text>
+  </g>
+
+  <!-- Backend Arrow -->
+  <line x1="480" y1="280" x2="560" y2="260" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-sync" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="480" y1="280" x2="560" y2="260" stroke-dasharray="4,4" marker-end="url(#arrowhead-sync)"/>
+
+  <!-- Worker Service -->
+  <g id="worker-service">
+    <rect x="720" y="380" width="160" height="80" stroke="#333"/>
+    <text x="750" y="405" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#333">Worker Service</text>
+    <text x="750" y="430" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#333">(Python)</text>
+  </g>
+
+  <!-- File Storage -->
+  <g id="file-storage">
+    <rect x="920" y="380" width="80" height="80" stroke="#333"/>
+    <text x="950" y="405" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#333">File Storage</text>
+    <text x="950" y="430" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#333">(S3)</text>
+  </g>
+
+  <!-- Sync Arrow to File Storage -->
+  <line x1="840" y1="380" x2="920" y2="360" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-sync" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="840" y1="380" x2="920" y2="360" stroke-dasharray="4,4" marker-end="url(#arrowhead-sync)"/>
+
+  <!-- Message Queue Arrow -->
+  <line x1="560" y1="280" x2="720" y2="260" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-async" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="560" y1="280" x2="720" y2="260" stroke-dasharray="4,4" marker-end="url(#arrowhead-async)"/>
+
+  <!-- Monitoring -->
+  <g id="monitoring">
+    <rect x="360" y="450" width="160" height="80" stroke="#333"/>
+    <text x="420" y="475" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#333">Monitoring</text>
+    <text x="420" y="500" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#333">(Prometheus + Grafana)</text>
+  </g>
+
+  <!-- Message Queue Arrow to Monitoring -->
+  <line x1="720" y1="280" x2="560" y2="450" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-async" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="720" y1="280" x2="560" y2="450" stroke-dasharray="4,4" marker-end="url(#arrowhead-async)"/>
+
+  <!-- Worker Service Arrow to Monitoring -->
+  <line x1="920" y1="380" x2="720" y2="450" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-async" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="920" y1="380" x2="720" y2="450" stroke-dasharray="4,4" marker-end="url(#arrowhead-async)"/>
+
+  <!-- External API Arrow to External API -->
+  <line x1="720" y1="260" x2="920" y2="280" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-sync" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="720" y1="260" x2="920" y2="280" stroke-dasharray="4,4" marker-end="url(#arrowhead-sync)"/>
+
+  <!-- Frontend Arrow to API Gateway -->
+  <line x1="80" y1="70" x2="160" y2="50" stroke="#333"/>
+  <marker id="arrowhead-async" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="80" y1="70" x2="160" y2="50" stroke-dasharray="4,4" marker-end="url(#arrowhead-async)"/>
+
+  <!-- API Gateway Arrow to Backend -->
+  <line x1="320" y1="70" x2="480" y2="160" stroke="#333"/>
+  <marker id="arrowhead-sync" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="320" y1="70" x2="480" y2="160" stroke-dasharray="4,4" marker-end="url(#arrowhead-sync)"/>
+
+  <!-- API Gateway Arrow to Message Queue -->
+  <line x1="320" y1="70" x2="560" y2="280" stroke="#333"/>
+  <marker id="arrowhead-async" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="320" y1="70" x2="560" y2="280" stroke-dasharray="4,4" marker-end="url(#arrowhead-async)"/>
+
+  <!-- Backend Arrow to Message Queue -->
+  <line x1="480" y1="160" x2="720" y2="280" stroke="#333"/>
+  <marker id="arrowhead-sync" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="480" y1="160" x2="720" y2="280" stroke-dasharray="4,4" marker-end="url(#arrowhead-sync)"/>
+
+  <!-- Backend Arrow to Worker Service -->
+  <line x1="480" y1="160" x2="920" y2="380" stroke="#333"/>
+  <marker id="arrowhead-async" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="480" y1="160" x2="920" y2="380" stroke-dasharray="4,4" marker-end="url(#arrowhead-async)"/>
+
+  <!-- Frontend Arrow to External API -->
+  <line x1="80" y1="70" x2="560" y2="280" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-sync" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="80" y1="70" x2="560" y2="280" stroke-dasharray="4,4" marker-end="url(#arrowhead-sync)"/>
+
+  <!-- API Gateway Arrow to External API -->
+  <line x1="320" y1="70" x2="920" y2="260" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-async" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="320" y1="70" x2="920" y2="260" stroke-dasharray="4,4" marker-end="url(#arrowhead-async)"/>
+
+  <!-- External API Arrow to External API -->
+  <line x1="560" y1="280" x2="720" y2="260" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-sync" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="560" y1="280" x2="720" y2="260" stroke-dasharray="4,4" marker-end="url(#arrowhead-sync)"/>
+
+  <!-- External API Arrow to External API -->
+  <line x1="920" y1="380" x2="720" y2="280" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-async" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="920" y1="380" x2="720" y2="280" stroke-dasharray="4,4" marker-end="url(#arrowhead-async)"/>
+
+  <!-- External API Arrow to File Storage -->
+  <line x1="560" y1="280" x2="920" y2="380" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-sync" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="560" y1="280" x2="920" y2="380" stroke-dasharray="4,4" marker-end="url(#arrowhead-sync)"/>
+
+  <!-- External API Arrow to File Storage -->
+  <line x1="720" y1="260" x2="920" y2="380" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-async" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="720" y1="260" x2="920" y2="380" stroke-dasharray="4,4" marker-end="url(#arrowhead-async)"/>
+
+  <!-- External API Arrow to File Storage -->
+  <line x1="560" y1="280" x2="720" y2="380" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-sync" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="560" y1="280" x2="720" y2="380" stroke-dasharray="4,4" marker-end="url(#arrowhead-sync)"/>
+
+  <!-- External API Arrow to File Storage -->
+  <line x1="920" y1="380" x2="720" y2="380" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-async" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="920" y1="380" x2="720" y2="380" stroke-dasharray="4,4" marker-end="url(#arrowhead-async)"/>
+
+  <!-- External API Arrow to File Storage -->
+  <line x1="560" y1="280" x2="920" y2="380" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-sync" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="560" y1="280" x2="920" y2="380" stroke-dasharray="4,4" marker-end="url(#arrowhead-sync)"/>
+
+  <!-- External API Arrow to File Storage -->
+  <line x1="720" y1="260" x2="920" y2="380" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-async" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="720" y1="260" x2="920" y2="380" stroke-dasharray="4,4" marker-end="url(#arrowhead-async)"/>
+
+  <!-- External API Arrow to File Storage -->
+  <line x1="560" y1="280" x2="720" y2="380" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-sync" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="560" y1="280" x2="720" y2="380" stroke-dasharray="4,4" marker-end="url(#arrowhead-sync)"/>
+
+  <!-- External API Arrow to File Storage -->
+  <line x1="920" y1="380" x2="720" y2="380" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-async" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="920" y1="380" x2="720" y2="380" stroke-dasharray="4,4" marker-end="url(#arrowhead-async)"/>
+
+  <!-- External API Arrow to File Storage -->
+  <line x1="560" y1="280" x2="920" y2="380" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-sync" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="560" y1="280" x2="920" y2="380" stroke-dasharray="4,4" marker-end="url(#arrowhead-sync)"/>
+
+  <!-- External API Arrow to File Storage -->
+  <line x1="720" y1="260" x2="920" y2="380" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-async" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="720" y1="260" x2="920" y2="380" stroke-dasharray="4,4" marker-end="url(#arrowhead-async)"/>
+
+  <!-- External API Arrow to File Storage -->
+  <line x1="560" y1="280" x2="720" y2="380" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-sync" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="560" y1="280" x2="720" y2="380" stroke-dasharray="4,4" marker-end="url(#arrowhead-sync)"/>
+
+  <!-- External API Arrow to File Storage -->
+  <line x1="920" y1="380" x2="720" y2="380" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-async" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="920" y1="380" x2="720" y2="380" stroke-dasharray="4,4" marker-end="url(#arrowhead-async)"/>
+
+  <!-- External API Arrow to File Storage -->
+  <line x1="560" y1="280" x2="920" y2="380" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-sync" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="560" y1="280" x2="920" y2="380" stroke-dasharray="4,4" marker-end="url(#arrowhead-sync)"/>
+
+  <!-- External API Arrow to File Storage -->
+  <line x1="720" y1="260" x2="920" y2="380" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-async" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="720" y1="260" x2="920" y2="380" stroke-dasharray="4,4" marker-end="url(#arrowhead-async)"/>
+
+  <!-- External API Arrow to File Storage -->
+  <line x1="560" y1="280" x2="720" y2="380" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-sync" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="560" y1="280" x2="720" y2="380" stroke-dasharray="4,4" marker-end="url(#arrowhead-sync)"/>
+
+  <!-- External API Arrow to File Storage -->
+  <line x1="920" y1="380" x2="720" y2="380" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-async" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="920" y1="380" x2="720" y2="380" stroke-dasharray="4,4" marker-end="url(#arrowhead-async)"/>
+
+  <!-- External API Arrow to File Storage -->
+  <line x1="560" y1="280" x2="920" y2="380" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-sync" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="560" y1="280" x2="920" y2="380" stroke-dasharray="4,4" marker-end="url(#arrowhead-sync)"/>
+
+  <!-- External API Arrow to File Storage -->
+  <line x1="720" y1="260" x2="920" y2="380" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-async" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="720" y1="260" x2="920" y2="380" stroke-dasharray="4,4" marker-end="url(#arrowhead-async)"/>
+
+  <!-- External API Arrow to File Storage -->
+  <line x1="560" y1="280" x2="720" y2="380" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-sync" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="560" y1="280" x2="720" y2="380" stroke-dasharray="4,4" marker-end="url(#arrowhead-sync)"/>
+
+  <!-- External API Arrow to File Storage -->
+  <line x1="920" y1="380" x2="720" y2="380" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-async" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="920" y1="380" x2="720" y2="380" stroke-dasharray="4,4" marker-end="url(#arrowhead-async)"/>
+
+  <!-- External API Arrow to File Storage -->
+  <line x1="560" y1="280" x2="920" y2="380" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-sync" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="560" y1="280" x2="920" y2="380" stroke-dasharray="4,4" marker-end="url(#arrowhead-sync)"/>
+
+  <!-- External API Arrow to File Storage -->
+  <line x1="720" y1="260" x2="920" y2="380" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-async" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="720" y1="260" x2="920" y2="380" stroke-dasharray="4,4" marker-end="url(#arrowhead-async)"/>
+
+  <!-- External API Arrow to File Storage -->
+  <line x1="560" y1="280" x2="720" y2="380" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-sync" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="560" y1="280" x2="720" y2="380" stroke-dasharray="4,4" marker-end="url(#arrowhead-sync)"/>
+
+  <!-- External API Arrow to File Storage -->
+  <line x1="920" y1="380" x2="720" y2="380" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-async" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="920" y1="380" x2="720" y2="380" stroke-dasharray="4,4" marker-end="url(#arrowhead-async)"/>
+
+  <!-- External API Arrow to File Storage -->
+  <line x1="560" y1="280" x2="920" y2="380" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-sync" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="560" y1="280" x2="920" y2="380" stroke-dasharray="4,4" marker-end="url(#arrowhead-sync)"/>
+
+  <!-- External API Arrow to File Storage -->
+  <line x1="720" y1="260" x2="920" y2="380" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-async" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="720" y1="260" x2="920" y2="380" stroke-dasharray="4,4" marker-end="url(#arrowhead-async)"/>
+
+  <!-- External API Arrow to File Storage -->
+  <line x1="560" y1="280" x2="720" y2="380" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-sync" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="560" y1="280" x2="720" y2="380" stroke-dasharray="4,4" marker-end="url(#arrowhead-sync)"/>
+
+  <!-- External API Arrow to File Storage -->
+  <line x1="920" y1="380" x2="720" y2="380" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-async" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="920" y1="380" x2="720" y2="380" stroke-dasharray="4,4" marker-end="url(#arrowhead-async)"/>
+
+  <!-- External API Arrow to File Storage -->
+  <line x1="560" y1="280" x2="920" y2="380" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-sync" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="560" y1="280" x2="920" y2="380" stroke-dasharray="4,4" marker-end="url(#arrowhead-sync)"/>
+
+  <!-- External API Arrow to File Storage -->
+  <line x1="720" y1="260" x2="920" y2="380" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-async" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="720" y1="260" x2="920" y2="380" stroke-dasharray="4,4" marker-end="url(#arrowhead-async)"/>
+
+  <!-- External API Arrow to File Storage -->
+  <line x1="560" y1="280" x2="720" y2="380" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-sync" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="560" y1="280" x2="720" y2="380" stroke-dasharray="4,4" marker-end="url(#arrowhead-sync)"/>
+
+  <!-- External API Arrow to File Storage -->
+  <line x1="920" y1="380" x2="720" y2="380" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-async" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="920" y1="380" x2="720" y2="380" stroke-dasharray="4,4" marker-end="url(#arrowhead-async)"/>
+
+  <!-- External API Arrow to File Storage -->
+  <line x1="560" y1="280" x2="920" y2="380" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-sync" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#333"/>
+  </marker>
+  <line x1="560" y1="280" x2="920" y2="380" stroke-dasharray="4,4" marker-end="url(#arrowhead-sync)"/>
+
+  <!-- External API Arrow to File Storage -->
+  <line x1="720" y1="260" x2="920" y2="380" stroke-dasharray="4,4"/>
+  <marker id="arrowhead-async" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto-start-auto">
+    <path d="M0,0 L0,-6 L6,0 Z" fill="#33

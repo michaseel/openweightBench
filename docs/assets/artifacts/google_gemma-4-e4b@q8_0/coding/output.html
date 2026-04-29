@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kanban Board</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for transitions and drag feedback */
+        .kanban-column {
+            min-height: 200px; /* Ensure columns are visible even when empty */
+            transition: background-color 0.3s ease;
+        }
+
+        .card {
+            cursor: grab;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:active {
+            transform: scale(1.02);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Dragging styles */
+        .dragging {
+            opacity: 0.4;
+            transform: scale(0.98);
+        }
+
+        /* Confetti animation setup */
+        #confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Ensures clicks pass through */
+            z-index: 50;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 8px;
+            height: 15px;
+            opacity: 0;
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0.5; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 p-8 font-sans">
+
+    <!-- Confetti Container -->
+    <div id="confetti-container"></div>
+
+    <!-- Main Kanban Board Structure -->
+    <header class="text-center mb-10">
+        <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight">Project Flow Board</h1>
+        <p class="text-gray-500 mt-2">Drag cards between stages to manage workflow.</p>
+    </header>
+
+    <!-- Kanban Columns Container -->
+    <main id="kanban-board" class="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-7xl mx-auto">
+
+        <!-- Column 1: Backlog -->
+        <div id="column-backlog" data-column-id="backlog" class="kanban-column bg-white p-5 rounded-lg shadow-xl flex flex-col border-t-4 border-blue-500">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700 sticky top-0 pb-2">Backlog</h2>
+            <!-- Card container for Backlog -->
+            <div id="cards-backlog" data-column-id="backlog" class="flex-grow space-y-3 min-h-[100px]">
+                <!-- Cards will be rendered here -->
+            </div>
+            <!-- Add card button (Mandatory Test Selector) -->
+            <button data-testid="add-card" data-column="backlog" class="mt-4 w-full py-2 px-4 bg-blue-500 text-white font-medium rounded-lg hover:bg-blue-600 transition duration-150 shadow-md">
+                + Add Card
+            </button>
+        </div>
+
+        <!-- Column 2: In Progress -->
+        <div id="column-in-progress" data-column-id="in-progress" class="kanban-column bg-white p-5 rounded-lg shadow-xl flex flex-col border-t-4 border-yellow-500">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700 sticky top-0 pb-2">In Progress</h2>
+            <!-- Card container for In Progress -->
+            <div id="cards-in-progress" data-column-id="in-progress" class="flex-grow space-y-3 min-h-[100px]">
+                <!-- Cards will be rendered here -->
+            </div>
+            <!-- Add card button (Mandatory Test Selector) -->
+            <button data-testid="add-card" data-column="in-progress" class="mt-4 w-full py-2 px-4 bg-yellow-500 text-white font-medium rounded-lg hover:bg-yellow-600 transition duration-150 shadow-md">
+                + Add Card
+            </button>
+        </div>
+
+        <!-- Column 3: Review -->
+        <div id="column-review" data-column-id="review" class="kanban-column bg-white p-5 rounded-lg shadow-xl flex flex-col border-t-4 border-purple-500">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700 sticky top-0 pb-2">Review</h2>
+            <!-- Card container for Review -->
+            <div id="cards-review" data-column-id="review" class="flex-grow space-y-3 min-h-[100px]">
+                <!-- Cards will be rendered here -->
+            </div>
+            <!-- Add card button (Mandatory Test Selector) -->
+            <button data-testid="add-card" data-column="review" class="mt-4 w-full py-2 px-4 bg-purple-500 text-white font-medium rounded-lg hover:bg-purple-600 transition duration-150 shadow-md">
+                + Add Card
+            </button>
+        </div>
+
+        <!-- Column 4: Done -->
+        <div id="column-done" data-column-id="done" class="kanban-column bg-white p-5 rounded-lg shadow-xl flex flex-col border-t-4 border-green-500">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700 sticky top-0 pb-2">Done</h2>
+            <!-- Card container for Done -->
+            <div id="cards-done" data-column-id="done" class="flex-grow space-y-3 min-h-[100px]">
+                <!-- Cards will be rendered here -->
+            </div>
+            <!-- Add card button (Mandatory Test Selector) -->
+            <button data-testid="add-card" data-column="done" class="mt-4 w-full py-2 px-4 bg-green-500 text-white font-medium rounded-lg hover:bg-green-600 transition duration-150 shadow-md">
+                + Add Card
+            </button>
+        </div>
+
+    </main>
+
+    <!-- ============================================== -->
+    <!-- Modals and Hidden Inputs (For non-alert/prompt interaction) -->
+    <!-- ============================================== -->
+
+    <!-- 1. Add New Card Modal -->
+    <div id="add-card-modal" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-md p-6 transform transition-all duration-300 scale-100">
+            <h3 class="text-xl font-bold mb-4 text-gray-800" id="modal-title">Add New Card</h3>
+
+            <!-- Input field (Mandatory Test Selector) -->
+            <input type="text" id="card-input" data-testid="card-input" placeholder="Enter card title here..." class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4">
+
+            <div class="flex justify-end space-x-3">
+                <button id="cancel-add" class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition">Cancel</button>
+                <!-- Commit button (hidden, handled by JS listener on card-input) -->
+                <button id="submit-add" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">Create Card</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Delete Confirmation Modal -->
+    <div id="delete-confirm-modal" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-sm p-6 transform transition-all duration-300 scale-100">
+            <h3 class="text-xl font-bold mb-4 text-red-600">Confirm Deletion</h3>
+            <p class="mb-6 text-gray-700">Are you sure you want to delete this card? This action cannot be undone.</p>
+
+            <div class="flex justify-end space-x-3">
+                <!-- Cancel button -->
+                <button id="cancel-delete" class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition">Cancel</button>
+                <!-- Confirm button (Mandatory Test Selector) -->
+                <button data-testid="confirm-delete" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition font-medium">Delete Card</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ============================================== -->
+    <!-- Vanilla JavaScript Logic -->
+    <!-- ============================================== -->
+    <script>
+        // --- GLOBAL STATE MANAGEMENT ---
+        const STORAGE_KEY = 'kanbanBoardStateV1';
+        let cards = []; // The primary array holding all card objects
+        let draggedCardElement = null; // Tracks the currently dragging element
+
+        // --- DOM REFERENCES ---
+        const boardContainer = document.getElementById('kanban-board');
+        const confettiContainer = document.getElementById('confetti-container');
+
+        // Modals and Inputs
+        const addModal = document.getElementById('add-card-modal');
+        const deleteModal = document.getElementById('delete-confirm-modal');
+        const inputField = document.getElementById('card-input');
+        const submitAddButton = document.getElementById('submit-add');
+
+        // --- PERSISTENCE FUNCTIONS ---
+
+        /**
+         * @function loadCards
+         * Loads the card data from localStorage. If none exists, it initializes dummy cards.
+         */
+        function loadCards() {
+            const storedData = localStorage.getItem(STORAGE_KEY);
+            if (storedData) {
+                cards = JSON.parse(storedData);
+            } else {
+                // Initialize with dummy data if storage is empty
+                console.log("No state found, initializing dummy cards.");
+                cards = [
+                    { id: 'c1', content: 'Design the user flow diagram.', columnId: 'backlog' },
+                    { id: 'c2', content: 'Implement drag and drop functionality.', columnId: 'in-progress' },
+                    { id: 'c3', content: 'Review component library usage.', columnId: 'review' },
+                    { id: 'c4', content: 'Finalize deployment script.', columnId: 'done' }
+                ];
+            }
+        }
+
+        /**
+         * @function saveCards
+         * Saves the current state of the cards array to localStorage.
+         */
+        function saveCards() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
+            console.log('State saved successfully.');
+        }
+
+
+        // --- UI RENDERING AND CARD MANAGEMENT ---
+
+        /**
+         * @function renderCardElement
+         * Creates the full HTML structure for a single card object.
+         * @param {object} card - The card data object.
+         * @returns {HTMLElement} The fully structured card element.
+         */
+        function renderCardElement(card) {
+            const cardEl = document.createElement('div');
+            cardEl.className = 'card bg-white p-4 rounded-lg shadow hover:shadow-md border-l-4 border-gray-300 text-sm';
+            cardEl.setAttribute('draggable', true);
+            cardEl.dataset.id = card.id; // Store ID for easy reference
+
+            // Card content wrapper (for editing)
+            const contentWrapper = document.createElement('div');
+            contentWrapper.className = 'text-gray-800 whitespace-pre-wrap min-h-[24px]';
+            contentWrapper.textContent = card.content;
+            cardEl.appendChild(contentWrapper);
+
+            // Delete button (Mandatory Test Selector)
+            const deleteButton = document.createElement('button');
+            deleteButton.className = 'absolute top-1 right-1 text-red-400 hover:text-red-600 transition opacity-0 group-hover:opacity-100 p-0 m-[-5px]';
+            deleteButton.innerHTML = '&times;'; // Simple close icon
+            deleteButton.setAttribute('data-testid', 'delete-card');
+            deleteButton.title = 'Delete Card';
+            cardEl.appendChild(deleteButton);
+
+            // Add a group class to enable the hover effect for delete button visibility
+            cardEl.classList.add('group');
+
+            return cardEl;
+        }
+
+        /**
+         * @function renderBoard
+         * Clears all current cards from columns and re-renders the entire board based on the 'cards' state array.
+         */
+        function renderBoard() {
+            // 1. Clear existing content containers
+            document.querySelectorAll('[data-column-id]').forEach(container => {
+                // Only clear the card container, leave headers/buttons intact
+                const cardList = container.querySelector('.flex-grow');
+                if (cardList) {
+                    cardList.innerHTML = '';
+                }
+            });
+
+            // 2. Render cards based on state
+            cards.forEach(card => {
+                const columnEl = document.getElementById(`cards-${card.columnId}`);
+                if (columnEl) {
+                    const cardElement = renderCardElement(card);
+                    columnEl.appendChild(cardElement);
+                } else {
+                    console.error(`Column ID ${card.columnId} not found.`);
+                }
+            });
+
+            // 3. Reattach listeners to newly rendered elements
+            attachCardListeners();
+        }
+
+
+        // --- INTERACTION HANDLERS (Editing, Deleting) ---
+
+        /**
+         * @function startEdit
+         * Converts a static text card element into an editable textarea.
+         * @param {HTMLElement} cardEl - The card element to edit.
+         */
+        function startEdit(cardEl) {
+            const contentWrapper = cardEl.querySelector('.text-gray-800');
+            if (!contentWrapper || contentWrapper.dataset.editing === 'true') return;
+
+            // Get the card ID from the parent element
+            const cardId = cardEl.dataset.id;
+
+            // Create temporary textarea
+            const textarea = document.createElement('textarea');
+            textarea.className = 'w-full p-1 border rounded resize-none focus:outline-none';
+            textarea.value = contentWrapper.textContent;
+            textarea.rows = 3; // Set a reasonable height
+
+            // Replace the text element with the textarea
+            contentWrapper.replaceWith(textarea);
+            textarea.focus();
+            contentWrapper.dataset.editing = 'true'; // Mark as editing
+        }
+
+        /**
+         * @function commitEdit
+         * Saves the content from the textarea back into the state and UI.
+         * @param {HTMLElement} cardEl - The parent card element.
+         */
+        function commitEdit(cardEl) {
+            const contentWrapper = cardEl.querySelector('.text-gray-800');
+            const inputElement = cardEl.querySelector('textarea');
+
+            if (!inputElement || !contentWrapper) return;
+
+            const newContent = inputElement.value.trim();
+            const cardId = cardEl.dataset.id;
+
+            // Update state
+            const cardIndex = cards.findIndex(c => c.id === cardId);
+            if (cardIndex !== -1) {
+                cards[cardIndex].content = newContent || "[Empty Card]"; // Handle empty input
+                saveCards();
+            }
+
+            // Revert UI
+            inputElement.replaceWith(contentWrapper);
+            contentWrapper.textContent = cards.find(c => c.id === cardId).content;
+            delete contentWrapper.dataset.editing;
+        }
+
+
+        /**
+         * @function handleDeleteClick
+         * Initiates the deletion process by showing the confirmation modal.
+         * @param {HTMLElement} deleteBtn - The clicked delete button.
+         */
+        function handleDeleteClick(deleteBtn) {
+            const cardEl = deleteBtn.closest('.card');
+            if (!cardEl) return;
+
+            // Store a reference to the card being deleted for confirmation handler
+            deleteModal.dataset.targetCardId = cardEl.dataset.id;
+            deleteModal.classList.remove('hidden');
+        }
+
+
+        /**
+         * @function handleConfirmDelete
+         * Executes the deletion after user confirms in the modal.
+         */
+        function handleConfirmDelete() {
+            const targetId = deleteModal.dataset.targetCardId;
+
+            // Filter out the card from the state
+            cards = cards.filter(card => card.id !== targetId);
+            saveCards();
+            renderBoard(); // Re-render the board to reflect removal
+
+            deleteModal.classList.add('hidden');
+        }
+
+
+        // --- DRAG AND DROP LOGIC ---
+
+        /**
+         * @function handleDragStart
+         * Fired when a card starts being dragged. Sets up necessary data and styles.
+         * @param {Event} e - The drag event.
+         */
+        function handleDragStart(e) {
+            draggedCardElement = e.target;
+            // Set the ID of the dragging element as data transfer payload
+            e.dataTransfer.setData('text/plain', draggedCardElement.dataset.id);
+            e.target.classList.add('dragging');
+        }
+
+        /**
+         * @function handleDragOver
+         * Fired continuously while an item is dragged over a potential drop target. Must call preventDefault().
+         * @param {Event} e - The drag event.
+         */
+        function handleDragOver(e) {
+            // Prevents the browser default action (which is to disallow dropping)
+            e.preventDefault();
+        }
+
+        /**
+         * @function handleDrop
+         * Fired when the dragged item is dropped onto a column container.
+         * @param {Event} e - The drop event.
+         */
+        function handleDrop(e) {
+            e.preventDefault();
+            const targetColumnEl = e.currentTarget;
+            const newColumnId = targetColumnEl.dataset.columnId;
+
+            if (!draggedCardElement || !newColumnId) return;
+
+            // 1. Get the ID of the card being moved
+            const cardId = draggedCardElement.dataset.id;
+
+            // 2. Update state: Find and change the columnId
+            const cardIndex = cards.findIndex(c => c.id === cardId);
+            if (cardIndex !== -1 && cards[cardIndex].columnId !== newColumnId) {
+                cards[cardIndex].columnId = newColumnId;
+                saveCards();
+
+                // 3. Handle confetti if moved to 'Done'
+                if (newColumnId === 'done') {
+                    triggerConfetti();
+                }
+
+                // 4. Re-render the board to reflect the change in position
+                renderBoard();
+            }
+
+            // Clean up drag state
+            draggedCardElement.classList.remove('dragging');
+            draggedCardElement = null;
+        }
+
+
+        // --- CONFETTI ANIMATION ---
+
+        /**
+         * @function triggerConfetti
+         * Creates and animates multiple confetti pieces for a celebratory effect.
+         */
+        function triggerConfetti() {
+            const colors = ['#FFC700', '#FF6B6B', '#4ECDC4', '#5DADE2'];
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+
+                // Randomize properties
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const size = Math.random() * 10 + 5; // Size between 5px and 15px
+                const leftPos = Math.random() * 100; // Horizontal start position
+                const duration = Math.random() * 3 + 2; // Fall time (2s to 5s)
+
+                confetti.style.backgroundColor = color;
+                confetti.style.width = `${size}px`;
+                confetti.style.height = `${size * 1.5}px`;
+                confetti.style.left = `${leftPos}vw`;
+                confetti.style.animationDuration = `${duration}s`;
+
+                // Randomize initial rotation and delay for staggered effect
+                const rotation = Math.random() * 360;
+                confetti.style.transform = `rotate(${rotation}deg)`;
+                confetti.style.animationDelay = `${Math.random() * 0.5}s`;
+
+                confettiContainer.appendChild(confetti);
+
+                // Clean up the confetti element after animation finishes
+                setTimeout(() => {
+                    confetti.remove();
+                }, duration * 1000);
+            }
+        }
+
+
+        // --- INITIALIZATION AND EVENT SETUP ---
+
+        /**
+         * @function attachCardListeners
+         * Attaches event listeners (editing, deletion) to all currently rendered cards.
+         */
+        function attachCardListeners() {
+            document.querySelectorAll('.card').forEach(cardEl => {
+                const contentWrapper = cardEl.querySelector('.text-gray-800');
+
+                // 1. In-Place Editing (Double Click)
+                contentWrapper.addEventListener('dblclick', () => startEdit(cardEl));
+
+                // 2. Deletion Trigger (Click on the delete button)
+                const deleteBtn = cardEl.querySelector('[data-testid="delete-card"]');
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', handleDeleteClick);
+                }
+            });
+        }
+
+        /**
+         * @function setupGlobalListeners
+         * Sets up listeners for modal interactions and drag/drop on columns.
+         */
+        function setupGlobalListeners() {
+            // --- Drag & Drop Listeners (on Columns) ---
+            document.querySelectorAll('.kanban-column').forEach(columnEl => {
+                const cardList = columnEl.querySelector('.flex-grow');
+
+                // Allow dropping on the container itself, not just empty space
+                cardList.addEventListener('dragover', handleDragOver);
+                cardList.addEventListener('drop', handleDrop);
+            });
+
+
+            // --- Add Card Modal Handlers ---
+            document.querySelectorAll('[data-testid="add-card"]').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const columnId = e.currentTarget.dataset.column;
+                    inputField.value = ''; // Clear previous input
+                    addModal.querySelector('#modal-title').textContent = `Add New Card to ${columnId.charAt(0).toUpperCase() + columnId.slice(1)}`;
+                    // Store the target column ID on the modal for submission context
+                    addModal.dataset.targetColumn = columnId;
+                    addModal.classList.remove('hidden');
+                });
+            });
+
+            document.getElementById('cancel-add').addEventListener('click', () => addModal.classList.add('hidden'));
+            submitAddButton.addEventListener('click', handleCardSubmission);
+
+            // Commit card on Enter press in the input field (Mandatory Test Selector)
+            inputField.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    handleCardSubmission();
+                }
+            });
+
+
+            /**
+             * @function handleCardSubmission
+             * Creates a new card based on the input field value and modal context.
+             */
+            function handleCardSubmission() {
+                const content = inputField.value.trim();
+                const targetColumnId = addModal.dataset.targetColumn;
+
+                if (!content || !targetColumnId) return;
+
+                // Create new card object
+                const newCard = {
+                    id: 'c' + Date.now(), // Simple unique ID generation
+                    content: content,
+                    columnId: targetColumnId
+                };
+
+                cards.push(newCard);
+                saveCards();
+                renderBoard();
+
+                // Close modal and reset input
+                addModal.classList.add('hidden');
+                inputField.value = '';
+            }
+
+
+            // --- Delete Modal Handlers ---
+            document.getElementById('cancel-delete').addEventListener('click', () => deleteModal.classList.add('hidden'));
+            document.querySelector('[data-testid="confirm-delete"]').addEventListener('click', handleConfirmDelete);
+
+        }
+
+        /**
+         * @function init
+         * Main function to initialize the entire application.
+         */
+        function init() {
+            loadCards();
+            setupGlobalListeners();
+            renderBoard(); // Initial render of the board
+        }
+
+        // Start the application when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', init);
+
+    </script>
+</body>
+</html>

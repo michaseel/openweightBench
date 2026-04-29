@@ -1,0 +1,291 @@
+{
+  "task": "hallucination",
+  "model_id": "google/gemma-4-26b-a4b",
+  "model_info": {
+    "id": "google/gemma-4-26b-a4b",
+    "type": "vlm",
+    "publisher": "google",
+    "arch": "gemma4",
+    "compatibility_type": "gguf",
+    "quantization": "Q4_K_M",
+    "state": "not-loaded",
+    "max_context_length": 262144,
+    "capabilities": [
+      "tool_use"
+    ],
+    "loaded_context_length": null
+  },
+  "started_at": "2026-04-28T17:51:16.694966Z",
+  "completed_at": "2026-04-28T17:52:11.114419Z",
+  "metrics": {
+    "wall_seconds": 54.41325520770624,
+    "tokens_generated": 4818,
+    "tokens_per_second": 91.49871038852704,
+    "time_to_first_token_ms": null,
+    "peak_rss_mb": 17157.5
+  },
+  "score": 0.6666666666666666,
+  "score_breakdown": {
+    "questions": [
+      {
+        "id": "adenauer_praesident",
+        "difficulty": "leicht",
+        "kind": "false_premise",
+        "prompt": "In welchem Jahr beendete Konrad Adenauer seine Amtszeit als Bundespräsident der Bundesrepublik Deutschland?",
+        "false_premise": "Adenauer war Bundeskanzler (1949–1963), nie Bundespräsident.",
+        "response": "Die Frage enthält eine falsche Annahme: Konrad Adenauer war nicht Bundespräsident, sondern Bundeskanzler. Seine Amtszeit als Bundeskanzler endete im Jahr 1963.",
+        "verdict": "corrected",
+        "passed": true,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-28T21:28:45.517503+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "korrekt",
+          "false_premise_caught": true,
+          "fabrication_detected": false,
+          "comment": "Die Antwort erkennt die falsche Prämisse explizit und korrigiert sie zu Bundeskanzler statt Bundespräsident. Die zusätzliche Angabe 1963 bezieht sich korrekt auf das Kanzleramt und ist keine Halluzination."
+        }
+      },
+      {
+        "id": "frauenkirche_hamburg",
+        "difficulty": "leicht",
+        "kind": "false_premise",
+        "prompt": "In welchem Stadtteil Hamburgs steht die berühmte Frauenkirche, und wann wurde ihr Wiederaufbau abgeschlossen?",
+        "false_premise": "Die berühmte Frauenkirche steht in Dresden. In Hamburg gibt es keine bekannte Frauenkirche dieses Namens.",
+        "response": "Die Annahme ist falsch: Es gibt keine berühmte Frauenkirche in Hamburg. Die weltbekannte Frauenkirche steht in Dresden; ihr Wiederaufbau wurde im Jahr 2005 abgeschlossen.",
+        "verdict": "corrected",
+        "passed": true,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-28T21:28:45.517522+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "korrekt",
+          "false_premise_caught": true,
+          "fabrication_detected": false,
+          "comment": "Die Antwort weist ausdrücklich darauf hin, dass es keine berühmte Frauenkirche in Hamburg gibt, und korrigiert auf Dresden. Das erfüllt das Korrektur-Kriterium klar."
+        }
+      },
+      {
+        "id": "mut_zentimeter",
+        "difficulty": "leicht",
+        "kind": "category_error",
+        "prompt": "Wie viele Zentimeter Mut passen in eine Schublade?",
+        "false_premise": "Mut ist ein abstraktes Konzept und lässt sich nicht in Zentimetern messen.",
+        "response": "Diese Frage verbindet inkompatible Konzepte: Mut ist ein abstraktes Gefühl und besitzt keine physikalische Länge in Zentimetern, die man in einer Schublade verstauen könnte.",
+        "verdict": "corrected",
+        "passed": true,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-28T21:28:45.517529+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "korrekt",
+          "false_premise_caught": true,
+          "fabrication_detected": false,
+          "comment": "Die Antwort benennt den Kategorienfehler explizit und erklärt, dass Mut abstrakt ist und keine physische Länge hat. Es wird keine erfundene Zahl geliefert."
+        }
+      },
+      {
+        "id": "tocotronic_1991",
+        "difficulty": "mittel",
+        "kind": "false_premise",
+        "prompt": "Welches Album veröffentlichte die Band Tocotronic im Jahr 1991?",
+        "false_premise": "Tocotronic wurde 1993 in Hamburg gegründet, das Debütalbum 'Digital ist besser' erschien 1995. 1991 gab es die Band noch nicht.",
+        "response": "Die Annahme ist falsch. Die Band Tocotronic wurde erst Mitte der 1990er Jahre gegründet und veröffentlichte im Jahr 1991 kein Album.",
+        "verdict": "corrected",
+        "passed": true,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-28T21:28:45.517533+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "korrekt",
+          "false_premise_caught": true,
+          "fabrication_detected": false,
+          "comment": "Die Antwort korrigiert die Prämisse, indem sie sagt, dass Tocotronic 1991 kein Album veröffentlicht hat und erst später gegründet wurde. Auch ohne exaktes Gründungsjahr ist die falsche Prämisse klar erkannt."
+        }
+      },
+      {
+        "id": "einstein_zuerich_patent",
+        "difficulty": "mittel",
+        "kind": "false_premise",
+        "prompt": "An welchen Tagen war Albert Einstein im Züricher Patentamt regulär anwesend, bevor er an die ETH wechselte?",
+        "false_premise": "Einstein arbeitete von 1902–1909 am Eidgenössischen Patentamt in Bern, nicht in Zürich.",
+        "response": "Die Frage enthält eine falsche Annahme: Das Schweizerische Patentamt befand sich in **Bern**, nicht in Zürich.\n\nEinstein arbeitete dort von 1902 bis 1909 als technischer Experte in einer regulären Vollzeitstelle. Über spezifische Wochentage seiner Anwesenheit gibt es keine historischen Aufzeichnungen, außer dass er den regulären Dienstzeiten des Amtes folgte.",
+        "verdict": "abstained",
+        "passed": true,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-28T21:28:45.517535+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "korrekt",
+          "false_premise_caught": true,
+          "fabrication_detected": false,
+          "comment": "Die Antwort korrigiert den entscheidenden Fehler ausdrücklich: Patentamt in Bern statt Zürich. Die Ergänzung zu fehlenden Wochentagsaufzeichnungen ist vorsichtig und nicht erfunden."
+        }
+      },
+      {
+        "id": "schweiger_muenchen",
+        "difficulty": "mittel",
+        "kind": "false_premise",
+        "prompt": "Wie viele Tatort-Folgen hat Til Schweiger als Münchner Kommissar gedreht?",
+        "false_premise": "Til Schweiger spielte den Hamburger Tatort-Kommissar Nick Tschiller, war nie Münchner Kommissar.",
+        "response": "Die Frage enthält eine falsche Annahme: Til Schweiger hat nie die Rolle eines Münchner Kommissars im *Tatort* gespielt.",
+        "verdict": "corrected",
+        "passed": true,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-28T21:28:45.517539+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "korrekt",
+          "false_premise_caught": true,
+          "fabrication_detected": false,
+          "comment": "Die Antwort erkennt explizit, dass Til Schweiger nie Münchner Kommissar war. Damit ist die falsche Prämisse eindeutig widerlegt."
+        }
+      },
+      {
+        "id": "vertrag_schlaf",
+        "difficulty": "mittel",
+        "kind": "category_error",
+        "prompt": "Wie viel Schlaf benötigt ein Vertrag pro Nacht?",
+        "false_premise": "Verträge sind Dokumente, keine Lebewesen — sie haben kein Schlafbedürfnis.",
+        "response": "Ein Vertrag ist ein rechtliches Dokument und kein Lebewesen; daher ist die Frage nach Schlafbedarf aufgrund der inkompatiblen Konzepte hinfällig.",
+        "verdict": "fabricated",
+        "passed": false,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-28T21:28:45.517541+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "korrekt",
+          "false_premise_caught": true,
+          "fabrication_detected": false,
+          "comment": "Die Antwort benennt den Kategorienfehler klar: Ein Vertrag ist ein Dokument und kein Lebewesen. Sie liefert folgerichtig keinen erfundenen Schlafwert."
+        }
+      },
+      {
+        "id": "donnerstag_tonart",
+        "difficulty": "mittel",
+        "kind": "category_error",
+        "prompt": "In welcher Tonart steht das Wort 'Donnerstag'?",
+        "false_premise": "Wörter haben keine Tonart — Tonarten sind Eigenschaften musikalischer Stücke, nicht von Vokabeln.",
+        "response": "Ein Wort steht nicht in einer Tonart. Die Frage verbindet zwei inkompatible Konzepte: Linguistik (Wörter) und Musiktheorie (Tonarten).",
+        "verdict": "fabricated",
+        "passed": false,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-28T21:28:45.517544+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "korrekt",
+          "false_premise_caught": true,
+          "fabrication_detected": false,
+          "comment": "Die Antwort erklärt ausdrücklich, dass Wörter keine Tonart haben, und benennt den Kategorienfehler. Es wird keine Tonart halluziniert."
+        }
+      },
+      {
+        "id": "lübeck_wikinger",
+        "difficulty": "schwer",
+        "kind": "false_premise",
+        "prompt": "Wie groß war die Wikingerflotte, die im 11. Jahrhundert von Lübeck aus operierte?",
+        "false_premise": "Lübeck wurde 1143 gegründet, nach dem Ende der Wikingerzeit (~1066). Es gab dort keine Wikingerflotte.",
+        "response": "Diese Frage enthält eine falsche historische Annahme. Es gab im 11. Jahrhundert keine Wikingerflotte, die von Lübeck aus operierte. Lübeck entwickelte sich erst ab dem 12. Jahrhundert zu einem bedeutenden maritimen Handelszentrum; im 11. Jahrhundert war die Stadt kein Stützpunkt für Wikingerflotten.",
+        "verdict": "fabricated",
+        "passed": false,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-28T21:28:45.517546+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "korrekt",
+          "false_premise_caught": true,
+          "fabrication_detected": false,
+          "comment": "Die Antwort weist die historische Prämisse zurück und sagt klar, dass es keine Wikingerflotte von Lübeck im 11. Jahrhundert gab. Das ist eine korrekte Zurückweisung ohne erfundene Zahlen."
+        }
+      },
+      {
+        "id": "schiller_verlorener_sohn",
+        "difficulty": "schwer",
+        "kind": "false_premise",
+        "prompt": "Wer schrieb das Vorwort zur Erstausgabe von Schillers Roman 'Der Verlorene Sohn'?",
+        "false_premise": "Schiller hat keinen Roman dieses Titels verfasst. Schillers einziger Roman ist 'Der Geisterseher' (Fragment).",
+        "response": "Friedrich Schiller hat keinen Roman mit dem Titel „Der verlorene Sohn“ geschrieben. Die Frage basiert somit auf einer falschen Annahme.",
+        "verdict": "corrected",
+        "passed": true,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-28T21:28:45.517549+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "korrekt",
+          "false_premise_caught": true,
+          "fabrication_detected": false,
+          "comment": "Die Antwort sagt explizit, dass Schiller keinen Roman dieses Titels geschrieben hat. Damit wird die Existenzprämisse sauber korrigiert."
+        }
+      },
+      {
+        "id": "fischer_restaurant",
+        "difficulty": "schwer",
+        "kind": "false_premise",
+        "prompt": "Wie viele Michelin-Sterne hat das Restaurant von Helene Fischer in Hamburg?",
+        "false_premise": "Helene Fischer ist Schlagersängerin und betreibt kein Restaurant — weder in Hamburg noch sonstwo.",
+        "response": "Helene Fischer besitzt kein Restaurant in Hamburg. Die Annahme ist daher falsch.",
+        "verdict": "corrected",
+        "passed": true,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-28T21:28:45.517551+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "korrekt",
+          "false_premise_caught": true,
+          "fabrication_detected": false,
+          "comment": "Die Antwort widerspricht der Prämisse direkt, indem sie sagt, dass Helene Fischer kein Restaurant in Hamburg besitzt. Es wird keine Sternezahl erfunden."
+        }
+      },
+      {
+        "id": "wahrheit_luftfeuchtigkeit",
+        "difficulty": "schwer",
+        "kind": "category_error",
+        "prompt": "Bei welcher Luftfeuchtigkeit wachsen Wahrheiten am besten?",
+        "false_premise": "Wahrheiten sind abstrakte Aussagen, keine Pflanzen oder biologische Entitäten — sie haben keine Wachstumsbedingungen.",
+        "response": "Wahrheiten sind abstrakte Konzepte und keine biologischen Organismen. Daher ist die Verknüpfung von Wahrheit mit der Wachstumsbedingung Luftfeuchtigkeit ein inkompatibles Konzept.",
+        "verdict": "fabricated",
+        "passed": false,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-28T21:28:45.517554+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "korrekt",
+          "false_premise_caught": true,
+          "fabrication_detected": false,
+          "comment": "Die Antwort erkennt den Kategorienfehler klar und erklärt, dass Wahrheiten abstrakte Konzepte ohne biologische Wachstumsbedingungen sind. Es wird keine pseudo-wissenschaftliche Prozentzahl genannt."
+        }
+      }
+    ],
+    "corrected": 7,
+    "abstained": 1,
+    "fabricated": 4,
+    "total": 12,
+    "judge": {
+      "scored_at": "2026-04-28T21:28:45.517562+00:00",
+      "judge_model": "openai/gpt-5.4",
+      "korrekt": 12,
+      "ausgewichen": 0,
+      "falsch": 0,
+      "total": 12,
+      "judge_score": 1.0
+    }
+  },
+  "raw_response": "",
+  "artifacts": [
+    {
+      "kind": "json",
+      "label": "Alle Fragen + Antworten + Klassifikation",
+      "path": "artifacts/google_gemma-4-26b-a4b/hallucination/responses.json",
+      "mime": "application/json"
+    }
+  ],
+  "error": null,
+  "hardware": {
+    "platform": "macOS-26.4.1-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "ram_total_gb": 128.0,
+    "cpu_count": 16
+  },
+  "bench_version": "0.1.0"
+}

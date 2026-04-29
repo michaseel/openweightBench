@@ -1,0 +1,191 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="100%" height="100%">
+  <defs>
+    <!-- Arrowhead Marker -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#000" />
+    </marker>
+    <!-- Dashed Arrowhead Marker -->
+    <marker id="arrow-dashed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#000" />
+    </marker>
+  </defs>
+
+  <style>
+    .title { font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif; font-size: 28px; font-weight: bold; fill: #000; }
+    .subtitle { font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif; font-size: 20px; font-weight: bold; fill: #000; }
+    .text { font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif; font-size: 16px; fill: #000; }
+    .small-text { font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif; font-size: 14px; fill: #000; }
+    .box { fill: #fff; stroke: #000; stroke-width: 2; }
+    .box-external { fill: #fff; stroke: #d00; stroke-width: 2; }
+    .db { fill: #fff; stroke: #000; stroke-width: 2; }
+    .line { stroke: #000; stroke-width: 2; fill: none; }
+    .line-dashed { stroke: #000; stroke-width: 2; fill: none; stroke-dasharray: 5,5; }
+    .legend-line { stroke: #000; stroke-width: 2; }
+    .legend-dash { stroke: #000; stroke-width: 2; stroke-dasharray: 5,5; }
+  </style>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#f9f9f9" />
+
+  <!-- Left Column: Text Info -->
+  <g id="left-info">
+    <text x="50" y="80" class="title">System Architecture</text>
+    
+    <text x="50" y="140" class="subtitle">Goals:</text>
+    <text x="50" y="170" class="text">- Scalability</text>
+    <text x="50" y="195" class="text">- Reliability</text>
+    <text x="50" y="220" class="text">- Security</text>
+    <text x="50" y="245" class="text">- Maintainability</text>
+
+    <text x="50" y="320" class="subtitle">Notes:</text>
+    <text x="50" y="350" class="text">- Use Docker for</text>
+    <text x="50" y="370" class="text">  all services</text>
+    <text x="50" y="400" class="text">- CI/CD with GitHub</text>
+    <text x="50" y="420" class="text">  Actions</text>
+    <text x="50" y="450" class="text">- Logs -> ELK Stack</text>
+  </g>
+
+  <!-- Legend -->
+  <g id="legend" transform="translate(950, 100)">
+    <line x1="0" y1="0" x2="40" y2="0" class="legend-line" />
+    <text x="50" y="5" class="text">Sync</text>
+    
+    <line x1="0" y1="25" x2="40" y2="25" class="legend-dash" />
+    <text x="50" y="30" class="text">Async</text>
+    
+    <rect x="0" y="45" width="20" height="15" class="box-external" />
+    <text x="50" y="58" class="text">External</text>
+  </g>
+
+  <!-- Main Diagram Components -->
+  <g id="diagram">
+    
+    <!-- Frontend -->
+    <g id="frontend" transform="translate(350, 200)">
+      <rect x="0" y="0" width="140" height="60" class="box" />
+      <text x="70" y="25" class="text" text-anchor="middle">Frontend</text>
+      <text x="70" y="45" class="small-text" text-anchor="middle">(React)</text>
+    </g>
+
+    <!-- API Gateway -->
+    <g id="api-gateway" transform="translate(550, 200)">
+      <rect x="0" y="0" width="140" height="60" class="box" />
+      <text x="70" y="25" class="text" text-anchor="middle">API Gateway</text>
+      <text x="70" y="45" class="small-text" text-anchor="middle">(Kong)</text>
+    </g>
+
+    <!-- Auth Service -->
+    <g id="auth-service" transform="translate(750, 100)">
+      <rect x="0" y="0" width="140" height="60" class="box" />
+      <text x="70" y="25" class="text" text-anchor="middle">Auth Service</text>
+      <text x="70" y="45" class="small-text" text-anchor="middle">(JWT)</text>
+    </g>
+
+    <!-- Backend -->
+    <g id="backend" transform="translate(750, 300)">
+      <rect x="0" y="0" width="140" height="60" class="box" />
+      <text x="70" y="25" class="text" text-anchor="middle">Backend</text>
+      <text x="70" y="45" class="small-text" text-anchor="middle">(Python/FastAPI)</text>
+    </g>
+
+    <!-- External API -->
+    <g id="external-api" transform="translate(450, 450)">
+      <rect x="0" y="0" width="160" height="60" class="box-external" />
+      <text x="80" y="25" class="text" text-anchor="middle" fill="#d00">External API</text>
+      <text x="80" y="45" class="small-text" text-anchor="middle">(Payment Provider)</text>
+    </g>
+
+    <!-- Message Queue -->
+    <g id="message-queue" transform="translate(750, 450)">
+      <rect x="0" y="0" width="140" height="60" class="box" />
+      <text x="70" y="25" class="text" text-anchor="middle">Message Queue</text>
+      <text x="70" y="45" class="small-text" text-anchor="middle">(RabbitMQ)</text>
+    </g>
+
+    <!-- Worker Service -->
+    <g id="worker-service" transform="translate(950, 450)">
+      <rect x="0" y="0" width="140" height="60" class="box" />
+      <text x="70" y="25" class="text" text-anchor="middle">Worker Service</text>
+      <text x="70" y="45" class="small-text" text-anchor="middle">(Python)</text>
+    </g>
+
+    <!-- Monitoring -->
+    <g id="monitoring" transform="translate(750, 600)">
+      <rect x="0" y="0" width="140" height="60" class="box" />
+      <text x="70" y="25" class="text" text-anchor="middle">Monitoring</text>
+      <text x="70" y="45" class="small-text" text-anchor="middle">(Prometheus + Grafana)</text>
+    </g>
+
+    <!-- User DB -->
+    <g id="user-db" transform="translate(950, 100)">
+      <path d="M 0 10 L 0 40 A 20 10 0 0 0 40 40 L 40 10 A 20 10 0 0 0 0 10 Z" class="db" />
+      <path d="M 0 10 A 20 10 0 0 1 40 10" class="db" fill="none" />
+      <text x="20" y="30" class="small-text" text-anchor="middle">User DB</text>
+      <text x="20" y="45" class="small-text" text-anchor="middle">(PostgreSQL)</text>
+    </g>
+
+    <!-- Database -->
+    <g id="database" transform="translate(950, 300)">
+      <path d="M 0 10 L 0 40 A 20 10 0 0 0 40 40 L 40 10 A 20 10 0 0 0 0 10 Z" class="db" />
+      <path d="M 0 10 A 20 10 0 0 1 40 10" class="db" fill="none" />
+      <text x="20" y="30" class="small-text" text-anchor="middle">Database</text>
+      <text x="20" y="45" class="small-text" text-anchor="middle">(PostgreSQL)</text>
+    </g>
+
+    <!-- File Storage -->
+    <g id="file-storage" transform="translate(1100, 450)">
+      <path d="M 0 10 L 0 40 A 20 10 0 0 0 40 40 L 40 10 A 20 10 0 0 0 0 10 Z" class="db" />
+      <path d="M 0 10 A 20 10 0 0 1 40 10" class="db" fill="none" />
+      <text x="20" y="30" class="small-text" text-anchor="middle">File Storage</text>
+      <text x="20" y="45" class="small-text" text-anchor="middle">(S3)</text>
+    </g>
+
+  </g>
+
+  <!-- Connections -->
+  <g id="connections">
+    <!-- Frontend -> API Gateway -->
+    <path d="M 490 230 L 540 230" class="line" marker-end="url(#arrow)" />
+    <text x="515" y="220" class="small-text">HTTPS</text>
+
+    <!-- API Gateway -> Auth Service -->
+    <path d="M 690 200 L 750 160" class="line" marker-end="url(#arrow)" />
+
+    <!-- API Gateway -> Backend -->
+    <path d="M 690 230 L 750 330" class="line" marker-end="url(#arrow)" />
+
+    <!-- API Gateway -> Message Queue -->
+    <path d="M 620 260 L 620 480 L 740 480" class="line" marker-end="url(#arrow)" />
+
+    <!-- API Gateway -> External API (Async) -->
+    <path d="M 620 260 L 620 480 L 610 480" class="line-dashed" marker-end="url(#arrow-dashed)" />
+    <!-- Note: The drawing shows a dashed line going down from API Gateway to External API. 
+         To keep it clean, I'll route it specifically. -->
+    <path d="M 620 230 L 620 480 L 610 480" class="line-dashed" marker-end="url(#arrow-dashed)" />
+
+    <!-- Auth Service <-> User DB -->
+    <path d="M 890 130 L 940 130" class="line" marker-end="url(#arrow)" />
+    <path d="M 940 130 L 890 130" class="line" marker-end="url(#arrow)" />
+
+    <!-- Backend <-> Database -->
+    <path d="M 890 330 L 940 330" class="line" marker-end="url(#arrow)" />
+    <path d="M 940 330 L 890 330" class="line" marker-end="url(#arrow)" />
+
+    <!-- Backend -> Message Queue -->
+    <path d="M 820 360 L 820 450" class="line" marker-end="url(#arrow)" />
+
+    <!-- Message Queue -> Worker Service (Async) -->
+    <path d="M 890 480 L 940 480" class="line-dashed" marker-end="url(#arrow-dashed)" />
+
+    <!-- Message Queue -> Monitoring (Async) -->
+    <path d="M 820 510 L 820 600" class="line-dashed" marker-end="url(#arrow-dashed)" />
+
+    <!-- Worker Service -> Monitoring (Async) -->
+    <path d="M 950 510 L 890 630" class="line-dashed" marker-end="url(#arrow-dashed)" />
+
+    <!-- Worker Service <-> File Storage -->
+    <path d="M 1090 480 L 1140 480" class="line" marker-end="url(#arrow)" />
+    <path d="M 1140 480 L 1090 480" class="line" marker-end="url(#arrow)" />
+
+  </g>
+</svg>

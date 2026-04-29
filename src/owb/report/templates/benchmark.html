@@ -1,0 +1,584 @@
+{% set landing_href = "../index.html" %}
+{% set home_href = "../index.html" %}
+{% set tab_url_prefix = "" %}
+{% extends "_layout.html" %}
+{% block title %}{{ task_label }} — Open Weight Bench{% endblock %}
+{% block content %}
+
+<style>
+  /* RAM-Filter: Modelle, die nicht in den Cap passen, werden ausgegraut
+     statt versteckt — der Vergleich bleibt dadurch sichtbar. */
+  #sp-list .sp-row.sp-filtered { opacity: 0.4; filter: saturate(0.3); }
+  #sp-list .sp-row.sp-filtered:hover { opacity: 0.85; }
+</style>
+
+<section class="mb-6">
+  <h1 class="text-2xl font-semibold tracking-tight">{{ task_label }}</h1>
+  {% if description %}<p class="mt-2 text-stone-600 max-w-3xl">{{ description }}</p>{% endif %}
+  {% if explainer %}
+    <details class="mt-3 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Aufgabe & Test-Logik im Detail
+      </summary>
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">{{ explainer }}</div>
+    </details>
+  {% endif %}
+  {% if prompt %}
+    <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Prompt
+      </summary>
+      <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
+        {% if prompt.system %}
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System-Prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">{{ prompt.system }}</pre>
+          </div>
+        {% endif %}
+        {% if prompt.user %}
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Developer-Prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">{{ prompt.user }}</pre>
+          </div>
+        {% endif %}
+      </div>
+    </details>
+  {% endif %}
+</section>
+
+{% if scatter_rows %}
+  {% set sp_w = 920 %}
+  {% set sp_h = 360 %}
+  {% set sp_pad_l = 50 %}
+  {% set sp_pad_r = 16 %}
+  {% set sp_pad_t = 16 %}
+  {% set sp_pad_b = 36 %}
+  {% set sp_inner_w = sp_w - sp_pad_l - sp_pad_r %}
+  {% set sp_inner_h = sp_h - sp_pad_t - sp_pad_b %}
+  {% set sp_max_wall = (scatter_rows | map(attribute='wall_s') | list + [1]) | max %}
+  {% set sp_max_wall_int = sp_max_wall | int %}
+  {# Round X-axis up to the next "nice" tick (multiple of 30 s, min 60 s) #}
+  {% set sp_max_wall = ((sp_max_wall_int // 30 + 1) * 30) %}
+  {% if sp_max_wall < 60 %}{% set sp_max_wall = 60 %}{% endif %}
+
+  <section class="mb-8">
+    <div class="flex items-baseline justify-between flex-wrap gap-2 mb-2">
+      <h2 class="text-sm font-semibold tracking-tight text-stone-800 uppercase">Wall-Time vs. Qualität</h2>
+      <div class="flex items-center gap-2 text-sm">
+        <label for="sp-ram-filter" class="text-stone-600">Max RAM</label>
+        <select id="sp-ram-filter" class="bg-white border border-stone-300 rounded px-2 py-1 num">
+          <option value="0">alle</option>
+          <option value="16">16 GB</option>
+          <option value="32">32 GB</option>
+          <option value="48">48 GB</option>
+          <option value="64">64 GB</option>
+          <option value="128" selected>128 GB</option>
+        </select>
+      </div>
+    </div>
+    <p class="text-xs text-stone-500 mb-3">
+      X = Wall-Time für <em>diesen</em> Bench · Y = Score (0–1) in diesem Bench. Optimum oben links — schnell und gut. RAM-Schätzung für 64k Kontext: 4&nbsp;GB System + Modellgewichte + max(2&nbsp;GB, 40% der Gewichte) für KV-Cache.
+    </p>
+    <p class="text-xs text-stone-500 mb-3 flex flex-wrap items-center gap-x-4 gap-y-1">
+      <span>Farbe = Hersteller · Zahl = Gesamt-Parameter (Mrd)</span>
+      <span class="inline-flex items-center gap-1.5">
+        <svg width="14" height="14"><circle cx="7" cy="7" r="5.5" fill="#475569" fill-opacity="0.78" stroke="#475569" stroke-width="2"/></svg>
+        dense
+      </span>
+      <span class="inline-flex items-center gap-1.5">
+        <svg width="14" height="14"><circle cx="7" cy="7" r="5.5" fill="#475569" fill-opacity="0.78" stroke="#475569" stroke-width="2" stroke-dasharray="3,2"/></svg>
+        MoE
+      </span>
+    </p>
+
+    <div class="bg-white border border-stone-200 rounded-lg p-4 relative" id="sp-card">
+      <svg viewBox="0 0 {{ sp_w }} {{ sp_h }}" class="w-full num" style="height:360px" preserveAspectRatio="xMidYMid meet">
+        <line x1="{{ sp_pad_l }}" y1="{{ sp_pad_t + sp_inner_h }}" x2="{{ sp_pad_l + sp_inner_w }}" y2="{{ sp_pad_t + sp_inner_h }}" stroke="#d6d3d1" stroke-width="1"/>
+        <line x1="{{ sp_pad_l }}" y1="{{ sp_pad_t }}" x2="{{ sp_pad_l }}" y2="{{ sp_pad_t + sp_inner_h }}" stroke="#d6d3d1" stroke-width="1"/>
+        {# Y-Achse: Score 0..1 #}
+        {% for tick_pct in [0, 25, 50, 75, 100] %}
+          {% set y = sp_pad_t + sp_inner_h - (sp_inner_h * tick_pct / 100) %}
+          <line x1="{{ sp_pad_l }}" y1="{{ y }}" x2="{{ sp_pad_l + sp_inner_w }}" y2="{{ y }}" stroke="#f5f5f4" stroke-width="1" stroke-dasharray="2,3"/>
+          <text x="{{ sp_pad_l - 6 }}" y="{{ y + 3 }}" font-size="10" fill="#78716c" text-anchor="end">{{ "%.2f"|format(tick_pct / 100) }}</text>
+        {% endfor %}
+        {# X-Achse: Wall-Time 0..sp_max_wall #}
+        {% for tick_pct in [0, 25, 50, 75, 100] %}
+          {% set x = sp_pad_l + (sp_inner_w * tick_pct / 100) %}
+          <line x1="{{ x }}" y1="{{ sp_pad_t }}" x2="{{ x }}" y2="{{ sp_pad_t + sp_inner_h }}" stroke="#f5f5f4" stroke-width="1" stroke-dasharray="2,3"/>
+          <text x="{{ x }}" y="{{ sp_pad_t + sp_inner_h + 16 }}" font-size="10" fill="#78716c" text-anchor="middle">{{ "%.0f"|format(sp_max_wall * tick_pct / 100) }}s</text>
+        {% endfor %}
+        <text x="{{ sp_pad_l + sp_inner_w / 2 }}" y="{{ sp_h - 4 }}" font-size="10" fill="#57534e" text-anchor="middle">Wall-Time (s) →</text>
+        <text x="{{ sp_pad_l - 36 }}" y="{{ sp_pad_t + sp_inner_h / 2 }}" font-size="10" fill="#57534e" text-anchor="middle" transform="rotate(-90 {{ sp_pad_l - 36 }} {{ sp_pad_t + sp_inner_h / 2 }})">Score</text>
+
+        {% for m in scatter_rows %}
+          {% set x = sp_pad_l + (sp_inner_w * m.wall_s / sp_max_wall) %}
+          {% set y = sp_pad_t + sp_inner_h - (sp_inner_h * m.score) %}
+          {% set lbl = m.params_b|string if m.params_b else "" %}
+          {% set lbl_size = 6 if lbl|length > 2 else 8 %}
+          <g class="sp-dot" data-model-id="{{ m.model_id }}" data-total-ram="{{ m.total_ram_gb or '' }}" data-moe="{{ '1' if m.is_moe else '0' }}" style="cursor:pointer">
+            <circle cx="{{ x }}" cy="{{ y }}" r="9" fill="{{ m.color }}" fill-opacity="0.78"
+                    stroke="{{ m.color }}" stroke-width="1.75"
+                    {% if m.is_moe %}stroke-dasharray="2.5,1.5"{% endif %}
+                    class="sp-circle"/>
+            {% if lbl %}
+              <text x="{{ x }}" y="{{ y }}" text-anchor="middle" dominant-baseline="central"
+                    font-size="{{ lbl_size }}" font-weight="700" fill="{{ m.label_color }}"
+                    pointer-events="none" class="sp-label">{{ lbl }}</text>
+            {% endif %}
+          </g>
+        {% endfor %}
+      </svg>
+      <div id="sp-tooltip" class="pointer-events-none absolute hidden bg-stone-900 text-stone-50 text-xs px-3 py-2 rounded shadow-lg num" style="white-space:nowrap;line-height:1.45"></div>
+    </div>
+
+    <div class="mt-3 bg-white border border-stone-200 rounded-lg p-3">
+      <div class="flex items-baseline justify-between flex-wrap gap-2 mb-2">
+        <div class="text-xs uppercase tracking-wider text-stone-500">Modelle in diesem Bench</div>
+        <div class="text-xs text-stone-500"><span id="sp-count">{{ scatter_rows|length }}</span> sichtbar</div>
+      </div>
+      <ol id="sp-list" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1.5 text-sm">
+        {% for m in scatter_rows|sort(attribute='score', reverse=True) %}
+          <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
+              data-model-id="{{ m.model_id }}" data-total-ram="{{ m.total_ram_gb or '' }}">
+            <span class="text-xs text-stone-400 w-5 text-right num">{{ loop.index }}.</span>
+            <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:{{ m.color }}"></span>
+            <a href="../models/{{ m.model_id|safe_id }}.html#{{ task_name }}" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="{{ m.model_id }}">{{ m.short_id }}</a>
+            {% if m.quant %}<span class="text-[11px] text-stone-400 num shrink-0">{{ m.quant }}</span>{% endif %}
+            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
+              {{ "%.2f"|format(m.score) }} · {{ "%.0f"|format(m.wall_s) }}s
+              {% if m.tps %} · {{ "%.0f"|format(m.tps) }} t/s{% endif %}
+              {% if m.total_ram_gb %} · {{ "%.0f"|format(m.total_ram_gb) }} GB{% endif %}
+            </span>
+          </li>
+        {% endfor %}
+      </ol>
+    </div>
+  </section>
+
+  <script id="sp-data" type="application/json">{{ scatter_rows_json | safe }}</script>
+  <script>
+  (() => {
+    const sel = document.getElementById('sp-ram-filter');
+    if (!sel) return;
+    const card = document.getElementById('sp-card');
+    const dots = card.querySelectorAll('.sp-dot');
+    const rows = document.querySelectorAll('#sp-list .sp-row');
+    const tip = document.getElementById('sp-tooltip');
+    const countEl = document.getElementById('sp-count');
+    const data = Object.fromEntries(
+      JSON.parse(document.getElementById('sp-data').textContent).map(m => [m.model_id, m])
+    );
+
+    // Optionen, für die kein Modell qualifiziert, ausgrauen (statt entfernen).
+    Array.from(sel.options).forEach(opt => {
+      const cap = parseFloat(opt.value);
+      if (!cap) return;
+      const matches = Array.from(dots).some(g => {
+        const ram = parseFloat(g.dataset.totalRam || '');
+        return ram && ram <= cap;
+      });
+      if (!matches) {
+        opt.disabled = true;
+        opt.textContent = opt.textContent + ' — keine Modelle';
+      }
+    });
+
+    // Bestimmt, ob ein Modell unter dem aktuellen RAM-Cap durchfällt
+    // (true = ausgegraut, false = innerhalb des Filters).
+    function isFiltered(g) {
+      const cap = parseFloat(sel.value);
+      if (!cap) return false;
+      const ram = parseFloat(g.dataset.totalRam || '');
+      return !ram || ram > cap;
+    }
+
+    function applyFilter() {
+      let visible = 0;
+      dots.forEach(g => {
+        const filtered = isFiltered(g);
+        g.classList.toggle('sp-filtered', filtered);
+        if (!filtered) visible++;
+      });
+      rows.forEach(li => {
+        li.classList.toggle('sp-filtered', isFiltered(li));
+      });
+      countEl.textContent = visible;
+      emphasize(null);
+    }
+    sel.addEventListener('change', applyFilter);
+    applyFilter();
+
+    function emphasize(modelId) {
+      dots.forEach(g => {
+        const c = g.querySelector('.sp-circle');
+        const lbl = g.querySelector('.sp-label');
+        const filtered = g.classList.contains('sp-filtered');
+        if (modelId == null) {
+          c.setAttribute('r', '9');
+          c.setAttribute('fill-opacity', filtered ? '0.12' : '0.78');
+          c.setAttribute('stroke-width', filtered ? '0.8' : '1.75');
+          c.setAttribute('stroke', filtered ? '#a8a29e' : c.getAttribute('fill'));
+          if (lbl) lbl.setAttribute('opacity', filtered ? '0.25' : '1');
+        } else if (g.dataset.modelId === modelId) {
+          c.setAttribute('r', '12');
+          c.setAttribute('fill-opacity', '1');
+          c.setAttribute('stroke', '#fff');
+          c.setAttribute('stroke-width', '2.5');
+          if (lbl) lbl.setAttribute('opacity', '1');
+        } else {
+          c.setAttribute('r', '7');
+          c.setAttribute('fill-opacity', '0.15');
+          c.setAttribute('stroke-width', '0');
+          if (lbl) lbl.setAttribute('opacity', '0.2');
+        }
+      });
+      rows.forEach(li => {
+        li.style.background = (modelId != null && li.dataset.modelId === modelId) ? 'rgb(245 245 244)' : '';
+      });
+    }
+
+    function showTip(m, clientX, clientY) {
+      const rect = card.getBoundingClientRect();
+      const ramTxt = m.total_ram_gb
+        ? `Geschätzter RAM (mit 64k Ctx): <b>${m.total_ram_gb.toFixed(0)} GB</b><br>&nbsp;&nbsp;Gewichte ${m.weights_gb?.toFixed(1) ?? '—'} GB · KV-Cache ~${m.kv_estimate_gb?.toFixed(1) ?? '—'} GB · 4 GB System`
+        : 'RAM unbekannt';
+      tip.innerHTML = `<div style="font-weight:600">${m.short_id}</div>
+<div style="opacity:0.7">by ${m.vendor} · ${m.quant}</div>
+<div style="margin-top:4px">Score: <b>${m.score?.toFixed(2)}</b></div>
+<div>Wall-Time: <b>${m.wall_s?.toFixed(1)} s</b>${m.tps != null ? ` · ${m.tps.toFixed(0)} tok/s` : ''}${m.tokens != null ? ` · ${m.tokens} tokens` : ''}</div>
+<div style="margin-top:4px;opacity:0.85">${ramTxt}</div>`;
+      tip.classList.remove('hidden');
+      let x = clientX - rect.left + 14;
+      let y = clientY - rect.top + 14;
+      const tipW = tip.offsetWidth, tipH = tip.offsetHeight;
+      if (x + tipW > rect.width - 8) x = clientX - rect.left - tipW - 14;
+      if (y + tipH > rect.height - 8) y = clientY - rect.top - tipH - 14;
+      tip.style.left = x + 'px';
+      tip.style.top = y + 'px';
+    }
+    function hideTip() { tip.classList.add('hidden'); }
+
+    dots.forEach(g => {
+      g.addEventListener('mousemove', e => {
+        const m = data[g.dataset.modelId];
+        if (!m) return;
+        emphasize(g.dataset.modelId);
+        showTip(m, e.clientX, e.clientY);
+      });
+      g.addEventListener('mouseleave', () => { emphasize(null); hideTip(); });
+      g.addEventListener('click', () => {
+        const safe = g.dataset.modelId.replace(/\//g, '_').replace(/ /g, '_');
+        window.location = '../models/' + safe + '.html#{{ task_name }}';
+      });
+    });
+    rows.forEach(li => {
+      li.addEventListener('mouseenter', () => emphasize(li.dataset.modelId));
+      li.addEventListener('mouseleave', () => emphasize(null));
+    });
+  })();
+  </script>
+{% endif %}
+
+{% if task_name == "context_growth" and rows %}
+  {% set palette = ["#0369a1","#059669","#b45309","#7c3aed","#db2777","#0891b2","#65a30d","#ea580c","#4338ca","#be123c","#0d9488","#475569"] %}
+  {% set ns = namespace(max_speed=0.001, max_prefill=0.001, max_pretps=0.001, max_turns=1, has_speed=false, has_prefill=false, has_pretps=false) %}
+  {% for r in rows %}
+    {% if r.score_breakdown and r.score_breakdown.steps %}
+      {% for s in r.score_breakdown.steps %}
+        {% set _tps = s.get('tokens_per_second') %}
+        {% set _pre = s.get('prefill_seconds') %}
+        {% set _pretps = s.get('prefill_tps') %}
+        {% set _turn = s.get('turn') %}
+        {% if _tps and _tps > ns.max_speed %}{% set ns.max_speed = _tps %}{% set ns.has_speed = true %}{% endif %}
+        {% if _pre is not none and _pre > ns.max_prefill %}{% set ns.max_prefill = _pre %}{% set ns.has_prefill = true %}{% endif %}
+        {% if _pretps is not none and _pretps > ns.max_pretps %}{% set ns.max_pretps = _pretps %}{% set ns.has_pretps = true %}{% endif %}
+        {% if _turn and _turn > ns.max_turns %}{% set ns.max_turns = _turn %}{% endif %}
+      {% endfor %}
+    {% endif %}
+  {% endfor %}
+  {% if ns.has_speed %}
+    {% set chart_w = 920 %}
+    {% set chart_h = 280 %}
+    {% set chart_pad_l = 50 %}
+    {% set chart_pad_r = 12 %}
+    {% set chart_pad_t = 10 %}
+    {% set chart_pad_b = 26 %}
+    {% set inner_w = chart_w - chart_pad_l - chart_pad_r %}
+    {% set inner_h = chart_h - chart_pad_t - chart_pad_b %}
+
+    {% macro draw_series(chart_id, title, attr, max_v, label_fmt, hint) -%}
+      <div class="bg-white border border-stone-200 rounded-lg p-4 mb-4 overflow-x-auto cg-chart" data-chart-id="{{ chart_id }}">
+        <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">{{ title }}</div>
+        <div class="relative">
+          <svg viewBox="0 0 {{ chart_w }} {{ chart_h }}" class="w-full h-72 num cg-svg" preserveAspectRatio="xMidYMid meet">
+            <line x1="{{ chart_pad_l }}" y1="{{ chart_pad_t + inner_h }}" x2="{{ chart_pad_l + inner_w }}" y2="{{ chart_pad_t + inner_h }}" stroke="#d6d3d1" stroke-width="1"/>
+            <line x1="{{ chart_pad_l }}" y1="{{ chart_pad_t }}" x2="{{ chart_pad_l }}" y2="{{ chart_pad_t + inner_h }}" stroke="#d6d3d1" stroke-width="1"/>
+            {% for tick_pct in [0, 25, 50, 75, 100] %}
+              {% set y = chart_pad_t + inner_h - (inner_h * tick_pct / 100) %}
+              <line x1="{{ chart_pad_l }}" y1="{{ y }}" x2="{{ chart_pad_l + inner_w }}" y2="{{ y }}" stroke="#f5f5f4" stroke-width="1"/>
+              <text x="{{ chart_pad_l - 6 }}" y="{{ y + 3 }}" font-size="9" fill="#78716c" text-anchor="end">{{ label_fmt|format(max_v * tick_pct / 100) }}</text>
+            {% endfor %}
+            {% for r in rows %}
+              {% if r.score_breakdown and r.score_breakdown.steps %}
+                {% set color = palette[loop.index0 % palette|length] %}
+                {% set series_ns = namespace(prev_x=none, prev_y=none) %}
+                <g class="cg-series" data-model-id="{{ r.model_id }}" data-color="{{ color }}">
+                {% for s in r.score_breakdown.steps %}
+                  {% set v = s.get(attr) %}
+                  {% set _turn = s.get('turn') or loop.index %}
+                  {% if v is not none %}
+                    {% set x = chart_pad_l + (inner_w * (_turn - 1) / (ns.max_turns - 1 if ns.max_turns > 1 else 1)) %}
+                    {% set y = chart_pad_t + inner_h - (inner_h * (v / max_v if max_v > 0 else 0)) %}
+                    {% if series_ns.prev_x is not none %}
+                      <line x1="{{ series_ns.prev_x }}" y1="{{ series_ns.prev_y }}" x2="{{ x }}" y2="{{ y }}" stroke="{{ color }}" stroke-width="1.8" stroke-opacity="0.9" class="cg-line"/>
+                    {% endif %}
+                    <circle cx="{{ x }}" cy="{{ y }}" r="3" fill="{{ color }}" fill-opacity="0.95"
+                            data-turn="{{ _turn }}" data-value="{{ "%.4f"|format(v) }}" data-fmt="{{ label_fmt }}" class="cg-point"/>
+                    {% set series_ns.prev_x = x %}
+                    {% set series_ns.prev_y = y %}
+                  {% endif %}
+                {% endfor %}
+                </g>
+              {% endif %}
+            {% endfor %}
+            {% for tick in [1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50] %}
+              {% if tick <= ns.max_turns %}
+                {% set x = chart_pad_l + (inner_w * (tick - 1) / (ns.max_turns - 1 if ns.max_turns > 1 else 1)) %}
+                <text x="{{ x }}" y="{{ chart_pad_t + inner_h + 14 }}" font-size="9" fill="#78716c" text-anchor="middle">{{ tick }}</text>
+              {% endif %}
+            {% endfor %}
+            <text x="{{ chart_pad_l + inner_w / 2 }}" y="{{ chart_h - 4 }}" font-size="10" fill="#57534e" text-anchor="middle">Turn-Nummer</text>
+          </svg>
+          <div class="cg-tooltip pointer-events-none absolute hidden bg-stone-900 text-stone-50 text-xs px-2 py-1 rounded shadow-lg num" style="white-space:nowrap"></div>
+        </div>
+        {% if hint %}<p class="mt-1 text-xs text-stone-500">{{ hint }}</p>{% endif %}
+      </div>
+    {%- endmacro %}
+
+    <section class="mb-6">
+      <div class="flex items-baseline justify-between flex-wrap gap-2 mb-3">
+        <h2 class="text-sm font-semibold tracking-tight text-stone-800">Modell-Vergleich</h2>
+        <div class="flex items-center gap-3 text-xs text-stone-500">
+          <button type="button" data-cg-toggle="all" class="hover:text-stone-900 underline">alle anzeigen</button>
+          <span>·</span>
+          <button type="button" data-cg-toggle="none" class="hover:text-stone-900 underline">alle ausblenden</button>
+        </div>
+      </div>
+      <div class="bg-white border border-stone-200 rounded-lg p-3 text-xs mb-4">
+        <div class="uppercase tracking-wider text-stone-500 mb-2">Legende — klicken zum Ein-/Ausblenden, Hover zum Hervorheben</div>
+        <ul id="cg-legend" class="flex flex-wrap gap-x-4 gap-y-2">
+          {% for r in rows %}
+            {% if r.score_breakdown and r.score_breakdown.steps %}
+              <li>
+                <button type="button"
+                        class="cg-legend-item flex items-center gap-2 px-2 py-1 rounded hover:bg-stone-50 transition"
+                        data-model-id="{{ r.model_id }}"
+                        data-color="{{ palette[loop.index0 % palette|length] }}"
+                        aria-pressed="true">
+                  <span class="cg-legend-swatch inline-block w-3 h-3 rounded-sm" style="background:{{ palette[loop.index0 % palette|length] }}"></span>
+                  <span class="num text-stone-700">{{ r.model_id }}</span>
+                </button>
+              </li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </div>
+
+      {{ draw_series("gen", "Generation-Speed (Tokens/s pro Turn)", "tokens_per_second", ns.max_speed, "%.0f", "") }}
+      {% if ns.has_prefill %}
+        {{ draw_series("prefill", "Prefill-Zeit pro Turn (Time-to-First-Token, s)", "prefill_seconds", ns.max_prefill, "%.2f", "Wall-Time vom Senden bis zum ersten generierten Token — bei nicht-streamender Inferenz praktisch komplett Prompt-Processing.") }}
+      {% endif %}
+    </section>
+
+    <script>
+    (() => {
+      const charts = document.querySelectorAll('.cg-chart');
+      if (!charts.length) return;
+      const allModels = new Set();
+      charts.forEach(c => c.querySelectorAll('.cg-series').forEach(g => allModels.add(g.dataset.modelId)));
+      const hidden = new Set();
+
+      function applyVisibility() {
+        charts.forEach(chart => {
+          chart.querySelectorAll('.cg-series').forEach(g => {
+            g.style.display = hidden.has(g.dataset.modelId) ? 'none' : '';
+          });
+        });
+        document.querySelectorAll('.cg-legend-item').forEach(btn => {
+          const off = hidden.has(btn.dataset.modelId);
+          btn.setAttribute('aria-pressed', off ? 'false' : 'true');
+          btn.querySelector('.cg-legend-swatch').style.background = off ? '#d6d3d1' : btn.dataset.color;
+          btn.querySelector('span:last-child').style.color = off ? '#a8a29e' : '';
+          btn.querySelector('span:last-child').style.textDecoration = off ? 'line-through' : '';
+        });
+      }
+
+      function setEmphasis(modelId) {
+        charts.forEach(chart => {
+          chart.querySelectorAll('.cg-series').forEach(g => {
+            const mid = g.dataset.modelId;
+            if (modelId == null) {
+              g.style.opacity = '';
+              g.querySelectorAll('.cg-line').forEach(l => l.setAttribute('stroke-width', '1.8'));
+            } else if (mid === modelId) {
+              g.style.opacity = '1';
+              g.querySelectorAll('.cg-line').forEach(l => l.setAttribute('stroke-width', '2.6'));
+            } else {
+              g.style.opacity = '0.18';
+              g.querySelectorAll('.cg-line').forEach(l => l.setAttribute('stroke-width', '1.4'));
+            }
+          });
+        });
+      }
+
+      // Legend interactions
+      document.querySelectorAll('.cg-legend-item').forEach(btn => {
+        btn.addEventListener('click', e => {
+          const id = btn.dataset.modelId;
+          if (hidden.has(id)) hidden.delete(id);
+          else hidden.add(id);
+          applyVisibility();
+        });
+        btn.addEventListener('mouseenter', () => setEmphasis(btn.dataset.modelId));
+        btn.addEventListener('mouseleave', () => setEmphasis(null));
+      });
+
+      // Bulk toggles
+      document.querySelectorAll('[data-cg-toggle]').forEach(b => {
+        b.addEventListener('click', () => {
+          if (b.dataset.cgToggle === 'all') hidden.clear();
+          else allModels.forEach(m => hidden.add(m));
+          applyVisibility();
+        });
+      });
+
+      // Tooltip + line/point hover emphasis
+      charts.forEach(chart => {
+        const tip = chart.querySelector('.cg-tooltip');
+        const svg = chart.querySelector('.cg-svg');
+        function show(text, clientX, clientY) {
+          const rect = chart.getBoundingClientRect();
+          tip.textContent = text;
+          tip.classList.remove('hidden');
+          tip.style.left = (clientX - rect.left + 12) + 'px';
+          tip.style.top  = (clientY - rect.top  + 12) + 'px';
+        }
+        function hide() { tip.classList.add('hidden'); }
+
+        function modelOf(node) {
+          const g = node.closest('.cg-series');
+          return g ? g.dataset.modelId : null;
+        }
+
+        svg.addEventListener('mousemove', e => {
+          const t = e.target;
+          if (t.classList.contains('cg-point')) {
+            const mid = modelOf(t) || '';
+            const turn = t.getAttribute('data-turn');
+            const fmt = t.getAttribute('data-fmt') || '%s';
+            const v = parseFloat(t.getAttribute('data-value'));
+            // tiny printf for %.0f / %.2f / %.4f / %s
+            let formatted;
+            const m = fmt.match(/%\.(\d+)f/);
+            if (m) formatted = v.toFixed(parseInt(m[1], 10));
+            else formatted = String(v);
+            show(`${mid} · Turn ${turn} · ${formatted}`, e.clientX, e.clientY);
+            setEmphasis(mid);
+          } else if (t.classList.contains('cg-line')) {
+            const mid = modelOf(t) || '';
+            show(mid, e.clientX, e.clientY);
+            setEmphasis(mid);
+          } else {
+            hide();
+            setEmphasis(null);
+          }
+        });
+        svg.addEventListener('mouseleave', () => { hide(); setEmphasis(null); });
+      });
+    })();
+    </script>
+  {% endif %}
+{% endif %}
+
+{% block table %}
+<section>
+  <div class="bg-white border border-stone-200 rounded-lg overflow-hidden">
+    <table class="sortable w-full text-sm">
+      <thead class="bg-stone-50 border-b border-stone-200 text-left text-stone-600">
+        <tr>
+          <th data-sort class="px-4 py-2 font-medium">Modell</th>
+          <th data-sort class="px-3 py-2 font-medium">Hersteller</th>
+          <th data-sort class="px-3 py-2 font-medium">Quant</th>
+          <th data-sort class="px-3 py-2 font-medium">Ctx</th>
+          <th data-sort class="px-3 py-2 font-medium">Released</th>
+          <th data-sort class="px-3 py-2 font-medium text-right">RAM</th>
+          <th data-sort class="px-3 py-2 font-medium text-right">tok/s</th>
+          <th data-sort class="px-3 py-2 font-medium text-right">Tokens</th>
+          <th data-sort class="px-3 py-2 font-medium text-right">Wall</th>
+          <th data-sort class="px-3 py-2 font-medium text-right">Score</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-stone-100">
+        {% for r in rows %}
+          {% set rns = namespace(preview=none) %}
+          {% if task_name in ["diagram_to_mermaid", "diagram_to_svg"] %}
+            {% for d in (r.score_breakdown.diagrams or []) %}
+              {% if rns.preview is none and d.render_path %}
+                {% set rns.preview = artifact_url(d.render_path) %}
+              {% endif %}
+            {% endfor %}
+          {% else %}
+            {% for a in r.artifacts if a.kind == 'image' and 'screenshot' in a.path %}
+              {% set rns.preview = artifact_url(a.path) %}
+            {% endfor %}
+          {% endif %}
+          <tr class="row-link cursor-pointer"
+              {% if rns.preview %}data-preview="{{ rns.preview }}"{% endif %}
+              onclick="window.location='{{ model_detail_url(r.model_id) }}#{{ task_name }}'">
+            <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="{{ r.model_id|short_id }}" title="{{ r.model_id }}">
+              {{ r.model_id|short_id }}
+            </td>
+            <td class="px-3 py-2 text-stone-600 whitespace-nowrap">{{ r.vendor }}</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">{{ r.quant }}</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="{{ r.ctx_k }}">{{ r.ctx_k }}k</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap" data-sort="{{ r.released or '' }}">{{ r.released or "—" }}</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="{{ r.ram_mb or 0 }}">
+              {% if r.ram_mb %}{{ "%.1f"|format(r.ram_mb / 1024) }} GB{% else %}—{% endif %}
+            </td>
+            <td class="px-3 py-2 num text-right" data-sort="{{ r.tps or 0 }}">{{ "%.0f"|format(r.tps) }}</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="{{ r.tokens or 0 }}">
+              {% if r.tokens %}{{ r.tokens }}{% else %}—{% endif %}
+            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="{{ r.wall_s }}">{{ "%.1f"|format(r.wall_s) }} s</td>
+            <td class="px-3 py-2 num text-right" data-sort="{{ r.score if r.score is not none else -1 }}">
+              {% if r.error %}
+                {% if 'timeout' in r.error|lower %}
+                  <span class="text-red-600 font-bold text-base" title="{{ r.error }}">timeout</span>
+                {% else %}
+                  <span class="text-red-600 font-bold text-base" title="{{ r.error }}">error</span>
+                {% endif %}
+              {% elif r.preliminary %}
+                <span class="font-bold text-lg text-stone-400" title="Judge noch nicht ausgeführt — Wert ist nur Linter-Score">
+                  {{ "%.2f"|format(r.score) }}
+                </span>
+                <span class="block text-[10px] text-stone-400 uppercase tracking-wider">preliminary</span>
+              {% elif r.score is not none %}
+                <span class="font-bold text-lg {% if r.score >= 0.7 %}text-emerald-700{% elif r.score > 0 %}text-amber-700{% else %}text-red-600{% endif %}">
+                  {{ "%.2f"|format(r.score) }}
+                </span>
+              {% else %}—{% endif %}
+            </td>
+          </tr>
+        {% else %}
+          <tr><td class="px-4 py-6 text-stone-500" colspan="10">Keine Ergebnisse für diesen Benchmark.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p class="mt-3 text-xs text-stone-500">
+    Klick auf eine Zeile öffnet die Modell-Detailseite. Hover zeigt verfügbare Render-Previews. Spaltenüberschriften klickbar zum Sortieren.
+  </p>
+</section>
+{% endblock %}
+
+{% endblock %}

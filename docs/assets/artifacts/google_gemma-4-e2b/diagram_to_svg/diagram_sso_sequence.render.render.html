@@ -1,0 +1,127 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html,body{margin:0;background:#fff;font-family:system-ui,-apple-system,sans-serif}
+  .wrap{padding:24px;display:inline-block;background:#fff}
+  .wrap svg{display:block;height:auto;max-width:none}
+</style></head><body><div class="wrap"><svg width="100%" height="600" viewBox="0 0 1200 750" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .box {
+      fill: #f9f9f9;
+      stroke: #333;
+      stroke-width: 2;
+      rx: 8;
+    }
+    .decision {
+      fill: #fff3cd;
+      stroke: #d6a100;
+      stroke-width: 2;
+      rx: 8;
+    }
+    .text {
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      fill: #333;
+    }
+    .title {
+      font-size: 18px;
+      font-weight: bold;
+      fill: #000;
+    }
+    .arrow {
+      stroke: #333;
+      stroke-width: 2;
+    }
+  </style>
+
+  <!-- Title -->
+  <text x="50" y="40" class="title">SSO - Ablaufdiagramm</text>
+
+  <!-- Nodes Grouping -->
+  <g id="flow_start">
+    <!-- 1. Benutzer -->
+    <rect x="50" y="120" width="150" height="60" class="box" id="user"/>
+    <text x="125" y="155" class="text">Benutzer</text>
+
+    <!-- 2. App / Service Provider -->
+    <rect x="300" y="120" width="180" height="60" class="box" id="sp"/>
+    <text x="390" y="155" class="text">App / Service Provider</text>
+
+    <!-- 3. Service Provider (Implied intermediate step) -->
+    <rect x="300" y="210" width="180" height="60" class="box" id="sp_intermediate"/>
+    <text x="390" y="245" class="text">Service Provider</text>
+
+    <!-- 4. Identity Provider (IdP) -->
+    <rect x="550" y="120" width="180" height="60" class="box" id="idp"/>
+    <text x="640" y="155" class="text">Identity Provider (IdP)</text>
+
+    <!-- 5. Login-Seite -->
+    <rect x="550" y="210" width="180" height="60" class="box" id="login_page"/>
+    <text x="640" y="245" class="text">Login-Seite</text>
+
+    <!-- Decision Point -->
+    <rect x="300" y="310" width="240" height="60" class="decision" id="auth_check"/>
+    <text x="420" y="345" class="text">Anmeldedaten korrekt?</text>
+
+    <!-- 6. SSO-Response -->
+    <rect x="790" y="120" width="180" height="60" class="box" id="sso_response"/>
+    <text x="880" y="155" class="text">SSO-Response</text>
+
+    <!-- 7. Zugriffsgewährt -->
+    <rect x="50" y="420" width="200" height="60" class="box" id="access_granted"/>
+    <text x="150" y="455" class="text">Zugriff gewährt</text>
+
+  </g>
+
+  <!-- Connections (Lines and Arrows) -->
+
+  <!-- User -> SP -->
+  <line x1="200" y1="180" x2="300" y2="180" class="arrow"/>
+  <marker id="arrowhead_right" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+  </marker>
+
+  <!-- SP -> Service Provider (Flow continuation) -->
+  <line x1="480" y1="180" x2="480" y2="210" class="arrow"/>
+  <marker id="arrowhead_down" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+  </marker>
+
+  <!-- SP -> IdP (Implicit flow for authentication) -->
+  <line x1="480" y1="210" x2="550" y2="210" class="arrow"/>
+  <marker id="arrowhead_right_auth" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+  </marker>
+
+  <!-- IdP -> Login Page (or flow continuation) -->
+  <line x1="640" y1="210" x2="640" y2="240" class="arrow"/>
+  <marker id="arrowhead_down_auth" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+  </marker>
+
+  <!-- Login Page -> SSO Response -->
+  <line x1="830" y1="240" x2="830" y2="310" class="arrow"/>
+  <marker id="arrowhead_down_response" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+  </marker>
+
+  <!-- Decision Branch (Yes/No) -->
+  <!-- Yes path (Ja) -->
+  <line x1="830" y1="310" x2="950" y2="310" class="arrow"/>
+  <marker id="arrowhead_right_yes" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+  </marker>
+
+  <!-- No path (Nein) -->
+  <line x1="830" y1="340" x2="950" y2="340" class="arrow"/>
+  <marker id="arrowhead_right_no" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+  </marker>
+
+  <!-- Final connection from Decision to SSO Response (Yes path) -->
+  <line x1="950" y1="240" x2="880" y2="240" class="arrow"/>
+  <marker id="arrowhead_up_final" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+  </marker>
+
+</svg></div></body></html>

@@ -1,0 +1,48 @@
+{
+  "name": "comprehension",
+  "description": "Inhaltliche Fragen zum Buch (~150k Tokens). Gemischt aus eindeutigen Faktenfragen (passendes Stichwort muss vorkommen) und gezielten Halluzinations-Fallen (das Modell soll zugeben, dass die Frage im Text nicht beantwortet wird).",
+  "system": "Antworte ausschließlich auf Basis des bereitgestellten Textes. Wenn die Frage im Text nicht beantwortet wird, sag das ausdrücklich — erfinde nichts.",
+  "context_target_tokens": 150000,
+  "questions": [
+    {
+      "id": "schmied_name",
+      "type": "factual",
+      "prompt": "Wie heißt der Schmied vom Blumental, bei dem Gottlieb in der Lehre ist? (Vor- und Nachname)",
+      "expected_keywords": ["Lebbin"],
+      "min_match": 1
+    },
+    {
+      "id": "kapitaen_eltern",
+      "type": "factual",
+      "prompt": "Wie heißt der französische Kapitän, der Gottliebs Eltern getötet hat?",
+      "expected_keywords": ["Beaumont", "Etienne"],
+      "min_match": 1
+    },
+    {
+      "id": "schluessel_ablenkung",
+      "type": "factual",
+      "prompt": "Womit lenkte Malineken die Wachen ab, um den Schlüssel zu entwenden?",
+      "expected_keywords": ["Tuch", "Kopftuch", "Semmel", "Verkleidung"],
+      "min_match": 1
+    },
+    {
+      "id": "insel_grund",
+      "type": "factual",
+      "prompt": "Warum muss Gottlieb sich verborgen halten? Was würden die Franzosen sonst tun?",
+      "expected_keywords": ["totschießen", "erschießen", "totgeschossen", "exekutieren", "hinrichten"],
+      "min_match": 1
+    },
+    {
+      "id": "trap_onkel",
+      "type": "trap",
+      "prompt": "Wie heißt Gottliebs Onkel?",
+      "trap_explanation": "Es wird kein Onkel erwähnt; Gottlieb ist Waisenkind. Erfindet das Modell einen Namen, ist das eine Halluzination."
+    },
+    {
+      "id": "trap_lebbin_bonaparte",
+      "type": "trap",
+      "prompt": "Mit welcher List überlistete Michael Lebbin Kaiser Bonaparte persönlich?",
+      "trap_explanation": "Michael Lebbin und Bonaparte begegnen sich im Text nie persönlich. Eine konkrete List-Antwort wäre frei erfunden."
+    }
+  ]
+}

@@ -1,0 +1,117 @@
+<svg viewBox="0 0 1000 850" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1000" height="850" fill="#ffffff" />
+
+  <!-- Definitions for Markers and Styles -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+    </marker>
+    <style>
+      .title { font-family: sans-serif; font-size: 28px; font-weight: bold; fill: #333; }
+      .axis-label { font-family: sans-serif; font-size: 18px; fill: #333; }
+      .quadrant-header { font-family: sans-serif; font-size: 20px; font-weight: bold; fill: #000; }
+      .list-item { font-family: sans-serif; font-size: 16px; fill: #333; }
+      .extra-text { font-family: sans-serif; font-size: 14px; fill: #444; }
+      .accent-text { font-family: sans-serif; font-size: 18px; font-weight: bold; fill: #d32f2f; }
+      .axis-tick { font-family: sans-serif; font-size: 14px; fill: #666; }
+    </style>
+  </defs>
+
+  <!-- Axes -->
+  <g id="axes" stroke="#333" stroke-width="2">
+    <!-- Y Axis (Wichtigkeit) -->
+    <line x1="80" y1="100" x2="80" y2="750" marker-end="url(#arrowhead)" />
+    <!-- X Axis (Dringlichkeit) -->
+    <line x1="80" y1="750" x2="920" y2="750" marker-end="url(#arrowhead)" />
+    <!-- Quadrant Dividers -->
+    <line x1="500" y1="100" x2="500" y2="750" stroke-dasharray="5,5" />
+    <line x1="80" y1="425" x2="920" y2="425" stroke-dasharray="5,5" />
+  </g>
+
+  <!-- Axis Labels -->
+  <text x="40" y="425" class="axis-label" transform="rotate(-90 40,425)" text-anchor="middle">Wichtigkeit</text>
+  <text x="500" y="800" class="axis-label" text-anchor="middle">Dringlichkeit</text>
+  <text x="50" y="100" class="axis-tick" text-anchor="end">hoch</text>
+  <text x="50" y="750" class="axis-tick" text-anchor="end">niedrig</text>
+  <text x="80" y="780" class="axis-tick" text-anchor="start">niedrig</text>
+  <text x="920" y="780" class="axis-tick" text-anchor="end">hoch</text>
+
+  <!-- Main Title -->
+  <text x="500" y="50" class="title" text-anchor="middle">Eisenhower - Matrix - Marketing</text>
+
+  <!-- Quadrant 1: Wichtig + Nicht dringend -->
+  <g id="quadrant_important_not_urgent">
+    <text x="290" y="150" class="quadrant-header" text-anchor="middle">Wichtig + Nicht dringend</text>
+    <text x="100" y="210" class="list-item">• Content - Strategie</text>
+    <text x="100" y="245" class="list-item">• Brand schärfen</text>
+    <text x="100" y="280" class="list-item">• SEO aufräumen</text>
+    <text x="100" y="315" class="list-item">• Zielgruppen verstehen</text>
+    <!-- Target Icon -->
+    <circle cx="440" cy="350" r="20" fill="none" stroke="#333" stroke-width="2"/>
+    <circle cx="440" cy="350" r="10" fill="none" stroke="#333" stroke-width="1"/>
+    <line x1="400" y1="350" x2="425" y2="350" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+  </g>
+
+  <!-- Quadrant 2: Wichtig + Dringend -->
+  <g id="quadrant_important_urgent">
+    <text x="710" y="150" class="quadrant-header" text-anchor="middle">Wichtig + Dringend</text>
+    <text x="520" y="210" class="list-item">• Kampagne retten</text>
+    <text x="520" y="245" class="list-item">• Shitstorm beantworten</text>
+    <text x="520" y="280" class="list-item">• Newsletter mit falschem Link fixen</text>
+    <text x="520" y="315" class="list-item">• Chef will bis 14 Uhr "viral gehen"</text>
+    <!-- Viral Starburst -->
+    <path d="M780,260 L790,240 L810,245 L820,230 L835,250 L855,245 L850,265 L870,275 L850,285 L855,305 L835,295 L815,310 L805,290 L785,285 Z" fill="#fff" stroke="#d32f2f" stroke-width="1" />
+    <text x="825" y="275" class="accent-text" text-anchor="middle">VIRAL??</text>
+    <!-- Megaphone -->
+    <path d="M740,360 L770,330 L770,390 Z" fill="#ddd" stroke="#333" />
+    <line x1="740" y1="360" x2="730" y2="345" stroke="#333" />
+    <line x1="740" y1="360" x2="730" y2="375" stroke="#333" />
+  </g>
+
+  <!-- Quadrant 3: Nicht wichtig + Nicht dringend -->
+  <g id="quadrant_not_important_not_urgent">
+    <text x="290" y="480" class="quadrant-header" text-anchor="middle">Nicht wichtig + Nicht dringend</text>
+    <text x="100" y="540" class="list-item">• Merch-Ideen mit Glitzer</text>
+    <text x="100" y="575" class="list-item">• Buzzword-Bingo</text>
+    <text x="100" y="610" class="list-item">• TikTok-Tanz mit dem Maskottchen</text>
+    <text x="100" y="645" class="list-item">• Hashtag brainstormen</text>
+    <text x="100" y="670" class="list-item">  #innovation #synergy #wow</text>
+    <!-- Unicorn Silhouette (Simplified) -->
+    <path d="M420,700 Q430,650 450,660 Q460,680 440,710 Z" fill="#eee" stroke="#ccc" />
+  </g>
+
+  <!-- Quadrant 4: Nicht wichtig + Dringend -->
+  <g id="quadrant_not_important_urgent">
+    <text x="710" y="480" class="quadrant-header" text-anchor="middle">Nicht wichtig + Dringend</text>
+    <text x="520" y="540" class="list-item">• Noch ein Last-Minute-Meeting</text>
+    <text x="520" y="575" class="list-item">• Kann das Logo größer?</text>
+    <text x="520" y="610" class="list-item">• LinkedIn-Post für "Welttag der Büroklammer"</text>
+    <text x="520" y="645" class="list-item">• Folie 27 schöner machen</text>
+    <!-- Exclamation marks -->
+    <line x1="800" y1="700" x2="800" y2="720" stroke="#333" stroke-width="2" />
+    <circle cx="800" cy="730" r="3" fill="#333" />
+    <line x1="820" y1="700" x2="820" y2="720" stroke="#333" stroke-width="2" />
+    <circle cx="820" cy="730" r="3" fill="#333" />
+  </g>
+
+  <!-- Side Elements -->
+  <g id="side_elements">
+    <!-- Heart/Internet Text -->
+    <text x="100" y="650" class="extra-text" text-anchor="middle">
+      <tspan x="100" dy="0">Erledigen, wenn das</tspan>
+      <tspan x="100" dy="20">Internet wieder da ist.</tspan>
+    </text>
+    <!-- Coffee Cup -->
+    <g transform="translate(830, 160)">
+        <path d="M0,0 Q10,-10 25,-10 Q40,-10 50,0 L45,40 Q40,50 25,50 Q10,50 0,40 Z" fill="#eee" stroke="#333" />
+        <path d="M50,10 Q60,10 60,25 Q60,40 50,40" fill="none" stroke="#333" stroke-width="2" />
+        <!-- Steam -->
+        <path d="M15,-20 Q20,-30 15,-40" fill="none" stroke="#ccc" stroke-width="2" />
+        <path d="M30,-25 Q35,-35 30,-45" fill="none" stroke="#ccc" stroke-width="2" />
+    </g>
+    <text x="855" y="230" class="extra-text" text-anchor="middle">Kaffee zählt nicht.</text>
+    <text x="855" y="250" class="extra-text" text-anchor="middle">Aber hilft. :)</text>
+  </g>
+
+</svg>

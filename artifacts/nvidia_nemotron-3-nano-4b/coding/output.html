@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Kanban Board</title>
+<link href="https://cdn.tailwindcss.com" rel="stylesheet">
+<script src="https://unpkg.com/confetti@2.0.7/dist/confetti.min.js"></script>
+<style>
+.card {
+  transition: opacity .3s ease;
+}
+</style>
+</head>
+<body class="bg-gray-100 p-4">
+
+<div data-testid="column-backlog" class="flex items-center gap-2">
+  <button id="add-card-backlog" data-testid="add-card">Add Card</button>
+  <div id="cards-backlog" class="space-y-2"></div>
+</div>
+
+<div data-testid="column-in-progress" class="flex items-center gap-2">
+  <button id="add-card-inprogress" data-testid="add-card">Add Card</button>
+  <div id="cards-inprogress" class="space-y-2"></div>
+</div>
+
+<div data-testid="column-review" class="flex items-center gap-2">
+  <button id="add-card-review" data-testid="add-card">Add Card</button>
+  <div id="cards-review" class="space-y-2"></div>
+</div>
+
+<div data-testid="column-done" class="flex items-center gap-2">
+  <button id="add-card-done" data-testid="add-card">Add Card</button>
+  <div id="cards-done" class="space-y-2"></div>
+</div>
+
+<!-- Delete confirmation modal -->
+<div id="delete-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-lg shadow-md w-full max-w-sm text-center">
+    <h2>Confirm delete</h2>
+    <p data-testid="card-input" placeholder="Type anything to confirm"></p>
+    <button id="confirm-delete" data-testid="confirm-delete">Delete</button>
+  </div>
+</div>
+
+<script>
+/* Namespace for storage */
+const STORAGE_KEY = 'kanbanBoard';
+let nextId = 1;
+
+/* ---------- Helper functions ---------- */
+// Create a new card element
+function createCard(title, column) {
+  const div = document.createElement('div');
+  div.className = 'card';
+  div.dataset.testid = 'card';
+  div.dataset.id = getNextId();
+  // Input field
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.dataset.testid = 'card-input';
+  input.placeholder = 'Title';
+  input.value = title;
+  // Delete button
+  const delBtn = document.createElement('button');
+  delBtn.textContent = '✕';
+  delBtn.dataset.testid = 'delete-card';
+  div.appendChild(input);
+  div.appendChild(delBtn);
+  return div;
+}
+
+// Get next id for cards
+function getNextId() {
+  return nextId++;
+}
+
+/* ---------- Persistence ---------- */
+function updateLocalStorage() {
+  const cols = [
+    {id: 'backlog', container: '#cards-backlog'},
+    {id: 'in-progress', container: '#cards-inprogress'},
+    {id: 'review', container: '#cards-review'},
+    {id: 'done', container: '#cards-done'}
+  ];
+  const result = cols.map(col => ({
+    column: col.id,
+    cards: Array.from(document.querySelectorAll('[data-testid="card"][data-id]').map(c => ({
+      id: c.dataset.id,
+      title: c.querySelector('[data-testid="card-input"]').value
+    }))).filter(Boolean)
+  }));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(result));
+}
+
+// Load existing data or create dummy cards
+function initBoard() {
+  const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  if (data.length === 0) {
+    // Dummy card in each column except Done
+    ['backlog', 'in-progress', 'review'].forEach(col => {
+      createCard('', col);
+      updateLocalStorage();
+    });
+  } else {
+    // Re‑render any stored cards into the DOM
+    const cols = [
+      {id: 'backlog', container: '#cards-backlog'},
+      {id: 'in-progress', container: '#cards-inprogress'},
+      {id: 'review', container: '#cards-review'},
+      {id: 'done', container: '#cards-done'}
+    ];
+    cols.forEach(c => {
+      const cards = data[c.id].map(cardData => createCard(cardData.title, c.id));
+      const container = document.getElementById(c.container);
+      container.innerHTML = '';
+      cards.forEach(card => container.appendChild(card));
+    });
+    updateLocalStorage();
+  }
+}
+
+/* ---------- UI actions ---------- */
+// Add card per column
+['add-card', 'add-card-backlog', 'add-card-inprogress', 'add-card-review', 'add-card-done'].forEach(id => {
+  const btn = document.getElementById(id);
+  if (btn) btn.addEventListener('click', () => {
+    const col = id.replace(/^add-/i, '');
+    createCard('', col);
+    updateLocalStorage();
+  });
+});
+
+// Commit title change on Enter
+document.querySelectorAll('[data-testid="card-input"]').forEach(inp => {
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      const card = inp.closest('.card');
+      const newTitle = inp.value;
+      updateCardTitle(newTitle);
+      e.preventDefault();
+    }
+  });
+});
+
+// Delete trigger
+document.querySelectorAll('[data-testid="delete-card"]').forEach(delBtn => {
+  delBtn.addEventListener('click', () => {
+    const cardDiv = delBtn.closest('.card');
+    showDeleteModal(cardDiv);
+  });
+});
+
+/* ---------- Modal handling ---------- */
+const modal = document.getElementById('delete-modal');
+modal.addEventListener('click', e => {
+  if (e.target === modal) modal.classList.add('hidden');
+});
+document.getElementById('confirm-delete').addEventListener('click', () => {
+  const cardDiv = document.querySelector(`[data-id="${this.dataset.cardid}"]`);
+  if (!cardDiv) return;
+  // Remove from DOM
+  updateLocalStorage();
+  triggerConfetti(); // animation when a card leaves the board
+  deleteCard(this.dataset.cardid);
+});
+
+/* ---------- Card data handling ---------- */
+function getCardByDel(btn) {
+  const card = btn.closest('.card');
+  return { id: card.dataset.id, column: card.parentElement.dataset.testid };
+}
+function updateCardTitle(title) {
+  document.querySelector(`[data-id="${this.dataset.id}"]`).querySelector('[data-testid="card-input"]').value = title;
+  updateLocalStorage();
+}
+function deleteCard(id) {
+  const cardDiv = document.querySelector(`[data-id="${id}"]`);
+  if (cardDiv) {
+    // Keep the input field empty after deletion
+    updateLocalStorage();
+  }
+}
+
+/* ---------- Confetti animation ---------- */
+function triggerConfetti() {
+  confetti({
+    text: 'Great job!',
+    duration: 2,
+    lineLength: 100,
+    particles: 50,
+    speed: 80,
+    spread: 90,
+    originX: 'right',
+    originY: 'bottom'
+  });
+}
+
+/* ---------- Initialisation ---------- */
+document.addEventListener('DOMContentLoaded', initBoard);
+</script>
+
+</body>
+</html>

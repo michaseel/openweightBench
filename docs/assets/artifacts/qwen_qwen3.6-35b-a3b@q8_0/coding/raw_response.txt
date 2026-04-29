@@ -1,0 +1,962 @@
+
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kanban Board</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ===== Global Styles ===== */
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      /* Vibrant gradient background */
+      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+      min-height: 100vh;
+      overflow-x: auto;
+    }
+
+    /* ===== Column Styles ===== */
+    .kanban-column {
+      min-width: 300px;
+      max-width: 340px;
+      flex-shrink: 0;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .kanban-column.drag-over {
+      background-color: rgba(255, 255, 255, 0.08) !important;
+      box-shadow: inset 0 0 0 2px rgba(139, 92, 246, 0.6);
+    }
+
+    /* ===== Card Styles ===== */
+    .kanban-card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+      cursor: grab;
+    }
+    .kanban-card:active { cursor: grabbing; }
+    .kanban-card.dragging {
+      opacity: 0.4;
+      transform: scale(0.95) rotate(2deg);
+      box-shadow: none !important;
+    }
+    .kanban-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    /* ===== Card Entrance Animation ===== */
+    @keyframes cardEntrance {
+      from { opacity: 0; transform: translateY(-10px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .card-enter { animation: cardEntrance 0.3s ease-out forwards; }
+
+    /* ===== Card Exit Animation ===== */
+    @keyframes cardExit {
+      from { opacity: 1; transform: scale(1); }
+      to   { opacity: 0; transform: scale(0.8); }
+    }
+    .card-exit { animation: cardExit 0.25s ease-in forwards; }
+
+    /* ===== Modal / Dialog Styles ===== */
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.9) translateY(10px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    @keyframes backdropFadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    .modal-backdrop {
+      animation: backdropFadeIn 0.2s ease-out forwards;
+    }
+    .modal-content {
+      animation: modalFadeIn 0.25s ease-out forwards;
+    }
+
+    /* ===== Confetti ===== */
+    .confetti-piece {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      pointer-events: none;
+      z-index: 9999;
+    }
+    @keyframes confettiFall {
+      0%   { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
+      100% { opacity: 0; transform: translateY(100vh) rotate(720deg) scale(0.5); }
+    }
+
+    /* ===== Scrollbar Styling ===== */
+    .kanban-cards-list::-webkit-scrollbar { width: 4px; }
+    .kanban-cards-list::-webkit-scrollbar-track { background: transparent; }
+    .kanban-cards-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+    .kanban-cards-list::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
+
+    /* ===== Column header gradient accents ===== */
+    .col-header-backlog { border-bottom: 3px solid #6366f1; }
+    .col-header-in-progress { border-bottom: 3px solid #f59e0b; }
+    .col-header-review { border-bottom: 3px solid #ec4899; }
+    .col-header-done { border-bottom: 3px solid #10b981; }
+
+    /* ===== Editable title focus ===== */
+    .card-title-input:focus {
+      outline: none;
+      border-color: #8b5cf6;
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25);
+    }
+
+    /* ===== Add card button hover ===== */
+    .add-card-btn:hover {
+      background-color: rgba(139, 92, 246, 0.25) !important;
+      color: #c4b5fd !important;
+    }
+  </style>
+
+  <!-- Tailwind config for custom colors -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+        }
+      }
+    }
+  </script>
+</head>
+
+<body class="p-4 md:p-8">
+
+  <!-- ===== App Header ===== -->
+  <header class="mb-8 text-center">
+    <h1 class="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-pink-400 to-amber-400 tracking-tight">
+      ✦ Kanban Board
+    </h1>
+    <p class="text-slate-400 mt-2 text-sm">Drag &amp; drop your tasks • Click to edit • Celebrate completion</p>
+  </header>
+
+  <!-- ===== Kanban Board Container ===== -->
+  <main id="kanban-board" class="flex gap-5 overflow-x-auto pb-6 px-2" style="min-height: 70vh;">
+    <!-- Columns are rendered by JavaScript -->
+  </main>
+
+  <!-- ===== Delete Confirmation Modal (hidden by default) ===== -->
+  <div id="delete-modal" class="fixed inset-0 z-50 hidden items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
+    <!-- Backdrop -->
+    <div class="modal-backdrop absolute inset-0 bg-black/60" id="delete-modal-backdrop"></div>
+    <!-- Modal Content -->
+    <div class="modal-content relative bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-2xl max-w-sm w-full mx-4 z-10">
+      <h2 id="delete-modal-title" class="text-xl font-bold text-white mb-2">Delete Card?</h2>
+      <p class="text-slate-300 text-sm mb-6">Are you sure you want to delete this card? This action cannot be undone.</p>
+      <div class="flex gap-3 justify-end">
+        <button id="cancel-delete" class="px-4 py-2 rounded-xl text-sm font-medium text-slate-300 bg-slate-700 hover:bg-slate-600 transition-colors">
+          Cancel
+        </button>
+        <!-- Confirm delete button — mandatory test selector -->
+        <button id="confirm-delete-btn" data-testid="confirm-delete" class="px-4 py-2 rounded-xl text-sm font-medium text-white bg-red-600 hover:bg-red-500 transition-colors">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== JavaScript Application Logic ===== -->
+  <script>
+    (() => {
+      'use strict';
+
+      // ============================================================
+      //  CONFIGURATION & CONSTANTS
+      // ============================================================
+
+      /**
+       * Custom localStorage namespace to avoid collisions
+       * with other apps or libraries.
+       */
+      const STORAGE_KEY = 'kanban-board-v1__cards';
+
+      /**
+       * Column definitions with display labels and CSS classes.
+       */
+      const COLUMNS = [
+        { id: 'backlog',       label: 'Backlog',       headerClass: 'col-header-backlog',  icon: '📋' },
+        { id: 'in-progress',   label: 'In Progress',   headerClass: 'col-header-in-progress', icon: '🔨' },
+        { id: 'review',        label: 'Review',        headerClass: 'col-header-review',   icon: '🔍' },
+        { id: 'done',          label: 'Done',          headerClass: 'col-header-done',     icon: '✅' },
+      ];
+
+      /**
+       * Color palette for card accent bars (vibrant, modern).
+       */
+      const CARD_COLORS = [
+        'from-violet-500 to-purple-600',
+        'from-sky-500 to-blue-600',
+        'from-emerald-500 to-teal-600',
+        'from-amber-500 to-orange-600',
+        'from-rose-500 to-pink-600',
+        'from-cyan-500 to-indigo-600',
+      ];
+
+      // ============================================================
+      //  STATE MANAGEMENT
+      // ============================================================
+
+      /**
+       * Application state: array of card objects.
+       * Each card has: { id, title, columnId, colorIndex, createdAt }
+       */
+      let cards = [];
+
+      /**
+       * The ID of the card currently being deleted (set when user clicks delete).
+       */
+      let deleteTargetId = null;
+
+      /**
+       * Counter for generating unique card IDs.
+       */
+      let idCounter = 0;
+
+      /**
+       * Generate a unique card ID.
+       * @returns {string} Unique ID string.
+       */
+      function generateId() {
+        return `card-${Date.now()}-${idCounter++}`;
+      }
+
+      // ============================================================
+      //  LOCAL STORAGE PERSISTENCE
+      // ============================================================
+
+      /**
+       * Load cards from localStorage.
+       * Returns an array of card objects, or an empty array if nothing stored.
+       * @returns {Array} Cards array.
+       */
+      function loadCards() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) return parsed;
+          }
+        } catch (e) {
+          console.warn('Failed to load cards from localStorage:', e);
+        }
+        return [];
+      }
+
+      /**
+       * Save the current cards array to localStorage.
+       */
+      function saveCards() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
+        } catch (e) {
+          console.warn('Failed to save cards to localStorage:', e);
+        }
+      }
+
+      // ============================================================
+      //  DUMMY DATA (seeded when no cards exist)
+      // ============================================================
+
+      /**
+       * Default dummy cards shown when the board is empty.
+       */
+      const DUMMY_CARDS = [
+        { id: null, title: 'Define project scope',        columnId: 'backlog',       colorIndex: 0 },
+        { id: null, title: 'Research competitors',         columnId: 'backlog',       colorIndex: 1 },
+        { id: null, title: 'Create wireframes',            columnId: 'in-progress',   colorIndex: 2 },
+        { id: null, title: 'Set up CI/CD pipeline',        columnId: 'in-progress',   colorIndex: 3 },
+        { id: null, title: 'Design system tokens',         columnId: 'review',        colorIndex: 4 },
+        { id: null, title: 'Write API documentation',      columnId: 'review',        colorIndex: 5 },
+        { id: null, title: 'Project kickoff',              columnId: 'done',          colorIndex: 0 },
+      ];
+
+      /**
+       * Seed dummy cards if the stored state is empty.
+       * @returns {Array} The cards array (seeded or loaded).
+       */
+      function seedCards() {
+        if (cards.length === 0) {
+          cards = DUMMY_CARDS.map(c => ({
+            id: generateId(),
+            title: c.title,
+            columnId: c.columnId,
+            colorIndex: c.colorIndex,
+            createdAt: Date.now(),
+          }));
+          saveCards();
+        }
+        return cards;
+      }
+
+      // ============================================================
+      //  DOM REFERENCES
+      // ============================================================
+
+      /** @type {HTMLElement} Main board container */
+      const boardEl = document.getElementById('kanban-board');
+
+      /** @type {HTMLElement} Delete modal container */
+      const deleteModal = document.getElementById('delete-modal');
+
+      /** @type {HTMLElement} Delete modal backdrop */
+      const deleteModalBackdrop = document.getElementById('delete-modal-backdrop');
+
+      /** @type {HTMLButtonElement} Cancel delete button */
+      const cancelDeleteBtn = document.getElementById('cancel-delete');
+
+      /** @type {HTMLButtonElement} Confirm delete button */
+      const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+
+      // ============================================================
+      //  RENDERING
+      // ============================================================
+
+      /**
+       * Render the entire Kanban board from the current cards state.
+       * This is the primary render function — it clears and rebuilds the DOM.
+       */
+      function render() {
+        boardEl.innerHTML = '';
+
+        // Create a column element for each column definition
+        COLUMNS.forEach(col => {
+          const columnEl = document.createElement('div');
+          // Mandatory test selector for column containers
+          columnEl.setAttribute('data-testid', `column-${col.id}`);
+          columnEl.className = `kanban-column flex flex-col rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10`;
+
+          // --- Column Header ---
+          const header = document.createElement('div');
+          header.className = `flex items-center justify-between px-5 py-4 ${col.headerClass} rounded-t-2xl`;
+
+          const titleWrap = document.createElement('div');
+          titleWrap.className = 'flex items-center gap-2';
+
+          const iconSpan = document.createElement('span');
+          iconSpan.className = 'text-lg';
+          iconSpan.textContent = col.icon;
+
+          const titleText = document.createElement('h2');
+          titleText.className = 'text-white font-bold text-lg tracking-wide';
+          titleText.textContent = col.label;
+
+          // Card count badge
+          const countBadge = document.createElement('span');
+          countBadge.className = 'inline-flex items-center justify-center w-6 h-6 rounded-full bg-white/10 text-xs font-semibold text-slate-300';
+          const colCards = cards.filter(c => c.columnId === col.id);
+          countBadge.textContent = colCards.length;
+
+          titleWrap.appendChild(iconSpan);
+          titleWrap.appendChild(titleText);
+          header.appendChild(titleWrap);
+          header.appendChild(countBadge);
+          columnEl.appendChild(header);
+
+          // --- Cards List ---
+          const cardsList = document.createElement('div');
+          cardsList.className = 'kanban-cards-list flex-1 p-3 pt-2 space-y-3 overflow-y-auto min-h-[100px]';
+          // Allow dropping into the list area
+          cardsList.dataset.columnId = col.id;
+
+          // Render each card in this column
+          colCards.forEach(card => {
+            cardsList.appendChild(createCardElement(card));
+          });
+
+          columnEl.appendChild(cardsList);
+
+          // --- Add Card Button ---
+          const addBtn = document.createElement('button');
+          // Mandatory test selector for add-card buttons
+          addBtn.setAttribute('data-testid', 'add-card');
+          addBtn.className = `add-card-btn w-full mx-3 mb-3 mt-2 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium text-slate-400 border border-dashed border-white/15 hover:border-violet-400/50 transition-all duration-200`;
+          addBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg> Add card`;
+          addBtn.addEventListener('click', () => showAddCardInput(columnEl, col.id));
+          columnEl.appendChild(addBtn);
+
+          // Attach drag-and-drop listeners to the cards list
+          attachDropZoneListeners(cardsList);
+
+          boardEl.appendChild(columnEl);
+        });
+      }
+
+      /**
+       * Create a card DOM element from a card data object.
+       * @param {Object} cardData - Card data { id, title, columnId, colorIndex, createdAt }
+       * @returns {HTMLElement} The card element.
+       */
+      function createCardElement(cardData) {
+        const cardEl = document.createElement('div');
+        // Mandatory test selector for card elements
+        cardEl.setAttribute('data-testid', 'card');
+        cardEl.setAttribute('draggable', 'true');
+        cardEl.dataset.cardId = cardData.id;
+        cardEl.className = `kanban-card card-enter relative rounded-xl overflow-hidden shadow-lg`;
+
+        // Accent gradient bar at the top of the card
+        const accentBar = document.createElement('div');
+        accentBar.className = `h-1.5 bg-gradient-to-r ${CARD_COLORS[cardData.colorIndex % CARD_COLORS.length]}`;
+        cardEl.appendChild(accentBar);
+
+        // Card body
+        const body = document.createElement('div');
+        body.className = 'p-4 bg-slate-800/80';
+
+        // Card title (editable)
+        const titleEl = document.createElement('div');
+        titleEl.className = 'text-white font-medium text-sm leading-relaxed cursor-text select-none';
+        titleEl.textContent = cardData.title;
+        titleEl.addEventListener('dblclick', () => startInlineEdit(cardData.id, titleEl));
+        body.appendChild(titleEl);
+
+        // Card meta info (timestamp)
+        const meta = document.createElement('div');
+        meta.className = 'flex items-center justify-between mt-3 pt-3 border-t border-white/5';
+
+        const timeText = document.createElement('span');
+        timeText.className = 'text-xs text-slate-500';
+        timeText.textContent = formatTimestamp(cardData.createdAt);
+
+        // Delete button
+        const deleteBtn = document.createElement('button');
+        // Mandatory test selector for delete-card buttons
+        deleteBtn.setAttribute('data-testid', 'delete-card');
+        deleteBtn.className = 'text-slate-500 hover:text-red-400 transition-colors p-1 rounded-md hover:bg-red-500/10';
+        deleteBtn.title = 'Delete card';
+        deleteBtn.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>`;
+        deleteBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openDeleteModal(cardData.id, cardData.title);
+        });
+
+        meta.appendChild(timeText);
+        meta.appendChild(deleteBtn);
+        body.appendChild(meta);
+        cardEl.appendChild(body);
+
+        // --- Drag Events on Card ---
+        cardEl.addEventListener('dragstart', (e) => {
+          cardEl.classList.add('dragging');
+          e.dataTransfer.setData('text/plain', cardData.id);
+          e.dataTransfer.effectAllowed = 'move';
+          // Small delay so the dragging class applies visually
+          requestAnimationFrame(() => { cardEl.style.opacity = '0.4'; });
+        });
+
+        cardEl.addEventListener('dragend', () => {
+          cardEl.classList.remove('dragging');
+          cardEl.style.opacity = '';
+          // Remove all drag-over highlights
+          document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+        });
+
+        return cardEl;
+      }
+
+      /**
+       * Format a timestamp to a human-readable relative time string.
+       * @param {number} ts - Unix timestamp in milliseconds.
+       * @returns {string} Formatted string.
+       */
+      function formatTimestamp(ts) {
+        const diff = Date.now() - ts;
+        const mins = Math.floor(diff / 60000);
+        if (mins < 1) return 'just now';
+        if (mins < 60) return `${mins}m ago`;
+        const hrs = Math.floor(mins / 60);
+        if (hrs < 24) return `${hrs}h ago`;
+        const days = Math.floor(hrs / 24);
+        return `${days}d ago`;
+      }
+
+      // ============================================================
+      //  ADD CARD INPUT
+      // ============================================================
+
+      /**
+       * Show an inline input field for adding a new card to a column.
+       * Pressing Enter commits the card.
+       * @param {HTMLElement} columnEl - The column element to add the card to.
+       * @param {string} columnId - The target column ID.
+       */
+      function showAddCardInput(columnEl, columnId) {
+        // Remove any existing add-card input in this column
+        const existing = columnEl.querySelector('.add-card-input-wrap');
+        if (existing) existing.remove();
+
+        const wrap = document.createElement('div');
+        wrap.className = 'add-card-input-wrap mx-3 mb-2';
+
+        const input = document.createElement('input');
+        // Mandatory test selector for the card input
+        input.setAttribute('data-testid', 'card-input');
+        input.type = 'text';
+        input.placeholder = 'Enter card title...';
+        input.className = 'w-full px-3 py-2.5 rounded-xl text-sm bg-white/10 border border-white/20 text-white placeholder-slate-400 focus:outline-none focus:border-violet-400/60 focus:ring-2 focus:ring-violet-500/30 transition-all';
+        input.autocomplete = 'off';
+
+        // On Enter, commit the new card
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            const title = input.value.trim();
+            if (title) {
+              addCard(columnId, title);
+            }
+            // Remove the input regardless
+            wrap.remove();
+          }
+        });
+
+        // On Escape, cancel
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') {
+            wrap.remove();
+            input.blur();
+          }
+        });
+
+        // On blur outside, remove the input (only if no valid title was entered)
+        input.addEventListener('blur', () => {
+          // Small delay to allow Enter key handler to fire first
+          setTimeout(() => {
+            if (document.activeElement !== input) {
+              const title = input.value.trim();
+              if (title) {
+                addCard(columnId, title);
+              }
+              wrap.remove();
+            }
+          }, 150);
+        });
+
+        wrap.appendChild(input);
+        columnEl.appendChild(wrap);
+
+        // Focus and select
+        requestAnimationFrame(() => {
+          input.focus();
+          input.select();
+        });
+      }
+
+      /**
+       * Add a new card to the specified column.
+       * @param {string} columnId - Target column ID.
+       * @param {string} title - Card title.
+       */
+      function addCard(columnId, title) {
+        const card = {
+          id: generateId(),
+          title: title,
+          columnId: columnId,
+          colorIndex: Math.floor(Math.random() * CARD_COLORS.length),
+          createdAt: Date.now(),
+        };
+        cards.push(card);
+        saveCards();
+        render();
+      }
+
+      // ============================================================
+      //  INLINE EDITING
+      // ============================================================
+
+      /**
+       * Start inline editing of a card's title.
+       * Replaces the title text with an input field.
+       * @param {string} cardId - The card's ID.
+       * @param {HTMLElement} titleEl - The title element to replace.
+       */
+      function startInlineEdit(cardId, titleEl) {
+        const cardData = cards.find(c => c.id === cardId);
+        if (!cardData) return;
+
+        // Create input element
+        const input = document.createElement('input');
+        input.setAttribute('data-testid', 'card-input');
+        input.type = 'text';
+        input.value = cardData.title;
+        input.className = 'card-title-input w-full px-2 py-1 rounded-lg text-sm text-white bg-white/10 border border-violet-500/40';
+
+        // Replace title with input
+        titleEl.replaceWith(input);
+        input.focus();
+        input.select();
+
+        /**
+         * Commit the edited title.
+         */
+        function commitEdit() {
+          const newTitle = input.value.trim();
+          if (newTitle && newTitle !== cardData.title) {
+            cardData.title = newTitle;
+            saveCards();
+          }
+          // Re-render to reflect changes
+          render();
+        }
+
+        // On Enter, commit
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            commitEdit();
+          } else if (e.key === 'Escape') {
+            // Cancel edit — just re-render to restore original
+            render();
+          }
+        });
+
+        // On blur, commit
+        input.addEventListener('blur', () => {
+          commitEdit();
+        });
+      }
+
+      // ============================================================
+      //  DELETE CARD WITH CONFIRMATION MODAL
+      // ============================================================
+
+      /**
+       * Open the delete confirmation modal.
+       * Uses a custom modal instead of window.confirm.
+       * @param {string} cardId - The card to delete.
+       * @param {string} cardTitle - The card title (for display).
+       */
+      function openDeleteModal(cardId, cardTitle) {
+        deleteTargetId = cardId;
+        // Update modal title with card title
+        const modalTitle = document.getElementById('delete-modal-title');
+        modalTitle.textContent = `Delete "${cardTitle}"?`;
+        deleteModal.classList.remove('hidden');
+        deleteModal.classList.add('flex');
+      }
+
+      /**
+       * Close the delete confirmation modal.
+       */
+      function closeDeleteModal() {
+        deleteTargetId = null;
+        deleteModal.classList.add('hidden');
+        deleteModal.classList.remove('flex');
+      }
+
+      /**
+       * Delete the card currently targeted in the modal.
+       */
+      function executeDelete() {
+        if (!deleteTargetId) return;
+
+        const cardEl = document.querySelector(`[data-testid="card"][data-card-id="${deleteTargetId}"]`);
+
+        if (cardEl) {
+          // Animate out before removing
+          cardEl.classList.add('card-exit');
+          cardEl.addEventListener('animationend', () => {
+            cards = cards.filter(c => c.id !== deleteTargetId);
+            saveCards();
+            render();
+            closeDeleteModal();
+          }, { once: true });
+        } else {
+          // Fallback: just remove and re-render
+          cards = cards.filter(c => c.id !== deleteTargetId);
+          saveCards();
+          render();
+          closeDeleteModal();
+        }
+      }
+
+      // ============================================================
+      //  CONFETTI ANIMATION
+      // ============================================================
+
+      /**
+       * Trigger a confetti burst effect.
+       * Spawns colorful pieces that fall and fade out.
+       * @param {HTMLElement} [element] - Optional element to center confetti around.
+       */
+      function triggerConfetti(element) {
+        const colors = ['#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4', '#f43f5e', '#3b82f6', '#eab308'];
+        const pieceCount = 60;
+        const container = element || document.body;
+
+        let rect;
+        if (element) {
+          rect = element.getBoundingClientRect();
+        } else {
+          rect = { left: window.innerWidth / 2, top: window.innerHeight / 2, width: 0, height: 0 };
+        }
+
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+
+        for (let i = 0; i < pieceCount; i++) {
+          const piece = document.createElement('div');
+          piece.className = 'confetti-piece';
+          piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+
+          // Random properties
+          const size = Math.random() * 8 + 4;
+          piece.style.width = `${size}px`;
+          piece.style.height = `${size}px`;
+
+          // Random starting position near center
+          const offsetX = (Math.random() - 0.5) * 200;
+          const offsetY = (Math.random() - 0.5) * 100;
+          piece.style.left = `${centerX + offsetX}px`;
+          piece.style.top = `${centerY + offsetY}px`;
+
+          // Random shape
+          const shapes = ['50%', '2px', '0'];
+          piece.style.borderRadius = shapes[Math.floor(Math.random() * shapes.length)];
+
+          // Random animation duration and delay
+          const duration = Math.random() * 2 + 1.5;
+          const delay = Math.random() * 0.5;
+          piece.style.animation = `confettiFall ${duration}s ${delay}s ease-out forwards`;
+
+          // Random horizontal drift via CSS custom property
+          const drift = (Math.random() - 0.5) * 300;
+          piece.style.setProperty('--drift', `${drift}px`);
+
+          // We'll use a custom animation with JS for drift
+          animateConfettiPiece(piece, drift, duration, delay);
+
+          document.body.appendChild(piece);
+
+          // Clean up after animation
+          setTimeout(() => {
+            if (piece.parentNode) piece.remove();
+          }, (duration + delay) * 1000 + 200);
+        }
+      }
+
+      /**
+       * Animate a single confetti piece with horizontal drift.
+       * @param {HTMLElement} piece - The confetti element.
+       * @param {number} drift - Horizontal drift in pixels.
+       * @param {number} duration - Animation duration in seconds.
+       * @param {number} delay - Delay before animation starts.
+       */
+      function animateConfettiPiece(piece, drift, duration, delay) {
+        const startTime = performance.now() + delay * 1000;
+        const startLeft = parseFloat(piece.style.left);
+        const startTop = parseFloat(piece.style.top);
+
+        function step(now) {
+          const elapsed = (now - startTime) / 1000;
+          if (elapsed < 0) {
+            requestAnimationFrame(step);
+            return;
+          }
+          const progress = Math.min(elapsed / duration, 1);
+
+          // Vertical fall with acceleration
+          const y = startTop + (window.innerHeight + 100) * progress;
+          // Horizontal drift with easing
+          const x = startLeft + drift * easeOutCubic(progress);
+          // Rotation
+          const rotation = progress * 720;
+          // Scale fade
+          const scale = 1 - progress * 0.5;
+          // Opacity fade
+          const opacity = 1 - progress;
+
+          piece.style.transform = `translate(${x - startLeft}px, ${y - startTop}px) rotate(${rotation}deg) scale(${scale})`;
+          piece.style.opacity = opacity;
+
+          if (progress < 1) {
+            requestAnimationFrame(step);
+          } else {
+            piece.remove();
+          }
+        }
+
+        requestAnimationFrame(step);
+      }
+
+      /**
+       * Easing function for smooth deceleration.
+       * @param {number} t - Value between 0 and 1.
+       * @returns {number} Eased value.
+       */
+      function easeOutCubic(t) {
+        return 1 - Math.pow(1 - t, 3);
+      }
+
+      /**
+       * Check if a card was moved to the "done" column and trigger confetti.
+       * @param {string} cardId - The card that was dropped.
+       * @param {string} newColumnId - The column it was dropped into.
+       */
+      function checkDoneConfetti(cardId, newColumnId) {
+        if (newColumnId === 'done') {
+          const cardEl = document.querySelector(`[data-testid="card"][data-card-id="${cardId}"]`);
+          if (cardEl) {
+            triggerConfetti(cardEl);
+          }
+        }
+      }
+
+      // ============================================================
+      //  DRAG AND DROP — DROP ZONE LISTENERS
+      // ============================================================
+
+      /**
+       * Attach drag-and-drop event listeners to a card list container (drop zone).
+       * @param {HTMLElement} listEl - The card list element.
+       */
+      function attachDropZoneListeners(listEl) {
+        /**
+         * When a dragged card enters the drop zone area.
+         */
+        listEl.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+          listEl.classList.add('drag-over');
+        });
+
+        /**
+         * When a dragged card leaves the drop zone area.
+         */
+        listEl.addEventListener('dragleave', (e) => {
+          // Only remove highlight if we're actually leaving the list (not entering a child)
+          if (!listEl.contains(e.relatedTarget)) {
+            listEl.classList.remove('drag-over');
+          }
+        });
+
+        /**
+         * When a card is dropped onto this drop zone.
+         */
+        listEl.addEventListener('drop', (e) => {
+          e.preventDefault();
+          listEl.classList.remove('drag-over');
+
+          const cardId = e.dataTransfer.getData('text/plain');
+          const newColumnId = listEl.dataset.columnId;
+
+          if (!cardId || !newColumnId) return;
+
+          // Find and update the card's column
+          const card = cards.find(c => c.id === cardId);
+          if (!card) return;
+
+          const oldColumnId = card.columnId;
+
+          // Only trigger confetti if moving TO done (not from done to done)
+          if (newColumnId === 'done' && oldColumnId !== 'done') {
+            checkDoneConfetti(cardId, newColumnId);
+          }
+
+          card.columnId = newColumnId;
+          saveCards();
+          render();
+        });
+      }
+
+      // ============================================================
+      //  EVENT LISTENERS (MODAL)
+      // ============================================================
+
+      /**
+       * Click on backdrop to close modal.
+       */
+      deleteModalBackdrop.addEventListener('click', closeDeleteModal);
+
+      /**
+       * Click Cancel button to close modal.
+       */
+      cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+
+      /**
+       * Click Confirm Delete button to execute deletion.
+       */
+      confirmDeleteBtn.addEventListener('click', executeDelete);
+
+      /**
+       * Close modal on Escape key.
+       */
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !deleteModal.classList.contains('hidden')) {
+          closeDeleteModal();
+        }
+      });
+
+      // ============================================================
+      //  INITIALIZATION
+      // ============================================================
+
+      /**
+       * Initialize the application: load state, seed if needed, render.
+       */
+      function init() {
+        // Load cards from localStorage
+        cards = loadCards();
+        // Seed dummy cards if empty
+        seedCards();
+        // Render the board
+        render();
+      }
+
+      // Start the app
+      init();
+
+    })();
+  </script>
+
+</body>
+</html>
+```
+
+This is a complete, self-contained Kanban board in a single HTML file. Here's a summary of what's included:
+
+### Features
+- **4 columns**: Backlog, In Progress, Review, Done — each with distinct header accent colors and icons
+- **Drag & drop**: Cards can be dragged between columns using the native HTML5 Drag and Drop API
+- **Inline editing**: Double-click any card title to edit it in place (Enter to commit, Escape to cancel)
+- **Persistence**: All state is saved to `localStorage` under the namespace `kanban-board-v1__cards`
+- **Deletion**: Custom modal dialog (no `window.confirm`) with a smooth exit animation
+- **Add card**: Each column has an "Add card" button that reveals an inline input (Enter to commit)
+- **Confetti**: A custom particle-based confetti animation triggers when a card is dropped into "Done"
+- **Dummy data**: 7 sample cards are auto-created on first load
+- **No `window.alert`/`window.prompt`**: All interactions use custom UI elements
+
+### Design
+- Dark theme with vibrant gradient accents
+- Glassmorphism-style columns with backdrop blur
+- Gradient accent bars on each card
+- Smooth CSS transitions and keyframe animations
+- Responsive horizontal scrolling layout
+- Custom scrollbar styling
+
+### Test Selectors (all present)
+| Selector | Purpose |
+|---|---|
+| `data-testid="column-backlog"` | Backlog column |
+| `data-testid="column-in-progress"` | In Progress column |
+| `data-testid="column-review"` | Review column |
+| `data-testid="column-done"` | Done column |
+| `data-testid="add-card"` | Add card button (×4) |
+| `data-testid="card"` | Every card element |
+| `data-testid="delete-card"` | Delete button inside each card |
+| `data-testid="confirm-delete"` | Confirm button in delete modal |
+| `data-testid="card-input"` | Input for new/edited card titles |

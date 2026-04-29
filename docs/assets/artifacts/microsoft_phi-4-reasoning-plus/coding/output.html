@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- Ensure proper scaling on mobile devices -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kanban Board</title>
+    <!-- Tailwind CSS CDN for styling -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <!-- Custom styles for confetti canvas and modal -->
+    <style>
+      /* The delete confirmation modal is hidden by default */
+      .modal {
+        display: none;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50">
+    <!-- A full-screen canvas for confetti animation (hidden until triggered) -->
+    <canvas
+      id="confettiCanvas"
+      style="position: absolute; top:0; left: 0; pointer-events:none;"
+    ></canvas>
+
+    <!-- Main board container -->
+    <div id="board" class="relative">
+      <!-- COLUMN: Backlog -->
+      <div
+        data-testid="column-backlog"
+        class="w-full md:w-1/2 lg:w-1/4 p-2"
+      >
+        <h2 class="text-lg font-bold mb-2">Backlog</h2>
+        <!-- "Add card" button with stable test selector -->
+        <button data-testid="add-card" class="mb-4 p-2 bg-blue-500 text-white rounded">
+          Add card
+        </button>
+        <!-- Container for cards will be dynamically appended here -->
+        <div class="card-list flex flex-col gap-2"></div>
+      </div>
+
+      <!-- COLUMN: In Progress -->
+      <div
+        data-testid="column-in-progress"
+        class="w-full md:w-1/2 lg:w-1/4 p-2"
+      >
+        <h2 class="text-lg font-bold mb-2">In Progress</h2>
+        <button data-testid="add-card" class="mb-4 p-2 bg-blue-500 text-white rounded">
+          Add card
+        </button>
+        <div class="card-list flex flex-col gap-2"></div>
+      </div>
+
+      <!-- COLUMN: Review -->
+      <div
+        data-testid="column-review"
+        class="w-full md:w-1/2 lg:w-1/4 p-2"
+      >
+        <h2 class="text-lg font-bold mb-2">Review</h2>
+        <button data-testid="add-card" class="mb-4 p-2 bg-blue-500 text-white rounded">
+          Add card
+        </button>
+        <div class="card-list flex flex-col gap-2"></div>
+      </div>
+
+      <!-- COLUMN: Done -->
+      <div
+        data-testid="column-done"
+        class="w-full md:w-1/2 lg:w-1/4 p-2"
+      >
+        <h2 class="text-lg font-bold mb-2">Done</h2>
+        <button data-testid="add-card" class="mb-4 p-2 bg-blue-500 text-white rounded">
+          Add card
+        </button>
+        <div class="card-list flex flex-col gap-2"></div>
+      </div>
+    </div>
+
+    <!-- Delete confirmation modal -->
+    <div
+      id="delete-modal"
+      class="modal fixed top-0 left-0 w-full h-full bg-black opacity-50 flex items-center justify-center"
+    >
+      <div class="bg-white p-6 rounded shadow-lg">
+        <!-- Modal contents will be added dynamically -->
+      </div>
+    </div>
+
+    <!-- VANILLA JAVASCRIPT CODE FOR KANBAN FUNCTIONALITY -->
+    <script>
+      (function () {
+        // Namespace for localStorage to persist our app state
+        const STORAGE_KEY = "myKanbanAppState";
+
+        // Our application state: an array of card objects.
+        // Each card object has { id, title, column }.
+        let state = [];
+
+        // Load the persisted state from localStorage if available.
+        function loadState() {
+          const stored = window.localStorage.getItem(STORAGE_KEY);
+          if (stored) {
+            try {
+              state = JSON.parse(stored);
+            } catch (e) {
+              console.error("Error parsing stored state", e);
+            }
+          }
+        }
+
+        // Save the current state to localStorage.
+        function saveState() {
+          window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        }
+
+        // Render the board by populating each column with its cards.
+        function renderBoard() {
+          const columns = ["Backlog", "In Progress", "Review", "Done"];
+          // First, clear any existing cards in each column.
+          columns.forEach((col) => {
+            const colLower = col.toLowerCase().replace(" ", "");
+            const columnContainer = document.querySelector(
+              `[data-testid="column-${colLower}"]`
+            );
+            if (columnContainer) {
+              const cardList = columnContainer.querySelector(".card-list");
+              if (cardList) {
+                cardList.innerHTML = "";
+              }
+            }
+          });
+
+          // Now, create and append cards for each state object into its column.
+          columns.forEach((col) => {
+            const colLower = col.toLowerCase().replace(" ", "");
+            const columnContainer = document.querySelector(
+              `[data-testid="column-${colLower}"]`
+            );
+            if (columnContainer) {
+              const cardList = document.createElement("div");
+              cardList.className = "card-list flex flex-col gap-2";
+              state
+                .filter((card) => card.column === col)
+                .forEach((cardObj) => {
+                  const cardEl = createCardElement(cardObj);
+                  cardList.appendChild(cardEl);
+                });
+              columnContainer.appendChild(cardList);
+            }
+          });
+        }
+
+        // Create a card element for a given card object.
+        function createCardElement(cardObj) {
+          // Each card must have the stable test selector "data-testid=card"
+          const cardEl = document.createElement("div");
+          cardEl.setAttribute("data-testid", "card");
+          // Use Tailwind classes for styling and add a transition effect.
+          cardEl.className =
+            "card bg-white p-4 rounded shadow-lg cursor-move transition duration-300 ease-in-out";
+          // Make the card draggable.
+          cardEl.setAttribute("draggable", "true");
+          // Assign a unique id for drag and drop purposes.
+          cardEl.id = "card-" + cardObj.id;
+
+          // Create a container for the title and delete button.
+          const contentEl = document.createElement("div");
+          contentEl.className = "flex items-center justify-between";
+
+          // Create the title element (initially as a span).
+          const titleEl = document.createElement("span");
+          titleEl.className = "text-lg font-semibold";
+          titleEl.textContent = cardObj.title;
+
+          // Enable in-place editing: click the title to turn it into an input.
+          titleEl.addEventListener("click", function () {
+            // Replace the span with an input field.
+            const inputEl = document.createElement("input");
+            inputEl.setAttribute("data-testid", "card-input");
+            inputEl.type = "text";
+            inputEl.value = cardObj.title;
+            inputEl.className =
+              "w-full border p-1 rounded transition duration-200";
+            // Commit changes when Enter is pressed.
+            inputEl.addEventListener("keydown", function (e) {
+              if (e.key === "Enter") {
+                cardObj.title = inputEl.value;
+                saveState();
+                const newSpan = document.createElement("span");
+                newSpan.className = "text-lg font-semibold";
+                newSpan.textContent = cardObj.title;
+                contentEl.replaceChild(newSpan, inputEl);
+              }
+            });
+            // Also commit changes when the input loses focus.
+            inputEl.addEventListener("blur", function () {
+              cardObj.title = inputEl.value;
+              saveState();
+              const newSpan = document.createElement("span");
+              newSpan.className = "text-lg font-semibold";
+              newSpan.textContent = cardObj.title;
+              contentEl.replaceChild(newSpan, inputEl);
+            });
+            // Replace the title element with the new input.
+            contentEl.replaceChild(inputEl, titleEl);
+          });
+
+          // Create the delete button with stable test selector.
+          const deleteBtn = document.createElement("button");
+          deleteBtn.setAttribute("data-testid", "delete-card");
+          deleteBtn.className = "bg-red-500 text-white px-2 py-1 rounded";
+          deleteBtn.textContent = "X";
+
+          // When clicked, show a custom confirmation modal.
+          deleteBtn.addEventListener("click", function () {
+            showDeleteConfirmation(cardObj, cardEl);
+          });
+
+          // Append the title and delete button to the content container.
+          contentEl.appendChild(titleEl);
+          contentEl.appendChild(deleteBtn);
+
+          // Append the content to the card element.
+          cardEl.appendChild(contentEl);
+
+          // Add drag and drop event listeners to this card.
+          addCardDragEvents(cardEl, cardObj);
+
+          return cardEl;
+        }
+
+        // Add drag and drop event listeners to a card element.
+        function addCardDragEvents(cardEl, cardObj) {
+          // On drag start, set the data transfer with the card's id.
+          cardEl.addEventListener("dragstart", function (e) {
+            e.dataTransfer.setData("text/plain", cardObj.id);
+          });
+          // Allow drop on all columns by preventing the default behavior.
+          document.querySelectorAll('[data-testid^="column-"]').forEach((columnEl) => {
+            columnEl.addEventListener("dragover", function (e) {
+              e.preventDefault();
+            });
+          });
+        }
+
+        // Set up the drop event on a column container to handle card reordering.
+        function setupColumnDrop(columnEl, columnName) {
+          columnEl.addEventListener("drop", function (e) {
+            e.preventDefault();
+            const id = e.dataTransfer.getData("text/plain");
+            // Find the card object by its id.
+            const cardObj = state.find((card) => card.id === parseInt(id));
+            if (cardObj) {
+              // Update the card's column.
+              cardObj.column = columnName;
+              saveState();
+              renderBoard();
+
+              // If the new column is "Done", trigger the confetti animation.
+              if (columnName === "Done") {
+                startConfettiAnimation();
+              }
+            }
+          });
+        }
+
+        // Set up the "Add card" action for a column.
+        function setupAddCard(columnEl, columnName) {
+          const addCardBtn = columnEl.querySelector('[data-testid="add-card"]');
+          if (!addCardBtn) return;
+
+          addCardBtn.addEventListener("click", function () {
+            // Create a new input field for entering the card title.
+            const inputEl = document.createElement("input");
+            inputEl.setAttribute("data-testid", "card-input");
+            inputEl.type = "text";
+            inputEl.placeholder = "Enter card title...";
+            inputEl.className =
+              "w-full border p-1 rounded transition duration-200";
+            // Focus the input field.
+            inputEl.focus();
+
+            // Insert the input after the "Add card" button.
+            addCardBtn.parentNode.insertBefore(inputEl, addCardBtn.nextSibling);
+
+            // Function to commit the new card.
+            function commitNewCard() {
+              const title = inputEl.value.trim();
+              if (title === "") return;
+              // Generate a unique id for the new card.
+              const newCardId = state.length > 0
+                ? Math.max(...state.map((card) => card.id)) + 1
+                : 1;
+              const newCard = { id: newCardId, title: title, column: columnName };
+              state.push(newCard);
+              saveState();
+              renderBoard();
+
+              // Remove the input element after committing.
+              addCardBtn.parentNode.removeChild(inputEl);
+            }
+
+            // Commit when the Enter key is pressed.
+            inputEl.addEventListener("keydown", function (e) {
+              if (e.key === "Enter") {
+                commitNewCard();
+              }
+            });
+            // Also commit when the input loses focus.
+            inputEl.addEventListener("blur", function () {
+              commitNewCard();
+            });
+          });
+        }
+
+        // Display a custom delete confirmation modal for a card.
+        function showDeleteConfirmation(cardObj, cardEl) {
+          // Create or reuse the modal element.
+          let modal = document.getElementById("delete-modal");
+          if (!modal) {
+            modal = document.createElement("div");
+            modal.id = "delete-modal";
+            modal.className =
+              "modal fixed top-0 left-0 w-full h-full bg-black opacity-50 flex items-center justify-center";
+            const modalContent = document.createElement("div");
+            modalContent.className = "bg-white p-6 rounded shadow-lg";
+
+            // Modal title.
+            const modalTitle = document.createElement("h3");
+            modalTitle.textContent = "Delete Card?";
+
+            // Modal message.
+            const message = document.createElement("p");
+            message.textContent =
+              "Are you sure you want to delete this card?";
+
+            // Confirm button with stable test selector.
+            const confirmBtn = document.createElement("button");
+            confirmBtn.setAttribute("data-testid", "confirm-delete");
+            confirmBtn.className =
+              "bg-red-500 text-white px-4 py-2 rounded mr-2";
+            confirmBtn.textContent = "Delete";
+
+            // Cancel button.
+            const cancelBtn = document.createElement("button");
+            cancelBtn.className =
+              "bg-gray-300 text-black px-4 py-2 rounded";
+            cancelBtn.textContent = "Cancel";
+
+            // When confirm is clicked, delete the card.
+            confirmBtn.addEventListener("click", function () {
+              state = state.filter((card) => card.id !== cardObj.id);
+              saveState();
+              if (cardEl.parentNode) {
+                cardEl.parentNode.removeChild(cardEl);
+              }
+              document.body.removeChild(modal);
+            });
+
+            // When cancel is clicked, simply close the modal.
+            cancelBtn.addEventListener("click", function () {
+              document.body.removeChild(modal);
+            });
+
+            modalContent.appendChild(modalTitle);
+            modalContent.appendChild(message);
+            modalContent.appendChild(confirmBtn);
+            modalContent.appendChild(cancelBtn);
+
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+          } else {
+            // If the modal already exists, remove it to ensure a single instance.
+            document.body.removeChild(modal);
+          }
+        }
+
+        // Start the confetti animation when a card is moved to "Done".
+        function startConfettiAnimation() {
+          const canvas = document.getElementById("confettiCanvas");
+          // Set the canvas dimensions to full window size.
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+          const ctx = canvas.getContext("2d");
+          // Make the canvas visible.
+          canvas.style.display = "block";
+
+          let particles = [];
+          const particleCount = 100;
+
+          // Initialize confetti particles with random properties.
+          for (let i = 0; i < particleCount; i++) {
+            particles.push({
+              x: Math.random() * canvas.width,
+              y: Math.random() * canvas.height,
+              size: (Math.random() * 5) + 1, // Size between 1 and 6.
+              speedY: (Math.random() * 1) + 0.5, // Vertical speed between 0.5 and 1.5.
+              drift: (Math.random() - 0.5) * 0.5, // Horizontal drift.
+            });
+          }
+
+          function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((p) => {
+              // Generate a random color for each particle.
+              let color = "#" + Math.floor(Math.random() * 16777215).toString(16);
+              ctx.fillStyle = color;
+              ctx.beginPath();
+              // Draw a circle for the particle.
+              ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+              ctx.fill();
+            });
+
+            // Update particle positions.
+            particles.forEach((p) => {
+              p.y += p.speedY;
+              p.x += p.drift;
+            });
+
+            // Remove particles that go off screen.
+            for (let i = particles.length - 1; i >= 0; i--) {
+              if (
+                particles[i].y > canvas.height ||
+                particles[i].x < 0 ||
+                particles[i].x > canvas.width
+              ) {
+                particles.splice(i, 1);
+              }
+            }
+
+            requestAnimationFrame(draw);
+          }
+
+          draw();
+
+          // Hide the canvas after 3 seconds of animation.
+          setTimeout(() => {
+            canvas.style.display = "none";
+          }, 3000);
+        }
+
+        // Initialize the Kanban board.
+        function init() {
+          loadState();
+          // If no cards exist yet, create some dummy cards.
+          if (state.length === 0) {
+            state = [
+              { id: 1, title: "Design new homepage", column: "Backlog" },
+              { id: 2, title: "Fix login bug", column: "Backlog" },
+              { id: 3, title: "Update documentation", column: "In Progress" },
+            ];
+            saveState();
+          }
+          renderBoard();
+
+          // Set up drag-and-drop and "Add card" functionality for each column.
+          const columns = ["Backlog", "In Progress", "Review", "Done"];
+          columns.forEach((col) => {
+            const colLower = col.toLowerCase().replace(" ", "");
+            const columnEl = document.querySelector(
+              `[data-testid="column-${colLower}"]`
+            );
+            if (columnEl) {
+              setupColumnDrop(columnEl, col);
+              setupAddCard(columnEl, col);
+            }
+          });
+        }
+
+        // Start the app once the DOM is fully loaded.
+        document.addEventListener("DOMContentLoaded", init);
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,570 @@
+
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Kanban Board</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Canvas Confetti for the "Done" celebration -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            900: '#1e3a8a',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-out',
+                        'slide-up': 'slideUp 0.3s ease-out'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(10px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom scrollbar for a polished look */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+
+        /* Drag and Drop visual cues */
+        .dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+        }
+        
+        .drag-over {
+            background-color: #f8fafc;
+            border: 2px dashed #cbd5e1;
+        }
+
+        /* Card content editable styles */
+        .card-title {
+            outline: none;
+            word-break: break-word;
+            line-height: 1.4;
+        }
+        .card-title:focus {
+            background-color: #f1f5f9;
+            border-radius: 4px;
+            padding: 2px 4px;
+        }
+
+        /* Modal backdrop blur */
+        .modal-backdrop {
+            backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-slate-200 p-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Kanban Board</h1>
+            <div class="text-sm text-slate-500">Vanilla JS • LocalStorage • Tailwind</div>
+        </div>
+    </header>
+
+    <!-- Main Board -->
+    <main class="flex-1 p-6 overflow-x-auto">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 h-full">
+            
+            <!-- Column: Backlog -->
+            <div class="flex flex-col h-full">
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="font-semibold text-slate-700">Backlog</h2>
+                    <span class="bg-slate-200 text-slate-600 text-xs px-2 py-1 rounded-full font-medium" id="count-backlog">0</span>
+                </div>
+                
+                <!-- Column Container for DnD -->
+                <div class="flex-1 bg-slate-50 rounded-xl border border-slate-200 p-3 overflow-y-auto min-h-[200px] transition-colors duration-200"
+                     data-testid="column-backlog"
+                     id="col-backlog"
+                     ondrop="handleDrop(event, 'backlog')"
+                     ondragover="handleDragOver(event)"
+                     ondragleave="handleDragLeave(event)">
+                    
+                    <!-- Cards will be injected here -->
+                    <div id="list-backlog" class="space-y-3"></div>
+                    
+                    <!-- Add Card Input (Hidden by default, shown when button clicked) -->
+                    <div id="input-backlog" class="hidden mt-3 animate-slide-up">
+                        <input type="text" 
+                               data-testid="card-input" 
+                               class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent mb-2"
+                               placeholder="Enter task title..."
+                               onkeydown="handleInputKeydown(event, 'backlog')">
+                        <div class="flex justify-end gap-2">
+                            <button onclick="cancelAddCard('backlog')" class="text-xs text-slate-500 hover:text-slate-700">Cancel</button>
+                            <button onclick="addCard('backlog')" class="text-xs bg-brand-600 text-white px-3 py-1 rounded hover:bg-brand-700">Add</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add Button -->
+                <button onclick="showAddCardInput('backlog')" 
+                        data-testid="add-card"
+                        class="mt-3 w-full py-2 border-2 border-dashed border-slate-300 rounded-xl text-slate-500 hover:border-brand-500 hover:text-brand-600 transition-colors font-medium text-sm flex items-center justify-center gap-2 group">
+                    <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Add Task
+                </button>
+            </div>
+
+            <!-- Column: In Progress -->
+            <div class="flex flex-col h-full">
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="font-semibold text-slate-700">In Progress</h2>
+                    <span class="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full font-medium" id="count-in-progress">0</span>
+                </div>
+                
+                <div class="flex-1 bg-slate-50 rounded-xl border border-slate-200 p-3 overflow-y-auto min-h-[200px] transition-colors duration-200"
+                     data-testid="column-in-progress"
+                     id="col-in-progress"
+                     ondrop="handleDrop(event, 'in-progress')"
+                     ondragover="handleDragOver(event)"
+                     ondragleave="handleDragLeave(event)">
+                    <div id="list-in-progress" class="space-y-3"></div>
+                    
+                    <div id="input-in-progress" class="hidden mt-3 animate-slide-up">
+                        <input type="text" 
+                               data-testid="card-input" 
+                               class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent mb-2"
+                               placeholder="Enter task title..."
+                               onkeydown="handleInputKeydown(event, 'in-progress')">
+                        <div class="flex justify-end gap-2">
+                            <button onclick="cancelAddCard('in-progress')" class="text-xs text-slate-500 hover:text-slate-700">Cancel</button>
+                            <button onclick="addCard('in-progress')" class="text-xs bg-brand-600 text-white px-3 py-1 rounded hover:bg-brand-700">Add</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="showAddCardInput('in-progress')" 
+                        data-testid="add-card"
+                        class="mt-3 w-full py-2 border-2 border-dashed border-slate-300 rounded-xl text-slate-500 hover:border-brand-500 hover:text-brand-600 transition-colors font-medium text-sm flex items-center justify-center gap-2 group">
+                    <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Add Task
+                </button>
+            </div>
+
+            <!-- Column: Review -->
+            <div class="flex flex-col h-full">
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="font-semibold text-slate-700">Review</h2>
+                    <span class="bg-purple-100 text-purple-700 text-xs px-2 py-1 rounded-full font-medium" id="count-review">0</span>
+                </div>
+                
+                <div class="flex-1 bg-slate-50 rounded-xl border border-slate-200 p-3 overflow-y-auto min-h-[200px] transition-colors duration-200"
+                     data-testid="column-review"
+                     id="col-review"
+                     ondrop="handleDrop(event, 'review')"
+                     ondragover="handleDragOver(event)"
+                     ondragleave="handleDragLeave(event)">
+                    <div id="list-review" class="space-y-3"></div>
+                    
+                    <div id="input-review" class="hidden mt-3 animate-slide-up">
+                        <input type="text" 
+                               data-testid="card-input" 
+                               class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent mb-2"
+                               placeholder="Enter task title..."
+                               onkeydown="handleInputKeydown(event, 'review')">
+                        <div class="flex justify-end gap-2">
+                            <button onclick="cancelAddCard('review')" class="text-xs text-slate-500 hover:text-slate-700">Cancel</button>
+                            <button onclick="addCard('review')" class="text-xs bg-brand-600 text-white px-3 py-1 rounded hover:bg-brand-700">Add</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="showAddCardInput('review')" 
+                        data-testid="add-card"
+                        class="mt-3 w-full py-2 border-2 border-dashed border-slate-300 rounded-xl text-slate-500 hover:border-brand-500 hover:text-brand-600 transition-colors font-medium text-sm flex items-center justify-center gap-2 group">
+                    <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Add Task
+                </button>
+            </div>
+
+            <!-- Column: Done -->
+            <div class="flex flex-col h-full">
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="font-semibold text-slate-700">Done</h2>
+                    <span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full font-medium" id="count-done">0</span>
+                </div>
+                
+                <div class="flex-1 bg-slate-50 rounded-xl border border-slate-200 p-3 overflow-y-auto min-h-[200px] transition-colors duration-200"
+                     data-testid="column-done"
+                     id="col-done"
+                     ondrop="handleDrop(event, 'done')"
+                     ondragover="handleDragOver(event)"
+                     ondragleave="handleDragLeave(event)">
+                    <div id="list-done" class="space-y-3"></div>
+                    
+                    <div id="input-done" class="hidden mt-3 animate-slide-up">
+                        <input type="text" 
+                               data-testid="card-input" 
+                               class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent mb-2"
+                               placeholder="Enter task title..."
+                               onkeydown="handleInputKeydown(event, 'done')">
+                        <div class="flex justify-end gap-2">
+                            <button onclick="cancelAddCard('done')" class="text-xs text-slate-500 hover:text-slate-700">Cancel</button>
+                            <button onclick="addCard('done')" class="text-xs bg-brand-600 text-white px-3 py-1 rounded hover:bg-brand-700">Add</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="showAddCardInput('done')" 
+                        data-testid="add-card"
+                        class="mt-3 w-full py-2 border-2 border-dashed border-slate-300 rounded-xl text-slate-500 hover:border-brand-500 hover:text-brand-600 transition-colors font-medium text-sm flex items-center justify-center gap-2 group">
+                    <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Add Task
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="fixed inset-0 z-50 hidden">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-slate-900/50 modal-backdrop transition-opacity" onclick="closeDeleteModal()"></div>
+        <!-- Modal Content -->
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-2xl p-6 w-80 animate-slide-up">
+            <h3 class="text-lg font-bold text-slate-800 mb-2">Delete Task?</h3>
+            <p class="text-slate-500 text-sm mb-6">Are you sure you want to remove this task? This action cannot be undone.</p>
+            <div class="flex justify-end gap-3">
+                <button onclick="closeDeleteModal()" class="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg text-sm font-medium transition-colors">Cancel</button>
+                <button onclick="confirmDelete()" data-testid="confirm-delete" class="px-4 py-2 bg-red-500 text-white hover:bg-red-600 rounded-lg text-sm font-medium shadow-sm transition-colors">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Logic -->
+    <script>
+        /**
+         * Kanban Board Application Logic
+         * Handles state management, local storage persistence, drag-and-drop,
+         * and DOM manipulation.
+         */
+
+        // --- Configuration & State ---
+        
+        // Custom namespace for localStorage
+        const STORAGE_KEY = 'kanban_board_v1_data';
+        
+        // Initial dummy data if storage is empty
+        const INITIAL_DUMMY_DATA = {
+            'backlog': [
+                { id: 't1', title: 'Design System Setup' },
+                { id: 't2', title: 'Research User Needs' }
+            ],
+            'in-progress': [
+                { id: 't3', title: 'Implement Drag & Drop' }
+            ],
+            'review': [
+                { id: 't4', title: 'Code Review: Auth Module' }
+            ],
+            'done': [
+                { id: 't5', title: 'Project Setup' }
+            ]
+        };
+
+        // Main application state
+        let boardState = JSON.parse(JSON.stringify(INITIAL_DUMMY_DATA));
+        
+        // Track the ID of the card currently being deleted (for confirmation)
+        let cardToDeleteId = null;
+
+        // --- Initialization ---
+
+        function init() {
+            // Load from localStorage if available
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                boardState = JSON.parse(stored);
+            } else {
+                boardState = JSON.parse(JSON.stringify(INITIAL_DUMMY_DATA));
+                saveToStorage();
+            }
+            renderBoard();
+        }
+
+        function saveToStorage() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(boardState));
+        }
+
+        // --- Rendering ---
+
+        function renderBoard() {
+            // Clear existing lists
+            ['backlog', 'in-progress', 'review', 'done'].forEach(col => {
+                const listEl = document.getElementById(`list-${col}`);
+                listEl.innerHTML = '';
+                
+                // Update counter
+                const countEl = document.getElementById(`count-${col}`);
+                countEl.textContent = boardState[col].length;
+
+                // Render cards
+                boardState[col].forEach(card => {
+                    const cardEl = createCardElement(card);
+                    listEl.appendChild(cardEl);
+                });
+            });
+        }
+
+        function createCardElement(card) {
+            const div = document.createElement('div');
+            div.className = 'bg-white p-4 rounded-lg shadow-sm border border-slate-200 hover:shadow-md transition-shadow cursor-grab active:cursor-grabbing group animate-fade-in';
+            div.draggable = true;
+            div.setAttribute('data-testid', 'card');
+            div.dataset.id = card.id;
+            div.dataset.col = getColumnKeyFromId(card.id); // Helper to find current column
+
+            // Content Editable Title
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'card-title text-slate-700 text-sm font-medium';
+            titleDiv.contentEditable = true;
+            titleDiv.textContent = card.title;
+            
+            // Event Listeners for Editing
+            titleDiv.addEventListener('input', (e) => {
+                // Update state on input (real-time)
+                const col = div.dataset.col;
+                const cardInState = boardState[col].find(c => c.id === card.id);
+                if (cardInState) {
+                    cardInState.title = e.target.textContent;
+                    // We don't save to localStorage here to avoid performance hit on every keystroke
+                }
+            });
+
+            titleDiv.addEventListener('blur', (e) => {
+                // Save to localStorage on blur
+                const col = div.dataset.col;
+                const cardInState = boardState[col].find(c => c.id === card.id);
+                if (cardInState) {
+                    saveToStorage();
+                }
+            });
+
+            // Prevent dropping content inside the card when dragging starts
+            div.addEventListener('dragstart', (e) => {
+                div.classList.add('dragging');
+                e.dataTransfer.setData('text/plain', card.id);
+                e.dataTransfer.effectAllowed = 'move';
+            });
+
+            div.addEventListener('dragend', () => {
+                div.classList.remove('dragging');
+                // Remove drag-over styles from all columns
+                ['backlog', 'in-progress', 'review', 'done'].forEach(col => {
+                    document.getElementById(`col-${col}`).classList.remove('drag-over');
+                });
+            });
+
+            // Delete Button (Absolute positioned for better UX, or inline)
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'absolute top-2 right-2 text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity';
+            deleteBtn.setAttribute('data-testid', 'delete-card');
+            deleteBtn.innerHTML = `
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+            `;
+            deleteBtn.onclick = () => openDeleteModal(card.id);
+
+            div.appendChild(titleDiv);
+            div.appendChild(deleteBtn);
+
+            return div;
+        }
+
+        function getColumnKeyFromId(id) {
+            for (const [key, cards] of Object.entries(boardState)) {
+                if (cards.some(c => c.id === id)) return key;
+            }
+            return 'backlog';
+        }
+
+        // --- Drag and Drop Logic ---
+
+        function handleDragOver(e) {
+            e.preventDefault(); // Necessary to allow dropping
+            e.dataTransfer.dropEffect = 'move';
+            e.currentTarget.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleDrop(e, targetCol) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+
+            const cardId = e.dataTransfer.getData('text/plain');
+            if (!cardId) return;
+
+            // Find the column the card is currently in
+            const oldCol = getColumnKeyFromId(cardId);
+            
+            // If dropping in the same column, do nothing
+            if (oldCol === targetCol) return;
+
+            // Move the card in the state
+            const cardIndex = boardState[oldCol].findIndex(c => c.id === cardId);
+            if (cardIndex > -1) {
+                const [card] = boardState[oldCol].splice(cardIndex, 1);
+                boardState[targetCol].push(card);
+                saveToStorage();
+                renderBoard();
+
+                // Trigger Confetti if moved to Done
+                if (targetCol === 'done') {
+                    triggerConfetti();
+                }
+            }
+        }
+
+        // --- Add Card Logic ---
+
+        function showAddCardInput(colId) {
+            const inputContainer = document.getElementById(`input-${colId}`);
+            const input = inputContainer.querySelector('input');
+            
+            // Show container
+            inputContainer.classList.remove('hidden');
+            // Focus input
+            input.focus();
+            // Move cursor to end
+            input.setSelectionRange(input.value.length, input.value.length);
+        }
+
+        function cancelAddCard(colId) {
+            const inputContainer = document.getElementById(`input-${colId}`);
+            const input = inputContainer.querySelector('input');
+            input.value = ''; // Clear value
+            inputContainer.classList.add('hidden');
+        }
+
+        function handleInputKeydown(e, colId) {
+            if (e.key === 'Enter') {
+                addCard(colId);
+            }
+        }
+
+        function addCard(colId) {
+            const inputContainer = document.getElementById(`input-${colId}`);
+            const input = inputContainer.querySelector('input');
+            const title = input.value.trim();
+
+            if (title) {
+                const newCard = {
+                    id: 'task-' + Date.now(),
+                    title: title
+                };
+                boardState[colId].push(newCard);
+                saveToStorage();
+                renderBoard();
+                cancelAddCard(colId);
+            }
+        }
+
+        // --- Delete Logic (Modal) ---
+
+        function openDeleteModal(cardId) {
+            cardToDeleteId = cardId;
+            const modal = document.getElementById('delete-modal');
+            modal.classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            const modal = document.getElementById('delete-modal');
+            modal.classList.add('hidden');
+            cardToDeleteId = null;
+        }
+
+        function confirmDelete() {
+            if (!cardToDeleteId) return;
+
+            // Iterate through all columns to find and remove the card
+            let found = false;
+            for (const col in boardState) {
+                const index = boardState[col].findIndex(c => c.id === cardToDeleteId);
+                if (index > -1) {
+                    boardState[col].splice(index, 1);
+                    found = true;
+                    break;
+                }
+            }
+
+            if (found) {
+                saveToStorage();
+                renderBoard();
+            }
+
+            closeDeleteModal();
+        }
+
+        // --- Visual Effects ---
+
+        function triggerConfetti() {
+            // Simple confetti burst
+            const count = 200;
+            const defaults = {
+                origin: { y: 0.7 },
+                zIndex: 100
+            };
+
+            function fire(particleRatio, opts) {
+                confetti(Object.assign({}, defaults, opts, {
+                    particleCount: Math.floor(count * particleRatio)
+                }));
+            }
+
+            fire(0.25, { spread: 26, startVelocity: 55, colors: ['#3b82f6', '#2563eb'] });
+            fire(0.2, { spread: 60, colors: ['#60a5fa', '#3b82f6'] });
+            fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+            fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+            fire(0.1, { spread: 120, startVelocity: 45 });
+        }
+
+        // Start the app
+        init();
+
+    </script>
+</body>
+</html>
+```

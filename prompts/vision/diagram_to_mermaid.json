@@ -1,0 +1,23 @@
+{
+  "name": "diagram_to_mermaid",
+  "label": "Diagramm → Mermaid",
+  "system": "Du bist Spezialist für Diagramm-Erkennung und Mermaid-Syntax.",
+  "user_prompt": "Auf dem Bild siehst du ein Diagramm (Architektur, Flowchart, Sequenzdiagramm o.ä.). Gib das Diagramm als Mermaid-Code zurück.\n\nWichtig:\n- Nur Mermaid-Syntax, keine Erklärungen drumherum, keine Markdown-Code-Fences.\n- Beginne direkt mit dem Diagramm-Typ (z.B. `flowchart TD`, `graph LR`, `sequenceDiagram`, `classDiagram`, `stateDiagram-v2`, `erDiagram`).\n- Verwende für IDs nur einfache ASCII-Bezeichner ohne Leerzeichen, z.B. `A`, `B1`, `ServiceAPI`, `Q1`.\n- Wenn Labels Sonderzeichen, Leerzeichen, Klammern, Slash, Plus oder Anführungszeichen enthalten, schreibe sie als quoted labels, z.B. `A[\"Frontend (React)\"]` oder `subgraph Q1[\"Wichtig + Dringend (Q1)\"]`.\n- Benutze `style` und `class` nur auf solche einfachen IDs, niemals auf sichtbare Labels mit Leerzeichen.\n- Beschrifte Knoten mit den im Bild lesbaren Texten.\n- Behalte Pfeilrichtungen und -typen bei (durchgezogen/gestrichelt/Beschriftung).",
+  "image_glob": "diagram_*.{jpg,jpeg,png}",
+  "diagram_keywords": [
+    "flowchart",
+    "graph",
+    "sequenceDiagram",
+    "classDiagram",
+    "stateDiagram",
+    "erDiagram",
+    "gantt",
+    "pie",
+    "journey",
+    "mindmap",
+    "gitGraph",
+    "quadrantChart",
+    "timeline",
+    "xychart"
+  ]
+}

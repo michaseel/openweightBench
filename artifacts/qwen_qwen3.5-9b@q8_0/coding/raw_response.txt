@@ -1,0 +1,520 @@
+
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vibrant Kanban Board</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom Styles for Transitions and Confetti */
+        
+        /* Smooth transitions for board interactions */
+        .kanban-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .dragging {
+            opacity: 0.5;
+            transform: scale(0.98);
+        }
+
+        /* Drag-over visual feedback */
+        .column-drag-over {
+            background-color: rgba(0, 0, 0, 0.03);
+            border-color: #fbbf24; /* Amber-400 */
+            border-style: dashed;
+        }
+
+        /* Confetti Animation Keyframes */
+        @keyframes confetti-fall {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+        }
+
+        .confetti-piece {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            z-index: 50;
+            pointer-events: none;
+        }
+
+        /* Custom scrollbar for columns */
+        .column-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        .column-content::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen p-8 font-sans text-slate-700">
+
+    <!-- Header -->
+    <header class="mb-8 flex justify-between items-center max-w-6xl mx-auto">
+        <div>
+            <h1 class="text-3xl font-bold text-indigo-600 tracking-tight">TaskFlow</h1>
+            <p class="text-slate-500 text-sm mt-1">Manage your workflow effortlessly.</p>
+        </div>
+        <button onclick="clearData()" class="text-xs text-red-400 hover:text-red-600 underline">Reset Data</button>
+    </header>
+
+    <!-- Main Board Container -->
+    <main class="max-w-6xl mx-auto h-full overflow-x-auto pb-8">
+        <div class="flex gap-6 h-[calc(100vh-140px)] min-w-max">
+
+            <!-- Column: Backlog -->
+            <div data-testid="column-backlog" 
+                 class="bg-slate-200/50 rounded-xl w-80 flex flex-col p-4 border border-slate-200 shadow-sm transition-colors duration-300"
+                 id="col-backlog">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="font-bold text-lg text-slate-700 uppercase tracking-wide">Backlog</h2>
+                    <span class="bg-indigo-100 text-indigo-700 text-xs font-semibold px-2.5 py-0.5 rounded-full" id="count-backlog">0</span>
+                </div>
+                
+                <!-- Drop Zone Content -->
+                <div class="flex-1 column-content overflow-y-auto space-y-3 pr-1" ondrop="handleDrop(event)" ondragover="allowDrop(event)">
+                    <!-- Cards will be injected here -->
+                </div>
+
+                <!-- Add Card Input Area -->
+                <div class="mt-4 pt-4 border-t border-slate-200">
+                    <textarea data-testid="card-input" 
+                              placeholder="+ Add a new task..." 
+                              class="w-full bg-white text-sm p-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none h-14 shadow-sm transition-shadow"
+                              onkeydown="handleEnter(event, 'backlog')"></textarea>
+                    <button data-testid="add-card" 
+                            onclick="addCard('backlog')" 
+                            class="mt-2 w-full text-xs font-medium text-indigo-600 hover:text-indigo-800">Add Card</button>
+                </div>
+            </div>
+
+            <!-- Column: In Progress -->
+            <div data-testid="column-in-progress" 
+                 class="bg-slate-200/50 rounded-xl w-80 flex flex-col p-4 border border-slate-200 shadow-sm transition-colors duration-300"
+                 id="col-in-progress">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="font-bold text-lg text-slate-700 uppercase tracking-wide">In Progress</h2>
+                    <span class="bg-blue-100 text-blue-700 text-xs font-semibold px-2.5 py-0.5 rounded-full" id="count-in-progress">0</span>
+                </div>
+                
+                <div class="flex-1 column-content overflow-y-auto space-y-3 pr-1" ondrop="handleDrop(event)" ondragover="allowDrop(event)">
+                    <!-- Cards will be injected here -->
+                </div>
+
+                <div class="mt-4 pt-4 border-t border-slate-200">
+                    <textarea data-testid="card-input" 
+                              placeholder="+ Add a new task..." 
+                              class="w-full bg-white text-sm p-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none h-14 shadow-sm transition-shadow"
+                              onkeydown="handleEnter(event, 'in-progress')"></textarea>
+                    <button data-testid="add-card" 
+                            onclick="addCard('in-progress')" 
+                            class="mt-2 w-full text-xs font-medium text-blue-600 hover:text-blue-800">Add Card</button>
+                </div>
+            </div>
+
+            <!-- Column: Review -->
+            <div data-testid="column-review" 
+                 class="bg-slate-200/50 rounded-xl w-80 flex flex-col p-4 border border-slate-200 shadow-sm transition-colors duration-300"
+                 id="col-review">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="font-bold text-lg text-slate-700 uppercase tracking-wide">Review</h2>
+                    <span class="bg-amber-100 text-amber-700 text-xs font-semibold px-2.5 py-0.5 rounded-full" id="count-review">0</span>
+                </div>
+                
+                <div class="flex-1 column-content overflow-y-auto space-y-3 pr-1" ondrop="handleDrop(event)" ondragover="allowDrop(event)">
+                    <!-- Cards will be injected here -->
+                </div>
+
+                <div class="mt-4 pt-4 border-t border-slate-200">
+                    <textarea data-testid="card-input" 
+                              placeholder="+ Add a new task..." 
+                              class="w-full bg-white text-sm p-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none h-14 shadow-sm transition-shadow"
+                              onkeydown="handleEnter(event, 'review')"></textarea>
+                    <button data-testid="add-card" 
+                            onclick="addCard('review')" 
+                            class="mt-2 w-full text-xs font-medium text-amber-600 hover:text-amber-800">Add Card</button>
+                </div>
+            </div>
+
+            <!-- Column: Done -->
+            <div data-testid="column-done" 
+                 class="bg-slate-200/50 rounded-xl w-80 flex flex-col p-4 border border-slate-200 shadow-sm transition-colors duration-300"
+                 id="col-done">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="font-bold text-lg text-slate-700 uppercase tracking-wide">Done</h2>
+                    <span class="bg-emerald-100 text-emerald-700 text-xs font-semibold px-2.5 py-0.5 rounded-full" id="count-done">0</span>
+                </div>
+                
+                <div class="flex-1 column-content overflow-y-auto space-y-3 pr-1" ondrop="handleDrop(event)" ondragover="allowDrop(event)">
+                    <!-- Cards will be injected here -->
+                </div>
+
+                <div class="mt-4 pt-4 border-t border-slate-200">
+                    <textarea data-testid="card-input" 
+                              placeholder="+ Add a new task..." 
+                              class="w-full bg-white text-sm p-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none h-14 shadow-sm transition-shadow"
+                              onkeydown="handleEnter(event, 'done')"></textarea>
+                    <button data-testid="add-card" 
+                            onclick="addCard('done')" 
+                            class="mt-2 w-full text-xs font-medium text-emerald-600 hover:text-emerald-800">Add Card</button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Custom Delete Confirmation Modal -->
+    <div id="delete-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 transition-opacity">
+        <div class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full mx-4 transform scale-100 animate-fade-in-up">
+            <h3 class="text-lg font-bold text-slate-800 mb-2">Delete Card?</h3>
+            <p class="text-slate-500 text-sm mb-6">Are you sure you want to remove this card? This action cannot be undone.</p>
+            <div class="flex justify-end gap-3">
+                <button id="cancel-delete-btn" class="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 font-medium transition-colors">Cancel</button>
+                <button data-testid="confirm-delete" class="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 shadow-md shadow-red-200 font-medium transition-all transform active:scale-95">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * STATE MANAGEMENT
+         */
+        const STORAGE_KEY = 'kanban-board-v1';
+        
+        // Initial Dummy Data
+        const initialData = {
+            backlog: [
+                { id: Date.now(), content: "Research competitors", tags: ["Design"] },
+                { id: Date.now() + 1, content: "Setup project repository" }
+            ],
+            "in-progress": [
+                { id: Date.now() + 2, content: "Draft initial wireframes" }
+            ],
+            review: [],
+            done: []
+        };
+
+        // Load state from localStorage or use default
+        let boardState = JSON.parse(localStorage.getItem(STORAGE_KEY)) || initialData;
+
+        /**
+         * CORE FUNCTIONS
+         */
+
+        function saveState() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(boardState));
+            updateCounts();
+        }
+
+        function updateCounts() {
+            Object.keys(boardState).forEach(col => {
+                const countEl = document.getElementById(`count-${col}`);
+                if(countEl) countEl.textContent = boardState[col].length;
+            });
+        }
+
+        function clearData() {
+            if(confirm("Are you sure you want to reset the board?")) {
+                localStorage.removeItem(STORAGE_KEY);
+                location.reload();
+            }
+        }
+
+        /**
+         * RENDERING
+         */
+
+        // Renders all columns based on current state
+        function renderBoard() {
+            const columns = ['backlog', 'in-progress', 'review', 'done'];
+            
+            columns.forEach(colKey => {
+                const container = document.getElementById(`col-${colKey}`);
+                if (!container) return;
+
+                // Clear existing cards (keep inputs)
+                const cardContainer = container.querySelector('.column-content');
+                cardContainer.innerHTML = '';
+
+                // Render Cards
+                boardState[colKey].forEach(card => {
+                    createCardElement(card, colKey);
+                });
+            });
+            
+            updateCounts();
+        }
+
+        function createCardElement(cardData, colKey) {
+            const container = document.querySelector(`#col-${colKey} .column-content`);
+            
+            // Create Card Container
+            const cardDiv = document.createElement('div');
+            cardDiv.className = 'kanban-card bg-white p-4 rounded-lg shadow-sm border border-slate-200 relative group cursor-default hover:shadow-md';
+            cardDiv.draggable = true;
+            cardDiv.dataset.id = cardData.id; // Store ID in dataset for easy access
+            
+            // Drag Events on Card
+            cardDiv.addEventListener('dragstart', handleDragStart);
+            cardDiv.addEventListener('click', (e) => handleCardClick(e, cardData));
+
+            // Card Content
+            const titleP = document.createElement('p');
+            titleP.className = 'text-slate-800 font-medium leading-tight mb-2 cursor-pointer';
+            titleP.textContent = cardData.content;
+            
+            // Tags (Visual only)
+            if(cardData.tags && cardData.tags.length > 0) {
+                const tagsDiv = document.createElement('div');
+                tagsDiv.className = 'flex gap-1 mt-2 flex-wrap';
+                cardData.tags.forEach(tag => {
+                    const badge = document.createElement('span');
+                    badge.className = 'text-[10px] uppercase font-bold px-1.5 py-0.5 bg-slate-100 text-slate-500 rounded';
+                    badge.textContent = tag;
+                    tagsDiv.appendChild(badge);
+                });
+                cardDiv.appendChild(tagsDiv);
+            }
+
+            // Delete Trigger (Hidden until hover)
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'absolute top-2 right-2 opacity-0 group-hover:opacity-100 p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all';
+            deleteBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>';
+            deleteBtn.setAttribute('data-testid', 'delete-card'); // Test ID Requirement
+            deleteBtn.onclick = (e) => { e.stopPropagation(); handleDeleteClick(cardData.id); };
+
+            cardDiv.appendChild(titleP);
+            cardDiv.appendChild(deleteBtn);
+            
+            container.appendChild(cardDiv);
+        }
+
+        /**
+         * DRAG AND DROP LOGIC
+         */
+
+        let draggedCardId = null;
+
+        function allowDrop(e) {
+            e.preventDefault(); // Necessary to allow dropping
+            const targetCol = e.target.closest('[data-testid]'); // Ensure we drop on a column, not inside a card
+            if(targetCol) {
+                targetCol.classList.add('column-drag-over');
+            }
+        }
+
+        function handleDragStart(e) {
+            draggedCardId = this.dataset.id;
+            this.classList.add('dragging');
+            // Set data transfer for potential native fallbacks, though we use ID logic mostly
+            e.dataTransfer.setData("text/plain", draggedCardId); 
+            e.dataTransfer.effectAllowed = "move";
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+            // Remove drag-over styles from all columns
+            document.querySelectorAll('.column').forEach(col => col.classList.remove('column-drag-over'));
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            
+            // Find the closest column that accepts drops
+            const targetColumn = e.target.closest('[data-testid^="column-"]');
+            
+            if (!targetColumn || !draggedCardId) return;
+
+            // Remove visual feedback
+            targetColumn.classList.remove('column-drag-over');
+            
+            // Determine which column key matches the element ID (e.g., col-backlog -> backlog)
+            const colKey = targetColumn.id.replace('col-', '');
+
+            // Logic: Move card in state
+            // 1. Find source column and remove card
+            let movedCard;
+            Object.keys(boardState).forEach(key => {
+                const index = boardState[key].findIndex(c => c.id == draggedCardId);
+                if (index !== -1) {
+                    movedCard = boardState[key].splice(index, 1)[0];
+                }
+            });
+
+            // 2. Add to target column
+            if (movedCard) {
+                boardState[colKey].push(movedCard);
+                
+                // Trigger Confetti if moving to Done
+                if (colKey === 'done') {
+                    triggerConfetti();
+                }
+
+                saveState();
+                renderBoard(); // Re-render specific column or full board
+            }
+        }
+
+        /**
+         * CRUD OPERATIONS
+         */
+
+        function handleEnter(e, colKey) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault(); // Prevent newline
+                const input = e.target;
+                const content = input.value.trim();
+                
+                if (content) {
+                    addCard(colKey);
+                } else {
+                    input.focus(); // Keep focus if empty
+                }
+            }
+        }
+
+        function addCard(colKey) {
+            const input = document.querySelector(`#col-${colKey} [data-testid="card-input"]`);
+            const content = input.value.trim();
+
+            if (content) {
+                boardState[colKey].push({
+                    id: Date.now(),
+                    content: content,
+                    tags: []
+                });
+                
+                // Clear input and focus back
+                input.value = '';
+                saveState();
+                renderBoard();
+            } else {
+                input.focus(); // Keep focus if empty
+            }
+        }
+
+        function handleCardClick(e, cardData) {
+            e.stopPropagation(); // Prevent bubbling
+            
+            const textarea = document.createElement('textarea');
+            textarea.value = cardData.content;
+            textarea.className = 'w-full bg-transparent text-slate-800 font-medium leading-tight resize-none focus:outline-none absolute inset-0 p-1';
+            
+            // Remove tags if they exist while editing (simplest approach)
+            const titleP = e.target.closest('.kanban-card').querySelector('p');
+            titleP.replaceWith(textarea);
+
+            textarea.focus();
+
+            // Save on Enter or Blur
+            const saveAndRestore = (newContent) => {
+                if (!newContent.trim()) return; // Don't save empty
+                
+                cardData.content = newContent.trim();
+                
+                // Restore visual style
+                titleP.replaceWith(textarea);
+                textarea.classList.add('bg-transparent', 'text-slate-800', 'font-medium');
+                titleP.textContent = newContent.trim();
+                titleP.style.opacity = '1';
+
+                saveState();
+            };
+
+            // Handle Enter to Save
+            textarea.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    saveAndRestore(textarea.value);
+                }
+            });
+
+            // Handle Blur to Save
+            textarea.addEventListener('blur', () => {
+                saveAndRestore(textarea.value);
+            });
+        }
+
+        function handleDeleteClick(id) {
+            const modal = document.getElementById('delete-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            // Setup Cancel Button
+            document.getElementById('cancel-delete-btn').onclick = () => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            };
+        }
+
+        function confirmDelete(id) {
+            // Find and remove card
+            let removed = false;
+            Object.keys(boardState).forEach(key => {
+                const idx = boardState[key].findIndex(c => c.id == id);
+                if (idx !== -1) {
+                    boardState[key].splice(idx, 1);
+                    removed = true;
+                }
+            });
+
+            if (removed) {
+                saveState();
+                renderBoard();
+            }
+
+            // Close Modal
+            const modal = document.getElementById('delete-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        /**
+         * CONFETTI ANIMATION
+         */
+        function triggerConfetti() {
+            const colors = ['#6366f1', '#ec4899', '#eab308', '#22c55e'];
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti-piece';
+                
+                // Random properties
+                const bg = colors[Math.floor(Math.random() * colors.length)];
+                const left = Math.random() * 100 + 'vw';
+                const animDuration = Math.random() * 3 + 2 + 's'; // 2-5s
+                const size = Math.random() > 0.5 ? '12px' : '8px';
+                
+                confetti.style.backgroundColor = bg;
+                confetti.style.left = left;
+                confetti.style.top = '-10px';
+                confetti.style.width = size;
+                confetti.style.height = size;
+                confetti.style.animation = `confetti-fall ${animDuration} linear forwards`;
+                
+                document.body.appendChild(confetti);
+
+                // Cleanup after animation
+                setTimeout(() => {
+                    confetti.remove();
+                }, 5000);
+            }
+        }
+
+        /**
+         * INITIALIZATION
+         */
+        window.addEventListener('DOMContentLoaded', () => {
+            renderBoard();
+        });
+
+    </script>
+</body>
+</html>
+```

@@ -1,0 +1,277 @@
+{
+  "task": "diagram_to_svg",
+  "model_id": "google/gemma-4-e2b",
+  "model_info": {
+    "id": "google/gemma-4-e2b",
+    "type": "vlm",
+    "publisher": "google",
+    "arch": "gemma4",
+    "compatibility_type": "gguf",
+    "quantization": "Q4_K_M",
+    "state": "not-loaded",
+    "max_context_length": 131072,
+    "capabilities": [
+      "tool_use"
+    ],
+    "loaded_context_length": null
+  },
+  "started_at": "2026-04-28T17:13:24.474947Z",
+  "completed_at": "2026-04-28T17:14:42.249149Z",
+  "metrics": {
+    "wall_seconds": 74.48968116601463,
+    "tokens_generated": 9445,
+    "tokens_per_second": 129.24864664772045,
+    "time_to_first_token_ms": null,
+    "peak_rss_mb": 4210.3
+  },
+  "score": 0.8388888888888889,
+  "score_breakdown": {
+    "diagrams": [
+      {
+        "id": "diagram_eisenhower",
+        "image_name": "diagram_eisenhower.png",
+        "image_path": "artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_eisenhower.png",
+        "svg_path": "artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_eisenhower.svg",
+        "render_path": "artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_eisenhower.render.png",
+        "raw_length": 6808,
+        "svg_length": 6808,
+        "grade": {
+          "score": 0.7916666666666667,
+          "parsed": true,
+          "has_root": true,
+          "element_count": 55,
+          "text_count": 30,
+          "matched_terms": [
+            "Wichtig",
+            "Dringend",
+            "Nicht wichtig",
+            "Nicht dringend",
+            "Brand schärfen",
+            "SEO",
+            "Zielgruppen",
+            "Kampagne retten",
+            "Shitstorm",
+            "viral gehen",
+            "Glitzer",
+            "TikTok",
+            "Maskottchen",
+            "Hashtag"
+          ],
+          "missing_terms": [
+            "Content-Strategie",
+            "Newsletter",
+            "falschem Link",
+            "Merch-Ideen",
+            "Buzzword-Bingo",
+            "Last-Minute-Meeting",
+            "Logo größer",
+            "LinkedIn-Post",
+            "Weltag der Büroklammer",
+            "Folie 27"
+          ],
+          "parse_error": null
+        },
+        "score": 0.7916666666666667,
+        "judge": {
+          "scored_at": "2026-04-28T22:33:23.970786+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "scores": {
+            "completeness": 0.18,
+            "labels": 0.12,
+            "connections": 0.72,
+            "grouping": 0.62,
+            "layout_readability": 0.28,
+            "diagram_kind_match": 0.9,
+            "aesthetic_quality": 0.2
+          },
+          "judge_score": 0.4025,
+          "comment": "Der Render trifft den Diagrammtyp als 2×2-Eisenhower-Matrix und zeigt Achsen sowie Quadrantenstruktur, aber ein großer Teil des Inhalts fehlt. Nur wenige Labels sind vorhanden; mehrere Quadrantenüberschriften sind falsch oder unvollständig, und fast alle Aufgabenlisten aus dem Original fehlen bzw. stehen im falschen Quadranten. Die Gruppierung durch die Matrix ist erkennbar, jedoch ist das Layout sehr klein und linksbündig gedrängt, wodurch Texte schwer lesbar sind; die dekorativen Elemente aus dem Original fehlen vollständig."
+        },
+        "error": null
+      },
+      {
+        "id": "diagram_service_architecture",
+        "image_name": "diagram_service_architecture.png",
+        "image_path": "artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_service_architecture.png",
+        "svg_path": "artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_service_architecture.svg",
+        "render_path": "artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_service_architecture.render.png",
+        "raw_length": 6255,
+        "svg_length": 6255,
+        "grade": {
+          "score": 0.925,
+          "parsed": true,
+          "has_root": true,
+          "element_count": 76,
+          "text_count": 28,
+          "matched_terms": [
+            "Frontend",
+            "React",
+            "API Gateway",
+            "Kong",
+            "User DB",
+            "Backend",
+            "FastAPI",
+            "External API",
+            "Payment Provider",
+            "Message Queue",
+            "RabbitMQ",
+            "Worker Service",
+            "File Storage",
+            "S3",
+            "Monitoring",
+            "Prometheus",
+            "Grafana"
+          ],
+          "missing_terms": [
+            "Auth Service",
+            "JWT",
+            "Database"
+          ],
+          "parse_error": null
+        },
+        "score": 0.925,
+        "judge": {
+          "scored_at": "2026-04-28T22:33:30.830544+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "scores": {
+            "completeness": 0.58,
+            "labels": 0.42,
+            "connections": 0.24,
+            "direction": 0.18,
+            "grouping": 0.12,
+            "layout_readability": 0.38,
+            "diagram_kind_match": 0.86,
+            "aesthetic_quality": 0.22
+          },
+          "judge_score": 0.35777777777777775,
+          "comment": "Der Render übernimmt einige Hauptknoten wie Frontend, API Gateway, External API, Backend, Message Queue, Worker Service, User DB und File Storage, aber mehrere zentrale Elemente fehlen, darunter Auth Service, die Database sowie Monitoring als beschrifteter Knoten. Einige Labels sind nur teilweise vorhanden oder deutlich vereinfacht; besonders die Datenbank-/Storage-Beschriftungen und Zusatztexte aus dem Original fehlen weitgehend. Die Verbindungen sind stark verfälscht: mehrere Linien laufen schräg durch andere Boxen, Endpunkte stimmen nicht, und die Pfeilrichtung bzw. Pfeilspitzen des Original-Flows gehen weitgehend verloren. Der Diagrammtyp bleibt zwar eine Architektur-Skizze, aber Gruppierung, Legende/Farbkodierung und die visuelle Ausarbeitung des SVG-Renders sind deutlich schwächer und teilweise chaotisch."
+        },
+        "error": null
+      },
+      {
+        "id": "diagram_sso_sequence",
+        "image_name": "diagram_sso_sequence.png",
+        "image_path": "artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_sso_sequence.png",
+        "svg_path": "artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_sso_sequence.svg",
+        "render_path": "artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_sso_sequence.render.png",
+        "raw_length": 4394,
+        "svg_length": 4394,
+        "grade": {
+          "score": 0.8,
+          "parsed": true,
+          "has_root": true,
+          "element_count": 44,
+          "text_count": 9,
+          "matched_terms": [
+            "Benutzer",
+            "App",
+            "Service Provider",
+            "Identity Provider",
+            "IdP",
+            "Login-Seite",
+            "Anmeldedaten",
+            "SSO-Response",
+            "Zugriff"
+          ],
+          "missing_terms": [
+            "Authentifizierung",
+            "Token",
+            "Assertion",
+            "Ressourcen",
+            "Nein",
+            "Ja"
+          ],
+          "parse_error": null
+        },
+        "score": 0.8,
+        "judge": {
+          "scored_at": "2026-04-28T22:33:38.531699+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "scores": {
+            "completeness": 0.62,
+            "labels": 0.58,
+            "connections": 0.22,
+            "direction": 0.18,
+            "layout_readability": 0.64,
+            "diagram_kind_match": 0.78,
+            "aesthetic_quality": 0.56
+          },
+          "judge_score": 0.5175,
+          "comment": "Die Hauptknoten sind größtenteils vorhanden, inklusive Benutzer, App/Service Provider, IdP, Login-Seite, Entscheidungsknoten und „Zugriff gewährt“, aber mehrere Inhalte aus dem Original fehlen oder sind falsch aufgespalten; zusätzlich taucht „SSO-Response“ als eigener Kasten auf, obwohl es im Original eher ein beschrifteter Ausgabeschritt ist. Die Labels sind teils brauchbar, aber „App / Service Provider“ und zusätzlich ein separater „Service Provider“-Kasten verfälschen die Struktur, und viele Schrittbeschriftungen wie Weiterleitung, Authentifizierung, Ja/Nein und Redirect fehlen ganz. Die Verbindungen sind deutlich unvollständig: der Rückfluss vom Entscheidungsknoten zur App, die Schleife bei falschen Anmeldedaten und der Ablauf zu „Zugriff gewährt“ stimmen topologisch nicht; Pfeilrichtungen sind meist gar nicht klar markiert. Insgesamt als Ablaufdiagramm noch erkennbar und ordentlich lesbar, aber strukturell stark vereinfacht und nur mäßig poliert."
+        },
+        "error": null
+      }
+    ],
+    "judge": {
+      "scored_at": "2026-04-28T22:33:38.531740+00:00",
+      "judge_model": "openai/gpt-5.4",
+      "judge_score": 0.4259259259259259
+    }
+  },
+  "raw_response": "",
+  "artifacts": [
+    {
+      "kind": "image",
+      "label": "Quelle diagram_eisenhower",
+      "path": "artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_eisenhower.png",
+      "mime": "image/jpeg"
+    },
+    {
+      "kind": "text",
+      "label": "SVG diagram_eisenhower",
+      "path": "artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_eisenhower.svg",
+      "mime": "image/svg+xml"
+    },
+    {
+      "kind": "image",
+      "label": "Render diagram_eisenhower",
+      "path": "artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_eisenhower.render.png",
+      "mime": "image/png"
+    },
+    {
+      "kind": "image",
+      "label": "Quelle diagram_service_architecture",
+      "path": "artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_service_architecture.png",
+      "mime": "image/jpeg"
+    },
+    {
+      "kind": "text",
+      "label": "SVG diagram_service_architecture",
+      "path": "artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_service_architecture.svg",
+      "mime": "image/svg+xml"
+    },
+    {
+      "kind": "image",
+      "label": "Render diagram_service_architecture",
+      "path": "artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_service_architecture.render.png",
+      "mime": "image/png"
+    },
+    {
+      "kind": "image",
+      "label": "Quelle diagram_sso_sequence",
+      "path": "artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_sso_sequence.png",
+      "mime": "image/jpeg"
+    },
+    {
+      "kind": "text",
+      "label": "SVG diagram_sso_sequence",
+      "path": "artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_sso_sequence.svg",
+      "mime": "image/svg+xml"
+    },
+    {
+      "kind": "image",
+      "label": "Render diagram_sso_sequence",
+      "path": "artifacts/google_gemma-4-e2b/diagram_to_svg/diagram_sso_sequence.render.png",
+      "mime": "image/png"
+    }
+  ],
+  "error": null,
+  "hardware": {
+    "platform": "macOS-26.4.1-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "ram_total_gb": 128.0,
+    "cpu_count": 16
+  },
+  "bench_version": "0.1.0"
+}

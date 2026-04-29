@@ -1,0 +1,1507 @@
+[
+  {
+    "id": "handwriting_easy",
+    "label": "Handschrift OCR – leicht",
+    "prompt": "Auf dem Bild siehst du eine handschriftliche Meeting-Notiz mit klarer Struktur und gut lesbarer Schrift. Transkribiere den gesamten lesbaren Text. Behalte die Anordnung bei (Überschrift, Spalten, To-Dos). Bei unleserlichen Stellen schreibe '[unleserlich]'. Gib ausschließlich den puren OCR-Text im Markdown-Format zurück — keine Vorbemerkung, keine Erklärungen, kein Code-Fence.",
+    "image_paths": [
+      "artifacts/google_gemma-4-26b-a4b/vision/handwriting_easy.jpg"
+    ],
+    "answer": "Meetingnotizen Website - Relaunch\n\n12.06.25, 09:30 Uhr                                     CMS langsam?\n\nAnwesend:\nAnna, Ben, Mira, Jonas, Ece\n\nThemen:                                  Stand:\n- Startseite                             - Design fast final ✓\n- Texte                                  - Texte für Über-uns fehlen noch\n- Bildauswahl                            - Bilder vom Team noch nicht komplett\n- Launch-Termin                          - Mobile Ansicht prüfen\n- offene Fragen\n\nTo-Dos:                                  Offen:\n- Ben -> Bilder anfragen                 - Rechtstexte final?\n- Mira -> Startseite anpassen            - Freigabe Kunde bis Freitag\n- Jonas -> Feedback Kunde                - Wer testet Kontaktformular?\n- Anna -> SEO-Check                      (bitte kurz halten)\n\nNächstes Meeting:\n17.06., 10 Uhr",
+    "ground_truth": "Meetingnotizen Website-Relaunch\n12.06.25, 09:30 Uhr\n\nAnwesend:\nAnna, Ben, Mira, Jonas, Ece\n\nCMS langsam?\n\nThemen:\nStartseite\nTexte\nBildauswahl\nLaunch-Termin\noffene Fragen\n\nStand:\nDesign fast final\nTexte für Über-uns fehlen noch\nBilder vom Team noch nicht komplett\nMobile Ansicht prüfen\n\nbitte kurz halten\n\nTo-Dos:\nBen Bilder anfragen\nMira Startseite anpassen\nJonas Feedback Kunde\nAnna SEO-Check\n\nOffen:\nRechtstexte final?\nFreigabe Kunde bis Freitag\nWer testet Kontaktformular?\n\nNächstes Meeting: 17.06., 10 Uhr",
+    "expected_keywords": [],
+    "ocr": {
+      "recall": 0.974025974025974,
+      "precision": 0.974025974025974,
+      "f1": 0.974025974025974,
+      "matched": 75,
+      "ordered_matched": 56,
+      "relocated_matched": 19,
+      "fuzzy_matched": 0,
+      "missed": 2,
+      "extra": 2,
+      "gt_total": 77,
+      "pred_total": 77,
+      "opcodes": [
+        {
+          "tag": "equal",
+          "gt": "meetingnotizen website relaunch 12 06 25 09 30 uhr",
+          "pred": "meetingnotizen website relaunch 12 06 25 09 30 uhr"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "cms"
+        },
+        {
+          "tag": "equal",
+          "gt": "anwesend anna ben mira jonas ece",
+          "pred": "anwesend anna ben mira jonas ece"
+        },
+        {
+          "tag": "delete",
+          "gt": "cms",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "langsam",
+          "pred": "langsam"
+        },
+        {
+          "tag": "equal",
+          "gt": "themen startseite",
+          "pred": "themen startseite"
+        },
+        {
+          "tag": "moved",
+          "gt": "texte bildauswahl launch termin offene fragen stand",
+          "pred": "texte bildauswahl launch termin offene fragen stand"
+        },
+        {
+          "tag": "equal",
+          "gt": "design fast final texte für über uns fehlen noch bilder vom team noch nicht komplett mobile ansicht prüfen",
+          "pred": "design fast final texte für über uns fehlen noch bilder vom team noch nicht komplett mobile ansicht prüfen"
+        },
+        {
+          "tag": "moved",
+          "gt": "bitte kurz halten",
+          "pred": "bitte kurz halten"
+        },
+        {
+          "tag": "equal",
+          "gt": "to dos ben bilder anfragen mira startseite anpassen",
+          "pred": "to dos ben bilder anfragen mira startseite anpassen"
+        },
+        {
+          "tag": "moved",
+          "gt": "jonas feedback kunde anna",
+          "pred": "jonas feedback kunde anna"
+        },
+        {
+          "tag": "delete",
+          "gt": "seo",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "check offen rechtstexte final",
+          "pred": "check offen rechtstexte final"
+        },
+        {
+          "tag": "equal",
+          "gt": "freigabe kunde bis freitag wer testet kontaktformular",
+          "pred": "freigabe kunde bis freitag wer testet kontaktformular"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "seo"
+        },
+        {
+          "tag": "equal",
+          "gt": "nächstes meeting 17 06 10 uhr",
+          "pred": "nächstes meeting 17 06 10 uhr"
+        }
+      ]
+    },
+    "score": 0.974025974025974,
+    "error": null,
+    "wall_seconds": 29.118254708009772,
+    "tokens_per_second": 90.26109966971748
+  },
+  {
+    "id": "handwriting_medium",
+    "label": "Handschrift OCR – mittel",
+    "prompt": "Auf dem Bild siehst du ein handschriftliches Meeting-Protokoll mit organisierter Struktur, aber kleinerer und teils flüchtiger Schrift. Transkribiere den lesbaren Text und behalte die Gliederung bei (Datum, Themen, Einzelpunkte). Bei unleserlichen Stellen '[unleserlich]'. Gib ausschließlich den puren OCR-Text im Markdown-Format zurück — keine Vorbemerkung, keine Erklärungen, kein Code-Fence.",
+    "image_paths": [
+      "artifacts/google_gemma-4-26b-a4b/vision/handwriting_medium.jpg"
+    ],
+    "answer": "Meeting protokoll 21.05.25 / 11 Uhr\n\nTeilnehmer: M. Schulz, T. Wagner, L. Becker, S. Klein (später), H. Jö.\n\nThemen:\n- Projektstatus Update\n- Budget $\\rightarrow$ izt zu hoch\n- Timeline / Meilenstein\n- Risiken\n\nProjektstatus:\n- Modul A fertig (Team S.)\n- Modul B verzögert sich $\\rightarrow$ Details in Jira\n- Testphase startet nächste Woche (hoffentlich)\n- Kundenfeedback steht noch aus\n\nBudget:\n- $\\sim$ 20% über Plan $\\rightarrow$ bitte Report bis 28.05.\n- Ursache: unklare Anforderungen\n- $\\rightarrow$ Nachbessern nötig\n- nächste Mal genauer kalkulieren !!\n\nOffene Punkte:\n- Freigabe von Kunde fehlt noch $\\rightarrow$ T.W. kümmert sich Rücksprache mit IT\n- Schnittstelle zu System X unklar $\\rightarrow$ [unleserlich] noch nicht geplant wer macht das?\n- Schulung für neues Tool?\n\nTo-Dos:\n- T.W.: Budget-Report $\\rightarrow$ 28.05.\n- L.B.: Kunden anstupsen wg. Feedback\n- Dokumentation aktualisieren\n\nRückfragen:\n- Wie gehen wir mit dem Risiko um?\n- Priorisierung der Features nochmal prüfen\n- ...",
+    "ground_truth": "Meetingprotokoll\n21.05.25\n11 Uhr\n\nTeilnehmer: M. Schulz, T. Wagner, L. Becher, S. Klein (später), H. Jt.\n\nThemen:\nProjektstatus / Update\nBudget — ist zu hoch\nTimeline / Meilenstein!\nRisiken\n\nProjektstatus:\nModul A fertig (Team S.)\nModul B verzögert sich\nTestphase startet nächste Woche (hoffentlich)\nKundenfeedback steht noch aus\n\nDetails in Jira\n\nBudget:\n20% über Plan\nUrsache: unklare Anforderungen\nNachbessern nötig\nnächstes Mal genauer kalkulieren\n\nbitte Report bis 28.05.\n\nOffene Punkte:\nFreigabe von Kunde fehlt noch (T.W. kümmert sich)\nSchnittstelle zu System X unklar — Rücksprache mit IT\nSchulung für neues Tool? noch nicht geplant — wer macht das?\n\nTo-Dos:\nT.W.: Budget-Report — 28.05.\nL.B.: Kunden anstupsen wg. Feedback\nDokumentation aktualisieren\n\nNächstes Meeting: 04.06.25, 10 Uhr (Raum 2.15?)\n\nRückfragen:\nWie gehen wir mit dem Risiko um?\nPriorisierung der Features nochmal prüfen\n...",
+    "expected_keywords": [],
+    "ocr": {
+      "recall": 0.8676470588235294,
+      "precision": 0.8676470588235294,
+      "f1": 0.8676470588235294,
+      "matched": 118,
+      "ordered_matched": 103,
+      "relocated_matched": 14,
+      "fuzzy_matched": 1,
+      "missed": 18,
+      "extra": 18,
+      "gt_total": 136,
+      "pred_total": 136,
+      "opcodes": [
+        {
+          "tag": "delete",
+          "gt": "meetingprotokoll",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "protokoll"
+        },
+        {
+          "tag": "equal",
+          "gt": "21 05 25 11 uhr teilnehmer m schulz t wagner l",
+          "pred": "21 05 25 11 uhr teilnehmer m schulz t wagner l"
+        },
+        {
+          "tag": "delete",
+          "gt": "becher",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "becker"
+        },
+        {
+          "tag": "equal",
+          "gt": "s klein später h",
+          "pred": "s klein später h"
+        },
+        {
+          "tag": "delete",
+          "gt": "jt",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "jö"
+        },
+        {
+          "tag": "equal",
+          "gt": "themen projektstatus update budget",
+          "pred": "themen projektstatus update budget"
+        },
+        {
+          "tag": "delete",
+          "gt": "ist",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "rightarrow izt"
+        },
+        {
+          "tag": "equal",
+          "gt": "zu hoch timeline meilenstein risiken projektstatus modul a fertig team s modul b verzögert sich",
+          "pred": "zu hoch timeline meilenstein risiken projektstatus modul a fertig team s modul b verzögert sich"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "rightarrow in"
+        },
+        {
+          "tag": "equal",
+          "gt": "testphase startet nächste woche hoffentlich kundenfeedback steht noch aus",
+          "pred": "testphase startet nächste woche hoffentlich kundenfeedback steht noch aus"
+        },
+        {
+          "tag": "moved",
+          "gt": "details",
+          "pred": "details"
+        },
+        {
+          "tag": "delete",
+          "gt": "in",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "jira",
+          "pred": "jira"
+        },
+        {
+          "tag": "equal",
+          "gt": "budget",
+          "pred": "budget"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "sim"
+        },
+        {
+          "tag": "equal",
+          "gt": "20 über plan",
+          "pred": "20 über plan"
+        },
+        {
+          "tag": "moved",
+          "gt": "ursache unklare anforderungen nachbessern nötig",
+          "pred": "ursache unklare anforderungen nachbessern nötig"
+        },
+        {
+          "tag": "fuzzy",
+          "gt": "nächstes",
+          "pred": "nächste"
+        },
+        {
+          "tag": "delete",
+          "gt": "mal",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "genauer kalkulieren",
+          "pred": "genauer kalkulieren"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "rightarrow"
+        },
+        {
+          "tag": "equal",
+          "gt": "bitte report bis 28 05",
+          "pred": "bitte report bis 28 05"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "rightarrow mal"
+        },
+        {
+          "tag": "equal",
+          "gt": "offene punkte freigabe von kunde fehlt noch",
+          "pred": "offene punkte freigabe von kunde fehlt noch"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "rightarrow"
+        },
+        {
+          "tag": "equal",
+          "gt": "t w kümmert sich",
+          "pred": "t w kümmert sich"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "mit it"
+        },
+        {
+          "tag": "equal",
+          "gt": "schnittstelle zu system x unklar",
+          "pred": "schnittstelle zu system x unklar"
+        },
+        {
+          "tag": "moved",
+          "gt": "rücksprache",
+          "pred": "rücksprache"
+        },
+        {
+          "tag": "delete",
+          "gt": "mit it",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "schulung",
+          "pred": "schulung"
+        },
+        {
+          "tag": "delete",
+          "gt": "für",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "neues tool",
+          "pred": "neues tool"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "rightarrow unleserlich"
+        },
+        {
+          "tag": "equal",
+          "gt": "noch nicht geplant wer macht das",
+          "pred": "noch nicht geplant wer macht das"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "für"
+        },
+        {
+          "tag": "equal",
+          "gt": "to dos t w budget report",
+          "pred": "to dos t w budget report"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "rightarrow"
+        },
+        {
+          "tag": "equal",
+          "gt": "28 05 l b kunden anstupsen wg feedback dokumentation aktualisieren",
+          "pred": "28 05 l b kunden anstupsen wg feedback dokumentation aktualisieren"
+        },
+        {
+          "tag": "delete",
+          "gt": "nächstes",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "meeting",
+          "pred": "meeting"
+        },
+        {
+          "tag": "delete",
+          "gt": "04 06 25 10 uhr raum 2 15",
+          "pred": ""
+        },
+        {
+          "tag": "equal",
+          "gt": "rückfragen wie gehen wir mit dem risiko um priorisierung der features nochmal prüfen",
+          "pred": "rückfragen wie gehen wir mit dem risiko um priorisierung der features nochmal prüfen"
+        }
+      ]
+    },
+    "score": 0.8676470588235294,
+    "error": null,
+    "wall_seconds": 58.751720707979985,
+    "tokens_per_second": 88.98852188248
+  },
+  {
+    "id": "handwriting_hard",
+    "label": "Handschrift OCR – schwer",
+    "prompt": "Auf dem Bild siehst du eine handschriftliche Notiz mit unleserlicher, geknitterter Schrift und vielen Abkürzungen. Versuche so viel wie möglich zu transkribieren. Behalte die räumliche Anordnung bei. Markiere unleserliche Stellen mit '[unleserlich]'. Wenn du gar nichts erkennen kannst, sag das ausdrücklich. Gib ausschließlich den puren OCR-Text im Markdown-Format zurück — keine Vorbemerkung, keine Erklärungen, kein Code-Fence.",
+    "image_paths": [
+      "artifacts/google_gemma-4-26b-a4b/vision/handwriting_hard.jpg"
+    ],
+    "answer": "Besprechung Sommerfest :)                                     Chef fragen!!\n23.05.24  10:15 Uhr (Kaffee?)\n\nTeilnehmer:         Ziel: entspanntes\n- Max                 Beisammensein\n- Jule                & Spaß haben\n- Tobi\n- Leni\n- Simon (konnte nur kurz)\n\nOrt:               Nächster Termin:\n- Park am See? #     Do, 30.05.\n  -> Genehmigung?   11 Uhr\n- Firmenhof / Terrasse? -> wer macht das?  kurzes Update\n  Leni?             an HR schicken\n  Terrasse reservieren??\n\nEssen / Trinken:    Grill wer?\n- Grillen evtl.    (Tobi fragen)\n- Vegetarische\n  Optionen\n  vergessen?        -> Kuchen?\n                        Jule macht was\n\n- Getränkeliste machen:\n- Bier, Limo, Wasser, was noch?\n  (Aperol? zu teuer?)\n\nMusik:             Wetter - Backup:\n- Musikbox organisieren  Pavillon? Wer bringt mit?\n- Playlist?             Max hat einen?\n                         -> zelt mieten? -> zu teuer\n                         Plan B: Kantine.\n\nSpiele | Programm:  Deko:\n- Volleyball / Federball  unnötig\n- evtl. Cornhole oder     evtl. Luftballons? neee\n  Wikingerschach?\n\n  -> Fotoidee Idee? Requisiten? #\n\nEinladung:          Offene Fragen:\n- Einladung bis Ende Woche raus!  Wer grillt? (muss jemand\n  -> Text: Leni?                 Schulung haben?)\n  -> Liste an Simon              Gibt's Strom im Park?\n  -> Versand: Jule               Müll / Reinigung klären! ♡\n\n                                   Budget:\n                                   ca. 15€ p.P.?\n                                   Kosten noch offen!",
+    "ground_truth": "Besprechung Sommerfest\n23.05.24 10:15 Uhr (Konfi)\n\nChef fragen!!\n\nTeilnehmer:\nMax\nJule\nTobi\nLeni\nSimon (konnte nur kurz)\n\nZiel: entspanntes Beisammensein & Spaß haben\n\nNächster Termin:\nDo, 30.05.\n11 Uhr\nkurzes Update\nan HR schicken\n\nOrt?:\nPark am See?\nGenehmigung?\nFirmenhof / Terrasse?\nTerrasse reservieren?? — wer macht das? Leni?\n\nEssen / Trinken:\nGrillen evtl.\nvegetarische Optionen vergessen?\nGetränkeliste machen!\nBier, Limo, Wasser, was noch? (Aperol? zu teuer?)\nGrill wer? (Tobi fragen)\nKuchen? Jule macht was\n\nWetter / Backup:\nPavillon? Wer bringt mit?\nMax hat einen?\nZelt mieten → zu teuer\nPlan B: Kantine?\n\nMusik:\nMusikbox organisieren\nPlaylist?\n\nDeko:\nunnötig?\nevtl. Luftballons? neee\n\nBudget:\nca. 15€ p.P.?\nKosten noch offen!\n\nSpiele / Programm:\nVolleyball / Federball\nevtl. Cornhole oder Wikingerschach?\nFotoecke Idee? Requisiten?\n\nEinladung:\nEinladung bis Ende Woche raus!\nText: Leni?\nListe an Simon\nVersand: Jule\n\nOffene Fragen:\nWer grillt? (muss jemand Schulung haben?)\nGibt's Strom im Park?\nMüll / Reinigung klären",
+    "expected_keywords": [],
+    "ocr": {
+      "recall": 0.8851351351351351,
+      "precision": 0.8851351351351351,
+      "f1": 0.8851351351351351,
+      "matched": 131,
+      "ordered_matched": 77,
+      "relocated_matched": 54,
+      "fuzzy_matched": 0,
+      "missed": 17,
+      "extra": 17,
+      "gt_total": 148,
+      "pred_total": 148,
+      "opcodes": [
+        {
+          "tag": "equal",
+          "gt": "besprechung sommerfest 23 05 24 10 15 uhr",
+          "pred": "besprechung sommerfest 23 05 24 10 15 uhr"
+        },
+        {
+          "tag": "delete",
+          "gt": "konfi",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "chef fragen",
+          "pred": "chef fragen"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "kaffee"
+        },
+        {
+          "tag": "equal",
+          "gt": "teilnehmer max jule",
+          "pred": "teilnehmer max jule"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "haben"
+        },
+        {
+          "tag": "equal",
+          "gt": "tobi leni simon konnte nur kurz",
+          "pred": "tobi leni simon konnte nur kurz"
+        },
+        {
+          "tag": "moved",
+          "gt": "ziel entspanntes beisammensein spaß",
+          "pred": "ziel entspanntes beisammensein spaß"
+        },
+        {
+          "tag": "delete",
+          "gt": "haben",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "ort"
+        },
+        {
+          "tag": "equal",
+          "gt": "nächster termin",
+          "pred": "nächster termin"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "am see"
+        },
+        {
+          "tag": "equal",
+          "gt": "do 30 05 11 uhr",
+          "pred": "do 30 05 11 uhr"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "wer das"
+        },
+        {
+          "tag": "equal",
+          "gt": "kurzes update an hr schicken",
+          "pred": "kurzes update an hr schicken"
+        },
+        {
+          "tag": "delete",
+          "gt": "ort",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "park",
+          "pred": "park"
+        },
+        {
+          "tag": "delete",
+          "gt": "am see",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "genehmigung firmenhof terrasse",
+          "pred": "genehmigung firmenhof terrasse"
+        },
+        {
+          "tag": "equal",
+          "gt": "terrasse reservieren",
+          "pred": "terrasse reservieren"
+        },
+        {
+          "tag": "delete",
+          "gt": "wer",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "macht",
+          "pred": "macht"
+        },
+        {
+          "tag": "delete",
+          "gt": "das",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "leni",
+          "pred": "leni"
+        },
+        {
+          "tag": "equal",
+          "gt": "essen trinken",
+          "pred": "essen trinken"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "wer"
+        },
+        {
+          "tag": "equal",
+          "gt": "grillen evtl vegetarische optionen vergessen",
+          "pred": "grillen evtl vegetarische optionen vergessen"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "was"
+        },
+        {
+          "tag": "equal",
+          "gt": "getränkeliste machen bier limo wasser was noch aperol zu teuer",
+          "pred": "getränkeliste machen bier limo wasser was noch aperol zu teuer"
+        },
+        {
+          "tag": "moved",
+          "gt": "grill",
+          "pred": "grill"
+        },
+        {
+          "tag": "delete",
+          "gt": "wer",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "tobi fragen kuchen jule macht",
+          "pred": "tobi fragen kuchen jule macht"
+        },
+        {
+          "tag": "delete",
+          "gt": "was",
+          "pred": ""
+        },
+        {
+          "tag": "equal",
+          "gt": "wetter backup pavillon wer bringt mit max hat einen zelt mieten zu teuer plan b kantine",
+          "pred": "wetter backup pavillon wer bringt mit max hat einen zelt mieten zu teuer plan b kantine"
+        },
+        {
+          "tag": "moved",
+          "gt": "musik musikbox organisieren playlist",
+          "pred": "musik musikbox organisieren playlist"
+        },
+        {
+          "tag": "equal",
+          "gt": "deko unnötig",
+          "pred": "deko unnötig"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "oder"
+        },
+        {
+          "tag": "equal",
+          "gt": "evtl luftballons neee",
+          "pred": "evtl luftballons neee"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "fotoidee bis wer haben an s im"
+        },
+        {
+          "tag": "equal",
+          "gt": "budget ca 15 p p kosten noch offen",
+          "pred": "budget ca 15 p p kosten noch offen"
+        },
+        {
+          "tag": "moved",
+          "gt": "spiele programm volleyball federball evtl cornhole",
+          "pred": "spiele programm volleyball federball evtl cornhole"
+        },
+        {
+          "tag": "delete",
+          "gt": "oder",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "wikingerschach",
+          "pred": "wikingerschach"
+        },
+        {
+          "tag": "delete",
+          "gt": "fotoecke",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "idee requisiten einladung einladung",
+          "pred": "idee requisiten einladung einladung"
+        },
+        {
+          "tag": "delete",
+          "gt": "bis",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "ende woche raus text leni liste",
+          "pred": "ende woche raus text leni liste"
+        },
+        {
+          "tag": "delete",
+          "gt": "an",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "simon versand jule offene fragen",
+          "pred": "simon versand jule offene fragen"
+        },
+        {
+          "tag": "delete",
+          "gt": "wer",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "grillt muss jemand schulung",
+          "pred": "grillt muss jemand schulung"
+        },
+        {
+          "tag": "delete",
+          "gt": "haben",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "gibt",
+          "pred": "gibt"
+        },
+        {
+          "tag": "delete",
+          "gt": "s",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "strom",
+          "pred": "strom"
+        },
+        {
+          "tag": "delete",
+          "gt": "im",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "park müll reinigung klären",
+          "pred": "park müll reinigung klären"
+        }
+      ]
+    },
+    "score": 0.8851351351351351,
+    "error": null,
+    "wall_seconds": 40.56108699995093,
+    "tokens_per_second": 89.82032370759285
+  },
+  {
+    "id": "fraktur_ocr",
+    "label": "Fraktur OCR",
+    "prompt": "Auf dem Bild siehst du eine Buchseite aus einer alten deutschen Erzählung in Frakturschrift (Seite 14). Transkribiere den gesamten Fließtext der Seite in moderne Antiqua-Schreibweise. Behalte die Absatzstruktur. Schreibe 'ß' wo es im Text steht. Bei unklaren Stellen [unleserlich]. Gib ausschließlich den puren OCR-Text im Markdown-Format zurück — keine Vorbemerkung, keine Erklärungen, kein Code-Fence.",
+    "image_paths": [
+      "artifacts/google_gemma-4-26b-a4b/vision/fraktur_innerpage.jpg"
+    ],
+    "answer": "\n*   Role: OCR specialist for historical German prints.\n    *   Task: Transcribe the provided image (page 14 of an old German story in Fraktur).\n    *   Output Format: Modern Antiqua script, preserve paragraph structure, use 'ß' as in text, use '[unleserlich]' for unclear parts.\n    *   Constraint: Pure OCR text only, Markdown format, no intro, no explanation, no code fence.\n\n    *   Page number at the top: `- 14 -`\n    *   Text content (reading line by line):\n        *   \"deiner Großmutter wohl geräumt haben.“ „Rein,“ meinte\"\n        *   \"Malineken hartnäckig, „sie hat ja auch die Prinzessin vom Se\"\n        *   \"sehen, und so etwas ganz Besonderes.“ „Davon habe ich\"\n        *   \"noch nie gehört,“ antwortete Gottlieb. „So kann sie dir\"\n        *   \"erzählen, fragte sie nur aus, sie weiß alles.“\"\n        *   (New paragraph)\n        *   \"Der Kahn war mittlereweile der Insel ganz nahe ge-\"\n        *   \"kommen; die Kinder landeten an einer dazu geeigneten Stelle\"\n        *   \"und befestigten ihn an einem aus dem Wasser ragenden Pfahl.\"\n        *   \"Sie erstiegen die kleine Anhöhe, auf der sich das Gehöft be-\"\n        *   \"fand. In den Kurzen, seinen Gräze, des Wodens be-\" (Wait, let me re-read carefully).\n        *   Let's look closer at the line: \"In den Kurzen, seinen Graze, des Wodens bede-\" -> Looking at the Fraktur: \"In den Kurzen, seinen Gräze, des Wodens bede-\"... actually, it looks like \"In den Kurzen, seinen Gräze, des Wodens be-\". Let's re-examine.\n        *   \"In den Kurzen, seinen Graze, des Wodens bede-\" -> Looking at the word \"Graze\"... could it be \"Gräze\"? Or \"Grase\"? It looks like \"Gräze\" or maybe \"Gras\". Actually, looking at the letters: \"G r a z e\" or \"G r ä z e\". Let's look at the context.\n        *   Let's re-read line by line very carefully.\n        *   Line 1: deiner Großmutter wohl geräumt haben.“ „Rein,“ meinte\n        *   Line 2: Malineken hartnäckig, „sie hat ja auch die Prinzessin vom Se\n        *   Line 3: sehen, und so etwas ganz Besonderes.“ „Davon habe ich\n        *   Line 4: noch nie gehört,“ antwortete Gottlieb. „So kann sie dir\n        *   Line 5: erzählen, fragte sie nur aus, sie weiß alles.“\n        *   (Paragraph break)\n        *   Line 6: Der Kahn war mittlerweile der Insel ganz nahe ge-\n        *   Line 7: kommen; die Kinder landeten an einer dazu geeigneten Stelle\n        *   Line 8: und befestigten ihn an einem aus dem Wasser ragenden Pfahl.\n        *   Line 9: Sie erstiegen die kleine Anhöhe, auf der sich das Gehöft be-\n        *   Line 10: fand. In den Kurzen, seinen Graze, des Wodens bede- (Wait, \"Graze\" is weird. Let's look at the letters again. It looks like \"Gräze\". Or maybe \"Gras\"? No, it's \"Gräze\". Wait, looking at the word \"Wodens\"... could it be \"Waldes\"? The 'l' might be missing or very thin. \"des Waldes bede-\"? Let's check: \"In den Kurzen, seinen Grase, des Waldes bede-\". Looking at the image: \"In den Kurzen, seinen Graze, des Wodens bede-\". Actually, it looks like \"Gräze\" and \"Wodens\". This might be a dialect or specific name. Let's look at \"Kurzen\". Could it be \"Kürzen\"? Or \"Kurzen\"? It looks like \"Kurzen\".\n        *   Let's re-examine line 10: \"fand. In den Kurzen, seinen Graze, des Wodens bede-\" -> Looking very closely at the image... \"In den Kurzen, seinen Gräze, des Waldes bede-\"? The 'l' in 'Waldes' is almost invisible if it's there. Let's look at \"Wodens\". It looks like \"W o d e n s\". Maybe \"Waldens\"? No.\n        *   Let's re-read the whole block: \"In den Kurzen, seinen Graze, des Wodens bede-\"... wait, looking at line 10 again. \"fand. In den Kurzen, seinen Gräze, des Woden bede-\"? Let me look at the word after 'Wodens'. It's 'bede-'.\n        *   Line 11: \"ckte, blühte der Thymian; ein festgezwirnt Weg führte gerade\" (Wait, \"festgezwirnt\"? Or \"festgezwirnte\"? Let me check the letters. \"f e s t g e z w i r n t e\". It looks like \"festgezwirnte\").\n        *   Line 12: \"auf die Schüffte zu, die lag heimlich unter den Weiden. Das\" (Wait, \"Schüffte\"? Or \"Schüfte\"? Looking at the image: \"S c h ü f f t e\". It looks like \"Schüffte\").\n        *   Line 13: \"mächtige Gast der majestätischen Bäume, mit silbergrauem\" (Wait, \"Gast\"? Or \"Gras\"? Let's check. \"G a s t\". Looking at the image... it could be \"Gras\". The 'r' is very small/merged with 'a'. But \"mächtige Gast der majestätischen Bäume\" makes sense metaphorically).\n        *   Line 14: \"ipblättrigem Laub bedeckte, breitete sich weit und wuchtig\" (Wait, \"ipblättrigem\"? Looking at the image... it looks like \"ipblättrigem\". Maybe \"blättrigem\"? Let's look at the start of the word. It starts with 'i'. Or is it 'l'? If it's 'l', then 'laubblättrigem'? No, that's not a word. Looking closely: \"ipblättrigem\" or \"lipblättrigem\"? Actually, looking at the letters... \"l i p b l ä t t r i g e m\". It looks like \"lipblättrigem\". Or maybe \"laubblättrigem\" but the 'laub' is on the previous line? No. Let's look at the word again: \"ipblättrigem\". The first letter is a bit strange. Could it be \"l\"? If so, \"lipblättrigem\" isn't standard. Maybe \"laubblättrigem\" but truncated? No. Let's check line 13 end: \"silbergrauem\". Line 14 starts with something that looks like \"ipblättrigem\". Wait, looking at the word again... it might be \"laubblättrigem\" where 'laub' is missing or merged. Actually, let's look at the letters: 'i', 'p', 'b', 'l', 'ä', 't', 't', 'r', 'i', 'g', 'e', 'm'. It looks like \"ipblättrigem\". I will use [unleserlich] if it's too ambiguous, but let me try to find a real word. \"laubblättrigem\"? No.\n        *   Let's look at line 14 again: \"...mit silbergrauem / ipblättrigem Laub bedeckte...\". Maybe \"laubblättrigem\" is split? No. Let's look at the 'i'. It could be an 'l'. \"lipblättrigem\"? Still not a word.\n        *   Let's re-read line 14: \"...mit silbergrauem / [unleserlich] Laub bedeckte...\". Actually, looking at the shape, it looks like \"laubblättrigem\" is too long. Let's look at \"ipblättrigem\" again. It might be \"laubblättrigem\" with a very bad print. Or maybe \"blatttrigem\"? No.\n        *   Let's re-read line 15: \"über das nähere Dach, breitete sich der Erde zunigte.\" (Wait, \"zunigte\"? Looking at the image... \"z u n i g t e\". Maybe \"zuigte\"? Or \"zunigte\"? Let me look at 'zunigte'. It looks like \"z u n i g t e\". Could it be \"zuigte\"? No. \"zunigte\" is not a word. \"zuigte\"? No. \"zunigte\"... maybe \"zunigte\" is \"zuigte\" or \"zunigte\" refers to something else? Let'... look at the letters: 'z', 'u', 'n', 'i', 'g', 't', 'e'. Wait, could it be \"zuigte\"? Or \"zunigte\"? Looking at line 15 again. \"über das nähere Dach, breitete sich der Erde zunigte.\" This is very strange German. Let's look at the word \"zunigte\" again. It looks like \"z u n i g t e\". Maybe it's \"zuigte\"? Or \"zunigte\"? Let me check if there's a typo in the original book.\n        *   Let's re-read line 15: \"...über das nähere Dach, breitete sich der Erde zunigte.\" Looking at 'zunigte'... could it be \"zuigte\"? No. Could it be \"zunigte\" -> \"zuigte\"? Let me look at the letters again. It looks like \"z u n i g t e\".\n        *   Let's re-read line 16: \"hinter erblickte ein Stück Garten und Acker, von Rohr\" (Wait, \"hinter erblickte\"? Looking at the image... \"hinter erblickte\". It looks like \"hinter erblickte\". Maybe \"dahinter\"? The 'da' might be missing. Or \"hinterer\"? No. Let's look: \"h i n t e r  e r b l i c k t e\".\n        *   Line 17: \"und Schilf wie mit einem Wall umschlossen. Eine Frau war\" (Wait, \"Schilf wie mit einem Wall\"... looking at the image... \"u m s c h l o s s e n .  E i n e  F r a u  w a r\").\n        *   Line 18: \"saß vor der Hüttchen zu und spann. Ihr Haar war\" (Wait, \"Hüttchen\"? Looking at the image... \"H ü t t c h e n\". It looks like \"Hüttchen\". Or \"Hütte\"? Let's look: \"H ü t t c h e n\". And \"spann\"... looking at line 18: \"saß vor der Hüttchen zu und spann.\" This is grammatically weird. Maybe \"vor der Hütte\"? But it looks like \"Hüttchen\".\n        *   Line 19: \"so weit wie das Gewebe der Spinnen, welches im Herbst über\" (Wait, \"Gewebe der Spinnen\"... looking at the image... \"G e w e b e  d e r  S p i n n e n\").\n        *   Line 20: \"die Spinnlein lag, band es ein schwarzes\" (Wait, \"Spinnlein\"? Looking at line 20: \"die Spinnlein lag, band es ein schwarzes\". Wait, looking at the image... it says \"die Spinnlein lag, band es ein schwarzes\").\n        *   Line 21: \"Band gebunden. Gottlieb und Malineken kam\" (Wait, \"Band gebunden\"... looking at line 21: \"Band gebunden. Gottlieb und Malineken kam\").\n        *   Line 22: \"und blieben vor ihr stehen. „Großmutter,“ sagte leiser, „er\" (Looking at line 22: \"und blieben vor ihr stehen. „Großmutter,“ sagte leiser, „er\").\n        *   Line 23: \"will nicht glauben, daß du die Segenjung hast, und er\" (Wait, \"Segenjung\"? Looking at the image... \"S e g e n j u n g\". This is very strange. Maybe \"Segenjung\"? Or \"Segenjung\"? Let's look at line 23 again: \"will nicht glauben, daß du die Segenjung hast, und er\").\n        *   Line 24: \"weiß nichts von der Prinzessin vom See.“ Sie neigten ihr\" (Looking at line 24: \"weiß nichts von der Prinessin vom See.“ Sie neigten ihr\").\n        *   Line 25: \"Faden. „Ach ihr Ehren verses, du wünstest ihm die Geschichte von der\" (Wait, \"Ehren verses\"? Looking at line 25: \"Faden. „Ach ihr Ehren verses, du wünstest ihm die Geschichte von der\"). This is getting very difficult. Let me re-examine the whole page with extreme care.\n\n    *   Line 1: `deiner Großmutter wohl geräumt haben.“ „Rein,“ meinte` (Correct)\n    *   Line 2: `Malineken hartnäckig, „sie hat ja auch die Prinzessin vom Se` (Correct)\n    *   Line 3: `sehen, und so etwas ganz Besonderes.“ „Davon habe ich` (Correct)\n    *   Line 4: `noch nie gehört,“ antwortete Gottlieb. „So kann sie dir` (Correct)\n    *   Line 5: `erzählen, fragte sie nur aus, sie weiß alles.“` (Correct)\n    *   (Paragraph break)\n    *   Line 6: `Der Kahn war mittlerweile der Insel ganz nahe ge-` (Correct)\n    *   Line 7: `kommen; die Kinder landeten an einer dazu geeigneten Stelle` (Correct)\n    *   Line 8: `und befestigten ihn an einem aus dem Wasser ragenden Pfahl.` (Correct)\n    *   Line 9: `Sie erstiegen die kleine Anhöhe, auf der sich das Gehöft be-` (Correct)\n    *   Line 10: `fand. In den Kurzen, seinen Graze, des Wodens bede-` -> Let's look at \"Kurzen\". Could it be \"Kürzen\"? No. \"Graze\"? Maybe \"Grase\"? Looking at the 'z'. It looks like a 'z'. \"Wodens\"? Could it be \"Waldes\"? The 'l' is very thin. I will transcribe what I see: `fand. In den Kurzen, seinen Graze, des Wodens bede-`\n    *   Line 11: `ckte, blühte der Thymian; ein festgezwirnt Weg führte gerade` -> Looking at \"festgezwirnt\". It looks like `festgezwirnte`. Let's check the end of the word. There is an 'e'. So `festgezwirnte`.\n    *   Line 12: `auf die Schüffte zu, die lag heimlich unter den Weiden. Das` -> \"Schüffte\"? Looking at the letters... `S c h ü f f t e`. It's possible it's a typo in the original or a dialect word.\n    *   Line 13: `mächtige Gast der majestätischen Bäume, mit silbergrauem` -> \"Gast\" or \"Gras\"? The 's' and 't' are clear. So `Gast`.\n    *   Line 14: `ipblättrigem Laub bedeckte, breitete sich weit und wuchtig` -> Looking at the first word again. It looks like `lipblättrigem`. Or maybe `laubblättrigem` but it's just badly printed. I will use `[unleserlich]` if it's too weird, but let me try to see if it's `laubblättrigem`. The 'l' and 'a' might be merged into an 'i'. Let's look at the word: `ipblättrigem`. I'll go with `[unleserlich]`.\n    *   Line 15: `über das nähere Dach, breitete sich der Erde zunigte.` -> \"zunigte\"? Looking at it... `z u n i g t e`. It looks like that.\n    *   Line 16: `hinter erblickte ein Stück Garten und Acker, von Rohr` -> `hinter erblickte`. Maybe `dahinter`? But the 'da' is not there. I will transcribe what is visible.\n    *   Line 17: `und Schilf wie mit einem Wall umschlossen. Eine Frau war` (Correct)\n    *   Line 18: `saß vor der Hüttchen zu und spann. Ihr Haar war` -> \"Hüttchen\"? Looking at the image... `H ü t t c h e n`. It's a bit strange, but that's what it says.\n    *   Line 19: `so weit wie das Gewebe der Spinnen, welches im Herbst über` (Correct)\n    *   Line 20: `die Spinnlein lag, band es ein schwarzes` -> \"Spinnlein\"? Looking at the image... `S p i n n l e i n`. Yes.\n    *   Line 21: `Band gebunden. Gottlieb und Malineken kam` (Correct)\n    *   Line 22: `und blieben vor ihr stehen. „Großmutter,“ sagte leiser, „er` (Correct)\n    *   Line 23: `will nicht glauben, daß du die Segenjung hast, und er` -> \"Segenjung\"? Looking at the image... `S e g e n j u n g`. It's very strange. Maybe \"Segenjung\" is a name or a typo for something else? I will transcribe what I see.\n    *   Line 24: `weiß nichts von der Prinzessin vom See.“ Sie neigten ihr` (Correct)\n    *   Line 25: `Faden. „Ach ihr Ehren verses, du wünstest ihm die Geschichte von der` -> \"Ehren verses\"? Looking at the image... `E h r e n  v e r s e s`. And \"wünstest\"? `w ü n s t e s t`. This is very difficult. Let me look at line 25 again.\n    *   Line 25: `Faden. „Ach ihr Ehren verses, du wünstest ihm die Geschichte von der` -> Looking at 'Ehren verses'... could it be \"Ehrenverwes\"? No. \"Ehrenverses\"? No. I'll use `[unleserlich]` for the parts that are clearly nonsensical/illegible.\n    *   Line 26: `[bottom of page - cut off]`\n\n    Let me re-read line 10-15 again very carefully. This is likely a poorly printed or damaged text, or contains heavy dialect/typos.\n    Line 10: `fand. In den Kurzen, seinen Graze, des Wodens bede-` -> Looking at \"Graze\"... could it be \"Grase\"? The 'z' looks like an 's'. Let's assume \"Grase\". And \"Wodens\" -> \"Waldes\"? The 'l' is very thin.\n    Line 14: `ipblättrigem`... looking at the word again... It really looks like `lipblättrigem`. I will use `[unleserlich]`.\n    Line 25: `„Ach ihr Ehren verses, du wünstest ihm die Geschichte von der` -> \"Ehren verses\"... maybe \"Ehrenverwes\"? No. Let's look at the word after 'Ehren'. It looks like `v e r s e s`. And `w ü n s t e s t`.\n\n    Wait! I just noticed something. The text might be from a specific story where these are names or dialect.\n    Let me try to find this text online. \"Malineken hartnäckig\", \"Prinzessin vom See\".\n    Searching... This looks like it could be from a collection of fairy tales.\n\n    Let's re-examine the image one more time, very closely.\n    Line 10: `fand. In den Kurzen, seinen Graze, des Wodens bede-` -> Looking at \"Kurzen\"... maybe \"Kürzen\"? No. \"Graze\"... looking at the 'z', it's a Fraktur 'z'. So \"Graze\".\n    Line 14: `ipblättrigem`. It looks like `l i p b l ä t t r i g e m`. I will use `[unleserlich]`.\n    Line 25: `„Ach ihr Ehren verses, du wünstest ihm die Geschichte von der` -> Looking at \"Ehren verses\"... it's very hard.\n\n    Let's look at the word \"Segenjung\" in line 23 again. It looks like `S e g e n j u n g`.\n    Wait, looking at line 10: `In den Kurzen, seinen Graze, des Wodens bede-`... could it be `In den Kürzen, seinen Grase, des Waldes bede-`? The 'l' in 'Waldes' is almost invisible. The 'z' in 'Graze' might be an 's'.\n    Line 14: `ipblättrigem`. Looking at the letters... it could be `laubblättrigem` if the 'laub' part is just a smudge/missing. I will use `[unleserlich]`.\n\n    Let's try to be as faithful as possible to the visual evidence.\n    Line 10: `fand. In den Kurzen, seinen Graze, des Wodens bede-` (I see 'z' and 'Wodens').\n    Line 14: `[unleserlich] Laub bedeckte`.\n    Line 25: `„Ach ihr Ehren verses, du wünstest ihm die Geschichte von der`\n\n    Actually, looking at line 10 again. \"In den Kurzen, seinen Graze, des Wodens bede-\"... If I look at the word \"Wodens\", it's very likely \"Waldes\". The 'l' is just a vertical stroke that didn't print well. And \"Graze\" -> \"Grase\".\n    Line 14: `ipblättrigem` -> It looks like `lipblättrigem`. I will use `[unleserlich]`.\n\n    Let me re-read the whole thing one last time to ensure no other errors.\n    Page number: `- 14 -`\n    Text:\n    deiner Großmutter wohl geräumt haben.“ „Rein,“ meinte\n    Malineken hartnäckig, „sie hat ja auch die Prinzessin vom Se\n    sehen, und so etwas ganz Besonderes.“ „Davon habe ich\n    noch nie gehört,“ antworte Gottlieb. „So kann sie dir\n    erzählen, fragte sie nur aus, sie weiß alles.“\n\n    Der Kahn war mittlerweile der Insel ganz nahe ge-\n    kommen; die Kinder landeten an einer dazu geeigneten Stelle\n    und befestigten ihn an einem aus dem Wasser ragenden Pfahl.\n    Sie erstiegen die kleine Anhöhe, auf der sich das Gehöft be-\n    fand. In den Kurzen, seinen Graze, des Wodens bede-\n    ckte, blühte der Thymian; ein festgezwirnt Weg führte gerade\n    auf die Schüffte zu, die lag heimlich unter den Weiden. Das\n    mächtige Gast der majestätischen Bäume, mit silbergrauem\n    [unleserlich] Laub bedeckte, breitete sich weit und wuchtig\n    über das nähere Dach, breitete sich der Erde zunigte.\n    hinter erblickte ein Stück Garten und Acker, von Rohr\n    und Schilf wie mit einem Wall umschlossen. Eine Frau war\n    saß vor der Hüttchen zu und spann. Ihr Haar war\n    so weit wie das Gewebe der Spinnen, welches im Herbst über\n    die Spinnlein lag, band es ein schwarzes\n    Band gebunden. Gottlieb und Maline [...] (Wait, line 21: \"Band gebunden. Gottlieb und Malineken kam\")\n    und blieben vor ihr stehen. „Großmutter,“ sagte leiser, „er\n    will nicht glauben, daß du die Segenjung hast, und er\n    weiß nichts von der Prinzessin vom See.“ Sie neigten ihr\n    Faden. „Ach ihr Ehren verses, du wünstest ihm die Geschichte von der\n\n    Wait, line 21: \"Band gebunden.\" -> looking at the image... it says \"Band gebunden.\".\n    Line 23: \"Segenjung\" -> Looking closely... `S e g e n j u n g`. It's very strange.\n    Line 25: \"Ehren verses\" -> `E h r e n  v e r s e s`.\n\n    Let me refine the transcription for line 10-15 based on visual evidence only, even if it makes no sense in German.\n    Line 10: `fand. In den Kurzen, seinen Graze, des Wodens bede-`\n    Line 11: `ckte, blühte der Thymian; ein festgezwirnt Weg führte gerade` (Wait, \"festgezwirnte\" or \"festgezwirnt\"? It looks like \"festgezwirnt\").\n    Line 12: `auf die Schüffte zu, die lag heimlich unter den Weiden. Das`\n    Line 13: `mächtige Gast der majestätischen Bäume, mit silbergrauem`\n    Line 14: `[unleserlich] Laub bedeckte, breitete sich weit und wuchtig`\n    Line 15: `über das nähere Dach, breitete sich der Erde zunigte.`\n    Line 16: `hinter erblickte ein Stück Garten und Acker, von Rohr`\n\n    Wait, line 20/21: \"die Spinnlein lag, band",
+    "ground_truth": "deiner Großmutter wohl nur geträumt haben. „Nein,\" meinte Malineken hartnäckig, „sie hat ja auch die Prinzessin vom See gesehen, und das ist etwas ganz Besonderes.\" „Davon habe ich noch nie gehört,\" antwortete Gottlieb. „So kann sie es dir erzählen, frag sie nur aus, sie weiß alles.\"\n\nDer Kahn war mittlerweile der Insel ganz nahe gekommen; die Kinder landeten an einer dazu geeigneten Stelle und befestigten ihn an einem aus dem Wasser ragenden Pflock. Sie erstiegen die kleine Anhöhe, auf der sich das Gehöft befand. In dem kurzen, feinen Grase, welches den Boden bedeckte, blühte der Thymian; ein festgetretener Weg führte gerade auf die Schilfhütte zu, die lag heimlich unter den Weiden. Das mächtige Geäst der majestätischen Bäume, mit silbergrauem, spitzblättrigem Laube beladen, breitete sich weit und wuchtig über das niedere Dach, welches sich der Erde zuneigte. Dahinter erblickte man ein Stück Garten und Ackerland, von Rohr und Schilf wie mit einem Wall umschlossen. Eine alte Frau saß vor der Thür des Hüttchens und spann. Ihr Haar war so weiß wie das Gewebe der Spinnen, welches im Herbst über die Stoppeln fliegt, um ihren Rocken hatte sie ein schwarzes Band gebunden. Gottlieb und Malineken kamen mit dem Korbe und blieben vor ihr stehen. „Großmutter,\" sagte letztere, „er will nicht glauben, daß du die Seejungfern gesehen hast, und er weiß nichts von der Prinzessin vom See.\" Sie netzte ihren Faden. „Geht ihr man eures Weges,\" gab sie ihnen zur Antwort. „Großmutter, du könntest ihm die Geschichte von der Prinzessin vom See wohl erzählen,\" bat Malineken, „sie läßt sich schön anhören, und man muß sie doch wissen, wenn man über den See fährt und in dem Blumental Tag für Tag herumwandert.\" „Ich meine, ihr könntet euer Vesper brauchen,\" sagte die Großmutter, „es hat eben vier Uhr geschlagen.\" „Ach ja,\" rief Malineken inbrünstig, „Erdbeeren mit Milch und ein Stück Brot dazu; und dieweil wir das aufzehren, erzählt Ihr dem Gottlieb die Geschichte.\" Sie ließ nicht nach, sie mußte ihren Willen haben. Ein Weilchen danach saßen die Kinder auf einem Baumstamm vor der Hütte und hatten zwischen sich einen Napf mit süßer Milch, in der schwammen die Erdbeeren so dick, daß man nicht wußte, war das Milch mit Erdbeeren, oder Erdbeeren mit Milch; doch es mochte wohl auf eins herauskommen. Die Großmutter blickte zuweilen nach ihnen hin",
+    "expected_keywords": [],
+    "ocr": {
+      "recall": 0.5732984293193717,
+      "precision": 0.07161543492478745,
+      "f1": 0.12732558139534883,
+      "matched": 219,
+      "ordered_matched": 192,
+      "relocated_matched": 19,
+      "fuzzy_matched": 8,
+      "missed": 163,
+      "extra": 2839,
+      "gt_total": 382,
+      "pred_total": 3058,
+      "opcodes": [
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "role ocr specialist for historical german prints task transcribe the provided image page 14 of an old german story in fraktur output format modern antiqua script preserve paragraph structure use ß as in text use unleserlich for unclear parts constraint pure ocr text only markdown format no intro no explanation no code fence page number at the top 14 text content reading line by line"
+        },
+        {
+          "tag": "equal",
+          "gt": "deiner großmutter wohl",
+          "pred": "deiner großmutter wohl"
+        },
+        {
+          "tag": "delete",
+          "gt": "nur",
+          "pred": ""
+        },
+        {
+          "tag": "fuzzy",
+          "gt": "geträumt",
+          "pred": "geräumt"
+        },
+        {
+          "tag": "equal",
+          "gt": "haben",
+          "pred": "haben"
+        },
+        {
+          "tag": "delete",
+          "gt": "nein",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "rein"
+        },
+        {
+          "tag": "equal",
+          "gt": "meinte malineken hartnäckig sie hat ja auch die prinzessin vom",
+          "pred": "meinte malineken hartnäckig sie hat ja auch die prinzessin vom"
+        },
+        {
+          "tag": "delete",
+          "gt": "see gesehen",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "se sehen"
+        },
+        {
+          "tag": "equal",
+          "gt": "und",
+          "pred": "und"
+        },
+        {
+          "tag": "delete",
+          "gt": "das ist",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "so"
+        },
+        {
+          "tag": "equal",
+          "gt": "etwas ganz besonderes davon habe ich noch nie gehört antwortete gottlieb so kann sie",
+          "pred": "etwas ganz besonderes davon habe ich noch nie gehört antwortete gottlieb so kann sie"
+        },
+        {
+          "tag": "delete",
+          "gt": "es",
+          "pred": ""
+        },
+        {
+          "tag": "equal",
+          "gt": "dir erzählen",
+          "pred": "dir erzählen"
+        },
+        {
+          "tag": "delete",
+          "gt": "frag",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "fragte"
+        },
+        {
+          "tag": "equal",
+          "gt": "sie nur aus sie weiß alles",
+          "pred": "sie nur aus sie weiß alles"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "new paragraph"
+        },
+        {
+          "tag": "equal",
+          "gt": "der kahn war",
+          "pred": "der kahn war"
+        },
+        {
+          "tag": "moved",
+          "gt": "mittlerweile",
+          "pred": "mittlerweile"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "mittlereweile"
+        },
+        {
+          "tag": "equal",
+          "gt": "der insel ganz nahe",
+          "pred": "der insel ganz nahe"
+        },
+        {
+          "tag": "fuzzy",
+          "gt": "gekommen",
+          "pred": "kommen"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "ge"
+        },
+        {
+          "tag": "equal",
+          "gt": "die kinder landeten an einer dazu geeigneten stelle und befestigten ihn an einem aus dem wasser ragenden",
+          "pred": "die kinder landeten an einer dazu geeigneten stelle und befestigten ihn an einem aus dem wasser ragenden"
+        },
+        {
+          "tag": "delete",
+          "gt": "pflock",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "pfahl"
+        },
+        {
+          "tag": "equal",
+          "gt": "sie erstiegen die kleine anhöhe auf der sich das gehöft",
+          "pred": "sie erstiegen die kleine anhöhe auf der sich das gehöft"
+        },
+        {
+          "tag": "delete",
+          "gt": "befand",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "be fand"
+        },
+        {
+          "tag": "equal",
+          "gt": "in",
+          "pred": "in"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "den kurzen seinen gräze des wodens be wait let me re read carefully let s look closer at the line in den kurzen seinen graze des wodens bede looking at the fraktur in den kurzen seinen gräze des wodens bede actually it looks like in den kurzen seinen gräze des wodens be let s re examine in den kurzen seinen graze des wodens bede looking at the word graze could it be gräze or grase it looks like gräze or maybe gras actually looking at the letters g r a z e or g r ä z e let s look at the context let s re read line by line very carefully line 1 deiner wohl geräumt haben rein line 2 hartnäckig sie hat ja auch die vom se line 3 sehen und so etwas ganz besonderes davon habe ich line 4 noch nie gehört antwortete so kann sie dir line 5 fragte sie nur aus sie alles paragraph break line 6 der kahn war der insel ganz nahe ge line 7 kommen die landeten an einer geeigneten stelle line 8 und befestigten ihn an einem aus"
+        },
+        {
+          "tag": "equal",
+          "gt": "dem",
+          "pred": "dem"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "wasser ragenden pfahl line 9 sie erstiegen die kleine anhöhe auf der sich das gehöft be line 10 fand in den"
+        },
+        {
+          "tag": "equal",
+          "gt": "kurzen",
+          "pred": "kurzen"
+        },
+        {
+          "tag": "delete",
+          "gt": "feinen",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "seinen graze des wodens bede wait graze is weird let s look at the letters again it looks like gräze or maybe gras no it s gräze wait looking at the word wodens could it be waldes the l might be missing or very thin des waldes bede let s check in den kurzen seinen"
+        },
+        {
+          "tag": "equal",
+          "gt": "grase",
+          "pred": "grase"
+        },
+        {
+          "tag": "moved",
+          "gt": "welches",
+          "pred": "welches"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "des waldes bede looking at the image in"
+        },
+        {
+          "tag": "equal",
+          "gt": "den",
+          "pred": "den"
+        },
+        {
+          "tag": "delete",
+          "gt": "boden",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "bedeckte",
+          "pred": "bedeckte"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "kurzen seinen graze des wodens bede actually it looks like gräze and wodens this might be a dialect or specific name let s look at kurzen could it be kürzen or kurzen it looks like kurzen let s re examine line 10 fand in den kurzen seinen graze des wodens bede looking very closely at the image in den kurzen seinen gräze des waldes bede the l in waldes is almost invisible if it s there let s look at wodens it looks like w o d e n s maybe waldens no let s re read the whole block in den kurzen seinen graze des wodens bede wait looking at line 10 again fand in den kurzen seinen gräze des woden bede let me look at the word after wodens it s bede line 11 ckte"
+        },
+        {
+          "tag": "equal",
+          "gt": "blühte der thymian ein",
+          "pred": "blühte der thymian ein"
+        },
+        {
+          "tag": "delete",
+          "gt": "festgetretener",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "festgezwirnt weg führte gerade wait festgezwirnt or festgezwirnte let me check the letters f e s t g e z w i r n t e it looks like festgezwirnte line 12 auf die schüffte zu die lag heimlich unter den weiden das wait schüffte or schüfte looking at the image s c h ü f f t e it looks like schüffte line 13 mächtige gast der majestätischen bäume mit silbergrauem wait gast or gras let s check g a s t looking at the image it could be gras the r is very small merged with a but mächtige gast der majestätischen bäume makes sense metaphorically line 14 ipblättrigem breitete sich weit und wuchtig wait ipblättrigem looking at the image it looks like ipblättrigem maybe blättrigem let s look at the start of the word it starts with i or is it l if it s l then laubblättrigem no that s not a word looking closely ipblättrigem or lipblättrigem actually looking at the letters l i p b l ä t t r i g e m it looks like lipblättrigem or maybe laubblättrigem but the laub is on the previous line no let s look at the word again ipblättrigem the first is a bit strange could it be l if so lipblättrigem isn t standard maybe laubblättrigem but truncated no let s check line 13 end silbergrauem line 14 starts with something that looks like ipblättrigem wait looking at the word again it might be laubblättrigem where laub is missing or merged actually let s look at the letters i p b l ä t t r i g e m it looks like ipblättrigem i will use unleserlich if it s too ambiguous but let me try to find a real word laubblättrigem no let s look at line 14 again mit silbergrauem ipblättrigem laub bedeckte maybe laubblättrigem is split no let s look at the i it could be an l lipblättrigem still not a word let s re read line 14 mit silbergrauem unleserlich laub bedeckte actually looking at the shape it looks like laubblättrigem is too long let s look at ipblättrigem again it might be laubblättrigem with a very bad print or maybe blatttrigem no let s re read line 15 über das nähere dach breitete sich der erde wait zunigte looking at the image z u n i g t e maybe zuigte or zunigte let me look at zunigte it looks like z u n i g t e could it be zuigte no zunigte is not a word zuigte no zunigte maybe zunigte is zuigte or zunigte refers to something else let look at the letters z u n i g t e wait could it be zuigte or zunigte looking at line 15 again über das nähere dach breitete sich der erde zunigte this is very strange german let s look at the word zunigte again it looks like z u n i g t e maybe it s zuigte or zunigte let me check if there s a typo in the original book let s re read line 15 über das nähere dach breitete sich der erde zunigte looking at zunigte could it be zuigte no could it be zunigte zuigte let me look at the letters again it looks like z u n i g t e let s re read line 16 hinter erblickte ein stück garten und acker von rohr wait hinter erblickte looking at the image hinter erblickte it looks like hinter erblickte maybe the da might be missing or hinterer no let s look h i n t e r e r b l i c k t e line 17 und schilf wie mit einem wall umschlossen eine frau war wait schilf wie mit einem wall looking at the image u m s c h l o s s e n e i n e f r a u w a r line 18 saß vor der zu und spann ihr haar war wait hüttchen looking at the image h ü t t c h e n it looks like hüttchen or let s look h ü t t c h e n and spann looking at line 18 saß vor der hüttchen zu und spann this is grammatically weird maybe vor der hütte but it looks like hüttchen line 19 so weit wie das gewebe der spinnen im herbst über wait gewebe der spinnen looking at the image g e w e b e d e r s p i n n e n line 20 die spinnlein lag band es ein schwarzes wait spinnlein looking at line 20 die spinnlein lag band es ein schwarzes wait looking at the image it says die spinnlein lag band es ein schwarzes line 21 band gebunden gottlieb und kam wait band gebunden looking at line 21 band gebunden gottlieb und malineken kam line 22 und blieben vor ihr stehen leiser er looking at line 22 und blieben vor ihr stehen sagte leiser er line 23 will nicht glauben daß du die segenjung hast und er wait segenjung looking at the image s e g e n j u n g this is very strange maybe segenjung or segenjung let s look at line 23 again will nicht glauben daß du die segenjung hast und er line 24 weiß nichts von der prinzessin vom see sie neigten ihr looking at line 24 weiß nichts von der prinessin vom see sie neigten ihr line 25 faden ach ihr ehren verses du wünstest ihm die von der wait ehren verses looking at line 25 faden ach ihr ehren verses du wünstest ihm die geschichte von der this is getting very difficult let me re examine the whole page with extreme care line 1 deiner großmutter wohl geräumt haben rein meinte correct line 2 malineken hartnäckig sie hat ja auch die prinzessin vom se correct line 3 sehen und so etwas ganz besonderes davon habe ich correct line 4 noch nie gehört antwortete gottlieb so kann sie dir correct line 5 erzählen fragte sie nur aus sie weiß alles correct paragraph break line 6 der kahn war mittlerweile der insel ganz nahe ge correct line 7 kommen die kinder landeten an einer dazu geeigneten stelle correct line 8 und befestigten ihn an einem aus dem wasser ragenden pfahl correct line 9 sie erstiegen die kleine anhöhe auf der sich das gehöft be correct line 10 fand in den kurzen seinen graze des wodens bede let s look at kurzen could it be kürzen no graze maybe grase looking at the z it looks like a z wodens could it be waldes the l is very thin i will transcribe what i see fand in den kurzen seinen graze des wodens bede line 11 ckte blühte der thymian ein festgezwirnt weg führte gerade looking at festgezwirnt it looks like festgezwirnte let s check the end of the word there is an e so festgezwirnte line 12 auf die schüffte zu die lag heimlich unter den weiden das schüffte looking at the letters s c h ü f f t e it s possible it s a typo in the original or a dialect word line 13 mächtige gast der majestätischen bäume mit silbergrauem gast or gras the s and t are clear so gast line 14 ipblättrigem laub bedeckte breitete sich weit und wuchtig looking at the first word again it looks like lipblättrigem or maybe laubblättrigem but it s just badly printed i will use unleserlich if it s too weird but let me try to see if it s laubblättrigem the l and a might be merged into an i let s look at the word ipblättrigem i ll go with unleserlich line 15 über das nähere dach breitete sich der erde zunigte zunigte looking at it z u n i g t e it looks like that line 16 hinter erblickte ein stück garten und acker von rohr hinter erblickte maybe dahinter but the da is not there i will transcribe what is visible line 17 und schilf wie mit einem wall umschlossen eine frau war correct line 18 saß vor der hüttchen zu und spann ihr haar war hüttchen looking at the image h ü t t c h e n it s a bit strange but that s what it says line 19 so weit wie das gewebe der spinnen im herbst über correct line 20 die spinnlein lag band es ein schwarzes spinnlein looking at the image s p i n n l e i n yes line 21 band gebunden gottlieb und malineken kam correct line 22 und blieben vor ihr stehen großmutter sagte leiser er correct line 23 will nicht glauben daß du die segenjung hast und er segenjung looking at the image s e g e n j u n g it s very strange maybe segenjung is a name or a typo for something else i will transcribe what i see line 24 weiß nichts von der prinzessin vom see sie neigten ihr correct line 25 faden ach ihr ehren verses du wünstest ihm die geschichte von der ehren verses looking at the image e h r e n v e r s e s and wünstest w ü n s t e s t this is very difficult let me look at line 25 again line 25 faden ach ihr ehren verses du wünstest ihm die geschichte von der looking at ehren verses could it be ehrenverwes no ehrenverses no i ll use unleserlich for the parts that are clearly nonsensical illegible line 26 bottom of page cut off let me re read line 10 15 again very carefully this is likely a poorly printed or damaged text or contains heavy dialect typos line 10 fand in den kurzen seinen graze des wodens bede looking at graze could it be grase the z looks like an s let s assume grase and wodens waldes the l is very thin line 14 ipblättrigem looking at the word again it really looks like lipblättrigem i will use unleserlich line 25 ach ihr ehren verses du wünstest ihm die geschichte von der ehren verses maybe ehrenverwes no let s look at the word after ehren it looks like v e r s e s and w ü n s t e s t wait i just noticed something the text might be from a specific story where these are names or dialect let me try to find this text online malineken hartnäckig prinzessin vom see searching this looks like it could be from a collection of fairy tales let s re examine the image one more time very closely line 10 fand in den kurzen seinen graze des wodens bede looking at kurzen maybe kürzen no graze looking at the z it s a fraktur z so graze line 14 ipblättrigem it looks like l i p b l ä t t r i g e m i will use unleserlich line 25 ach ihr ehren verses du wünstest ihm die geschichte von der looking at ehren verses it s very hard let s look at the word segenjung in line 23 again it looks like s e g e n j u n g wait looking at line 10 in den kurzen seinen graze des wodens bede could it be in den kürzen seinen grase des waldes bede the l in waldes is almost invisible the z in graze might be an s line 14 ipblättrigem looking at the letters it could be laubblättrigem if the laub part is just a smudge missing i will use unleserlich let s try to be as faithful as possible to the visual evidence line 10 fand in den kurzen seinen graze des wodens bede i see z and wodens line 14 unleserlich laub bedeckte line 25 ach ihr ehren verses du wünstest ihm die geschichte von der actually looking at line 10 again in den kurzen seinen graze des wodens bede if i look at the word wodens it s very likely waldes the l is just a vertical stroke that didn t print well and graze grase line 14 ipblättrigem it looks like lipblättrigem i will use unleserlich let me re read the whole thing one last time to ensure no other errors page number 14 text deiner großmutter wohl geräumt haben rein meinte malineken hartnäckig sie hat ja auch die prinzessin vom se sehen und so etwas ganz besonderes davon habe ich noch nie gehört gottlieb so kann sie dir erzählen fragte sie nur aus sie weiß alles der kahn war mittlerweile der insel ganz nahe ge kommen die kinder landeten an einer dazu geeigneten stelle und befestigten ihn an einem aus dem wasser ragenden pfahl sie erstiegen die kleine anhöhe auf der sich das gehöft be fand in den kurzen seinen graze des wodens bede ckte blühte der thymian ein festgezwirnt"
+        },
+        {
+          "tag": "equal",
+          "gt": "weg führte gerade auf die",
+          "pred": "weg führte gerade auf die"
+        },
+        {
+          "tag": "delete",
+          "gt": "schilfhütte",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "schüffte"
+        },
+        {
+          "tag": "equal",
+          "gt": "zu die lag heimlich unter den weiden das mächtige",
+          "pred": "zu die lag heimlich unter den weiden das mächtige"
+        },
+        {
+          "tag": "delete",
+          "gt": "geäst",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "gast"
+        },
+        {
+          "tag": "equal",
+          "gt": "der majestätischen bäume mit silbergrauem",
+          "pred": "der majestätischen bäume mit silbergrauem"
+        },
+        {
+          "tag": "delete",
+          "gt": "spitzblättrigem",
+          "pred": ""
+        },
+        {
+          "tag": "fuzzy",
+          "gt": "laube",
+          "pred": "laub"
+        },
+        {
+          "tag": "delete",
+          "gt": "beladen",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "unleserlich laub bedeckte"
+        },
+        {
+          "tag": "equal",
+          "gt": "breitete sich weit und wuchtig über das",
+          "pred": "breitete sich weit und wuchtig über das"
+        },
+        {
+          "tag": "delete",
+          "gt": "niedere",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "nähere"
+        },
+        {
+          "tag": "equal",
+          "gt": "dach",
+          "pred": "dach"
+        },
+        {
+          "tag": "moved",
+          "gt": "welches",
+          "pred": "welches"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "breitete"
+        },
+        {
+          "tag": "equal",
+          "gt": "sich der erde",
+          "pred": "sich der erde"
+        },
+        {
+          "tag": "fuzzy",
+          "gt": "zuneigte",
+          "pred": "zunigte"
+        },
+        {
+          "tag": "moved",
+          "gt": "dahinter",
+          "pred": "dahinter"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "zunigte hinter"
+        },
+        {
+          "tag": "equal",
+          "gt": "erblickte",
+          "pred": "erblickte"
+        },
+        {
+          "tag": "delete",
+          "gt": "man",
+          "pred": ""
+        },
+        {
+          "tag": "equal",
+          "gt": "ein stück garten und",
+          "pred": "ein stück garten und"
+        },
+        {
+          "tag": "delete",
+          "gt": "ackerland",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "acker"
+        },
+        {
+          "tag": "equal",
+          "gt": "von rohr und schilf wie mit einem wall umschlossen eine",
+          "pred": "von rohr und schilf wie mit einem wall umschlossen eine"
+        },
+        {
+          "tag": "delete",
+          "gt": "alte",
+          "pred": ""
+        },
+        {
+          "tag": "equal",
+          "gt": "frau",
+          "pred": "frau"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "war"
+        },
+        {
+          "tag": "equal",
+          "gt": "saß vor der",
+          "pred": "saß vor der"
+        },
+        {
+          "tag": "delete",
+          "gt": "thür des",
+          "pred": ""
+        },
+        {
+          "tag": "fuzzy",
+          "gt": "hüttchens",
+          "pred": "hüttchen"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "hüttchen zu"
+        },
+        {
+          "tag": "equal",
+          "gt": "und spann ihr haar war so",
+          "pred": "und spann ihr haar war so"
+        },
+        {
+          "tag": "moved",
+          "gt": "weiß",
+          "pred": "weiß"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "weit"
+        },
+        {
+          "tag": "equal",
+          "gt": "wie das gewebe der spinnen welches im herbst über die",
+          "pred": "wie das gewebe der spinnen welches im herbst über die"
+        },
+        {
+          "tag": "delete",
+          "gt": "stoppeln fliegt um ihren rocken hatte sie",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "spinnlein lag band es"
+        },
+        {
+          "tag": "equal",
+          "gt": "ein schwarzes band gebunden gottlieb und",
+          "pred": "ein schwarzes band gebunden gottlieb und"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "maline wait line 21 band gebunden gottlieb und"
+        },
+        {
+          "tag": "equal",
+          "gt": "malineken",
+          "pred": "malineken"
+        },
+        {
+          "tag": "delete",
+          "gt": "kamen mit dem korbe",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "kam"
+        },
+        {
+          "tag": "equal",
+          "gt": "und blieben vor ihr stehen großmutter sagte",
+          "pred": "und blieben vor ihr stehen großmutter sagte"
+        },
+        {
+          "tag": "fuzzy",
+          "gt": "letztere",
+          "pred": "letter"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "leiser"
+        },
+        {
+          "tag": "equal",
+          "gt": "er will nicht glauben daß du die",
+          "pred": "er will nicht glauben daß du die"
+        },
+        {
+          "tag": "delete",
+          "gt": "seejungfern gesehen",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "segenjung"
+        },
+        {
+          "tag": "equal",
+          "gt": "hast und er weiß nichts von der prinzessin vom see sie",
+          "pred": "hast und er weiß nichts von der prinzessin vom see sie"
+        },
+        {
+          "tag": "delete",
+          "gt": "netzte ihren",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "neigten ihr"
+        },
+        {
+          "tag": "equal",
+          "gt": "faden",
+          "pred": "faden"
+        },
+        {
+          "tag": "delete",
+          "gt": "geht",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "ach"
+        },
+        {
+          "tag": "equal",
+          "gt": "ihr",
+          "pred": "ihr"
+        },
+        {
+          "tag": "delete",
+          "gt": "man eures weges gab sie ihnen zur",
+          "pred": ""
+        },
+        {
+          "tag": "fuzzy",
+          "gt": "antwort",
+          "pred": "antworte"
+        },
+        {
+          "tag": "moved",
+          "gt": "großmutter",
+          "pred": "großmutter"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "ehren verses"
+        },
+        {
+          "tag": "equal",
+          "gt": "du",
+          "pred": "du"
+        },
+        {
+          "tag": "delete",
+          "gt": "könntest",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "wünstest"
+        },
+        {
+          "tag": "equal",
+          "gt": "ihm die geschichte von der",
+          "pred": "ihm die geschichte von der"
+        },
+        {
+          "tag": "moved",
+          "gt": "prinzessin",
+          "pred": "prinzessin"
+        },
+        {
+          "tag": "delete",
+          "gt": "vom see wohl",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "erzählen",
+          "pred": "erzählen"
+        },
+        {
+          "tag": "delete",
+          "gt": "bat",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "malineken",
+          "pred": "malineken"
+        },
+        {
+          "tag": "delete",
+          "gt": "sie läßt",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "wait line 21 band gebunden looking at the image it says band gebunden line 23 segenjung looking closely s e g e n j u n g it s very strange line 25 ehren verses e h r e n v e r s e s let me refine the transcription for line 10 15 based on visual evidence only even if it makes no sense in german line 10 fand in den kurzen seinen graze des wodens bede line 11 ckte blühte der thymian ein festgezwirnt weg führte gerade wait festgezwirnte or festgezwirnt it looks like festgezwirnt line 12 auf die schüffte zu die lag heimlich unter den weiden das line 13 mächtige gast der majestätischen bäume mit silbergrauem line 14 unleserlich laub bedeckte breitete"
+        },
+        {
+          "tag": "equal",
+          "gt": "sich",
+          "pred": "sich"
+        },
+        {
+          "tag": "delete",
+          "gt": "schön anhören",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "weit"
+        },
+        {
+          "tag": "equal",
+          "gt": "und",
+          "pred": "und"
+        },
+        {
+          "tag": "delete",
+          "gt": "man muß sie doch wissen wenn man",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "wuchtig line 15"
+        },
+        {
+          "tag": "equal",
+          "gt": "über",
+          "pred": "über"
+        },
+        {
+          "tag": "delete",
+          "gt": "den see fährt und in dem blumental tag für tag herumwandert ich",
+          "pred": ""
+        },
+        {
+          "tag": "fuzzy",
+          "gt": "meine",
+          "pred": "meinte"
+        },
+        {
+          "tag": "delete",
+          "gt": "ihr könntet euer vesper brauchen",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "sagte",
+          "pred": "sagte"
+        },
+        {
+          "tag": "delete",
+          "gt": "die",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "großmutter",
+          "pred": "großmutter"
+        },
+        {
+          "tag": "delete",
+          "gt": "es hat eben vier uhr geschlagen ach ja rief",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "malineken",
+          "pred": "malineken"
+        },
+        {
+          "tag": "delete",
+          "gt": "inbrünstig erdbeeren mit milch und",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "das nähere dach breitete sich der erde zunigte line 16 hinter erblickte"
+        },
+        {
+          "tag": "equal",
+          "gt": "ein stück",
+          "pred": "ein stück"
+        },
+        {
+          "tag": "delete",
+          "gt": "brot",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "dazu",
+          "pred": "dazu"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "garten"
+        },
+        {
+          "tag": "equal",
+          "gt": "und",
+          "pred": "und"
+        },
+        {
+          "tag": "delete",
+          "gt": "dieweil wir das aufzehren erzählt ihr dem",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "gottlieb",
+          "pred": "gottlieb"
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "acker von rohr wait line 20 21"
+        },
+        {
+          "tag": "equal",
+          "gt": "die",
+          "pred": "die"
+        },
+        {
+          "tag": "moved",
+          "gt": "geschichte",
+          "pred": "geschichte"
+        },
+        {
+          "tag": "delete",
+          "gt": "sie ließ nicht nach sie mußte ihren willen haben ein weilchen danach saßen die",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "kinder",
+          "pred": "kinder"
+        },
+        {
+          "tag": "delete",
+          "gt": "auf einem baumstamm vor der",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "hütte",
+          "pred": "hütte"
+        },
+        {
+          "tag": "delete",
+          "gt": "und hatten zwischen sich einen napf mit süßer milch in der schwammen die erdbeeren so dick daß man nicht wußte war das milch mit erdbeeren oder erdbeeren mit milch doch es mochte wohl auf eins herauskommen die",
+          "pred": ""
+        },
+        {
+          "tag": "moved",
+          "gt": "großmutter",
+          "pred": "großmutter"
+        },
+        {
+          "tag": "delete",
+          "gt": "blickte zuweilen nach ihnen hin",
+          "pred": ""
+        },
+        {
+          "tag": "insert",
+          "gt": "",
+          "pred": "spinnlein lag band"
+        }
+      ]
+    },
+    "score": 0.12732558139534883,
+    "error": null,
+    "wall_seconds": 68.59766812506132,
+    "tokens_per_second": 88.76098600301837
+  }
+]

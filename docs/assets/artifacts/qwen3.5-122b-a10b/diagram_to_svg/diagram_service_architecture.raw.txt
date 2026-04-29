@@ -1,0 +1,179 @@
+
+
+<svg width="1200" height="850" viewBox="0 0 1200 850" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    text { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    .title { font-size: 24px; font-weight: bold; fill: #2c3e50; }
+    .label { font-size: 16px; fill: #333; }
+    .sub-label { font-size: 14px; fill: #555; font-style: italic; }
+    .note-title { font-size: 18px; font-weight: bold; fill: #27ae60; }
+    .goal-title { font-size: 18px; font-weight: bold; fill: #2980b9; }
+    .legend-text { font-size: 14px; fill: #333; }
+    
+    /* Box Styles */
+    .box-std { fill: white; stroke: #333; stroke-width: 2; rx: 5; }
+    .box-ext { fill: white; stroke: #e74c3c; stroke-width: 2; rx: 5; } /* External - Red */
+    .box-mq { fill: white; stroke: #16a085; stroke-width: 2; rx: 5; } /* MQ - Teal */
+    .box-mon { fill: white; stroke: #8e44ad; stroke-width: 2; rx: 5; } /* Monitoring - Purple */
+    
+    /* Connection Styles */
+    .line-sync { stroke: #333; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+    .line-async { stroke: #333; stroke-width: 2; fill: none; stroke-dasharray: 8,4; marker-end: url(#arrow); }
+    .line-bi { stroke: #333; stroke-width: 2; fill: none; marker-start: url(#arrow); marker-end: url(#arrow); }
+    
+    /* Text specific styles */
+    .text-red { fill: #c0392b; font-weight: bold; }
+    .text-teal { fill: #16a085; font-weight: bold; }
+    .text-purple { fill: #8e44ad; font-weight: bold; }
+  </style>
+
+  <defs>
+    <!-- Arrow Marker -->
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#333" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="850" fill="#f9f9f9" />
+
+  <!-- Title -->
+  <text x="60" y="50" class="title">System Architecture</text>
+
+  <!-- Legend (Top Right) -->
+  <g transform="translate(900, 40)">
+    <line x1="0" y1="10" x2="30" y2="10" class="line-sync" />
+    <text x="40" y="15" class="legend-text">Sync</text>
+    
+    <line x1="0" y1="35" x2="30" y2="35" class="line-async" />
+    <text x="40" y="40" class="legend-text">Async</text>
+    
+    <rect x="0" y="50" width="30" height="15" class="box-ext" fill="none"/>
+    <text x="40" y="62" class="legend-text text-red">External</text>
+  </g>
+
+  <!-- Goals (Left Side) -->
+  <g transform="translate(60, 120)">
+    <text x="0" y="0" class="goal-title">Goals:</text>
+    <text x="0" y="30" class="label">- Scalability</text>
+    <text x="0" y="55" class="label">- Reliability</text>
+    <text x="0" y="80" class="label">- Security</text>
+    <text x="0" y="105" class="label">- Maintainability</text>
+  </g>
+
+  <!-- Notes (Bottom Left) -->
+  <g transform="translate(60, 320)">
+    <text x="0" y="0" class="note-title">Notes:</text>
+    <text x="0" y="30" class="label">- Use Docker for all services</text>
+    <text x="0" y="55" class="label">- CI/CD with GitHub Actions</text>
+    <text x="0" y="80" class="label">- Logs -> ELK Stack</text>
+  </g>
+
+  <!-- Main Diagram Components -->
+
+  <!-- Frontend -->
+  <rect x="300" y="250" width="140" height="70" class="box-std" />
+  <text x="370" y="285" text-anchor="middle" class="label">Frontend</text>
+  <text x="370" y="305" text-anchor="middle" class="sub-label">(React)</text>
+
+  <!-- API Gateway -->
+  <rect x="490" y="250" width="140" height="70" class="box-std" />
+  <text x="560" y="285" text-anchor="middle" class="label">API Gateway</text>
+  <text x="560" y="305" text-anchor="middle" class="sub-label">(Kong)</text>
+
+  <!-- Auth Service -->
+  <rect x="720" y="140" width="140" height="70" class="box-std" />
+  <text x="790" y="175" text-anchor="middle" class="label">Auth Service</text>
+  <text x="790" y="195" text-anchor="middle" class="sub-label">(JWT)</text>
+
+  <!-- User DB -->
+  <g transform="translate(920, 140)">
+    <path d="M0,10 Q0,0 30,0 L60,0 Q90,0 90,10 V50 Q90,60 60,60 H30 Q0,60 0,50 Z" fill="white" stroke="#333" stroke-width="2"/>
+    <ellipse cx="45" cy="10" rx="45" ry="10" fill="white" stroke="#333" stroke-width="2"/>
+    <text x="45" y="35" text-anchor="middle" class="label">User DB</text>
+    <text x="45" y="50" text-anchor="middle" class="sub-label">(PostgreSQL)</text>
+  </g>
+
+  <!-- Backend -->
+  <rect x="720" y="310" width="160" height="70" class="box-std" />
+  <text x="800" y="345" text-anchor="middle" class="label">Backend</text>
+  <text x="800" y="365" text-anchor="middle" class="sub-label">(Python/FastAPI)</text>
+
+  <!-- Database (PostgreSQL) -->
+  <g transform="translate(920, 310)">
+    <path d="M0,10 Q0,0 30,0 L60,0 Q90,0 90,10 V50 Q90,60 60,60 H30 Q0,60 0,50 Z" fill="white" stroke="#333" stroke-width="2"/>
+    <ellipse cx="45" cy="10" rx="45" ry="10" fill="white" stroke="#333" stroke-width="2"/>
+    <text x="45" y="35" text-anchor="middle" class="label">Database</text>
+    <text x="45" y="50" text-anchor="middle" class="sub-label">(PostgreSQL)</text>
+  </g>
+
+  <!-- External API (Red Box) -->
+  <rect x="380" y="460" width="160" height="70" class="box-ext" />
+  <text x="460" y="495" text-anchor="middle" class="label">External API</text>
+  <text x="460" y="515" text-anchor="middle" class="sub-label">(Payment Provider)</text>
+
+  <!-- Message Queue (Teal Box) -->
+  <rect x="620" y="460" width="160" height="70" class="box-mq" />
+  <text x="700" y="495" text-anchor="middle" class="label">Message Queue</text>
+  <text x="700" y="515" text-anchor="middle" class="sub-label">(RabbitMQ)</text>
+
+  <!-- Worker Service -->
+  <rect x="860" y="460" width="140" height="70" class="box-std" />
+  <text x="930" y="495" text-anchor="middle" class="label">Worker Service</text>
+  <text x="930" y="515" text-anchor="middle" class="sub-label">(Python)</text>
+
+  <!-- File Storage (S3) -->
+  <g transform="translate(1040, 460)">
+    <path d="M0,10 Q0,0 30,0 L60,0 Q90,0 90,10 V50 Q90,60 60,60 H30 Q0,60 0,50 Z" fill="white" stroke="#333" stroke-width="2"/>
+    <ellipse cx="45" cy="10" rx="45" ry="10" fill="white" stroke="#333" stroke-width="2"/>
+    <text x="45" y="35" text-anchor="middle" class="label">File Storage</text>
+    <text x="45" y="50" text-anchor="middle" class="sub-label">(S3)</text>
+  </g>
+
+  <!-- Monitoring (Purple Box) -->
+  <rect x="620" y="610" width="180" height="70" class="box-mon" />
+  <text x="710" y="645" text-anchor="middle" class="label">Monitoring</text>
+  <text x="710" y="665" text-anchor="middle" class="sub-label">(Prometheus + Grafana)</text>
+
+  <!-- Connections -->
+
+  <!-- Frontend -> API Gateway (HTTPS) -->
+  <line x1="440" y1="285" x2="490" y2="285" class="line-sync" />
+  <text x="465" y="270" text-anchor="middle" font-size="12" fill="#333">HTTPS</text>
+
+  <!-- API Gateway -> Auth Service -->
+  <path d="M560,250 V200 H720 V210" class="line-sync" />
+
+  <!-- API Gateway -> Backend -->
+  <path d="M630,285 H720 V345" class="line-sync" />
+
+  <!-- API Gateway -> External API (Dashed) -->
+  <path d="M510,320 V380 H460 V460" class="line-async" />
+
+  <!-- Auth Service <-> User DB -->
+  <line x1="860" y1="175" x2="920" y2="175" class="line-bi" />
+
+  <!-- Backend <-> Database -->
+  <line x1="880" y1="345" x2="920" y2="345" class="line-bi" />
+
+  <!-- Backend -> Message Queue (Solid) -->
+  <path d="M760,380 V460" class="line-sync" /> 
+  <!-- Note: Looking at the diagram again, the line to MQ seems to come from Gateway or the path between Gateway and Backend. Let's trace carefully. 
+       There is a vertical line dropping down from the horizontal segment connecting Gateway and Backend? No.
+       It looks like it drops from the API Gateway box bottom edge, goes down, then right into MQ. 
+       Let's adjust: From Gateway (bottom) -> Down -> Right to MQ. -->
+  <path d="M560,320 V410 H700 V460" class="line-sync" />
+
+  <!-- Message Queue -> Worker Service (Dashed) -->
+  <line x1="780" y1="495" x2="860" y2="495" class="line-async" />
+
+  <!-- Message Queue -> Monitoring (Dashed) -->
+  <path d="M700,530 V610" class="line-async" />
+
+  <!-- Worker Service <-> File Storage -->
+  <line x1="1000" y1="495" x2="1040" y2="495" class="line-bi" />
+
+  <!-- Worker Service -> Monitoring (Dashed) -->
+  <path d="M860,530 H710 V610" class="line-async" />
+
+</svg>

@@ -1,0 +1,7 @@
+{
+  "name": "diagram_to_svg",
+  "label": "Diagramm → SVG",
+  "system": "Du bist Spezialist für Diagramm-Erkennung und SVG. Du gibst sauberes, parsbares SVG zurück, das jeder Browser ohne externe Ressourcen rendern kann.",
+  "user_prompt": "Auf dem Bild siehst du ein Diagramm (Architektur, Flowchart, Sequenz, Quadrant o.ä.). Erstelle eine SVG-Repräsentation des Diagramms.\n\nAnforderungen:\n- Antworte ausschließlich mit dem rohen SVG-Code, beginnend mit <svg ...> und endend mit </svg>. Keine Erklärungen, keine Markdown-Fences.\n- Setze ein viewBox-Attribut (z.B. viewBox=\"0 0 1200 800\"), damit das Bild skaliert.\n- Nur Inline-Inhalt, keine externen Referenzen (kein <image href>, kein @import, kein xlink:href auf URLs).\n- Alle im Diagramm sichtbaren Beschriftungen müssen als <text>-Elemente vorhanden und lesbar (Font-Size ≥ 12) sein.\n- Verbindungen als <line>, <polyline> oder <path> mit deutlichem stroke. Pfeilspitzen via <marker>.\n- Gruppiere zusammengehörige Teile mit <g>-Tags und sinnvollen id-Attributen.\n- Wähle ausreichend Kontrast: dunkler Stroke auf weißem/hellem Hintergrund.\n- Vermeide Überlappungen — plane das Layout so, dass Boxen nicht über Pfeilen liegen und Texte nicht aus ihren Boxen herausragen.\n- Behalte die Struktur des Originals bei: Anzahl der Boxen, ihre Verbindungen und ihre Anordnung sollen vergleichbar sein.",
+  "image_glob": "diagram_*.{jpg,jpeg,png}"
+}

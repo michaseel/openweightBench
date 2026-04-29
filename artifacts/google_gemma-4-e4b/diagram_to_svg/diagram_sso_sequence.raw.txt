@@ -1,0 +1,89 @@
+<svg width="100%" height="100%" viewBox="0 0 1200 850" xmlns="http://www.w3.org/2000/svg" style="background-color: #ffffff;">
+    <defs>
+        <!-- Arrowhead Marker Definition -->
+        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5"orient="auto"markerUnits="strokeWidth">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+        </marker>
+    </defs>
+
+    <!-- ================================================== -->
+    <!-- STYLES AND GLOBAL GROUPING -->
+    <!-- ================================================== -->
+    <g id="diagram-flow">
+
+        <!-- 1. AKTOR: BENUTZER (User) -->
+        <g id="benutzer" transform="translate(50, 20)">
+            <text x="0" y="30" font-family="Arial, sans-serif" font-size="24" fill="#333">Benutzer</text>
+            <!-- Simple stick figure representation -->
+            <rect x="-10" y="50" width="20" height="60" style="fill:none; stroke:#333; stroke-width:2;"/>
+        </g>
+
+        <!-- 2. KOMPONENTE: APP / SERVICE PROVIDER (SP) -->
+        <g id="service-provider">
+            <rect x="180" y="150" width="240" height="100" rx="10" style="fill:#e6f7ff; stroke:#333; stroke-width:2;" />
+            <text x="290" y="185" font-family="Arial, sans-serif" font-size="18" fill="#333">App / Service Provider</text>
+        </g>
+
+        <!-- 3. KOMPONENTE: IDENTITY PROVIDER (IdP) -->
+        <g id="identity-provider">
+            <rect x="650" y="120" width="480" height="700" rx="15" style="fill:#fff0e6; stroke:#333; stroke-width:2;" />
+            <text x="750" y="150" font-family="Arial, sans-serif" font-size="24" fill="#333">Identity Provider (IdP)</text>
+
+            <!-- Inner Components of IdP -->
+            <g id="idp-login-page" transform="translate(700, 250)">
+                <rect x="0" y="0" width="280" height="100" rx="8" style="fill:#f9f9f9; stroke:#666; stroke-width:1;" />
+                <text x="30" y="45" font-family="Arial, sans-serif" font-size="16" fill="#333">Login-Seite anzeigen</text>
+            </g>
+
+            <!-- Decision Diamond -->
+            <g id="idp-auth-check" transform="translate(700, 450)">
+                <polygon points="0,0 280,100 280,0" style="fill:none; stroke:#333; stroke-width:2;" />
+                <text x="140" y="30" font-family="Arial, sans-serif" font-size="16" fill="#333">Anmeldedaten korrekt?</text>
+            </g>
+
+             <!-- Token/Assertion Box -->
+            <g id="idp-token-response" transform="translate(700, 650)">
+                <rect x="0" y="0" width="280" height="80" rx="8" style="fill:#e6ffe6; stroke:#333; stroke-width:2;" />
+                <text x="30" y="45" font-family="Arial, sans-serif" font-size="16" fill="#333">Token / Assertion (SSO-Response)</text>
+            </g>
+
+        </g>
+
+
+        <!-- ================================================== -->
+        <!-- FLOW CONNECTIONS AND TEXT LABELS -->
+        <!-- ================================================== -->
+
+        <!-- 1. Benutzer -> App/SP: Zugang zu App -->
+        <path d="M200 50 L200 130" stroke="#333" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+        <text x="220" y="80" font-family="Arial, sans-serif" font-size="14" fill="#333">1. Zugang zu App</text>
+
+        <!-- 2. App/SP -> IdP: Weiterleitung -->
+        <path d="M460 200 C550 180, 700 180, 700 200" stroke="#333" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+        <text x="560" y="190" font-family="Arial, sans-serif" font-size="14" fill="#333">2. Weiterleitung zur Login-Seite</text>
+
+        <!-- 3. IdP: Benutzer gibt Anmeldedaten ein (Input) -->
+        <path d="M700 350 L980 350" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrowhead)"/>
+        <text x="820" y="340" font-family="Arial, sans-serif" font-size="14" fill="#333">Benutzer gibt Anmeldedaten ein</text>
+
+        <!-- 4. Login Page -> Auth Check (Implicit flow) -->
+        <path d="M700 250 L700 380" stroke="#333" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+
+        <!-- 5. Decision Path: Nein (Failure Loop) -->
+        <path d="M700 400 C650 420, 650 480, 700 500" stroke="#cc3333" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+        <text x="690" y="460" font-family="Arial, sans-serif" font-size="14" fill="#cc3333">Nein</text>
+
+        <!-- 6. Decision Path: Ja (Success Flow) -->
+        <path d="M700 500 L700 620" stroke="#339933" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+        <text x="710" y="540" font-family="Arial, sans-serif" font-size="14" fill="#339933">Ja</text>
+
+        <!-- 7. Token Response -> App/SP: Redirect -->
+        <path d="M650 730 C550 720, 380 720, 380 680" stroke="#333" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+        <text x="450" y="710" font-family="Arial, sans-serif" font-size="14" fill="#333">Redirect zurück zur App mit Token</text>
+
+        <!-- 8. App/SP -> Ressourcen: Zugriff gewährt -->
+        <path d="M380 620 L380 750" stroke="#333" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+        <text x="400" y="690" font-family="Arial, sans-serif" font-size="14" fill="#333">7. Zugriff auf Ressourcen</text>
+
+    </g>
+</svg>

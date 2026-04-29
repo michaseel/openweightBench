@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 900" font-family="Arial, sans-serif">
+  <defs>
+    <!-- Arrowhead Marker -->
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+    </marker>
+  </defs>
+
+  <!-- Background/Canvas -->
+  <rect width="1400" height="900" fill="#FFFFFF" stroke="#DDD" stroke-width="1"/>
+
+  <!-- Group: Goals and Notes (Left Side) -->
+  <g id="GoalsAndNotes">
+    <!-- Goals Box -->
+    <rect x="50" y="120" width="240" height="230" rx="8" fill="#F9F9F9" stroke="#333" stroke-width="2"/>
+    <text x="70" y="150" font-size="16" font-weight="bold" fill="#333">Goals:</text>
+    <text x="70" y="185" font-size="14" fill="#333">• Scalability</text>
+    <text x="70" y="205" font-size="14" fill="#333">• Reliability</text>
+    <text x="70" y="225" font-size="14" fill="#333">• Security</text>
+    <text x="70" y="245" font-size="14" fill="#333">• Maintainability</text>
+
+    <!-- Notes Box -->
+    <rect x="50" y="380" width="240" height="160" rx="8" fill="#F9F9F9" stroke="#333" stroke-width="2"/>
+    <text x="70" y="410" font-size="16" font-weight="bold" fill="#333">Notes:</text>
+    <text x="70" y="445" font-size="14" fill="#333">• Use Docker for all services</text>
+    <text x="70" y="465" font-size="14" fill="#333">• CI/CD with GitHub Actions</text>
+    <text x="70" y="485" font-size="14" fill="#333">• Logs -> ELK Stack</text>
+  </g>
+
+  <!-- Group: Core Services Flow -->
+  <g id="CoreServices">
+    <!-- Frontend (React) -->
+    <rect x="320" y="150" width="280" height="90" rx="8" fill="#E6F7FF" stroke="#007BFF" stroke-width="2"/>
+    <text x="340" y="195" font-size="16" font-weight="bold" fill="#007BFF">Frontend</text>
+    <text x="340" y="218" font-size="14" fill="#007BFF">(React)</text>
+
+    <!-- API Gateway (Kong) -->
+    <rect x="650" y="150" width="280" height="90" rx="8" fill="#FFF3CD" stroke="#FFC107" stroke-width="2"/>
+    <text x="670" y="195" font-size="16" font-weight="bold" fill="#FFC107">API Gateway</text>
+    <text x="670" y="218" font-size="14" fill="#FFC107">(Kong)</text>
+
+    <!-- External API (Payment Provider) -->
+    <rect x="320" y="350" width="280" height="90" rx="8" fill="#FEEAEA" stroke="#DC3545" stroke-width="2"/>
+    <text x="340" y="395" font-size="16" font-weight="bold" fill="#DC3545">External API</text>
+    <text x="340" y="418" font-size="14" fill="#DC3545">(Payment Provider)</text>
+
+    <!-- Auth Service (JWT) -->
+    <rect x="720" y="150" width="280" height="90" rx="8" fill="#E6F7FF" stroke="#007BFF" stroke-width="2"/>
+    <text x="740" y="195" font-size="16" font-weight="bold" fill="#007BFF">Auth Service</text>
+    <text x="740" y="218" font-size="14" fill="#007BFF">(JWT)</text>
+
+    <!-- Backend (Python/FastAPI) -->
+    <rect x="650" y="350" width="280" height="90" rx="8" fill="#E6F7FF" stroke="#007BFF" stroke-width="2"/>
+    <text x="670" y="395" font-size="16" font-weight="bold" fill="#007BFF">Backend</text>
+    <text x="670" y="418" font-size="14" fill="#007BFF">(Python/FastAPI)</text>
+
+    <!-- Message Queue (RabbitMQ) -->
+    <rect x="320" y="550" width="280" height="90" rx="8" fill="#FFF3CD" stroke="#FFC107" stroke-width="2"/>
+    <text x="340" y="595" font-size="16" font-weight="bold" fill="#FFC107">Message Queue</text>
+    <text x="340" y="618" font-size="14" fill="#FFC107">(RabbitMQ)</text>
+
+    <!-- Worker Service (Python) -->
+    <rect x="650" y="550" width="280" height="90" rx="8" fill="#E6F7FF" stroke="#007BFF" stroke-width="2"/>
+    <text x="670" y="595" font-size="16" font-weight="bold" fill="#007BFF">Worker Service</text>
+    <text x="670" y="618" font-size="14" fill="#007BFF">(Python)</text>
+
+    <!-- File Storage (S3) -->
+    <rect x="950" y="550" width="200" height="90" rx="8" fill="#F0FFF0" stroke="#28A745" stroke-width="2"/>
+    <text x="960" y="595" font-size="14" fill="#28A745">File Storage</text>
+    <text x="960" y="618" font-size="14" fill="#28A745">(S3)</text>
+
+  </g>
+
+  <!-- Group: Databases and Monitoring -->
+  <g id="DataAndMonitoring">
+    <!-- User DB (PostgreSQL) -->
+    <rect x="700" y="290" width="160" height="80" rx="5" fill="#F0FFF0" stroke="#28A745" stroke-width="2"/>
+    <text x="715" y="315" font-size="14" fill="#28A745">User DB</text>
+    <text x="715" y="335" font-size="12" fill="#28A745">(PostgreSQL)</text>
+
+    <!-- Database (PostgreSQL) -->
+    <rect x="600" y="590" width="160" height="80" rx="5" fill="#F0FFF0" stroke="#28A745" stroke-width="2"/>
+    <text x="615" y="615" font-size="14" fill="#28A745">Database</text>
+    <text x="615" y="635" font-size="12" fill="#28A745">(PostgreSQL)</text>
+
+    <!-- Monitoring (Prometheus + Grafana) -->
+    <rect x="900" y="100" width="240" height="100" rx="8" fill="#F9EBEA" stroke="#6C757D" stroke-width="2"/>
+    <text x="920" y="130" font-size="14" font-weight="bold" fill="#6C757D">Monitoring</text>
+    <text x="920" y="150" font-size="12" fill="#6C757D">(Prometheus + Grafana)</text>
+  </g>
+
+  <!-- Connections (Lines and Arrows) -->
+
+  <!-- 1. Frontend -> API Gateway -->
+  <line x1="380" y1="205" x2="650" y2="205" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="515" y="190" font-size="12" fill="#333">HTTPS</text>
+
+  <!-- 2. API Gateway -> Auth Service -->
+  <line x1="730" y1="205" x2="840" y2="205" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- 3. API Gateway -> Backend -->
+  <line x1="730" y1="240" x2="840" y2="390" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- 4. External API -> API Gateway (Integration/Call) -->
+  <line x1="560" y1="395" x2="650" y2="395" stroke="#DC3545" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- 5. Backend -> Database -->
+  <line x1="790" y1="440" x2="790" y2="630" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- 6. Auth Service <-> User DB -->
+  <line x1="840" y1="245" x2="790" y2="330" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="790" y1="330" x2="840" y2="245" stroke="#333" stroke-width="2" marker-start="url(#arrowhead)"/>
+
+  <!-- 7. Backend -> Message Queue -->
+  <line x1="670" y1="440" x2="560" y2="595" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- 8. Message Queue -> Worker Service -->
+  <line x1="560" y1="645" x2="790" y2="595" stroke="#FFC107" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- 9. Worker Service -> File Storage (S3) -->
+  <line x1="840" y1="645" x2="950" y2="615" stroke="#28A745" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- 10. Monitoring Connections (General Observability) -->
+  <line x1="900" y1="150" x2="340" y2="150" stroke="#6C757D" stroke-width="1" stroke-dasharray="4 2"/>
+  <line x1="900" y1="150" x2="670" y2="150" stroke="#6C757D" stroke-width="1" stroke-dasharray="4 2"/>
+  <line x1="900" y1="150" x2="670" y2="390" stroke="#6C757D" stroke-width="1" stroke-dasharray="4 2"/>
+  <line x1="900" y1="150" x2="670" y2="595" stroke="#6C757D" stroke-width="1" stroke-dasharray="4 2"/>
+
+</svg>

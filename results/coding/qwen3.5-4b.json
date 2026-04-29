@@ -1,0 +1,201 @@
+{
+  "task": "coding",
+  "model_id": "qwen3.5-4b",
+  "model_info": {
+    "id": "qwen3.5-4b",
+    "type": "vlm",
+    "publisher": "lmstudio-community",
+    "arch": "qwen35",
+    "compatibility_type": "gguf",
+    "quantization": "Q4_K_M",
+    "state": "not-loaded",
+    "max_context_length": 262144,
+    "capabilities": [
+      "tool_use"
+    ],
+    "loaded_context_length": null
+  },
+  "started_at": "2026-04-28T19:10:27.091123Z",
+  "completed_at": "2026-04-28T19:11:55.568109Z",
+  "metrics": {
+    "wall_seconds": 88.4753622499993,
+    "tokens_generated": 7046,
+    "tokens_per_second": 85.49317348657942,
+    "time_to_first_token_ms": 308.0,
+    "peak_rss_mb": 3226.4
+  },
+  "score": 0.625,
+  "score_breakdown": {
+    "looks_like_html": true,
+    "html_length": 23154,
+    "raw_length": 23168,
+    "lint_checks": [
+      {
+        "id": "col_backlog",
+        "label": "Spalte 'Backlog'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_in_progress",
+        "label": "Spalte 'In Progress'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_review",
+        "label": "Spalte 'Review'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_done",
+        "label": "Spalte 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "drag_drop",
+        "label": "HTML5 Drag&Drop oder Sortable-Lib",
+        "passed": false,
+        "detail": "kein draggable / dragstart / sortable.js gefunden"
+      },
+      {
+        "id": "local_storage",
+        "label": "localStorage-Persistenz",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "tailwind_cdn",
+        "label": "Tailwind via CDN",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "confetti",
+        "label": "Confetti-Animation auf 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Add-Card-Button",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "vanilla_js",
+        "label": "Vanilla JS (kein React/Vue/Angular/Svelte)",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_alert_prompt",
+        "label": "Keine window.alert/prompt für CRUD",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "editable_cards",
+        "label": "Editierbare Karten (contenteditable / input)",
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "lint_passed": 11,
+    "lint_total": 12,
+    "lint_score": 0.9166666666666666,
+    "e2e_checks": [
+      {
+        "id": "renders",
+        "label": "Seite lädt mit allen 4 Spalten",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Karte hinzufügen via Button",
+        "passed": false,
+        "detail": "Page.wait_for_selector: Timeout 2000ms exceeded.\nCall log:\n  - waiting for locator(\"[data-testid=\\\"card-input\\\"]\") to be visible\n"
+      },
+      {
+        "id": "no_double_add",
+        "label": "Karte wird genau 1× angelegt (kein Doppel-Submit)",
+        "passed": false,
+        "detail": "übersprungen — Add-Flow ist gescheitert"
+      },
+      {
+        "id": "delete_card",
+        "label": "Karte löschen via Button + Bestätigung",
+        "passed": false,
+        "detail": "keine Karten zum Löschen vorhanden"
+      },
+      {
+        "id": "persistence",
+        "label": "Karten überleben einen Reload",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_console_errors",
+        "label": "Keine JS-Konsolen-Fehler",
+        "passed": false,
+        "detail": "pageerror: Cannot read properties of null (reading 'length'); pageerror: Cannot read properties of null (reading 'push'); pageerror: Cannot read properties of null (reading 'length')"
+      }
+    ],
+    "e2e_passed": 2,
+    "e2e_total": 6,
+    "e2e_score": 0.3333333333333333,
+    "judge": {
+      "scored_at": "2026-04-28T21:45:42.789033+00:00",
+      "judge_model": "openai/gpt-5.4",
+      "scores": {
+        "board_renders": 0.5,
+        "column_completeness": 1.0,
+        "cards_present": 0.0,
+        "ui_affordances": 0.5,
+        "design_quality": 0.7,
+        "code_structure": 0.5,
+        "dom_safety": 0.0,
+        "robustness": 0.5,
+        "code_quality": 0.2,
+        "render_matches_code": 0.0
+      },
+      "judge_score": 0.385,
+      "comment_visual": "Vier Spalten sind klar sichtbar und optisch ordentlich gestaltet, aber der Board-Inhalt bleibt komplett leer. Add-Buttons sind erkennbar, weitere Interaktionshinweise wie echte Drag-Affordances oder Karten fehlen im Render.",
+      "comment_code": "Die Grundstruktur ist brauchbar, mit App-Objekt und getrennten Methoden für State, Render und Events. Allerdings enthält der Code mehrere gravierende Logikfehler: ungesichertes innerHTML mit User-Input, defekte Drag-and-Drop-Logik, falsche Behandlung von addColumnCard('backlog') sowie fehleranfällige State-Initialisierung.",
+      "comment_consistency": "Starke Diskrepanz zwischen Anspruch und Render: Der Code soll Dummy-Karten erzeugen und rendern, im Screenshot sind dennoch keine Karten sichtbar. Das spricht klar für einen Init-/Render-Fehler oder fehlerhafte Zustandslogik zur Laufzeit."
+    }
+  },
+  "raw_response": "\n\n```html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Vibrant Kanban Board</title>\n    \n    <!-- Tailwind CSS via CDN -->\n    <script src=\"https://cdn.tailwindcss.com\"></script>\n    \n    <!-- Custom Styles for Confetti and Dragging -->\n    <style>\n        /* Smooth transitions for cards */\n        .card {\n            transition: all 0.2s ease-in-out;\n        }\n\n        /* Visual feedback during drag */\n        .dragging {\n            opacity: 0.5;\n            cursor: grabbing !important;\n        }\n\n        /* Confetti Canvas Positioning */\n        #confetti-canvas {\n            position: fixed;\n            top: 0;\n            left: 0;\n            width: 100%;\n            height: 100%;\n            pointer-events: none;\n            z-index: 9999;\n        }\n\n        /* Custom Scrollbar for columns */\n        .column-list {\n            scrollbar-width: thin;\n            scrollbar-color: #cbd5e1 transparent;\n        }\n    </style>\n</head>\n<body class=\"bg-slate-100 h-screen overflow-hidden font-sans text-slate-800\">\n\n    <!-- Confetti Canvas -->\n    <canvas id=\"confetti-canvas\"></canvas>\n\n    <div class=\"flex h-full p-6 gap-6 items-start justify-center\">\n        \n        <!-- \n            CANVAS CONTAINER \n            Used to render the board. \n        -->\n        <div id=\"kanban-board\" class=\"flex flex-col md:flex-row w-full max-w-[1200px] gap-4 h-full overflow-x-auto overflow-y-hidden pb-4\">\n\n            <!-- Column 1: Backlog -->\n            <div data-testid=\"column-backlog\" \n                 class=\"bg-white rounded-lg shadow-md w-80 flex flex-col h-full border border-slate-200 transition-colors duration-300\"\n                 style=\"background: linear-gradient(145deg, #eef2ff 0%, #dbeafe 100%);\">\n                \n                <div class=\"p-4 border-b border-blue-100 bg-white rounded-t-lg shadow-sm flex justify-between items-center\">\n                    <h3 cl",
+  "artifacts": [
+    {
+      "kind": "html",
+      "label": "Generierte App",
+      "path": "artifacts/qwen3.5-4b/coding/output.html",
+      "mime": "text/html"
+    },
+    {
+      "kind": "text",
+      "label": "Roh-Antwort des Modells",
+      "path": "artifacts/qwen3.5-4b/coding/raw_response.txt",
+      "mime": "text/plain"
+    },
+    {
+      "kind": "image",
+      "label": "Screenshot der gerenderten App",
+      "path": "artifacts/qwen3.5-4b/coding/screenshot.png",
+      "mime": "image/png"
+    }
+  ],
+  "error": null,
+  "hardware": {
+    "platform": "macOS-26.4.1-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "ram_total_gb": 128.0,
+    "cpu_count": 16
+  },
+  "bench_version": "0.1.0"
+}

@@ -1,0 +1,201 @@
+{
+  "task": "coding",
+  "model_id": "nvidia/nemotron-3-nano-4b",
+  "model_info": {
+    "id": "nvidia/nemotron-3-nano-4b",
+    "type": "llm",
+    "publisher": "nvidia",
+    "arch": "nemotron_h",
+    "compatibility_type": "gguf",
+    "quantization": "Q4_K_M",
+    "state": "not-loaded",
+    "max_context_length": 1048576,
+    "capabilities": [
+      "tool_use"
+    ],
+    "loaded_context_length": null
+  },
+  "started_at": "2026-04-28T18:51:41.407938Z",
+  "completed_at": "2026-04-28T18:52:45.423030Z",
+  "metrics": {
+    "wall_seconds": 64.01436054101214,
+    "tokens_generated": 4899,
+    "tokens_per_second": 83.5723621166056,
+    "time_to_first_token_ms": 350.0,
+    "peak_rss_mb": 2705.7
+  },
+  "score": 0.5833333333333334,
+  "score_breakdown": {
+    "looks_like_html": true,
+    "html_length": 6256,
+    "raw_length": 6257,
+    "lint_checks": [
+      {
+        "id": "col_backlog",
+        "label": "Spalte 'Backlog'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_in_progress",
+        "label": "Spalte 'In Progress'",
+        "passed": false,
+        "detail": "Spalten-Label fehlt im HTML"
+      },
+      {
+        "id": "col_review",
+        "label": "Spalte 'Review'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_done",
+        "label": "Spalte 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "drag_drop",
+        "label": "HTML5 Drag&Drop oder Sortable-Lib",
+        "passed": false,
+        "detail": "kein draggable / dragstart / sortable.js gefunden"
+      },
+      {
+        "id": "local_storage",
+        "label": "localStorage-Persistenz",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "tailwind_cdn",
+        "label": "Tailwind via CDN",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "confetti",
+        "label": "Confetti-Animation auf 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Add-Card-Button",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "vanilla_js",
+        "label": "Vanilla JS (kein React/Vue/Angular/Svelte)",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_alert_prompt",
+        "label": "Keine window.alert/prompt für CRUD",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "editable_cards",
+        "label": "Editierbare Karten (contenteditable / input)",
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "lint_passed": 10,
+    "lint_total": 12,
+    "lint_score": 0.8333333333333334,
+    "e2e_checks": [
+      {
+        "id": "renders",
+        "label": "Seite lädt mit allen 4 Spalten",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Karte hinzufügen via Button",
+        "passed": false,
+        "detail": "Page.wait_for_selector: Timeout 2000ms exceeded.\nCall log:\n  - waiting for locator(\"[data-testid=\\\"card-input\\\"]\") to be visible\n    9 × locator resolved to hidden <p data-testid=\"card-input\" placehol"
+      },
+      {
+        "id": "no_double_add",
+        "label": "Karte wird genau 1× angelegt (kein Doppel-Submit)",
+        "passed": false,
+        "detail": "übersprungen — Add-Flow ist gescheitert"
+      },
+      {
+        "id": "delete_card",
+        "label": "Karte löschen via Button + Bestätigung",
+        "passed": false,
+        "detail": "keine Karten zum Löschen vorhanden"
+      },
+      {
+        "id": "persistence",
+        "label": "Karten überleben einen Reload",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_console_errors",
+        "label": "Keine JS-Konsolen-Fehler",
+        "passed": false,
+        "detail": "pageerror: document.querySelectorAll(...).map is not a function; pageerror: document.querySelectorAll(...).map is not a function; pageerror: document.querySelectorAll(...).map is not a function"
+      }
+    ],
+    "e2e_passed": 2,
+    "e2e_total": 6,
+    "e2e_score": 0.3333333333333333,
+    "judge": {
+      "scored_at": "2026-04-28T21:45:22.437237+00:00",
+      "judge_model": "openai/gpt-5.4",
+      "scores": {
+        "board_renders": 0.1,
+        "column_completeness": 0.5,
+        "cards_present": 0.0,
+        "ui_affordances": 0.5,
+        "design_quality": 0.1,
+        "code_structure": 0.3,
+        "dom_safety": 0.9,
+        "robustness": 0.1,
+        "code_quality": 0.2,
+        "render_matches_code": 0.0
+      },
+      "judge_score": 0.25000000000000006,
+      "comment_visual": "Es ist kein brauchbares Kanban-Board sichtbar: nur vier Add-Buttons und ein ungestylter Delete-Bereich auf leerer Seite. Die vier Spalten sind indirekt vorhanden, aber ohne Überschriften, Karten oder klare visuelle Struktur.",
+      "comment_code": "Der Code ist funktional schwach und fehleranfällig: createCard erzeugt Karten, hängt sie aber nirgends ein; mehrere DOM-Selektoren und Datenzugriffe sind kaputt; zudem werden this-Kontexte in Arrow-Functions falsch verwendet. Positiv ist nur, dass User-Text überwiegend per value/textContent statt per innerHTML gesetzt wird.",
+      "comment_consistency": "Starke Diskrepanz zwischen Anspruch und Render: Der Code versucht ein Board mit Karten, Modal und Persistenz zu bauen, im Screenshot erscheint davon fast nichts. Das spricht für gravierende Initialisierungs- und DOM-Logikfehler."
+    }
+  },
+  "raw_response": "\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<title>Kanban Board</title>\n<link href=\"https://cdn.tailwindcss.com\" rel=\"stylesheet\">\n<script src=\"https://unpkg.com/confetti@2.0.7/dist/confetti.min.js\"></script>\n<style>\n.card {\n  transition: opacity .3s ease;\n}\n</style>\n</head>\n<body class=\"bg-gray-100 p-4\">\n\n<div data-testid=\"column-backlog\" class=\"flex items-center gap-2\">\n  <button id=\"add-card-backlog\" data-testid=\"add-card\">Add Card</button>\n  <div id=\"cards-backlog\" class=\"space-y-2\"></div>\n</div>\n\n<div data-testid=\"column-in-progress\" class=\"flex items-center gap-2\">\n  <button id=\"add-card-inprogress\" data-testid=\"add-card\">Add Card</button>\n  <div id=\"cards-inprogress\" class=\"space-y-2\"></div>\n</div>\n\n<div data-testid=\"column-review\" class=\"flex items-center gap-2\">\n  <button id=\"add-card-review\" data-testid=\"add-card\">Add Card</button>\n  <div id=\"cards-review\" class=\"space-y-2\"></div>\n</div>\n\n<div data-testid=\"column-done\" class=\"flex items-center gap-2\">\n  <button id=\"add-card-done\" data-testid=\"add-card\">Add Card</button>\n  <div id=\"cards-done\" class=\"space-y-2\"></div>\n</div>\n\n<!-- Delete confirmation modal -->\n<div id=\"delete-modal\" class=\"hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4\">\n  <div class=\"bg-white rounded-lg shadow-md w-full max-w-sm text-center\">\n    <h2>Confirm delete</h2>\n    <p data-testid=\"card-input\" placeholder=\"Type anything to confirm\"></p>\n    <button id=\"confirm-delete\" data-testid=\"confirm-delete\">Delete</button>\n  </div>\n</div>\n\n<script>\n/* Namespace for storage */\nconst STORAGE_KEY = 'kanbanBoard';\nlet nextId = 1;\n\n/* ---------- Helper functions ---------- */\n// Create a new card element\nfunction createCard(title, column) {\n  const div = document.createElement('div');\n  div.className = 'card';\n  div.dataset.testid = 'card';\n  div.dataset.id = getNextId();\n  // Input field\n  const input = document.createElement('input');\n  input.type = 'text';\n  input.dataset.testid = 'card-input';\n  ",
+  "artifacts": [
+    {
+      "kind": "html",
+      "label": "Generierte App",
+      "path": "artifacts/nvidia_nemotron-3-nano-4b/coding/output.html",
+      "mime": "text/html"
+    },
+    {
+      "kind": "text",
+      "label": "Roh-Antwort des Modells",
+      "path": "artifacts/nvidia_nemotron-3-nano-4b/coding/raw_response.txt",
+      "mime": "text/plain"
+    },
+    {
+      "kind": "image",
+      "label": "Screenshot der gerenderten App",
+      "path": "artifacts/nvidia_nemotron-3-nano-4b/coding/screenshot.png",
+      "mime": "image/png"
+    }
+  ],
+  "error": null,
+  "hardware": {
+    "platform": "macOS-26.4.1-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "ram_total_gb": 128.0,
+    "cpu_count": 16
+  },
+  "bench_version": "0.1.0"
+}

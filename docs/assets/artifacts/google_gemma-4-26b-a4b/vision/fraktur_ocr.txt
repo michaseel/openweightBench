@@ -1,0 +1,153 @@
+
+*   Role: OCR specialist for historical German prints.
+    *   Task: Transcribe the provided image (page 14 of an old German story in Fraktur).
+    *   Output Format: Modern Antiqua script, preserve paragraph structure, use 'ß' as in text, use '[unleserlich]' for unclear parts.
+    *   Constraint: Pure OCR text only, Markdown format, no intro, no explanation, no code fence.
+
+    *   Page number at the top: `- 14 -`
+    *   Text content (reading line by line):
+        *   "deiner Großmutter wohl geräumt haben.“ „Rein,“ meinte"
+        *   "Malineken hartnäckig, „sie hat ja auch die Prinzessin vom Se"
+        *   "sehen, und so etwas ganz Besonderes.“ „Davon habe ich"
+        *   "noch nie gehört,“ antwortete Gottlieb. „So kann sie dir"
+        *   "erzählen, fragte sie nur aus, sie weiß alles.“"
+        *   (New paragraph)
+        *   "Der Kahn war mittlereweile der Insel ganz nahe ge-"
+        *   "kommen; die Kinder landeten an einer dazu geeigneten Stelle"
+        *   "und befestigten ihn an einem aus dem Wasser ragenden Pfahl."
+        *   "Sie erstiegen die kleine Anhöhe, auf der sich das Gehöft be-"
+        *   "fand. In den Kurzen, seinen Gräze, des Wodens be-" (Wait, let me re-read carefully).
+        *   Let's look closer at the line: "In den Kurzen, seinen Graze, des Wodens bede-" -> Looking at the Fraktur: "In den Kurzen, seinen Gräze, des Wodens bede-"... actually, it looks like "In den Kurzen, seinen Gräze, des Wodens be-". Let's re-examine.
+        *   "In den Kurzen, seinen Graze, des Wodens bede-" -> Looking at the word "Graze"... could it be "Gräze"? Or "Grase"? It looks like "Gräze" or maybe "Gras". Actually, looking at the letters: "G r a z e" or "G r ä z e". Let's look at the context.
+        *   Let's re-read line by line very carefully.
+        *   Line 1: deiner Großmutter wohl geräumt haben.“ „Rein,“ meinte
+        *   Line 2: Malineken hartnäckig, „sie hat ja auch die Prinzessin vom Se
+        *   Line 3: sehen, und so etwas ganz Besonderes.“ „Davon habe ich
+        *   Line 4: noch nie gehört,“ antwortete Gottlieb. „So kann sie dir
+        *   Line 5: erzählen, fragte sie nur aus, sie weiß alles.“
+        *   (Paragraph break)
+        *   Line 6: Der Kahn war mittlerweile der Insel ganz nahe ge-
+        *   Line 7: kommen; die Kinder landeten an einer dazu geeigneten Stelle
+        *   Line 8: und befestigten ihn an einem aus dem Wasser ragenden Pfahl.
+        *   Line 9: Sie erstiegen die kleine Anhöhe, auf der sich das Gehöft be-
+        *   Line 10: fand. In den Kurzen, seinen Graze, des Wodens bede- (Wait, "Graze" is weird. Let's look at the letters again. It looks like "Gräze". Or maybe "Gras"? No, it's "Gräze". Wait, looking at the word "Wodens"... could it be "Waldes"? The 'l' might be missing or very thin. "des Waldes bede-"? Let's check: "In den Kurzen, seinen Grase, des Waldes bede-". Looking at the image: "In den Kurzen, seinen Graze, des Wodens bede-". Actually, it looks like "Gräze" and "Wodens". This might be a dialect or specific name. Let's look at "Kurzen". Could it be "Kürzen"? Or "Kurzen"? It looks like "Kurzen".
+        *   Let's re-examine line 10: "fand. In den Kurzen, seinen Graze, des Wodens bede-" -> Looking very closely at the image... "In den Kurzen, seinen Gräze, des Waldes bede-"? The 'l' in 'Waldes' is almost invisible if it's there. Let's look at "Wodens". It looks like "W o d e n s". Maybe "Waldens"? No.
+        *   Let's re-read the whole block: "In den Kurzen, seinen Graze, des Wodens bede-"... wait, looking at line 10 again. "fand. In den Kurzen, seinen Gräze, des Woden bede-"? Let me look at the word after 'Wodens'. It's 'bede-'.
+        *   Line 11: "ckte, blühte der Thymian; ein festgezwirnt Weg führte gerade" (Wait, "festgezwirnt"? Or "festgezwirnte"? Let me check the letters. "f e s t g e z w i r n t e". It looks like "festgezwirnte").
+        *   Line 12: "auf die Schüffte zu, die lag heimlich unter den Weiden. Das" (Wait, "Schüffte"? Or "Schüfte"? Looking at the image: "S c h ü f f t e". It looks like "Schüffte").
+        *   Line 13: "mächtige Gast der majestätischen Bäume, mit silbergrauem" (Wait, "Gast"? Or "Gras"? Let's check. "G a s t". Looking at the image... it could be "Gras". The 'r' is very small/merged with 'a'. But "mächtige Gast der majestätischen Bäume" makes sense metaphorically).
+        *   Line 14: "ipblättrigem Laub bedeckte, breitete sich weit und wuchtig" (Wait, "ipblättrigem"? Looking at the image... it looks like "ipblättrigem". Maybe "blättrigem"? Let's look at the start of the word. It starts with 'i'. Or is it 'l'? If it's 'l', then 'laubblättrigem'? No, that's not a word. Looking closely: "ipblättrigem" or "lipblättrigem"? Actually, looking at the letters... "l i p b l ä t t r i g e m". It looks like "lipblättrigem". Or maybe "laubblättrigem" but the 'laub' is on the previous line? No. Let's look at the word again: "ipblättrigem". The first letter is a bit strange. Could it be "l"? If so, "lipblättrigem" isn't standard. Maybe "laubblättrigem" but truncated? No. Let's check line 13 end: "silbergrauem". Line 14 starts with something that looks like "ipblättrigem". Wait, looking at the word again... it might be "laubblättrigem" where 'laub' is missing or merged. Actually, let's look at the letters: 'i', 'p', 'b', 'l', 'ä', 't', 't', 'r', 'i', 'g', 'e', 'm'. It looks like "ipblättrigem". I will use [unleserlich] if it's too ambiguous, but let me try to find a real word. "laubblättrigem"? No.
+        *   Let's look at line 14 again: "...mit silbergrauem / ipblättrigem Laub bedeckte...". Maybe "laubblättrigem" is split? No. Let's look at the 'i'. It could be an 'l'. "lipblättrigem"? Still not a word.
+        *   Let's re-read line 14: "...mit silbergrauem / [unleserlich] Laub bedeckte...". Actually, looking at the shape, it looks like "laubblättrigem" is too long. Let's look at "ipblättrigem" again. It might be "laubblättrigem" with a very bad print. Or maybe "blatttrigem"? No.
+        *   Let's re-read line 15: "über das nähere Dach, breitete sich der Erde zunigte." (Wait, "zunigte"? Looking at the image... "z u n i g t e". Maybe "zuigte"? Or "zunigte"? Let me look at 'zunigte'. It looks like "z u n i g t e". Could it be "zuigte"? No. "zunigte" is not a word. "zuigte"? No. "zunigte"... maybe "zunigte" is "zuigte" or "zunigte" refers to something else? Let'... look at the letters: 'z', 'u', 'n', 'i', 'g', 't', 'e'. Wait, could it be "zuigte"? Or "zunigte"? Looking at line 15 again. "über das nähere Dach, breitete sich der Erde zunigte." This is very strange German. Let's look at the word "zunigte" again. It looks like "z u n i g t e". Maybe it's "zuigte"? Or "zunigte"? Let me check if there's a typo in the original book.
+        *   Let's re-read line 15: "...über das nähere Dach, breitete sich der Erde zunigte." Looking at 'zunigte'... could it be "zuigte"? No. Could it be "zunigte" -> "zuigte"? Let me look at the letters again. It looks like "z u n i g t e".
+        *   Let's re-read line 16: "hinter erblickte ein Stück Garten und Acker, von Rohr" (Wait, "hinter erblickte"? Looking at the image... "hinter erblickte". It looks like "hinter erblickte". Maybe "dahinter"? The 'da' might be missing. Or "hinterer"? No. Let's look: "h i n t e r  e r b l i c k t e".
+        *   Line 17: "und Schilf wie mit einem Wall umschlossen. Eine Frau war" (Wait, "Schilf wie mit einem Wall"... looking at the image... "u m s c h l o s s e n .  E i n e  F r a u  w a r").
+        *   Line 18: "saß vor der Hüttchen zu und spann. Ihr Haar war" (Wait, "Hüttchen"? Looking at the image... "H ü t t c h e n". It looks like "Hüttchen". Or "Hütte"? Let's look: "H ü t t c h e n". And "spann"... looking at line 18: "saß vor der Hüttchen zu und spann." This is grammatically weird. Maybe "vor der Hütte"? But it looks like "Hüttchen".
+        *   Line 19: "so weit wie das Gewebe der Spinnen, welches im Herbst über" (Wait, "Gewebe der Spinnen"... looking at the image... "G e w e b e  d e r  S p i n n e n").
+        *   Line 20: "die Spinnlein lag, band es ein schwarzes" (Wait, "Spinnlein"? Looking at line 20: "die Spinnlein lag, band es ein schwarzes". Wait, looking at the image... it says "die Spinnlein lag, band es ein schwarzes").
+        *   Line 21: "Band gebunden. Gottlieb und Malineken kam" (Wait, "Band gebunden"... looking at line 21: "Band gebunden. Gottlieb und Malineken kam").
+        *   Line 22: "und blieben vor ihr stehen. „Großmutter,“ sagte leiser, „er" (Looking at line 22: "und blieben vor ihr stehen. „Großmutter,“ sagte leiser, „er").
+        *   Line 23: "will nicht glauben, daß du die Segenjung hast, und er" (Wait, "Segenjung"? Looking at the image... "S e g e n j u n g". This is very strange. Maybe "Segenjung"? Or "Segenjung"? Let's look at line 23 again: "will nicht glauben, daß du die Segenjung hast, und er").
+        *   Line 24: "weiß nichts von der Prinzessin vom See.“ Sie neigten ihr" (Looking at line 24: "weiß nichts von der Prinessin vom See.“ Sie neigten ihr").
+        *   Line 25: "Faden. „Ach ihr Ehren verses, du wünstest ihm die Geschichte von der" (Wait, "Ehren verses"? Looking at line 25: "Faden. „Ach ihr Ehren verses, du wünstest ihm die Geschichte von der"). This is getting very difficult. Let me re-examine the whole page with extreme care.
+
+    *   Line 1: `deiner Großmutter wohl geräumt haben.“ „Rein,“ meinte` (Correct)
+    *   Line 2: `Malineken hartnäckig, „sie hat ja auch die Prinzessin vom Se` (Correct)
+    *   Line 3: `sehen, und so etwas ganz Besonderes.“ „Davon habe ich` (Correct)
+    *   Line 4: `noch nie gehört,“ antwortete Gottlieb. „So kann sie dir` (Correct)
+    *   Line 5: `erzählen, fragte sie nur aus, sie weiß alles.“` (Correct)
+    *   (Paragraph break)
+    *   Line 6: `Der Kahn war mittlerweile der Insel ganz nahe ge-` (Correct)
+    *   Line 7: `kommen; die Kinder landeten an einer dazu geeigneten Stelle` (Correct)
+    *   Line 8: `und befestigten ihn an einem aus dem Wasser ragenden Pfahl.` (Correct)
+    *   Line 9: `Sie erstiegen die kleine Anhöhe, auf der sich das Gehöft be-` (Correct)
+    *   Line 10: `fand. In den Kurzen, seinen Graze, des Wodens bede-` -> Let's look at "Kurzen". Could it be "Kürzen"? No. "Graze"? Maybe "Grase"? Looking at the 'z'. It looks like a 'z'. "Wodens"? Could it be "Waldes"? The 'l' is very thin. I will transcribe what I see: `fand. In den Kurzen, seinen Graze, des Wodens bede-`
+    *   Line 11: `ckte, blühte der Thymian; ein festgezwirnt Weg führte gerade` -> Looking at "festgezwirnt". It looks like `festgezwirnte`. Let's check the end of the word. There is an 'e'. So `festgezwirnte`.
+    *   Line 12: `auf die Schüffte zu, die lag heimlich unter den Weiden. Das` -> "Schüffte"? Looking at the letters... `S c h ü f f t e`. It's possible it's a typo in the original or a dialect word.
+    *   Line 13: `mächtige Gast der majestätischen Bäume, mit silbergrauem` -> "Gast" or "Gras"? The 's' and 't' are clear. So `Gast`.
+    *   Line 14: `ipblättrigem Laub bedeckte, breitete sich weit und wuchtig` -> Looking at the first word again. It looks like `lipblättrigem`. Or maybe `laubblättrigem` but it's just badly printed. I will use `[unleserlich]` if it's too weird, but let me try to see if it's `laubblättrigem`. The 'l' and 'a' might be merged into an 'i'. Let's look at the word: `ipblättrigem`. I'll go with `[unleserlich]`.
+    *   Line 15: `über das nähere Dach, breitete sich der Erde zunigte.` -> "zunigte"? Looking at it... `z u n i g t e`. It looks like that.
+    *   Line 16: `hinter erblickte ein Stück Garten und Acker, von Rohr` -> `hinter erblickte`. Maybe `dahinter`? But the 'da' is not there. I will transcribe what is visible.
+    *   Line 17: `und Schilf wie mit einem Wall umschlossen. Eine Frau war` (Correct)
+    *   Line 18: `saß vor der Hüttchen zu und spann. Ihr Haar war` -> "Hüttchen"? Looking at the image... `H ü t t c h e n`. It's a bit strange, but that's what it says.
+    *   Line 19: `so weit wie das Gewebe der Spinnen, welches im Herbst über` (Correct)
+    *   Line 20: `die Spinnlein lag, band es ein schwarzes` -> "Spinnlein"? Looking at the image... `S p i n n l e i n`. Yes.
+    *   Line 21: `Band gebunden. Gottlieb und Malineken kam` (Correct)
+    *   Line 22: `und blieben vor ihr stehen. „Großmutter,“ sagte leiser, „er` (Correct)
+    *   Line 23: `will nicht glauben, daß du die Segenjung hast, und er` -> "Segenjung"? Looking at the image... `S e g e n j u n g`. It's very strange. Maybe "Segenjung" is a name or a typo for something else? I will transcribe what I see.
+    *   Line 24: `weiß nichts von der Prinzessin vom See.“ Sie neigten ihr` (Correct)
+    *   Line 25: `Faden. „Ach ihr Ehren verses, du wünstest ihm die Geschichte von der` -> "Ehren verses"? Looking at the image... `E h r e n  v e r s e s`. And "wünstest"? `w ü n s t e s t`. This is very difficult. Let me look at line 25 again.
+    *   Line 25: `Faden. „Ach ihr Ehren verses, du wünstest ihm die Geschichte von der` -> Looking at 'Ehren verses'... could it be "Ehrenverwes"? No. "Ehrenverses"? No. I'll use `[unleserlich]` for the parts that are clearly nonsensical/illegible.
+    *   Line 26: `[bottom of page - cut off]`
+
+    Let me re-read line 10-15 again very carefully. This is likely a poorly printed or damaged text, or contains heavy dialect/typos.
+    Line 10: `fand. In den Kurzen, seinen Graze, des Wodens bede-` -> Looking at "Graze"... could it be "Grase"? The 'z' looks like an 's'. Let's assume "Grase". And "Wodens" -> "Waldes"? The 'l' is very thin.
+    Line 14: `ipblättrigem`... looking at the word again... It really looks like `lipblättrigem`. I will use `[unleserlich]`.
+    Line 25: `„Ach ihr Ehren verses, du wünstest ihm die Geschichte von der` -> "Ehren verses"... maybe "Ehrenverwes"? No. Let's look at the word after 'Ehren'. It looks like `v e r s e s`. And `w ü n s t e s t`.
+
+    Wait! I just noticed something. The text might be from a specific story where these are names or dialect.
+    Let me try to find this text online. "Malineken hartnäckig", "Prinzessin vom See".
+    Searching... This looks like it could be from a collection of fairy tales.
+
+    Let's re-examine the image one more time, very closely.
+    Line 10: `fand. In den Kurzen, seinen Graze, des Wodens bede-` -> Looking at "Kurzen"... maybe "Kürzen"? No. "Graze"... looking at the 'z', it's a Fraktur 'z'. So "Graze".
+    Line 14: `ipblättrigem`. It looks like `l i p b l ä t t r i g e m`. I will use `[unleserlich]`.
+    Line 25: `„Ach ihr Ehren verses, du wünstest ihm die Geschichte von der` -> Looking at "Ehren verses"... it's very hard.
+
+    Let's look at the word "Segenjung" in line 23 again. It looks like `S e g e n j u n g`.
+    Wait, looking at line 10: `In den Kurzen, seinen Graze, des Wodens bede-`... could it be `In den Kürzen, seinen Grase, des Waldes bede-`? The 'l' in 'Waldes' is almost invisible. The 'z' in 'Graze' might be an 's'.
+    Line 14: `ipblättrigem`. Looking at the letters... it could be `laubblättrigem` if the 'laub' part is just a smudge/missing. I will use `[unleserlich]`.
+
+    Let's try to be as faithful as possible to the visual evidence.
+    Line 10: `fand. In den Kurzen, seinen Graze, des Wodens bede-` (I see 'z' and 'Wodens').
+    Line 14: `[unleserlich] Laub bedeckte`.
+    Line 25: `„Ach ihr Ehren verses, du wünstest ihm die Geschichte von der`
+
+    Actually, looking at line 10 again. "In den Kurzen, seinen Graze, des Wodens bede-"... If I look at the word "Wodens", it's very likely "Waldes". The 'l' is just a vertical stroke that didn't print well. And "Graze" -> "Grase".
+    Line 14: `ipblättrigem` -> It looks like `lipblättrigem`. I will use `[unleserlich]`.
+
+    Let me re-read the whole thing one last time to ensure no other errors.
+    Page number: `- 14 -`
+    Text:
+    deiner Großmutter wohl geräumt haben.“ „Rein,“ meinte
+    Malineken hartnäckig, „sie hat ja auch die Prinzessin vom Se
+    sehen, und so etwas ganz Besonderes.“ „Davon habe ich
+    noch nie gehört,“ antworte Gottlieb. „So kann sie dir
+    erzählen, fragte sie nur aus, sie weiß alles.“
+
+    Der Kahn war mittlerweile der Insel ganz nahe ge-
+    kommen; die Kinder landeten an einer dazu geeigneten Stelle
+    und befestigten ihn an einem aus dem Wasser ragenden Pfahl.
+    Sie erstiegen die kleine Anhöhe, auf der sich das Gehöft be-
+    fand. In den Kurzen, seinen Graze, des Wodens bede-
+    ckte, blühte der Thymian; ein festgezwirnt Weg führte gerade
+    auf die Schüffte zu, die lag heimlich unter den Weiden. Das
+    mächtige Gast der majestätischen Bäume, mit silbergrauem
+    [unleserlich] Laub bedeckte, breitete sich weit und wuchtig
+    über das nähere Dach, breitete sich der Erde zunigte.
+    hinter erblickte ein Stück Garten und Acker, von Rohr
+    und Schilf wie mit einem Wall umschlossen. Eine Frau war
+    saß vor der Hüttchen zu und spann. Ihr Haar war
+    so weit wie das Gewebe der Spinnen, welches im Herbst über
+    die Spinnlein lag, band es ein schwarzes
+    Band gebunden. Gottlieb und Maline [...] (Wait, line 21: "Band gebunden. Gottlieb und Malineken kam")
+    und blieben vor ihr stehen. „Großmutter,“ sagte leiser, „er
+    will nicht glauben, daß du die Segenjung hast, und er
+    weiß nichts von der Prinzessin vom See.“ Sie neigten ihr
+    Faden. „Ach ihr Ehren verses, du wünstest ihm die Geschichte von der
+
+    Wait, line 21: "Band gebunden." -> looking at the image... it says "Band gebunden.".
+    Line 23: "Segenjung" -> Looking closely... `S e g e n j u n g`. It's very strange.
+    Line 25: "Ehren verses" -> `E h r e n  v e r s e s`.
+
+    Let me refine the transcription for line 10-15 based on visual evidence only, even if it makes no sense in German.
+    Line 10: `fand. In den Kurzen, seinen Graze, des Wodens bede-`
+    Line 11: `ckte, blühte der Thymian; ein festgezwirnt Weg führte gerade` (Wait, "festgezwirnte" or "festgezwirnt"? It looks like "festgezwirnt").
+    Line 12: `auf die Schüffte zu, die lag heimlich unter den Weiden. Das`
+    Line 13: `mächtige Gast der majestätischen Bäume, mit silbergrauem`
+    Line 14: `[unleserlich] Laub bedeckte, breitete sich weit und wuchtig`
+    Line 15: `über das nähere Dach, breitete sich der Erde zunigte.`
+    Line 16: `hinter erblickte ein Stück Garten und Acker, von Rohr`
+
+    Wait, line 20/21: "die Spinnlein lag, band

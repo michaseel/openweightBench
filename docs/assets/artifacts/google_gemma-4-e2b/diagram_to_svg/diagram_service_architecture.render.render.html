@@ -1,0 +1,170 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html,body{margin:0;background:#fff;font-family:system-ui,-apple-system,sans-serif}
+  .wrap{padding:24px;display:inline-block;background:#fff}
+  .wrap svg{display:block;height:auto;max-width:none}
+</style></head><body><div class="wrap"><svg width="100%" height="100%" viewBox="0 0 1200 850" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .node {
+      stroke: #333;
+      stroke-width: 2;
+      fill: #f9f9f9;
+      rx: 5;
+      transition: all 0.3s;
+    }
+    .title {
+      font-size: 24px;
+      font-weight: bold;
+      fill: #000;
+    }
+    .label {
+      font-size: 16px;
+      font-weight: bold;
+      fill: #333;
+    }
+    .flow-text {
+      font-size: 14px;
+      fill: #555;
+    }
+  </style>
+
+  <!-- Title -->
+  <text x="50" y="40" class="title">System Architecture</text>
+
+  <!-- Goals and Notes Section (Left Column) -->
+  <g id="goals_notes" transform="translate(50, 100)">
+    <text x="0" y="0" class="label">Goals:</text>
+    <text x="0" y="25" class="flow-text">Scalability</text>
+    <text x="0" y="50" class="flow-text">Reliability</text>
+    <text x="0" y="75" class="flow-text">Security</text>
+    <text x="0" y="100" class="flow-text">Maintainability</text>
+
+    <text x="0" y="150" class="label">Notes:</text>
+    <text x="0" y="175" class="flow-text">Use Docker for all services</text>
+    <text x="0" y="200" class="flow-text">CI/CD with Github</text>
+    <text x="0" y="225" class="flow-text">Logs -> ELK Stack</text>
+  </g>
+
+  <!-- Main Architecture Flow (Central/Right) -->
+
+  <!-- 1. Frontend -->
+  <g id="frontend" transform="translate(150, 300)">
+    <rect x="0" y="0" width="200" height="80" class="node"/>
+    <text x="10" y="45" class="label">Frontend</text>
+    <text x="10" y="65" class="flow-text">(React)</text>
+  </g>
+
+  <!-- 2. API Gateway -->
+  <g id="api_gateway" transform="translate(400, 300)">
+    <rect x="0" y="0" width="200" height="80" class="node"/>
+    <text x="10" y="45" class="label">API Gateway</text>
+    <text x="10" y="65" class="flow-text">(Kong)</text>
+  </g>
+
+  <!-- 3. External API (Payment Provider) -->
+  <g id="external_api" transform="translate(700, 300)">
+    <rect x="0" y="0" width="200" height="80" class="node"/>
+    <text x="10" y="45" class="label">External API</text>
+    <text x="10" y="65" class="flow-text">(Payment Provider)</text>
+  </g>
+
+  <!-- 4. Backend -->
+  <g id="backend" transform="translate(400, 500)">
+    <rect x="0" y="0" width="200" height="80" class="node"/>
+    <text x="10" y="45" class="label">Backend</text>
+    <text x="10" y="65" class="flow-text">(Python/FastAPI)</text>
+  </g>
+
+  <!-- 5. Message Queue -->
+  <g id="message_queue" transform="translate(400, 650)">
+    <rect x="0" y="0" width="200" height="80" class="node"/>
+    <text x="10" y="45" class="label">Message Queue</text>
+    <text x="10" y="65" class="flow-text">(RabbitMQ)</text>
+  </g>
+
+  <!-- 6. Worker Service -->
+  <g id="worker_service" transform="translate(700, 500)">
+    <rect x="0" y="0" width="200" height="80" class="node"/>
+    <text x="10" y="45" class="label">Worker Service</text>
+    <text x="10" y="65" class="flow-text">(Python)</text>
+  </g>
+
+  <!-- 7. User DB -->
+  <g id="user_db" transform="translate(950, 500)">
+    <rect x="0" y="0" width="200" height="80" class="node"/>
+    <text x="10" y="45" class="label">User DB</text>
+    <text x="10" y="65" class="flow-text">(PostgreSQL)</text>
+  </g>
+
+  <!-- 8. File Storage -->
+  <g id="file_storage" transform="translate(950, 700)">
+    <rect x="0" y="0" width="200" height="80" class="node"/>
+    <text x="10" y="45" class="label">File Storage</text>
+    <text x="10" y="65" class="flow-text">(S3)</text>
+  </g>
+
+  <!-- 9. Monitoring -->
+  <g id="monitoring" transform="translate(400, 850)">
+    <rect x="0" y="0" width="200" height="80" class="node"/>
+    <text x="10" y="45" class="label">Monitoring</text>
+    <text x="10" y="65" class="flow-text">(Prometheus + Grafana)</text>
+  </g>
+
+  <!-- Connections (Lines and Arrows) -->
+
+  <!-- Frontend -> API Gateway -->
+  <line x1="350" y1="340" x2="400" y2="340" stroke="#333" stroke-width="2"/>
+  <marker id="arrow1" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+  </marker>
+
+  <!-- API Gateway -> Backend -->
+  <line x1="600" y1="340" x2="400" y2="500" stroke="#333" stroke-width="2"/>
+  <marker id="arrow2" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+  </marker>
+
+  <!-- External API -> API Gateway (Implied flow) -->
+  <line x1="700" y1="340" x2="400" y2="340" stroke="#333" stroke-width="2"/>
+  <marker id="arrow3" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+  </marker>
+
+  <!-- Backend -> Message Queue -->
+  <line x1="600" y1="580" x2="400" y2="650" stroke="#333" stroke-width="2"/>
+  <marker id="arrow4" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+  </marker>
+
+  <!-- Message Queue -> Worker Service -->
+  <line x1="600" y1="730" x2="700" y2="500" stroke="#333" stroke-width="2"/>
+  <marker id="arrow5" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+  </marker>
+
+  <!-- Backend/Worker interaction (Implied flow to DB/Storage) -->
+  <line x1="400" y1="650" x2="950" y2="500" stroke="#333" stroke-width="2"/>
+  <marker id="arrow6" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+  </marker>
+
+  <!-- Worker Service -> User DB -->
+  <line x1="950" y1="580" x2="950" y2="500" stroke="#333" stroke-width="2"/>
+  <marker id="arrow7" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+  </marker>
+
+  <!-- Worker Service -> File Storage -->
+  <line x1="700" y1="580" x2="950" y2="700" stroke="#333" stroke-width="2"/>
+  <marker id="arrow8" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+  </marker>
+
+  <!-- Monitoring -> Backend/Queue (Implied flow) -->
+  <line x1="600" y1="850" x2="400" y2="650" stroke="#333" stroke-width="2"/>
+  <marker id="arrow9" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+  </marker>
+
+</svg></div></body></html>

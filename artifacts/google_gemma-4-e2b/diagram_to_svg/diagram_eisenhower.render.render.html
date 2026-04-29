@@ -1,0 +1,119 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html,body{margin:0;background:#fff;font-family:system-ui,-apple-system,sans-serif}
+  .wrap{padding:24px;display:inline-block;background:#fff}
+  .wrap svg{display:block;height:auto;max-width:none}
+</style></head><body><div class="wrap"><svg width="100%" height="100%" viewBox="0 0 1200 750" xmlns="http://www.w3.org/2000/svg">
+    <!-- Define Markers for Arrows -->
+    <defs>
+        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="5" refY="3" orient="auto">
+            <polygon points="0 0, 10 3, 0 6" fill="#333"/>
+        </marker>
+    </defs>
+
+    <!-- Background and Main Structure -->
+    <rect width="1200" height="750" fill="#FFFFFF"/>
+
+    <!-- Title/Central Theme -->
+    <text x="600" y="40" font-family="Arial, sans-serif" font-size="30" font-weight="bold" text-anchor="middle" fill="#333">Eisenhower - Matrix - Marketing</text>
+
+    <!-- Axis Labels (Wichtigkeit / Dringlichkeit) -->
+    <!-- Wichtigkeit (Y-axis) -->
+    <line x1="50" y1="700" x2="50" y2="40" stroke="#333" stroke-width="2"/>
+    <text x="25" y="720" font-family="Arial, sans-serif" font-size="20" fill="#333">Wichtigkeit</text>
+
+    <!-- Dringlichkeit (X-axis) -->
+    <line x1="750" y1="40" x2="1150" y2="40" stroke="#333" stroke-width="2"/>
+    <text x="800" y="720" font-family="Arial, sans-serif" font-size="20" fill="#333">Dringlichkeit</text>
+
+    <!-- Quadrant Definitions (Conceptual Boxes) -->
+
+    <!-- Q1: Hoch Wichtigkeit / Hoch Dringlichkeit (Top Right) -->
+    <g id="q1" transform="translate(50, 50)">
+        <rect x="300" y="50" width="400" height="350" fill="#F0F8FF" stroke="#333" stroke-width="2"/>
+        <text x="500" y="100" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="#333">Hoch Wichtigkeit / Hoch Dringlichkeit</text>
+    </g>
+
+    <!-- Q2: Niedrig Wichtigkeit / Hoch Dringlichkeit (Top Left) -->
+    <g id="q2" transform="translate(50, 400)">
+        <rect x="50" y="380" width="300" height="350" fill="#F0FFF0" stroke="#333" stroke-width="2"/>
+        <text x="200" y="610" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="#333">Niedrig Wichtigkeit / Hoch Dringlichkeit</text>
+    </g>
+
+    <!-- Q3: Niedrig Wichtigkeit / Niedrige Dringlichkeit (Bottom Left) -->
+    <g id="q3" transform="translate(50, 800)">
+        <rect x="50" y="780" width="300" height="350" fill="#FFF0F0" stroke="#333" stroke-width="2"/>
+        <text x="200" y="1010" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="#333">Niedrig Wichtigkeit / Niedrige Dringlichkeit</text>
+    </g>
+
+    <!-- Q4: Hoch Wichtigkeit / Niedrige Dringlichkeit (Bottom Right) -->
+    <g id="q4" transform="translate(750, 800)">
+        <rect x="750" y="780" width="300" height="350" fill="#F0FFF0" stroke="#333" stroke-width="2"/>
+        <text x="900" y="1010" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="#333">Hoch Wichtigkeit / Niedrige Dringlichkeit</text>
+    </g>
+
+    <!-- Content Placement (Mapping the lists to quadrants) -->
+
+    <!-- Q1 Content (High Importance / High Urgency) -->
+    <g id="content_q1" transform="translate(50, 50)">
+        <text x="300" y="120" font-family="Arial, sans-serif" font-size="16" fill="#333">Wichtigt + Nicht dringend</text>
+        <text x="300" y="150" font-family="Arial, sans-serif" font-size="16" fill="#333">Wichtigt + Dringend</text>
+    </g>
+
+    <!-- Q2 Content (Low Importance / High Urgency) -->
+    <g id="content_q2" transform="translate(50, 400)">
+        <text x="200" y="120" font-family="Arial, sans-serif" font-size="16" fill="#333">Nicht wichtig + Dringend</text>
+        <text x="200" y="150" font-family="Arial, sans-serif" font-size="16" fill="#333">Wichtigt + Dringend</text>
+    </g>
+
+    <!-- Q3 Content (Low Importance / Low Urgency) -->
+    <g id="content_q3" transform="translate(50, 800)">
+        <text x="200" y="120" font-family="Arial, sans-serif" font-size="16" fill="#333">Nicht wichtig + Nicht dringend</text>
+        <text x="200" y="150" font-family="Arial, sans-serif" font-size="16" fill="#333">Nicht wichtig + Nicht dringend</text>
+    </g>
+
+    <!-- Q4 Content (High Importance / Low Urgency) -->
+    <g id="content_q4" transform="translate(750, 800)">
+        <text x="900" y="120" font-family="Arial, sans-serif" font-size="16" fill="#333">Wichtigt + Dringend</text>
+        <text x="900" y="150" font-family="Arial, sans-serif" font-size="16" fill="#333">Nicht wichtig</text>
+    </g>
+
+    <!-- Detailed List Placement (Simulating the original flow) -->
+
+    <!-- Q1 Details (High/High) -->
+    <g id="list_q1" transform="translate(50, 50)">
+        <text x="300" y="200" font-family="Arial, sans-serif" font-size="14" fill="#333">Wichtigt</text>
+        <text x="300" y="225" font-family="Arial, sans-serif" font-size="14" fill="#333">Nicht dringend</text>
+    </g>
+
+    <!-- Q2 Details (Low/High) -->
+    <g id="list_q2" transform="translate(50, 400)">
+        <text x="200" y="200" font-family="Arial, sans-serif" font-size="14" fill="#333">Content - Strategie</text>
+        <text x="200" y="225" font-family="Arial, sans-serif" font-size="14" fill="#333">Brand schärfen</text>
+        <text x="200" y="250" font-family="Arial, sans-serif" font-size="14" fill="#333">SEO aufwärmen</text>
+        <text x="200" y="275" font-family="Arial, sans-serif" font-size="14" fill="#333">Zielgruppen verstehen</text>
+    </g>
+
+    <!-- Q3 Details (Low/Low) -->
+    <g id="list_q3" transform="translate(50, 800)">
+        <text x="200" y="200" font-family="Arial, sans-serif" font-size="14" fill="#333">Merch - Ideen mit Glitzer</text>
+        <text x="200" y="225" font-family="Arial, sans-serif" font-size="14" fill="#333">Buzzword - Bingo</text>
+        <text x="200" y="250" font-family="Arial, sans-serif" font-size="14" fill="#333">TikTok - Tanz mit dem Maskottchen</text>
+        <text x="200" y="275" font-family="Arial, sans-serif" font-size="14" fill="#333">Hashtag brainstorm #innovation #synergy #wow</text>
+    </g>
+
+    <!-- Q4 Details (High/Low) -->
+    <g id="list_q4" transform="translate(750, 800)">
+        <text x="900" y="200" font-family="Arial, sans-serif" font-size="14" fill="#333">Nicht wichtig + Dringend</text>
+        <text x="900" y="225" font-family="Arial, sans-serif" font-size="14" fill="#333">Kampagne retten</text>
+        <text x="900" y="250" font-family="Arial, sans-serif" font-size="14" fill="#333">Shitstorm beantworten</text>
+        <text x="900" y="275" font-family="Arial, sans-serif" font-size="14" fill="#333">LinkedIn fixen</text>
+        <text x="900" y="300" font-family="Arial, sans-serif" font-size="14" fill="#333">Chef will bis 14 Uhr "viral gehen"</text>
+    </g>
+
+    <!-- Connecting Arrows (Simplified flow representation) -->
+    <polyline points="500,285 750,285" stroke="#666" stroke-width="3" marker-end="url(#arrowhead)" />
+    <polyline points="500,425 750,425" stroke="#666" stroke-width="3" marker-end="url(#arrowhead)" />
+
+</svg></div></body></html>

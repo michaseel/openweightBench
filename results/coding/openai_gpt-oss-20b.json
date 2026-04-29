@@ -1,0 +1,201 @@
+{
+  "task": "coding",
+  "model_id": "openai/gpt-oss-20b",
+  "model_info": {
+    "id": "openai/gpt-oss-20b",
+    "type": "llm",
+    "publisher": "openai",
+    "arch": "gpt_oss",
+    "compatibility_type": "mlx",
+    "quantization": "MXFP4",
+    "state": "not-loaded",
+    "max_context_length": 131072,
+    "capabilities": [
+      "tool_use"
+    ],
+    "loaded_context_length": null
+  },
+  "started_at": "2026-04-28T20:24:51.377601Z",
+  "completed_at": "2026-04-28T20:25:35.447752Z",
+  "metrics": {
+    "wall_seconds": 44.070310042006895,
+    "tokens_generated": 2537,
+    "tokens_per_second": 109.0428621636789,
+    "time_to_first_token_ms": 813.0,
+    "peak_rss_mb": 11543.6
+  },
+  "score": 0.9166666666666667,
+  "score_breakdown": {
+    "looks_like_html": true,
+    "html_length": 9349,
+    "raw_length": 9361,
+    "lint_checks": [
+      {
+        "id": "col_backlog",
+        "label": "Spalte 'Backlog'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_in_progress",
+        "label": "Spalte 'In Progress'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_review",
+        "label": "Spalte 'Review'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_done",
+        "label": "Spalte 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "drag_drop",
+        "label": "HTML5 Drag&Drop oder Sortable-Lib",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "local_storage",
+        "label": "localStorage-Persistenz",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "tailwind_cdn",
+        "label": "Tailwind via CDN",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "confetti",
+        "label": "Confetti-Animation auf 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Add-Card-Button",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "vanilla_js",
+        "label": "Vanilla JS (kein React/Vue/Angular/Svelte)",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_alert_prompt",
+        "label": "Keine window.alert/prompt für CRUD",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "editable_cards",
+        "label": "Editierbare Karten (contenteditable / input)",
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "lint_passed": 12,
+    "lint_total": 12,
+    "lint_score": 1.0,
+    "e2e_checks": [
+      {
+        "id": "renders",
+        "label": "Seite lädt mit allen 4 Spalten",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Karte hinzufügen via Button",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_double_add",
+        "label": "Karte wird genau 1× angelegt (kein Doppel-Submit)",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "delete_card",
+        "label": "Karte löschen via Button + Bestätigung",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "persistence",
+        "label": "Karten überleben einen Reload",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_console_errors",
+        "label": "Keine JS-Konsolen-Fehler",
+        "passed": false,
+        "detail": "pageerror: Cannot read properties of undefined (reading 'forEach'); pageerror: Cannot read properties of undefined (reading 'forEach'); pageerror: Cannot read properties of undefined (reading 'forEach')"
+      }
+    ],
+    "e2e_passed": 5,
+    "e2e_total": 6,
+    "e2e_score": 0.8333333333333334,
+    "judge": {
+      "scored_at": "2026-04-28T21:45:29.598241+00:00",
+      "judge_model": "openai/gpt-5.4",
+      "scores": {
+        "board_renders": 0.8,
+        "column_completeness": 1.0,
+        "cards_present": 0.5,
+        "ui_affordances": 0.7,
+        "design_quality": 0.2,
+        "code_structure": 0.6,
+        "dom_safety": 0.4,
+        "robustness": 0.1,
+        "code_quality": 0.3,
+        "render_matches_code": 0.2
+      },
+      "judge_score": 0.41,
+      "comment_visual": "Das Board rendert grundsätzlich und alle vier Spalten sind sichtbar, aber das Layout ist fast völlig ungestylt. Nur in Backlog sind Karten sichtbar; zusätzlich ist der Delete-Dialog unten offen bzw. fehlplatziert, was den Eindruck einer fehlerhaften UI verstärkt.",
+      "comment_code": "Die Struktur ist noch einigermaßen funktional mit getrennten Render- und Hilfsfunktionen, hat aber gravierende Logikfehler. Besonders kritisch: Die State-Keys passen nicht zu den verwendeten Spaltennamen (`inProgress` vs. `in-progress`), der Drop-Code verwechselt Array-Inhalt mit Spaltennamen, und `innerHTML` wird zwar nur zum Leeren genutzt, aber Robustheit rund um `localStorage`/`JSON.parse` fehlt komplett.",
+      "comment_consistency": "Deutliche Diskrepanz zwischen Anspruch und Render: Der Code verspricht ein modernes Tailwind-Board, im Screenshot erscheint jedoch nahezu nur Browser-Default-Styling, was stark auf fehlgeschlagenes CSS-Laden oder fehlerhafte Klassenwirkung hindeutet. Zudem erklären die Key-Mismatches im Code, warum nur Teile funktionieren und das Gesamtverhalten brüchig wirkt."
+    }
+  },
+  "raw_response": "```html\n<!DOCTYPE html>\n<html lang=\"en\" class=\"h-full bg-gray-100\">\n<head>\n<meta charset=\"UTF-8\">\n<title>Vanilla Kanban Board</title>\n<!-- Tailwind CSS CDN -->\n<link href=\"https://cdn.jsdelivr.net/npm/tailwindcss@3.4.1/dist/tailwind.min.css\" rel=\"stylesheet\">\n<style>\n/* Custom transitions */\n.card {\n  transition: transform 0.2s ease, background-color 0.2s ease;\n}\n.card.dragging {\n  opacity: 0.6;\n  transform: scale(1.02);\n}\n.column {\n  min-height: 200px;\n}\n</style>\n</head>\n<body class=\"h-full flex items-center justify-center p-4\">\n<div id=\"app\" class=\"w-full max-w-6xl grid grid-cols-1 md:grid-cols-4 gap-4\">\n  <!-- Backlog Column -->\n  <div class=\"bg-white rounded-lg shadow p-3 column\" data-testid=\"column-backlog\">\n    <h2 class=\"font-semibold mb-2\">Backlog</h2>\n    <div class=\"cards space-y-2\" data-column=\"backlog\"></div>\n    <button class=\"mt-3 w-full bg-blue-600 text-white py-1 rounded hover:bg-blue-700 focus:outline-none\"\n            data-testid=\"add-card\">Add card</button>\n  </div>\n\n  <!-- In Progress Column -->\n  <div class=\"bg-white rounded-lg shadow p-3 column\" data-testid=\"column-in-progress\">\n    <h2 class=\"font-semibold mb-2\">In Progress</h2>\n    <div class=\"cards space-y-2\" data-column=\"in-progress\"></div>\n    <button class=\"mt-3 w-full bg-blue-600 text-white py-1 rounded hover:bg-blue-700 focus:outline-none\"\n            data-testid=\"add-card\">Add card</button>\n  </div>\n\n  <!-- Review Column -->\n  <div class=\"bg-white rounded-lg shadow p-3 column\" data-testid=\"column-review\">\n    <h2 class=\"font-semibold mb-2\">Review</h2>\n    <div class=\"cards space-y-2\" data-column=\"review\"></div>\n    <button class=\"mt-3 w-full bg-blue-600 text-white py-1 rounded hover:bg-blue-700 focus:outline-none\"\n            data-testid=\"add-card\">Add card</button>\n  </div>\n\n  <!-- Done Column -->\n  <div class=\"bg-white rounded-lg shadow p-3 column\" data-testid=\"column-done\">\n    <h2 class=\"font-semibold mb-2\">Done</h2>\n    <div class=\"cards space-y-2\" data-column=\"done\"></div>\n    <b",
+  "artifacts": [
+    {
+      "kind": "html",
+      "label": "Generierte App",
+      "path": "artifacts/openai_gpt-oss-20b/coding/output.html",
+      "mime": "text/html"
+    },
+    {
+      "kind": "text",
+      "label": "Roh-Antwort des Modells",
+      "path": "artifacts/openai_gpt-oss-20b/coding/raw_response.txt",
+      "mime": "text/plain"
+    },
+    {
+      "kind": "image",
+      "label": "Screenshot der gerenderten App",
+      "path": "artifacts/openai_gpt-oss-20b/coding/screenshot.png",
+      "mime": "image/png"
+    }
+  ],
+  "error": null,
+  "hardware": {
+    "platform": "macOS-26.4.1-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "ram_total_gb": 128.0,
+    "cpu_count": 16
+  },
+  "bench_version": "0.1.0"
+}

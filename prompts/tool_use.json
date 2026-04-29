@@ -1,0 +1,94 @@
+{
+  "name": "tool_use",
+  "description": "Agentic-Workflow-Simulation: Modell bekommt im System-Prompt einen Werkzeugkasten beschrieben, im User-Prompt eine Aufgabe — und muss selbst die richtigen Tools in der richtigen Reihenfolge wählen, mehrstufig planen, Ergebnisse zusammensetzen. Sieben Szenarien über drei Schwierigkeitsstufen. Bewertet werden Tool-Nutzung und outcome (validierter Diff, valides JSON, korrekte Werte), nicht das Vorkommen einzelner Schlagwörter.",
+  "system": "Du arbeitest in einer agentic IDE (vergleichbar mit Cursor/Claude Code). Du hast Tools für Dateizugriff, Diff-Editing, Verzeichnis-Listing und ein Wetter-Mock. Plane mehrstufig: erst aufklären, dann handeln, am Ende prüfen. Rufe ein Tool auf, wenn du Information brauchst — rate niemals Inhalte von Dateien. Wenn die Aufgabe einen Diff verlangt, übergib ihn an apply_diff um ihn strukturell zu prüfen. Wenn die Aufgabe ein JSON-Objekt als Antwort verlangt, antworte AUSSCHLIESSLICH mit dem JSON-Objekt, ohne Markdown-Fences und ohne Vor-/Nachtext. Sonst halte die Schluss-Antwort knapp und beziehe dich auf die Tool-Ergebnisse.",
+  "max_tool_iterations": 10,
+  "scenarios": [
+    {
+      "id": "easy_extract_todos",
+      "difficulty": "leicht",
+      "user_prompt": "In notes.md stehen Sprint-Notizen. Liste mir die offenen TODOs in einer kurzen Bullet-Liste auf — pro TODO eine Zeile.",
+      "expected_tools": ["read_file"],
+      "expected_args": {"read_file": {"path_contains": "notes.md"}},
+      "answer_should_mention": ["Caching", "Logging", "Stripe", "Safari"],
+      "answer_should_mention_min": 3
+    },
+    {
+      "id": "easy_list_then_read",
+      "difficulty": "leicht",
+      "user_prompt": "Ich weiß nicht mehr, welche Datei in diesem Projekt die Konfiguration enthält. Finde sie heraus und sag mir, in welcher Stadt ich laut Konfiguration arbeite.",
+      "expected_tools": ["list_files", "read_file"],
+      "expected_args": {"read_file": {"path_contains": "config.json"}},
+      "answer_should_mention": ["München"],
+      "answer_should_mention_min": 1
+    },
+    {
+      "id": "medium_fizzbuzz_fix",
+      "difficulty": "mittel",
+      "user_prompt": "fizzbuzz.py hat einen Bug — die Funktion liefert die Werte 1..n-1 statt 1..n. Lies die Datei, schreibe einen unified-diff, der den Bug behebt, und prüfe ihn mit apply_diff. Antworte am Ende mit einer kurzen Erklärung des Fixes.",
+      "expected_tools": ["read_file", "apply_diff"],
+      "expected_args": {
+        "read_file": {"path_contains": "fizzbuzz.py"},
+        "apply_diff": {"path_contains": "fizzbuzz.py"}
+      },
+      "expect_diff_validates": "fizzbuzz.py",
+      "expect_diff_min_changes": 2
+    },
+    {
+      "id": "medium_filter_users",
+      "difficulty": "mittel",
+      "user_prompt": "users.json enthält eine Liste aller Nutzer. Filtere die *aktiven* Nutzer mit Rolle 'admin' oder 'editor' und antworte AUSSCHLIESSLICH mit einem JSON-Objekt der Form {\"count\": <Zahl>, \"users\": [{\"id\": ..., \"name\": ..., \"role\": ...}, ...]}. Keine Markdown-Fences, kein Vor- oder Nachtext.",
+      "expected_tools": ["read_file"],
+      "expected_args": {"read_file": {"path_contains": "users.json"}},
+      "expect_json": true,
+      "expect_json_keys": ["count", "users"],
+      "expect_json_eval": {
+        "count_equals": 4,
+        "users_ids_set": [1001, 1003, 1004, 1006]
+      }
+    },
+    {
+      "id": "medium_weather_alert",
+      "difficulty": "mittel",
+      "user_prompt": "Lies config.json und hol das Wetter für die dort eingetragene Stadt. Antworte AUSSCHLIESSLICH mit einem JSON-Objekt {\"city\": ..., \"temp_c\": ..., \"condition\": ..., \"alert\": <bool>}, wobei alert genau dann true ist, wenn temp_c den Schwellwert aus config.json überschreitet.",
+      "expected_tools": ["read_file", "get_weather"],
+      "expected_args": {
+        "read_file": {"path_contains": "config.json"},
+        "get_weather": {"city_match": "München"}
+      },
+      "expect_json": true,
+      "expect_json_keys": ["city", "temp_c", "condition", "alert"],
+      "expect_json_eval": {
+        "alert_equals": false
+      }
+    },
+    {
+      "id": "hard_rename_function",
+      "difficulty": "schwer",
+      "user_prompt": "Die Funktion calculate_total in inventory.py soll konsistent zum Projekt-Stil in compute_total umbenannt werden. Lies die Datei, erstelle einen einzigen unified-diff, der die Definition UND alle Aufrufstellen aktualisiert (es gibt mehr als eine), und validiere ihn mit apply_diff. Achte darauf, keine anderen Identifier-Vorkommen zu verändern. Antworte am Ende kurz, wie viele Stellen du geändert hast.",
+      "expected_tools": ["read_file", "apply_diff"],
+      "expected_args": {
+        "read_file": {"path_contains": "inventory.py"},
+        "apply_diff": {"path_contains": "inventory.py"}
+      },
+      "expect_diff_validates": "inventory.py",
+      "expect_diff_min_changes": 8,
+      "expect_diff_contains": ["compute_total", "calculate_total"]
+    },
+    {
+      "id": "hard_compose_report",
+      "difficulty": "schwer",
+      "user_prompt": "Erstelle eine Zusammenfassung aus zwei Quellen. Lies users.json und config.json. Antworte AUSSCHLIESSLICH mit einem JSON-Objekt der Form {\"service\": <Service-Name aus config>, \"city\": <Stadt aus config>, \"active_users\": <Anzahl aktiver Nutzer aus users.json>, \"admin_emails\": [<E-Mails aller aktiven Admins, sortiert>]}. Keine Markdown-Fences.",
+      "expected_tools": ["read_file"],
+      "expected_args": {},
+      "expect_json": true,
+      "expect_json_keys": ["service", "city", "active_users", "admin_emails"],
+      "expect_json_eval": {
+        "service_equals": "owb-test-fixture",
+        "city_equals": "München",
+        "active_users_equals": 4,
+        "admin_emails_set": ["anja.sommer@example.com", "frederik.otto@example.com"]
+      }
+    }
+  ]
+}
