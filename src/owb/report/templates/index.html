@@ -17,20 +17,27 @@
 <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
   {% for c in cards %}
     <a href="benchmarks/{{ c.name }}.html"
-       class="group block bg-white border border-stone-200 rounded-lg p-5 hover:border-stone-400 transition-colors">
-      <div class="flex items-baseline justify-between">
-        <h2 class="text-lg font-medium tracking-tight">{{ c.label }}</h2>
-        <span class="text-xs text-stone-500">{{ c.model_count }} models</span>
+       class="group flex bg-white border border-stone-200 rounded-lg overflow-hidden hover:border-stone-400 transition-colors">
+      <div class="shrink-0 w-32 sm:w-40 bg-stone-50 self-stretch overflow-hidden border-r border-stone-200">
+        <img src="assets/landing/{{ c.name }}.png" alt=""
+             class="w-full h-full object-cover" loading="lazy"
+             onerror="this.style.display='none'">
       </div>
-      <p class="mt-2 text-sm text-stone-600">{{ c.description }}</p>
-      <div class="mt-4 flex items-center gap-6 text-xs text-stone-500">
-        {% if c.best_score is not none %}
-          <span>Top score <span class="font-mono num text-stone-900">{{ "%.2f"|format(c.best_score) }}</span></span>
-        {% endif %}
-        {% if c.median_speed is not none %}
-          <span>Median <span class="font-mono num text-stone-900">{{ "%.0f"|format(c.median_speed) }}</span> tok/s</span>
-        {% endif %}
-        <span class="ml-auto text-stone-400 group-hover:text-stone-700">open →</span>
+      <div class="flex-1 p-5 min-w-0">
+        <div class="flex items-baseline justify-between gap-3">
+          <h2 class="text-lg font-medium tracking-tight">{{ c.label }}</h2>
+          <span class="text-xs text-stone-500 shrink-0">{{ c.model_count }} models</span>
+        </div>
+        <p class="mt-2 text-sm text-stone-600">{{ c.description }}</p>
+        <div class="mt-4 flex items-center gap-6 text-xs text-stone-500">
+          {% if c.best_score is not none %}
+            <span>Top score <span class="font-mono num text-stone-900">{{ "%.2f"|format(c.best_score) }}</span></span>
+          {% endif %}
+          {% if c.median_speed is not none %}
+            <span>Median <span class="font-mono num text-stone-900">{{ "%.0f"|format(c.median_speed) }}</span> tok/s</span>
+          {% endif %}
+          <span class="ml-auto text-stone-400 group-hover:text-stone-700">open →</span>
+        </div>
       </div>
     </a>
   {% else %}

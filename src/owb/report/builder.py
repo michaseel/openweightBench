@@ -126,6 +126,16 @@ def _copy_artifacts(store: BenchStore, out_dir: Path) -> None:
         for f in long_src.glob("*.txt"):
             shutil.copy(f, long_dst / f.name)
 
+    # Landing-page teaser images, generated via scripts/gen_landing_images.py.
+    landing_src = store.root / "assets" / "landing"
+    landing_dst = out_dir / "assets" / "landing"
+    if landing_dst.exists():
+        shutil.rmtree(landing_dst)
+    if landing_src.exists():
+        landing_dst.mkdir(parents=True, exist_ok=True)
+        for f in landing_src.glob("*.png"):
+            shutil.copy(f, landing_dst / f.name)
+
 
 # Vendor display config (colors, prefix mapping) lives in data/vendors.json.
 # A module-level lazy instance avoids re-reading the file for every call.

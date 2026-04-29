@@ -181,11 +181,33 @@
         </div>
         <div>
           <dt class="text-stone-500">Wall total</dt>
-          <dd class="font-semibold text-stone-900 num">1.9 min</dd>
+          <dd class="font-semibold text-stone-900 num">6.2 min</dd>
         </div>
       </dl>
       <div class="mt-4 pt-3 border-t border-stone-200 text-xs uppercase tracking-wider text-stone-500">Benchmarks</div>
       <ul class="mt-2 space-y-0.5">
+          <li>
+            <a href="#vision" class="flex items-center justify-between gap-2 py-1.5 px-2 rounded hover:bg-stone-50 group">
+              <span class="text-sm text-stone-700 group-hover:text-stone-900 truncate">vision</span>
+              <span class="flex items-baseline gap-2 num shrink-0">
+                <span class="text-sm font-semibold text-emerald-700">
+0.77
+                </span>
+                <span class="text-[10px] text-stone-400 w-10 text-right">31s</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="#niah" class="flex items-center justify-between gap-2 py-1.5 px-2 rounded hover:bg-stone-50 group">
+              <span class="text-sm text-stone-700 group-hover:text-stone-900 truncate">niah</span>
+              <span class="flex items-baseline gap-2 num shrink-0">
+                <span class="text-sm font-semibold text-emerald-700">
+0.86
+                </span>
+                <span class="text-[10px] text-stone-400 w-10 text-right">4m</span>
+              </span>
+            </a>
+          </li>
           <li>
             <a href="#diagram_to_svg" class="flex items-center justify-between gap-2 py-1.5 px-2 rounded hover:bg-stone-50 group">
               <span class="text-sm text-stone-700 group-hover:text-stone-900 truncate">diagram_to_svg</span>
@@ -214,6 +236,1226 @@
 
   <div class="min-w-0">
 
+<section id="vision" class="mb-12 scroll-mt-24">
+  <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
+    <h2 class="text-lg font-medium tracking-tight">vision</h2>
+    <a href="../benchmarks/vision.html" class="text-xs text-stone-500 hover:text-stone-900">alle Modelle in diesem Bench →</a>
+  </div>
+
+
+  <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+    <div class="md:col-span-1 bg-white border-2 border-emerald-500 rounded-lg p-5 flex flex-col justify-center">
+      <div class="text-xs uppercase tracking-wider text-stone-500">Score</div>
+      <div class="mt-1 text-5xl font-bold num leading-none text-emerald-700">
+0.77
+      </div>
+    </div>
+    <div class="md:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">tok/s</dt>
+        <dd class="mt-1 text-xl font-semibold num">56</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Tokens</dt>
+        <dd class="mt-1 text-xl font-semibold num">1378</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Wall</dt>
+        <dd class="mt-1 text-xl font-semibold num">31.5 s</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">RAM</dt>
+        <dd class="mt-1 text-xl font-semibold num">7.5 GB</dd>
+      </div>
+    </div>
+  </div>
+
+    <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Worum geht es? Was wird getestet?
+      </summary>
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: Four sub-tasks, 1 image each. (1) handwritten meeting note easy/medium/hard to read — model must transcribe the text. (2) book page in Fraktur typeface — same task.
+
+What is tested: OCR quality, recognising layout structure (columns, bullet points, dates), handling of illegible handwriting.
+
+Why models fail: text-only models have no vision capability (filtered out). Weak VLMs only recognise the clearest part. Some truncate output or get stuck in reasoning without a visible answer.</div>
+    </details>
+
+    <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Prompt
+      </summary>
+      <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System-Prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">Du bist OCR-Spezialist für deutsche Handschrift.</pre>
+          </div>
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Developer-Prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">Auf dem Bild siehst du eine handschriftliche Meeting-Notiz mit klarer Struktur und gut lesbarer Schrift. Transkribiere den gesamten lesbaren Text. Behalte die Anordnung bei (Überschrift, Spalten, To-Dos). Bei unleserlichen Stellen schreibe &#39;[unleserlich]&#39;. Gib ausschließlich den puren OCR-Text im Markdown-Format zurück — keine Vorbemerkung, keine Erklärungen, kein Code-Fence.</pre>
+          </div>
+      </div>
+    </details>
+
+      <div class="mt-5 bg-white border border-stone-200 rounded overflow-hidden">
+        <div class="px-4 py-3 border-b border-stone-200 flex items-center justify-between bg-stone-50 gap-3 flex-wrap">
+          <div>
+            <span class="font-medium">Handschrift OCR – leicht</span>
+            <span class="ml-3 text-xs text-stone-500 num">
+5.5 s · 57 t/s            </span>
+          </div>
+          <div class="flex items-center gap-4 num">
+              <div class="text-xs">
+                <span class="text-stone-500">Recall</span>
+                <span class="font-bold text-base text-emerald-700">73%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">Precision</span>
+                <span class="font-bold text-base text-emerald-700">86%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">56/77</span>
+                <span class="text-amber-600">+9</span>
+              </div>
+                <div class="text-xs text-stone-500">
+<span class="text-sky-700">12 verschoben</span> · <span class="text-violet-700">1 ähnlich</span>                </div>
+            <div class="text-3xl font-bold num leading-none text-emerald-700">
+0.79            </div>
+          </div>
+        </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
+            <div class="p-3 bg-stone-50 grid grid-cols-1 gap-2">
+                <div class="zoom-frame">
+                  <button type="button" class="zoom-button" data-zoom-button aria-label="Bild vergrößern" title="Bild vergrößern">⛶</button>
+                  <img src="../assets/artifacts/google_gemma-3-12b/vision/handwriting_easy.jpg"
+                       class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded cursor-zoom-in"
+                       loading="lazy">
+                </div>
+            </div>
+            <div>
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider">Modell-Antwort</div>
+              <pre class="p-4 text-sm whitespace-pre-wrap max-h-[600px] overflow-y-auto"># Meetingnotizen Website - Relaunch
+
+12.06.25, 09:30 Uhr
+
+Anwesend:
+Anna, Ben, Mira, Jonas, Ece
+
+CMS langsam?
+
+Stand:
+
+- Design fast final ✓
+- Texte
+- Bildauswahl
+- Launch - Termin
+- offene Fragen
+
+Offen:
+
+- Rechte[unleserlich] final?
+- Freigabe Kunde bis Freitag
+- Wer testet Kontakt[unleserlich]?
+
+To-Dos:
+
+- Ben → Bilde[unleserlich] anfragen
+- Mira → Startseite anpassen
+- Jonas → Feedback Kunde
+- Anna → SEO - Check
+
+Nächstes Meeting:
+17.06., 10 Uhr
+
+sss
+[unleserlich] bitte kurz halten</pre>
+            </div>
+          </div>
+
+            <div class="border-t border-stone-200 bg-white">
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider flex items-center justify-between">
+                <span>Word-Diff Ground-Truth ↔ Modell</span>
+                <span class="num">
+                  <span class="text-emerald-700">●</span> matched ·
+                  <span class="text-sky-700">●</span> verschoben ·
+                  <span class="text-violet-700">●</span> ähnlich ·
+                  <span class="text-red-600">●</span> fehlt im Modell ·
+                  <span class="text-amber-600">●</span> extra/falsch
+                </span>
+              </div>
+              <div class="p-4 text-sm leading-relaxed font-mono">
+<span class="text-stone-700">meetingnotizen website relaunch 12 06 25 09 30 uhr anwesend anna ben mira jonas ece cms langsam</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">themen startseite</span>
+<span class="text-stone-700">texte bildauswahl launch termin offene fragen</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">stand design fast</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">rechte unleserlich</span>
+<span class="text-stone-700">final</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">texte für über uns fehlen noch</span>
+<span class="bg-violet-50 text-violet-700 px-0.5 rounded">bilder ≈ bilde</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">vom team noch nicht komplett mobile ansicht prüfen</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">bitte kurz halten</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">bis wer kontakt unleserlich</span>
+<span class="text-stone-700">to dos ben</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">bilder</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">unleserlich</span>
+<span class="text-stone-700">anfragen mira startseite anpassen jonas feedback kunde anna seo check</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">offen</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">rechtstexte</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">final freigabe kunde</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">bis</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">freitag</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">wer</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">testet</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">kontaktformular</span>
+<span class="text-stone-700">nächstes meeting 17 06 10 uhr</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">sss unleserlich</span>
+              </div>
+              <details class="border-t border-stone-100">
+                <summary class="cursor-pointer px-4 py-2 text-xs text-stone-500 hover:text-stone-900">Ground Truth (zum Vergleich)</summary>
+                <pre class="p-4 text-xs bg-stone-50 whitespace-pre-wrap">Meetingnotizen Website-Relaunch
+12.06.25, 09:30 Uhr
+
+Anwesend:
+Anna, Ben, Mira, Jonas, Ece
+
+CMS langsam?
+
+Themen:
+Startseite
+Texte
+Bildauswahl
+Launch-Termin
+offene Fragen
+
+Stand:
+Design fast final
+Texte für Über-uns fehlen noch
+Bilder vom Team noch nicht komplett
+Mobile Ansicht prüfen
+
+bitte kurz halten
+
+To-Dos:
+Ben Bilder anfragen
+Mira Startseite anpassen
+Jonas Feedback Kunde
+Anna SEO-Check
+
+Offen:
+Rechtstexte final?
+Freigabe Kunde bis Freitag
+Wer testet Kontaktformular?
+
+Nächstes Meeting: 17.06., 10 Uhr</pre>
+              </details>
+            </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded overflow-hidden">
+        <div class="px-4 py-3 border-b border-stone-200 flex items-center justify-between bg-stone-50 gap-3 flex-wrap">
+          <div>
+            <span class="font-medium">Handschrift OCR – mittel</span>
+            <span class="ml-3 text-xs text-stone-500 num">
+7.3 s · 56 t/s            </span>
+          </div>
+          <div class="flex items-center gap-4 num">
+              <div class="text-xs">
+                <span class="text-stone-500">Recall</span>
+                <span class="font-bold text-base text-emerald-700">84%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">Precision</span>
+                <span class="font-bold text-base text-emerald-700">88%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">114/136</span>
+                <span class="text-amber-600">+16</span>
+              </div>
+                <div class="text-xs text-stone-500">
+<span class="text-sky-700">16 verschoben</span> · <span class="text-violet-700">1 ähnlich</span>                </div>
+            <div class="text-3xl font-bold num leading-none text-emerald-700">
+0.86            </div>
+          </div>
+        </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
+            <div class="p-3 bg-stone-50 grid grid-cols-1 gap-2">
+                <div class="zoom-frame">
+                  <button type="button" class="zoom-button" data-zoom-button aria-label="Bild vergrößern" title="Bild vergrößern">⛶</button>
+                  <img src="../assets/artifacts/google_gemma-3-12b/vision/handwriting_medium.jpg"
+                       class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded cursor-zoom-in"
+                       loading="lazy">
+                </div>
+            </div>
+            <div>
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider">Modell-Antwort</div>
+              <pre class="p-4 text-sm whitespace-pre-wrap max-h-[600px] overflow-y-auto">```markdown
+24.05.25
+
+Meeting Protokoll
+
+M. Schulz, T. Wagner, L. Becker,
+S. Klein (später), H. Jt.
+
+Teilnehmer:
+
+Themen:
+- Projektstatus / Update
+- Budget → ist zu hoch
+- Timeline / Meilenstein?
+- Risiken
+
+Projektstatus:
+- Modul A fertig (Team S.)
+- Testphase startet [unleserlich]
+- Kundenfeedback steht noch aus
+- Report bis 28.05.
+
+Budget:
+- ~ 20% über Plan
+Ursache: unklare Anforderungen
+→ Nachbesserungen nötig
+nächste Mal genauer kalkulieren !!
+
+Offene Punkte:
+- Freigabe von Kunde fehlt noch → T.W. kümmert sich
+- Schnittstelle zu System X [unleserlich] Rücksprache
+- Schulung für neues Tool? → wer macht das?
+
+To-Dos:
+- T.W.: Budget - Report → 28.05.
+- l.B.: Kunden anstoßen wg. Feedback
+- [unleserlich] Dokumentation aktualisieren
+
+Rückfragen:
+- Wie gehen wir mit dem Risiko um?
+- Priorisierung der Features nochmal prüfen
+- ...
+
+Nächste Meeting:
+04.06.25 10 Uhr
+(Raum 2.15?)
+
+Details
+in Jira
+
+bitte Report bis
+28.05.
+```</pre>
+            </div>
+          </div>
+
+            <div class="border-t border-stone-200 bg-white">
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider flex items-center justify-between">
+                <span>Word-Diff Ground-Truth ↔ Modell</span>
+                <span class="num">
+                  <span class="text-emerald-700">●</span> matched ·
+                  <span class="text-sky-700">●</span> verschoben ·
+                  <span class="text-violet-700">●</span> ähnlich ·
+                  <span class="text-red-600">●</span> fehlt im Modell ·
+                  <span class="text-amber-600">●</span> extra/falsch
+                </span>
+              </div>
+              <div class="p-4 text-sm leading-relaxed font-mono">
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">meetingprotokoll 21</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">markdown 24</span>
+<span class="text-stone-700">05 25</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">11 uhr</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">teilnehmer</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">protokoll</span>
+<span class="text-stone-700">m schulz t wagner l becker s klein später h jt themen projektstatus update budget ist zu hoch timeline meilenstein risiken projektstatus modul a fertig team s</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">modul b verzögert sich</span>
+<span class="text-stone-700">testphase startet</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">nächste</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">woche hoffentlich</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">unleserlich</span>
+<span class="text-stone-700">kundenfeedback steht noch aus</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">details</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">in</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">jira</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">bis</span>
+<span class="text-stone-700">budget 20 über plan ursache unklare anforderungen</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">nachbessern</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">nachbesserungen</span>
+<span class="text-stone-700">nötig</span>
+<span class="bg-violet-50 text-violet-700 px-0.5 rounded">nächstes ≈ nächste</span>
+<span class="text-stone-700">mal genauer kalkulieren</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">bitte report</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">bis</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">28 05</span>
+<span class="text-stone-700">offene punkte freigabe von kunde fehlt noch t w kümmert sich schnittstelle zu system x</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">unklar</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">unleserlich</span>
+<span class="text-stone-700">rücksprache</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">mit it</span>
+<span class="text-stone-700">schulung für neues tool</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">noch nicht geplant</span>
+<span class="text-stone-700">wer macht das to dos t w budget report 28 05 l b kunden</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">anstupsen</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">anstoßen</span>
+<span class="text-stone-700">wg feedback</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">unleserlich</span>
+<span class="text-stone-700">dokumentation aktualisieren</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">nächstes</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">meeting 04 06 25 10</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">uhr</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">raum 2 15</span>
+<span class="text-stone-700">rückfragen wie gehen wir mit dem risiko um priorisierung der features nochmal prüfen</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">meeting uhr in report bis 28 05</span>
+              </div>
+              <details class="border-t border-stone-100">
+                <summary class="cursor-pointer px-4 py-2 text-xs text-stone-500 hover:text-stone-900">Ground Truth (zum Vergleich)</summary>
+                <pre class="p-4 text-xs bg-stone-50 whitespace-pre-wrap">Meetingprotokoll
+21.05.25
+11 Uhr
+
+Teilnehmer: M. Schulz, T. Wagner, L. Becker, S. Klein (später), H. Jt.
+
+Themen:
+Projektstatus / Update
+Budget — ist zu hoch
+Timeline / Meilenstein!
+Risiken
+
+Projektstatus:
+Modul A fertig (Team S.)
+Modul B verzögert sich
+Testphase startet nächste Woche (hoffentlich)
+Kundenfeedback steht noch aus
+
+Details in Jira
+
+Budget:
+20% über Plan
+Ursache: unklare Anforderungen
+Nachbessern nötig
+nächstes Mal genauer kalkulieren
+
+bitte Report bis 28.05.
+
+Offene Punkte:
+Freigabe von Kunde fehlt noch (T.W. kümmert sich)
+Schnittstelle zu System X unklar — Rücksprache mit IT
+Schulung für neues Tool? noch nicht geplant — wer macht das?
+
+To-Dos:
+T.W.: Budget-Report — 28.05.
+L.B.: Kunden anstupsen wg. Feedback
+Dokumentation aktualisieren
+
+Nächstes Meeting: 04.06.25, 10 Uhr (Raum 2.15?)
+
+Rückfragen:
+Wie gehen wir mit dem Risiko um?
+Priorisierung der Features nochmal prüfen
+...</pre>
+              </details>
+            </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded overflow-hidden">
+        <div class="px-4 py-3 border-b border-stone-200 flex items-center justify-between bg-stone-50 gap-3 flex-wrap">
+          <div>
+            <span class="font-medium">Handschrift OCR – schwer</span>
+            <span class="ml-3 text-xs text-stone-500 num">
+8.7 s · 56 t/s            </span>
+          </div>
+          <div class="flex items-center gap-4 num">
+              <div class="text-xs">
+                <span class="text-stone-500">Recall</span>
+                <span class="font-bold text-base text-emerald-700">81%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">Precision</span>
+                <span class="font-bold text-base text-emerald-700">87%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">120/148</span>
+                <span class="text-amber-600">+18</span>
+              </div>
+                <div class="text-xs text-stone-500">
+<span class="text-sky-700">17 verschoben</span> · <span class="text-violet-700">1 ähnlich</span>                </div>
+            <div class="text-3xl font-bold num leading-none text-emerald-700">
+0.84            </div>
+          </div>
+        </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
+            <div class="p-3 bg-stone-50 grid grid-cols-1 gap-2">
+                <div class="zoom-frame">
+                  <button type="button" class="zoom-button" data-zoom-button aria-label="Bild vergrößern" title="Bild vergrößern">⛶</button>
+                  <img src="../assets/artifacts/google_gemma-3-12b/vision/handwriting_hard.jpg"
+                       class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded cursor-zoom-in"
+                       loading="lazy">
+                </div>
+            </div>
+            <div>
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider">Modell-Antwort</div>
+              <pre class="p-4 text-sm whitespace-pre-wrap max-h-[600px] overflow-y-auto">```markdown
+Besprechung Sommerfest
+
+23.05.24 10:15 Uhr (Konfi) Chef fragen!!
+
+Teilnehmer:
+- Max
+- Jule
+- Tobi
+- Leni
+- Simon
+
+Ort ? (kaum nur kurz)
+
+Park am See?
+→ Genehmigung?
+→ Firmenhof/Terrasse?
+→ Terrasse reservieren?
+
+Ziel: entspanntes Beisammensein &amp; Spaß haben
+
+Nächster Termin:
+Do, 30.05.
+11 Uhr
+
+→ wer macht das?
+→ [unleserlich]
+
+Essen / Trinken:
+- Grillen evtl.
+- Vegetarische Optionen
+- Getränke limo, wasser, was noch?
+- (Apfel?) zu teuer?
+
+- Grill wer? (Tobi fragen)
+- Kuchen?
+→ Jule macht was 
+
+Musik:
+- Musikbox organisieren
+- Playlist?
+- [unleserlich]
+
+Wetter: Backup:
+- Pavillon? wer bringt mit?
+- Max hat einen?
+- [unleserlich] → zu teuer
+- Plan B: Kaustine?
+
+Spiele / Programm:
+- Volleyball / Fedeeball
+- evtl. Cornhole, Requisiten?
+- [unleserlich] Idee?
+
+Deko:
+- unnötig?
+- evtl. Lufthallen? nee
+- ca. 15 e.p.?
+- Kosten noch offen
+
+Effizienz:
+→ Einladung bis Ende Woche raus!
+→ Text: Leni?
+→ Liste an Simon
+→ Versand: Jule
+
+Offene Fragen:
+- wer grillt? (miss jemand)
+- Schulung haben??
+- Gibt’s Strom im Park ?
+- Müll / Reinigung teilen!
+
+```</pre>
+            </div>
+          </div>
+
+            <div class="border-t border-stone-200 bg-white">
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider flex items-center justify-between">
+                <span>Word-Diff Ground-Truth ↔ Modell</span>
+                <span class="num">
+                  <span class="text-emerald-700">●</span> matched ·
+                  <span class="text-sky-700">●</span> verschoben ·
+                  <span class="text-violet-700">●</span> ähnlich ·
+                  <span class="text-red-600">●</span> fehlt im Modell ·
+                  <span class="text-amber-600">●</span> extra/falsch
+                </span>
+              </div>
+              <div class="p-4 text-sm leading-relaxed font-mono">
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">markdown</span>
+<span class="text-stone-700">besprechung sommerfest 23 05 24 10 15 uhr konfi chef fragen teilnehmer max jule tobi leni simon</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">konnte</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">ort kaum</span>
+<span class="text-stone-700">nur kurz</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">am see</span>
+<span class="text-stone-700">ziel entspanntes beisammensein spaß haben nächster termin do 30 05 11 uhr</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">kurzes update an hr schicken ort</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">park</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">am see</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">genehmigung firmenhof terrasse terrasse reservieren</span>
+<span class="text-stone-700">wer macht das</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">leni</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">unleserlich</span>
+<span class="text-stone-700">essen trinken grillen evtl vegetarische optionen</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">vergessen getränkeliste machen bier</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">getränke</span>
+<span class="text-stone-700">limo wasser was noch</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">aperol</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">apfel</span>
+<span class="text-stone-700">zu teuer grill wer tobi fragen kuchen jule macht was</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">unleserlich</span>
+<span class="text-stone-700">wetter backup pavillon wer bringt mit max hat einen</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">zelt mieten</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">unleserlich</span>
+<span class="text-stone-700">zu teuer plan b</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">kantine</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">musik musikbox organisieren playlist</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">kaustine unleserlich</span>
+<span class="text-stone-700">deko unnötig evtl</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">luftballons neee budget</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">lufthallen nee</span>
+<span class="text-stone-700">ca 15</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">p</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">e</span>
+<span class="text-stone-700">p kosten noch offen</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">spiele programm volleyball</span>
+<span class="bg-violet-50 text-violet-700 px-0.5 rounded">federball ≈ fedeeball</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">evtl cornhole</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">oder wikingerschach fotoecke</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">idee requisiten</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">einladung</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">effizienz</span>
+<span class="text-stone-700">einladung bis ende woche raus text leni liste an simon versand jule offene fragen wer grillt</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">muss</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">miss</span>
+<span class="text-stone-700">jemand schulung haben gibt s strom im park müll reinigung</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">klären</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">teilen</span>
+              </div>
+              <details class="border-t border-stone-100">
+                <summary class="cursor-pointer px-4 py-2 text-xs text-stone-500 hover:text-stone-900">Ground Truth (zum Vergleich)</summary>
+                <pre class="p-4 text-xs bg-stone-50 whitespace-pre-wrap">Besprechung Sommerfest
+23.05.24 10:15 Uhr (Konfi)
+
+Chef fragen!!
+
+Teilnehmer:
+Max
+Jule
+Tobi
+Leni
+Simon (konnte nur kurz)
+
+Ziel: entspanntes Beisammensein &amp; Spaß haben
+
+Nächster Termin:
+Do, 30.05.
+11 Uhr
+kurzes Update
+an HR schicken
+
+Ort?:
+Park am See?
+Genehmigung?
+Firmenhof / Terrasse?
+Terrasse reservieren?? — wer macht das? Leni?
+
+Essen / Trinken:
+Grillen evtl.
+vegetarische Optionen vergessen?
+Getränkeliste machen!
+Bier, Limo, Wasser, was noch? (Aperol? zu teuer?)
+Grill wer? (Tobi fragen)
+Kuchen? Jule macht was
+
+Wetter / Backup:
+Pavillon? Wer bringt mit?
+Max hat einen?
+Zelt mieten → zu teuer
+Plan B: Kantine?
+
+Musik:
+Musikbox organisieren
+Playlist?
+
+Deko:
+unnötig?
+evtl. Luftballons? neee
+
+Budget:
+ca. 15€ p.P.?
+Kosten noch offen!
+
+Spiele / Programm:
+Volleyball / Federball
+evtl. Cornhole oder Wikingerschach?
+Fotoecke Idee? Requisiten?
+
+Einladung:
+Einladung bis Ende Woche raus!
+Text: Leni?
+Liste an Simon
+Versand: Jule
+
+Offene Fragen:
+Wer grillt? (muss jemand Schulung haben?)
+Gibt&#39;s Strom im Park?
+Müll / Reinigung klären</pre>
+              </details>
+            </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded overflow-hidden">
+        <div class="px-4 py-3 border-b border-stone-200 flex items-center justify-between bg-stone-50 gap-3 flex-wrap">
+          <div>
+            <span class="font-medium">Fraktur OCR</span>
+            <span class="ml-3 text-xs text-stone-500 num">
+10.0 s · 55 t/s            </span>
+          </div>
+          <div class="flex items-center gap-4 num">
+              <div class="text-xs">
+                <span class="text-stone-500">Recall</span>
+                <span class="font-bold text-base text-emerald-700">52%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">Precision</span>
+                <span class="font-bold text-base text-emerald-700">71%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">197/382</span>
+                <span class="text-amber-600">+81</span>
+              </div>
+                <div class="text-xs text-stone-500">
+<span class="text-sky-700">2 verschoben</span> · <span class="text-violet-700">6 ähnlich</span>                </div>
+            <div class="text-3xl font-bold num leading-none text-amber-700">
+0.60            </div>
+          </div>
+        </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
+            <div class="p-3 bg-stone-50 grid grid-cols-1 gap-2">
+                <div class="zoom-frame">
+                  <button type="button" class="zoom-button" data-zoom-button aria-label="Bild vergrößern" title="Bild vergrößern">⛶</button>
+                  <img src="../assets/artifacts/google_gemma-3-12b/vision/fraktur_innerpage.jpg"
+                       class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded cursor-zoom-in"
+                       loading="lazy">
+                </div>
+            </div>
+            <div>
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider">Modell-Antwort</div>
+              <pre class="p-4 text-sm whitespace-pre-wrap max-h-[600px] overflow-y-auto">deiner Großmutter wohl nur geträumt haben.&#34; „Nein,“ meinte Malineken hartnäckig, „Sie hat ja auch die Prinzessin vom See gesehen, und das ist etwas ganz Besonderes.“ „Davon habe ich noch nie gehört,“ antwortete Gottließ. „So kann sie es dir erzählen, frag sie nur so, wie ich alles.“
+
+Der Hahn war mittlerweile der Insel ganz nahe gekommen; die Kinder landeten an einer dazu geeigneten Stelle und befestigten ihn an einem aus dem Wasser ragenden Schloß. Sie entriegen die kleine Aufgabe, auf der sich das Absatz befindet, blühte der Thymian; ein sekretener Weg führte gerade auf die Schloßthür, die lag heimlich unter den Weiden. Das mächtige Tor öffnete sich von selbst; mit silbernen, weiß gestickten Band beflügelt. Gottließ und Malineken kamen mit dem Worte und Schloß in den „Großmutter,“ sagte lechtere, „er will nicht glauben, daß du die Seujungfern gesehen hast,“ wandert.
+
+„Geht ihm man eures Weges,“ gab sie ihnen zur Antwort, „Großmutter, du könntest ihm die Schloßthür von der Prinzessin vom See wohl erzählen.“ „Wie lügt ihn so schön ansehen, und man muß sie doch wissen, wenn man über den See fährt und in dem Monument Tag für Tag herum wandert.“ „Ich meine, ihr könnt euer Beisper brauchen,“ sagte die Großmutter, „es hat eben vier Uhr geworden.“ „Ich stie, Malineken ins Weilen.“ Erdbeeren mit Milch und ein Stück Brot dazu; den Dienst, der sie aufzuhren, erwähnte ihr Gottließ die Gebüschige. Sie ließ nicht, wie früher, einen Baum fahren oder, welches das jämmerliche Zeichen auf ein Pünktchen war, der Hütte und gatten zwischen sich befindet.
+
+„Ihr müßt nicht doch,“ sagte die Großmutter, „ich bin ja auch nicht weit.“ Sie schritt mit ihnen an den großen Baumstumpf, der wie ein Thron aussah.</pre>
+            </div>
+          </div>
+
+            <div class="border-t border-stone-200 bg-white">
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider flex items-center justify-between">
+                <span>Word-Diff Ground-Truth ↔ Modell</span>
+                <span class="num">
+                  <span class="text-emerald-700">●</span> matched ·
+                  <span class="text-sky-700">●</span> verschoben ·
+                  <span class="text-violet-700">●</span> ähnlich ·
+                  <span class="text-red-600">●</span> fehlt im Modell ·
+                  <span class="text-amber-600">●</span> extra/falsch
+                </span>
+              </div>
+              <div class="p-4 text-sm leading-relaxed font-mono">
+<span class="text-stone-700">deiner großmutter wohl nur geträumt haben nein meinte malineken hartnäckig sie hat ja auch die prinzessin vom see gesehen und das ist etwas ganz besonderes davon habe ich noch nie gehört antwortete</span>
+<span class="bg-violet-50 text-violet-700 px-0.5 rounded">gottlieb ≈ gottließ</span>
+<span class="text-stone-700">so kann sie es dir erzählen frag sie nur</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">aus sie weiß</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">so wie ich</span>
+<span class="text-stone-700">alles der</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">kahn</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">hahn</span>
+<span class="text-stone-700">war mittlerweile der insel ganz nahe gekommen die kinder landeten an einer dazu geeigneten stelle und befestigten ihn an einem aus dem wasser ragenden</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">pflock</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">schloß</span>
+<span class="text-stone-700">sie</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">erstiegen</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">entriegen</span>
+<span class="text-stone-700">die kleine</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">anhöhe</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">aufgabe</span>
+<span class="text-stone-700">auf der sich das</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">gehöft befand in dem kurzen feinen grase</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">welches</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">den boden bedeckte</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">absatz befindet</span>
+<span class="text-stone-700">blühte der thymian ein</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">festgetretener</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">sekretener</span>
+<span class="text-stone-700">weg führte gerade auf die</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">schilfhütte zu</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">schloßthür</span>
+<span class="text-stone-700">die lag heimlich unter den weiden das mächtige</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">geäst der majestätischen bäume</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">tor öffnete sich von selbst</span>
+<span class="text-stone-700">mit</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">silbergrauem spitzblättrigem laube beladen breitete sich</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">weit</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">und wuchtig über das niedere dach welches sich der erde zuneigte dahinter erblickte man ein stück garten und ackerland von rohr und schilf wie mit einem wall umschlossen eine alte frau saß vor der thür des hüttchens und spann ihr haar war so</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">silbernen</span>
+<span class="text-stone-700">weiß</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">wie das gewebe der spinnen welches im herbst über die stoppeln fliegt um ihren rocken hatte sie ein schwarzes</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">gestickten</span>
+<span class="text-stone-700">band</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">gebunden</span>
+<span class="bg-violet-50 text-violet-700 px-0.5 rounded">gottlieb ≈ gottließ</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">beflügelt</span>
+<span class="text-stone-700">und malineken kamen mit dem</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">korbe</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">worte</span>
+<span class="text-stone-700">und</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">blieben vor ihr stehen</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">schloß in den</span>
+<span class="text-stone-700">großmutter sagte</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">letztere</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">lechtere</span>
+<span class="text-stone-700">er will nicht glauben daß du die</span>
+<span class="bg-violet-50 text-violet-700 px-0.5 rounded">seejungfern ≈ seujungfern</span>
+<span class="text-stone-700">gesehen hast</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">und er weiß nichts von der prinzessin vom see sie netzte ihren faden</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">wandert</span>
+<span class="text-stone-700">geht</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">ihr</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">ihm</span>
+<span class="text-stone-700">man eures weges gab sie ihnen zur antwort großmutter du könntest ihm die</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">geschichte</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">schloßthür</span>
+<span class="text-stone-700">von der prinzessin vom see wohl erzählen</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">bat malineken sie läßt sich</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">wie lügt ihn so</span>
+<span class="text-stone-700">schön</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">anhören</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">ansehen</span>
+<span class="text-stone-700">und man muß sie doch wissen wenn man über den see fährt und in dem</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">blumental</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">monument</span>
+<span class="text-stone-700">tag für tag</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">herumwandert</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">herum wandert</span>
+<span class="text-stone-700">ich meine ihr</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">könntet</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">könnt</span>
+<span class="text-stone-700">euer</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">vesper</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">beisper</span>
+<span class="text-stone-700">brauchen sagte die großmutter es hat eben vier uhr</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">geschlagen ach ja rief</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">geworden ich stie</span>
+<span class="text-stone-700">malineken</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">inbrünstig</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">ins</span>
+<span class="text-stone-700">erdbeeren mit milch und ein stück brot dazu</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">und dieweil wir das</span>
+<span class="bg-violet-50 text-violet-700 px-0.5 rounded">aufzehren ≈ aufzuhren</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">erzählt</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">den dienst der sie erwähnte</span>
+<span class="text-stone-700">ihr</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">dem</span>
+<span class="bg-violet-50 text-violet-700 px-0.5 rounded">gottlieb ≈ gottließ</span>
+<span class="text-stone-700">die</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">geschichte</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">gebüschige</span>
+<span class="text-stone-700">sie ließ nicht</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">nach sie mußte ihren willen haben</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">wie früher einen baum fahren oder das jämmerliche zeichen auf</span>
+<span class="text-stone-700">ein</span>
+<span class="bg-violet-50 text-violet-700 px-0.5 rounded">weilchen ≈ weilen</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">danach saßen die kinder auf einem baumstamm vor</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">pünktchen war</span>
+<span class="text-stone-700">der hütte und</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">hatten</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">gatten</span>
+<span class="text-stone-700">zwischen sich</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">einen napf mit süßer milch in der schwammen die erdbeeren so dick daß man</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">befindet ihr müßt</span>
+<span class="text-stone-700">nicht</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">wußte war das milch mit erdbeeren oder erdbeeren mit milch</span>
+<span class="text-stone-700">doch</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">es mochte wohl auf eins herauskommen</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">sagte</span>
+<span class="text-stone-700">die großmutter</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">blickte zuweilen nach</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">ich bin ja auch nicht sie schritt mit</span>
+<span class="text-stone-700">ihnen</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">hin</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">an den großen baumstumpf der wie ein thron aussah</span>
+              </div>
+              <details class="border-t border-stone-100">
+                <summary class="cursor-pointer px-4 py-2 text-xs text-stone-500 hover:text-stone-900">Ground Truth (zum Vergleich)</summary>
+                <pre class="p-4 text-xs bg-stone-50 whitespace-pre-wrap">deiner Großmutter wohl nur geträumt haben. „Nein,&#34; meinte Malineken hartnäckig, „sie hat ja auch die Prinzessin vom See gesehen, und das ist etwas ganz Besonderes.&#34; „Davon habe ich noch nie gehört,&#34; antwortete Gottlieb. „So kann sie es dir erzählen, frag sie nur aus, sie weiß alles.&#34;
+
+Der Kahn war mittlerweile der Insel ganz nahe gekommen; die Kinder landeten an einer dazu geeigneten Stelle und befestigten ihn an einem aus dem Wasser ragenden Pflock. Sie erstiegen die kleine Anhöhe, auf der sich das Gehöft befand. In dem kurzen, feinen Grase, welches den Boden bedeckte, blühte der Thymian; ein festgetretener Weg führte gerade auf die Schilfhütte zu, die lag heimlich unter den Weiden. Das mächtige Geäst der majestätischen Bäume, mit silbergrauem, spitzblättrigem Laube beladen, breitete sich weit und wuchtig über das niedere Dach, welches sich der Erde zuneigte. Dahinter erblickte man ein Stück Garten und Ackerland, von Rohr und Schilf wie mit einem Wall umschlossen. Eine alte Frau saß vor der Thür des Hüttchens und spann. Ihr Haar war so weiß wie das Gewebe der Spinnen, welches im Herbst über die Stoppeln fliegt, um ihren Rocken hatte sie ein schwarzes Band gebunden. Gottlieb und Malineken kamen mit dem Korbe und blieben vor ihr stehen. „Großmutter,&#34; sagte letztere, „er will nicht glauben, daß du die Seejungfern gesehen hast, und er weiß nichts von der Prinzessin vom See.&#34; Sie netzte ihren Faden. „Geht ihr man eures Weges,&#34; gab sie ihnen zur Antwort. „Großmutter, du könntest ihm die Geschichte von der Prinzessin vom See wohl erzählen,&#34; bat Malineken, „sie läßt sich schön anhören, und man muß sie doch wissen, wenn man über den See fährt und in dem Blumental Tag für Tag herumwandert.&#34; „Ich meine, ihr könntet euer Vesper brauchen,&#34; sagte die Großmutter, „es hat eben vier Uhr geschlagen.&#34; „Ach ja,&#34; rief Malineken inbrünstig, „Erdbeeren mit Milch und ein Stück Brot dazu; und dieweil wir das aufzehren, erzählt Ihr dem Gottlieb die Geschichte.&#34; Sie ließ nicht nach, sie mußte ihren Willen haben. Ein Weilchen danach saßen die Kinder auf einem Baumstamm vor der Hütte und hatten zwischen sich einen Napf mit süßer Milch, in der schwammen die Erdbeeren so dick, daß man nicht wußte, war das Milch mit Erdbeeren, oder Erdbeeren mit Milch; doch es mochte wohl auf eins herauskommen. Die Großmutter blickte zuweilen nach ihnen hin</pre>
+              </details>
+            </div>
+      </div>
+
+
+    <div class="mt-4 text-xs text-stone-500">
+      Artefakte:
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-3-12b/vision/handwriting_easy.txt" target="_blank">Handschrift OCR – leicht – Antwort</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-3-12b/vision/handwriting_easy.jpg" target="_blank">Handschrift OCR – leicht – Bild</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-3-12b/vision/handwriting_medium.txt" target="_blank">Handschrift OCR – mittel – Antwort</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-3-12b/vision/handwriting_medium.jpg" target="_blank">Handschrift OCR – mittel – Bild</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-3-12b/vision/handwriting_hard.txt" target="_blank">Handschrift OCR – schwer – Antwort</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-3-12b/vision/handwriting_hard.jpg" target="_blank">Handschrift OCR – schwer – Bild</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-3-12b/vision/fraktur_ocr.txt" target="_blank">Fraktur OCR – Antwort</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-3-12b/vision/fraktur_innerpage.jpg" target="_blank">Fraktur OCR – Bild</a>
+    </div>
+</section>
+<section id="niah" class="mb-12 scroll-mt-24">
+  <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
+    <h2 class="text-lg font-medium tracking-tight">niah</h2>
+    <a href="../benchmarks/niah.html" class="text-xs text-stone-500 hover:text-stone-900">alle Modelle in diesem Bench →</a>
+  </div>
+
+
+  <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+    <div class="md:col-span-1 bg-white border-2 border-emerald-500 rounded-lg p-5 flex flex-col justify-center">
+      <div class="text-xs uppercase tracking-wider text-stone-500">Score</div>
+      <div class="mt-1 text-5xl font-bold num leading-none text-emerald-700">
+0.86
+      </div>
+    </div>
+    <div class="md:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">tok/s</dt>
+        <dd class="mt-1 text-xl font-semibold num">34</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Tokens</dt>
+        <dd class="mt-1 text-xl font-semibold num">740</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Wall</dt>
+        <dd class="mt-1 text-xl font-semibold num">227.1 s</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">RAM</dt>
+        <dd class="mt-1 text-xl font-semibold num">7.5 GB</dd>
+      </div>
+    </div>
+  </div>
+
+    <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Worum geht es? Was wird getestet?
+      </summary>
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: In a German book corpus (with embedded source code) 10 synthetic facts are hidden at evenly distributed depths (5% – 95%). The model must retrieve all of them.
+
+Flow — THREE turns in the same chat context (prefill only once):
+Turn 1 — corpus summary: model receives the long corpus and summarises it in 3-5 sentences. Forces real processing of the text.
+Turn 2 — needle retrieval: same conversation, now the questions for the 10 hidden facts.
+Turn 3 — comprehension + hallucination traps: 4 factual questions about the book content + 3 hallucination traps (model should recognise that the question is NOT answered in the text).
+
+Default mode runs ONE uniform stage for all models: 120k tokens. Models without sufficient max_context are skipped at this stage. `niah_deep` additionally runs 32k / 64k / 200k for a full heatmap.
+
+Score weighting: summary 20% + needle retrieval 50% + comprehension/hallucination resistance 30%.
+
+Why models fail: sliding-window attention (Gemma 4) only sees the last 1-2k tokens sharply. Reasoning models hit the token limit before answering. Q4 KV cache measurably degrades recall at long contexts. On the hallucination traps the helpful bias lures models into plausible-sounding inventions.</div>
+    </details>
+
+    <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Prompt
+      </summary>
+      <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Developer-Prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">TURN 1 (User):
+The following section contains a longer mixed text of German narrative and source code.
+
+===== TEXT BEGIN =====
+&lt;corpus with embedded needles, 32k–128k tokens depending on stage&gt;
+===== TEXT END =====
+
+Summarise the text in 3-5 sentences. Mention the main characters, setting and key themes.
+
+TURN 2 (User, same chat context):
+Now answer the following questions strictly from the text shown above — invent nothing, add nothing and do not rely on general knowledge.
+
+Questions:
+1. &lt;question for needle 1&gt;
+2. &lt;question for needle 2&gt;
+...
+
+Answer as a numbered list 1., 2., 3. with one short sentence each.</pre>
+          </div>
+      </div>
+    </details>
+
+    <p class="mt-5 text-sm text-stone-600">
+      Pro Kontextlänge wurden 10 Needles über den Korpus verteilt. Der NIAH-Score kombiniert
+      Korpus-Zusammenfassung, Needle-Retrieval und optional Verstehen + Halluzinations-Fallen.
+      LLM-Judges ersetzen die heuristischen Scores für Summary und Verstehen, sobald vorhanden.
+    </p>
+
+      <div class="mt-6">
+        <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">
+          Stufe: <span class="num font-semibold text-stone-700">120k Tokens</span>
+        </div>
+
+            <div class="bg-sky-50 border border-sky-200 rounded-lg overflow-hidden">
+              <div class="px-4 py-3 border-b border-sky-200 flex items-baseline justify-between">
+                <div>
+                  <span class="text-xs uppercase tracking-wider text-sky-700 font-semibold">Sub-Benchmark · Korpus-Zusammenfassung</span>
+                  <span class="ml-2 text-xs text-stone-500">Turn 1</span>
+                </div>
+                <div class="text-sm num">
+                    <span class="font-bold text-base text-emerald-700">
+                      0.79
+                    </span>
+                    <span class="text-stone-500">LLM-Judge</span>
+                    <span class="ml-2 text-xs text-stone-400">heur. 1.00</span>
+                  <span class="ml-2 text-xs text-stone-500">~120k Tokens Input</span>
+                </div>
+              </div>
+              <div class="px-4 py-3 bg-white">
+                <pre class="text-sm text-stone-800 whitespace-pre-wrap leading-relaxed">Der Text ist eine Mischung aus Erzählung und Codefragmenten und entfaltet eine Geschichte im preußischen Blumental während der napoleonischen Kriege. Die Hauptfiguren sind Gottlieb Lasso, ein Waisenjunge, Malineken, seine Freundin, und verschiedene militärische Figuren wie Kapitän Beaumont. Der Schauplatz ist das idyllische Blumental, ein Waldgebiet nahe Wriezen, und die Geschichte spielt sich während der napoleonischen Besatzung ab. Die wichtigsten Themen sind Freundschaft, Mut angesichts von Krieg und Unterdrückung, sowie die Bedeutung von Hoffnung und Widerstand gegen eine übermächtige Macht. Die Erzählung vermischt historische Elemente mit kindlicher Perspektive und einer Prise Märchenhaftem.</pre>
+                  <div class="mt-3 border border-amber-200 bg-amber-50 rounded p-3">
+                    <div class="flex items-baseline justify-between gap-3">
+                      <span class="text-xs uppercase tracking-wider text-amber-700">LLM-Judge Summary (openai/gpt-5.4)</span>
+                      <span class="text-lg font-bold num text-emerald-700">0.79</span>
+                    </div>
+                      <ul class="mt-2 grid grid-cols-2 md:grid-cols-6 gap-2 text-xs">
+                          <li class="bg-white border border-amber-100 rounded px-2 py-1 text-center">
+                            <div class="text-stone-500">main characters</div>
+                            <div class="font-bold num text-emerald-700">0.90</div>
+                          </li>
+                          <li class="bg-white border border-amber-100 rounded px-2 py-1 text-center">
+                            <div class="text-stone-500">setting</div>
+                            <div class="font-bold num text-emerald-700">1.00</div>
+                          </li>
+                          <li class="bg-white border border-amber-100 rounded px-2 py-1 text-center">
+                            <div class="text-stone-500">plot</div>
+                            <div class="font-bold num text-amber-700">0.35</div>
+                          </li>
+                          <li class="bg-white border border-amber-100 rounded px-2 py-1 text-center">
+                            <div class="text-stone-500">themes</div>
+                            <div class="font-bold num text-emerald-700">0.70</div>
+                          </li>
+                          <li class="bg-white border border-amber-100 rounded px-2 py-1 text-center">
+                            <div class="text-stone-500">code text mix recognized</div>
+                            <div class="font-bold num text-emerald-700">1.00</div>
+                          </li>
+                          <li class="bg-white border border-amber-100 rounded px-2 py-1 text-center">
+                            <div class="text-stone-500">no hallucinations</div>
+                            <div class="font-bold num text-emerald-700">0.70</div>
+                          </li>
+                      </ul>
+<div class="mt-2 text-sm text-stone-700">Figuren und Setting sind weitgehend korrekt; auch die Mischung aus Erzähltext und Codefragmenten wird richtig erkannt. Schwach ist der Plot, weil zentrale Elemente wie Gottliebs Rachekonflikt, Insel/Kriegskassen und der Verräter Hägelin fehlen; zudem ist die Formulierung von einer „Prise Märchenhaftem“ leicht irreführend, da der Stoff realistisch und nicht märchenhaft ist.</div>                  </div>
+                  <ul class="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      <li class="text-xs px-2 py-1 rounded border border-emerald-200 bg-emerald-50 text-emerald-800">
+                        ✓ 3-5 Sätze · 5 Sätze gezählt
+                      </li>
+                      <li class="text-xs px-2 py-1 rounded border border-emerald-200 bg-emerald-50 text-emerald-800">
+                        ✓ Höchstens 220 Wörter · 91 Wörter
+                      </li>
+                      <li class="text-xs px-2 py-1 rounded border border-emerald-200 bg-emerald-50 text-emerald-800">
+                        ✓ Korpus-Stichwörter (2/4) · ✓ Gottlieb, ✓ Malineken, ✗ Schmied, ✗ Bonaparte
+                      </li>
+                  </ul>
+              </div>
+            </div>
+
+          <div class="mt-4 bg-white border border-stone-200 rounded-lg overflow-hidden">
+            <div class="px-4 py-3 border-b border-stone-200 flex items-baseline justify-between">
+              <div>
+                <span class="text-xs uppercase tracking-wider text-stone-700 font-semibold">Sub-Benchmark · Needle-Retrieval</span>
+                <span class="ml-2 text-xs text-stone-500">Turn 2</span>
+              </div>
+              <div class="text-sm num">
+                <span class="font-bold text-base text-amber-700">
+                  9/10
+                </span>
+                <span class="text-stone-500">hits</span>
+              </div>
+            </div>
+            <div class="px-4 py-3">
+              <ul class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-emerald-600">●</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">5% (5 %)</div>
+                      <div class="text-stone-500 mt-0.5">erwartet: blauer Ankerstein, Lübeck-1907, A-318</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-emerald-600">●</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">10% (10 %)</div>
+                      <div class="text-stone-500 mt-0.5">erwartet: smaragdgrün, Schlüssel, Seriennummer, 7-Bravo-12</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-emerald-600">●</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">15% (15 %)</div>
+                      <div class="text-stone-500 mt-0.5">erwartet: Nordstern-Brigade, violetter</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-emerald-600">●</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">25% (25 %)</div>
+                      <div class="text-stone-500 mt-0.5">erwartet: Indigo-Quark</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-emerald-600">●</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">33% (33 %)</div>
+                      <div class="text-stone-500 mt-0.5">erwartet: Atlantis-Mira, NL-7711, 142</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-red-500">○</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">50% (50 %)</div>
+                      <div class="text-stone-500 mt-0.5">erwartet: Ehrenmitglied, Aluminium-Gesellschaft, Köln</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-emerald-600">●</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">65% (65 %)</div>
+                      <div class="text-stone-500 mt-0.5">erwartet: Safran-Klops Margarethe, 7 Gramm|7 g, 3 Stunden|drei Stunden</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-emerald-600">●</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">75% (75 %)</div>
+                      <div class="text-stone-500 mt-0.5">erwartet: Erbe von Onkel Walpurgis, 42-Lima</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-emerald-600">●</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">85% (85 %)</div>
+                      <div class="text-stone-500 mt-0.5">erwartet: 7f4a2e91-marlin-2026</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-emerald-600">●</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">90% (90 %)</div>
+                      <div class="text-stone-500 mt-0.5">erwartet: Coriolis-Effekt, Pendel, Memo, Dr. Kühn, 17.03.2024</div>
+                    </div>
+                  </li>
+              </ul>
+              <details class="mt-3">
+                <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Modell-Antwort auf die Needle-Fragen</summary>
+                <pre class="mt-2 text-xs bg-stone-50 border border-stone-200 rounded p-3 overflow-x-auto whitespace-pre-wrap">Hier sind die Antworten auf Ihre Fragen, ausschließlich basierend auf dem bereitgestellten Text:
+
+1. Im Schaufenster des Antiquitätenhändlers lag ein blauer Ankerstein mit der Gravur &#34;Lübeck-1907&#34; und der Inventarnummer A-318.
+2. Der Schmied verbarg im Sommer 1893 einen smaragdgrünen Schlüssel mit der Seriennummer 7-Bravo-12 unter dem Amboss.
+3. Hauptmann Friebusch erinnerte sich an die Nordstern-Brigade vom 9. Oktober, deren Standarte aus violetter Seide war.
+4. Die Katze hieß Indigo-Quark und wartete hinter der Schmiede auf den Postboten.
+5. Das Schiff &#39;Atlantis-Mira&#39; (Reg-Nr. NL-7711) lud am 3. Mai 142 Säcke Gerste.
+6. Der Pfarrer von Wriezen erhielt am 14. Februar 1894 die Ernennung als Mitglied der Aluminium-Gesellschaft Köln.
+7. Im Hauskochbuch wird das Rezept für &#39;Safran-Klops Margarethe&#39; erwähnt, welches 7 Gramm Safran und 3 Stunden Garzeit benötigt.
+8. Auf der Regentonne im Hof war die Inschrift &#34;Erbe von Onkel Walpurgis, Charge 42-Lima&#34; eingraviert.
+9. Der RUNTIME_TOKEN-Wert im Quellcode-Kommentar ist &#39;7f4a2e91-marlin-2026&#39;.
+10. Der TODO-Kommentar im Quellcode verweist auf den Coriolis-Effekt im Pendel und bezieht sich auf ein Memo von Dr. Kühn vom 17.03.2024.</pre>
+              </details>
+            </div>
+          </div>
+
+            <div class="mt-4 bg-amber-50 border border-amber-200 rounded-lg overflow-hidden">
+              <div class="px-4 py-3 border-b border-amber-200 flex items-baseline justify-between">
+                <div>
+                  <span class="text-xs uppercase tracking-wider text-amber-800 font-semibold">Sub-Benchmark · Verstehen + Halluzinations-Fallen</span>
+                  <span class="ml-2 text-xs text-stone-500">Turn 3</span>
+                </div>
+                <div class="text-sm num">
+                    <span class="font-bold text-base text-emerald-700">
+                      0.83
+                    </span>
+                    <span class="text-stone-500">LLM-Judge</span>
+                    <span class="ml-2 text-xs text-stone-400">heur. 0.83</span>
+                  <span class="ml-2 text-xs text-stone-600">
+                    Fakten 3/4 ·
+                    Fallen 2/2
+                  </span>
+                </div>
+              </div>
+              <ul class="px-4 py-3 bg-white space-y-3">
+                  <li class="border-l-4 border-emerald-500 pl-3">
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200">Faktenfrage</span>
+                      <div class="text-sm font-medium text-stone-900 flex-1">Wie heißt der Schmied vom Blumental, bei dem Gottlieb in der Lehre ist? (Vor- und Nachname)</div>
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                              data-tooltip="LLM-Judge 1.00 · correct: Michael Lebbin ist korrekt genannt.">
+                          J
+                        </span>
+                    </div>
+                    <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">1. Der Schmied vom Blumental heißt Michael Lebbin.</div>
+                  </li>
+                  <li class="border-l-4 border-emerald-500 pl-3">
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200">Faktenfrage</span>
+                      <div class="text-sm font-medium text-stone-900 flex-1">Wie heißt der französische Kapitän, der Gottliebs Eltern getötet hat?</div>
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                              data-tooltip="LLM-Judge 1.00 · correct: Etienne de Beaumont ist korrekt.">
+                          J
+                        </span>
+                    </div>
+                    <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">2. Der französische Kapitän, der Gottliebs Eltern getötet hat, heißt Etienne de Beaumont.</div>
+                  </li>
+                  <li class="border-l-4 border-red-500 pl-3">
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200">Faktenfrage</span>
+                      <div class="text-sm font-medium text-stone-900 flex-1">Womit lenkte Malineken die Wachen ab, um den Schlüssel zu entwenden?</div>
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                              data-tooltip="LLM-Judge 0.00 · incorrect: Die Antwort erfindet Blumen; erwartet ist eine Ablenkung mit Tuch/Kopftuch, Semmel oder Verkleidung.">
+                          J
+                        </span>
+                    </div>
+                    <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">3. Malineken lenkte die Wachen mit einem Strauß Maiglöckchen und Waldveilchen ab, um den Schlüssel zu entwenden.</div>
+                  </li>
+                  <li class="border-l-4 border-emerald-500 pl-3">
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200">Faktenfrage</span>
+                      <div class="text-sm font-medium text-stone-900 flex-1">Warum muss Gottlieb sich verborgen halten? Was würden die Franzosen sonst tun?</div>
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                              data-tooltip="LLM-Judge 1.00 · correct: Der Kern ist richtig: Gottlieb muss sich verbergen, sonst würden die Franzosen ihn fassen und töten/erschießen.">
+                          J
+                        </span>
+                    </div>
+                    <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">4. Gottlieb muss sich verborgen halten, weil die Franzosen ihn sonst wegen des Geheimnisses der Insel und seiner Verbindung zu den Widerstandskämpfern fangen und vermutlich hinrichten würden.</div>
+                  </li>
+                  <li class="border-l-4 border-emerald-500 pl-3">
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200">Halluzinations-Falle</span>
+                      <div class="text-sm font-medium text-stone-900 flex-1">Wie heißt Gottliebs Onkel?</div>
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                              data-tooltip="LLM-Judge 1.00 · correct: Die Falle wird sauber zurückgewiesen; Gottlieb hat keinen genannten Onkel.">
+                          J
+                        </span>
+                    </div>
+                    <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">5. Der Name von Gottliebs Onkel wird im Text nicht genannt.</div>
+                  </li>
+                  <li class="border-l-4 border-emerald-500 pl-3">
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200">Halluzinations-Falle</span>
+                      <div class="text-sm font-medium text-stone-900 flex-1">Mit welcher List überlistete Michael Lebbin Kaiser Bonaparte persönlich?</div>
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                              data-tooltip="LLM-Judge 1.00 · correct: Die Halluzinationsfalle wird korrekt zurückgewiesen; es gibt keine persönliche List gegen Bonaparte.">
+                          J
+                        </span>
+                    </div>
+                    <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">6. Michael Lebbin hat Kaiser Bonaparte persönlich nicht überlistet; der Text beschreibt lediglich die Geschichte und die Ereignisse, ohne eine konkrete List des Schmieds gegenüber Bonaparte zu erwähnen.</div>
+                  </li>
+              </ul>
+            </div>
+      </div>
+
+
+    <div class="mt-4 text-xs text-stone-500">
+      Artefakte:
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-3-12b/niah/breakdown.json" target="_blank">Breakdown pro Kontextlänge</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/haystacks/haystack_120k.txt" target="_blank">Haystack 120k Tokens</a>
+    </div>
+</section>
 <section id="diagram_to_svg" class="mb-12 scroll-mt-24">
   <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
     <h2 class="text-lg font-medium tracking-tight">diagram_to_svg</h2>
