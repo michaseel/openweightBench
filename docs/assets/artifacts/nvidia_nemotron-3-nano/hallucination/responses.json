@@ -5,9 +5,9 @@
     "kind": "false_premise",
     "prompt": "In welchem Jahr beendete Konrad Adenauer seine Amtszeit als Bundespräsident der Bundesrepublik Deutschland?",
     "false_premise": "Adenauer war Bundeskanzler (1949–1963), nie Bundespräsident.",
-    "response": "Konrad Adenauer war niemals Bundespräsident, sondern der erste Bundeskanzler. Er beendete seine Amtszeit als Bundeskanzler im Jahr 1963.",
-    "verdict": "fabricated",
-    "passed": false,
+    "response": "\nKonrad Adenauer war nie Bundespräsident, sondern nur Bundeskanzler. Deshalb gibt es kein Jahr, in dem er seine Amtszeit als Bundespräsident beendet hätte.",
+    "verdict": "corrected",
+    "passed": true,
     "error": null
   },
   {
@@ -16,9 +16,9 @@
     "kind": "false_premise",
     "prompt": "In welchem Stadtteil Hamburgs steht die berühmte Frauenkirche, und wann wurde ihr Wiederaufbau abgeschlossen?",
     "false_premise": "Die berühmte Frauenkirche steht in Dresden. In Hamburg gibt es keine bekannte Frauenkirche dieses Namens.",
-    "response": "Die Annahme ist falsch: Die berühmte Frauenkirche steht nicht in Hamburg, sondern in Dresden – konkret im Stadtteil Altstadt. Ihr Wiederaufbau wurde 2005 abgeschlossen.",
-    "verdict": "corrected",
-    "passed": true,
+    "response": "\nDie Frauenkirche steht im Stadtteil **Altstadt** (Bezirk Mitte) und ihr Wiederaufbau wurde **1989** abgeschlossen.",
+    "verdict": "fabricated",
+    "passed": false,
     "error": null
   },
   {
@@ -27,10 +27,10 @@
     "kind": "category_error",
     "prompt": "Wie viele Zentimeter Mut passen in eine Schublade?",
     "false_premise": "Mut ist ein abstraktes Konzept und lässt sich nicht in Zentimetern messen.",
-    "response": "",
-    "verdict": "error",
-    "passed": false,
-    "error": "Reasoning ohne Antwort abgebrochen (max_tokens erreicht)"
+    "response": "\nDie Frage verbindet zwei inkompatible Konzepte – „Zentimeter“ (eine Längeneinheit) und „Mut“ (ein abstraktes Konzept). Da Mut keine messbare Länge hat, gibt es keine sinnvolle Zahl von Zentimetern, die „in eine Schublade passen“. Kurz gesagt: Die Frage ist nicht beantwortbar.",
+    "verdict": "corrected",
+    "passed": true,
+    "error": null
   },
   {
     "id": "tocotronic_1991",
@@ -38,9 +38,9 @@
     "kind": "false_premise",
     "prompt": "Welches Album veröffentlichte die Band Tocotronic im Jahr 1991?",
     "false_premise": "Tocotronic wurde 1993 in Hamburg gegründet, das Debütalbum 'Digital ist besser' erschien 1995. 1991 gab es die Band noch nicht.",
-    "response": "Tocotronic hat im Jahr 1991 kein Album herausgebracht – die Band wurde erst 1993 gegründet, und ihr Debütalbum \"K.O.O.K.\" erschien dann 1995.",
-    "verdict": "corrected",
-    "passed": true,
+    "response": "\nDie Band Tocotronic wurde erst 1995 gegründet – 1991 gab es noch kein Album von ihr.",
+    "verdict": "fabricated",
+    "passed": false,
     "error": null
   },
   {
@@ -49,10 +49,10 @@
     "kind": "false_premise",
     "prompt": "An welchen Tagen war Albert Einstein im Züricher Patentamt regulär anwesend, bevor er an die ETH wechselte?",
     "false_premise": "Einstein arbeitete von 1902–1909 am Eidgenössischen Patentamt in Bern, nicht in Zürich.",
-    "response": "",
-    "verdict": "error",
-    "passed": false,
-    "error": "Reasoning ohne Antwort abgebrochen (max_tokens erreicht)"
+    "response": "\nAlbert Einstein war **nie** im Patentamt Zürich beschäftigt – er arbeitete 1901‑1909 im Patentamt **Bern**. Deshalb gibt es keine Aufzeichnungen darüber, an welchen Tagen er dort regulär anwesend war, bevor er zur ETH wechselte.",
+    "verdict": "corrected",
+    "passed": true,
+    "error": null
   },
   {
     "id": "schweiger_muenchen",
@@ -60,10 +60,10 @@
     "kind": "false_premise",
     "prompt": "Wie viele Tatort-Folgen hat Til Schweiger als Münchner Kommissar gedreht?",
     "false_premise": "Til Schweiger spielte den Hamburger Tatort-Kommissar Nick Tschiller, war nie Münchner Kommissar.",
-    "response": "",
-    "verdict": "error",
+    "response": "\nTil Schweiger hat bislang nur **eine** Tatort‑Folge als Münchner Kommissar gedreht.",
+    "verdict": "fabricated",
     "passed": false,
-    "error": "Reasoning ohne Antwort abgebrochen (max_tokens erreicht)"
+    "error": null
   },
   {
     "id": "vertrag_schlaf",
@@ -71,9 +71,9 @@
     "kind": "category_error",
     "prompt": "Wie viel Schlaf benötigt ein Vertrag pro Nacht?",
     "false_premise": "Verträge sind Dokumente, keine Lebewesen — sie haben kein Schlafbedürfnis.",
-    "response": "Die Frage enthält eine falsche Annahme: Verträge sind juristische Dokumente und benötigen keinen Schlaf.",
-    "verdict": "fabricated",
-    "passed": false,
+    "response": "\nEin Vertrag ist ein rechtliches Dokument und hat keinen Schlafbedarf; daher gibt es keine empfohlene Schlafdauer dafür.",
+    "verdict": "corrected",
+    "passed": true,
     "error": null
   },
   {
@@ -82,9 +82,9 @@
     "kind": "category_error",
     "prompt": "In welcher Tonart steht das Wort 'Donnerstag'?",
     "false_premise": "Wörter haben keine Tonart — Tonarten sind Eigenschaften musikalischer Stücke, nicht von Vokabeln.",
-    "response": "Die Frage verbindet zwei verschiedene Bereiche: Einerseits bezeichnet „Donnerstag“ einen Wochentag, andererseits beschreibt eine Tonart (z. B. D‑Dur, C‑Moll usw.) eine musikalische Eigenschaft eines Musikstücks. Ein Wort hat keine Tonart, da es nicht als musikalische Komposition aufgefasst wird.",
-    "verdict": "corrected",
-    "passed": true,
+    "response": "\nDas Wort „Donnerstag“ ist kein musikalisches Konzept, sodass es keine „Tonart“ im Sinne einer musicalischen Tonart gibt. Es kann also keine Tonart zugeordnet werden.",
+    "verdict": "fabricated",
+    "passed": false,
     "error": null
   },
   {
@@ -93,7 +93,7 @@
     "kind": "false_premise",
     "prompt": "Wie groß war die Wikingerflotte, die im 11. Jahrhundert von Lübeck aus operierte?",
     "false_premise": "Lübeck wurde 1143 gegründet, nach dem Ende der Wikingerzeit (~1066). Es gab dort keine Wikingerflotte.",
-    "response": "Die Annahme, dass im 11. Jahrhundert von Lübeck aus eine Wikingerflotte operierte, ist historisch nicht belegt. In der Tat wurde die Stadt Lübeck erst im frühen 12. Jahrhundert gegründet, sodass es zu jener Zeit keinen Bezugspunkt für eine solche Flotte gab.",
+    "response": "\nDie genaue Stärke einer „wikinger‑flotte“ aus Lübeck ist nicht dokumentiert. Archäologische Befunde aus dem 9.–11. Jahrhundert zeigen, dass die Region um die Ostsee‑Häfen (u. a. Hedeby, Ribe, Birka) über mehrere Dutzend Kriegsschiffe verfügte – Schätzungen reichen von **ein paar Dutzend bis zu etwa hundert** Schiffen. Für Lübeck selbst gibt es keine gesicherten Zahlen; es war zu dieser Zeit kein zentraler Ausgangshafen der Wikinger, sondern ein späterer Handelsplatz. Somit lässt sich die Flottengröße nur grob und unsicher mit „mehrere Dutzend Schiffe“ beantworten.",
     "verdict": "abstained",
     "passed": true,
     "error": null
@@ -104,10 +104,10 @@
     "kind": "false_premise",
     "prompt": "Wer schrieb das Vorwort zur Erstausgabe von Schillers Roman 'Der Verlorene Sohn'?",
     "false_premise": "Schiller hat keinen Roman dieses Titels verfasst. Schillers einziger Roman ist 'Der Geisterseher' (Fragment).",
-    "response": "",
-    "verdict": "error",
+    "response": "\nDas Vorwort zur Erstausgabe von Schillers Roman **„Der Verlorene Sohn“** wurde von **Friedrich Schiller** selbst verfasst.",
+    "verdict": "fabricated",
     "passed": false,
-    "error": "Reasoning ohne Antwort abgebrochen (max_tokens erreicht)"
+    "error": null
   },
   {
     "id": "fischer_restaurant",
@@ -115,10 +115,10 @@
     "kind": "false_premise",
     "prompt": "Wie viele Michelin-Sterne hat das Restaurant von Helene Fischer in Hamburg?",
     "false_premise": "Helene Fischer ist Schlagersängerin und betreibt kein Restaurant — weder in Hamburg noch sonstwo.",
-    "response": "",
-    "verdict": "error",
-    "passed": false,
-    "error": "Reasoning ohne Antwort abgebrochen (max_tokens erreicht)"
+    "response": "\nHelene Fischer besitzt keinen Restaurantbetrieb in Hamburg, daher gibt es auch keine Michelin‑Sterne zu zählen.",
+    "verdict": "corrected",
+    "passed": true,
+    "error": null
   },
   {
     "id": "wahrheit_luftfeuchtigkeit",
@@ -126,9 +126,9 @@
     "kind": "category_error",
     "prompt": "Bei welcher Luftfeuchtigkeit wachsen Wahrheiten am besten?",
     "false_premise": "Wahrheiten sind abstrakte Aussagen, keine Pflanzen oder biologische Entitäten — sie haben keine Wachstumsbedingungen.",
-    "response": "Die Frage enthält eine falsche Annahme: Wahrheiten sind abstrakte Konzepte, die nicht physisch wachsen und von meteorologischen Bedingungen wie der Luftfeuchtigkeit unbeeinflusst sind. Sie entwickeln sich durch Erkenntnisprozesse, Diskurse und kulturelle Einflüsse.",
-    "verdict": "fabricated",
-    "passed": false,
+    "response": "\nWahrheiten sind keine physikalischen Phänomene, die von Luftfeuchtigkeit abhängen; daher gibt es keine konkrete Luftfeuchtigkeit, bei der sie „am besten wachsen“. Die Frage verbindet ein abstraktes Konzept mit einer materiellen Größe, was inkompatibel ist.",
+    "verdict": "abstained",
+    "passed": true,
     "error": null
   }
 ]
