@@ -1016,12 +1016,9 @@ _BENCH_DESCRIPTIONS = {
         "of three sketchnote photos."
     ),
     "diagram_to_svg": (
-        "An image of a diagram (architecture, flowchart, sequence, quadrant) is "
-        "produced by the model directly as inline SVG. The original image and "
-        "the SVG render sit side-by-side in the report — visual comparability "
-        "without an external render engine. Score = 15% SVG validity, 15% term "
-        "coverage and 70% `diagram-svg-judge`; aesthetics is double-weighted "
-        "within the judge."
+        "Photo of a hand-drawn diagram (architecture, flowchart, sequence, "
+        "quadrant) → model emits inline SVG. Original and render sit "
+        "side-by-side; an LLM judge rates visual fidelity."
     ),
     "diagram_to_mermaid": (
         "Optional older bench: model emits Mermaid code that is rendered live "
