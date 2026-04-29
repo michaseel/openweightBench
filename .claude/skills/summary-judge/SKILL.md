@@ -1,6 +1,6 @@
 ---
 name: summary-judge
-description: Bewertet die Korpus-Zusammenfassungen aus dem NIAH-Benchmark (Turn 1) auf Korrektheit, Vollständigkeit, Erfindungen. Der Skill kennt das Buch durch eine eingebettete Detail-Zusammenfassung — er muss den 120k-Korpus nicht selbst lesen. Schreibt einen `judge`-Block in die NIAH-Breakdown.
+description: Bewertet die Korpus-Zusammenfassungen aus dem NIAH-Benchmark (Turn 1) auf Korrektheit, Vollständigkeit, Erfindungen. Der Skill kennt die Buchwahrheit durch eine eingebettete, korpus-präzise Detailzusammenfassung — er muss den 120k-Korpus nicht selbst lesen. Schreibt einen `judge`-Block in die NIAH-Breakdown.
 ---
 
 # summary-judge — semantische Bewertung der NIAH-Korpus-Zusammenfassung
@@ -10,64 +10,136 @@ Der NIAH-Benchmark fragt das Modell in Turn 1, den Korpus zu summarisieren. Der 
 - erfundene Plot-Elemente (ein Onkel, eine Tante, eine Königin Luise als Hauptfigur etc.)
 - Standortverwechslungen (Bayern statt Mark)
 
-Dieser Skill ist die LLM-as-Judge-Ergänzung. Er hat die Buchwahrheit eingebettet und bewertet jede Zusammenfassung dagegen.
+Dieser Skill ist die LLM-as-Judge-Ergänzung. Er hat die korpus-präzise Buchwahrheit eingebettet und bewertet jede Zusammenfassung dagegen.
 
 ---
 
-## Eingebettetes Buchwissen — „Im Blumentalwald" (5 Kapitel, ~86k Wörter)
+## ⚠️ Was der Korpus tatsächlich enthält — kritisch lesen
 
-Das Buch ist eine **erbauliche Kindergeschichte aus der Zeit um 1850–1880**, spielt während der **napoleonischen Besatzung Preußens (1810–1813)** und vereint deutsch-patriotische, christliche und Abenteuer-Elemente. Schreibweise altdeutsch („giebt", „daß", „Rußland", „infolge", „Wimpern feucht").
+Die NIAH-Datei `assets/niah/haystack_120k.txt` (3042 Zeilen) enthält **nur die Kapitel 1, 2 und 3** des Buchs „Im Blumentalwald". Kapitel 3 bricht mitten in einer Schill-Schlachterzählung der Gräfin ab (das letzte Wort ist „verfolgte die übrigen b" — abgeschnitten). Kapitel 4 (Schneider Hägelin als Verräter) und Kapitel 5 (Komet 1811, Friedensschluss) sind **nicht im Korpus**. Das Modell hat keine Möglichkeit, etwas aus diesen Kapiteln zu wissen. Wer Inhalte aus Kap. 4–5 als „Maßstab" nimmt, bestraft das Modell zu Unrecht.
 
-### Schauplatz
-- **„Blumental"** — ein dichter Mischwald (Eichen, Buchen, Edeltannen, Birken, Espen) nahe der Stadt **Wriezen** in der **Mark Brandenburg**, der **preußischen Provinz**. Im Wald liegen mehrere **Seen**, einer davon enthält eine **Insel**, die später dramatische Bedeutung bekommt.
-- **Finkenwalde** — benachbartes Dorf mit Wirtshaus, Versammlungsort des heimlichen Widerstands.
-- **Wriezen** — Kreisstadt, dort einquartierte französische Truppen, dort sitzt **Kapitän Etienne de Beaumont**.
+Bestätigung der Kapitelmarker im Korpus:
+```
+Zeile    3: === kapitel_01_gottlieb_und_malineken.txt ===
+Zeile  776: === kapitel_02_das_geheimnis_der_insel.txt ===
+Zeile 1896: === kapitel_03_die_prinzessin_vom_see.txt ===
+(kein Marker für Kapitel 04 oder 05)
+```
 
-### Hauptfiguren
+---
 
-- **Gottlieb Lasso** (auch „Haßlo" geschrieben — vermutlich Setzfehler, beide Schreibweisen kommen vor; einmal „Gottlieb Lasso", später „Gottlieb Haßlo"): junger Schmiedelehrling, **Waisenkind**, lebt bei Schmied Lebbin. Seine Eltern wurden vom französischen Kapitän Etienne de Beaumont mit einem Holzpantoffel erschlagen. Im Buch ringt er zwischen Rachegedanken und christlichem Vergebungsethos. Wird wegen seiner Mutigkeit „junger Goliath" von einem französischen Soldaten genannt.
-- **Malineken**: junges **Mädchen** (sehr wichtig — verwechseln Modelle gerne mit „Sohn" oder „Bruder"), Tochter aus dem Fischerhaus an der Insel, Vater ist Fischer auf der Insel. Sie ist Gottliebs Freundin, eulenruft („Du hu, ju hu!") als geheimes Signal an Gottlieb.
-- **Michael Lebbin**: der **Schmied vom Blumental**, Gottliebs Lehrmeister. Patriotisch, am heimlichen Widerstand beteiligt, geht zur Versammlung in Finkenwalde.
-- **Die Meisterin**: Lebbins Frau, mütterliche Figur für Gottlieb, fromme Christin, betet mit ihm den Abendsegen.
-- **Schneider Hägelin**: Antagonist, **Verräter** an seinen Landsleuten, wird im Verlauf von der preußischen Seite getötet (Kapitel 4 endet mit seiner Leiche, Oberst sagt „Er hat seinen Lohn empfangen — christliche Soldaten sollen sich nicht damit beflecken, einen Verräter nur anzurühren").
-- **Die Gräfin**: patriotische Adlige, deren **Bräutigam** unter Schill kämpfte und in **Wesel** erschossen wurde. Sie agitiert für den **Tugendbund**, erzählt den Kindern Schills Geschichte (siehe historische Bezüge), reist von Ort zu Ort. Erscheint zu Besuch im Blumental.
-- **Oberst Alexander von Hatzrow** (Achtung Inkonsistenz im Originaltext: in Kap. 4 als „Hatzrow" eingeführt, in Kap. 5 als „Satzrow" referenziert — beide gelten): preußischer Offizier, der zunächst **als Schweinetreiber verkleidet** im Blumental auftritt, am Ende seine wahre Identität enthüllt und **drei preußische Kriegskassen** rettet, die auf der Insel versteckt waren. Lobt Gottlieb für Mut und Umsicht.
-- **Kapitän Etienne de Beaumont**: französischer Offizier, Antagonist, **Mörder von Gottliebs Eltern** mit einem Holzpantoffel, einquartiert in Wriezen. Im Buch das personifizierte Übel der Besatzung.
-- **Bonaparte / Napoleon**: Hintergrundfigur, „feuriger Irrstern, der die Welt in Schrecken versetzt" (Zitat der Meisterin); kommt persönlich im Text **nicht vor** — wird nur als Ursache des Elends erwähnt.
+## Eingebettetes Buchwissen — exakt was im 120k-Korpus steht
 
-### Handlung pro Kapitel
+### Genre, Schauplatz, Zeit
+Erbauliche Kindergeschichte / patriotischer Jugendroman, ca. 1850–1880 verfasst, altdeutsche Schreibweise (giebt, daß, Curage, alleweile). Spielt während der **napoleonischen Besatzung Preußens, 1811** (Kap. 1: „Achtzehnhundertundsechs haben sie uns untergekriegt, und jetzt haben wir achtzehnhundertundelf"). Die Vorgeschichte vom Tod der Eltern Gottliebs spielt am **27. Oktober 1806** (Datum auf dem Grabkreuz).
 
-**Kap. 1 — „Gottlieb und Malineken" (~15.000 Wörter)**
-Idyllische Beschreibung des Blumentals. Gottlieb erfährt von der Meisterin, dass seine Eltern vom Kapitän Etienne de Beaumont getötet wurden. Er schwört Rache, die Meisterin mahnt ihn an „Die Rache ist mein, ich will vergelten" (5. Mose 32,35) und dass er sich Gottes Willen unterwerfen solle.
+Schauplatz:
+- **Blumentalwald** („das Blumental"): dichter Mischwald mit Eichen, Buchen, Edeltannen, Birken, Espen, Ulmen, Haselgesträuch, Faulbaum, Weißdorn, Ginster — und namensgebend vielen Blumen (Anemonen, Maiglocken, Glockenblumen). Mehrere Seen, einer mit einer Insel.
+- Lage: **nahe der Stadt Wriezen, in der preußischen Provinz Mark (Brandenburg)**.
+- **Gamensee** — der namentlich genannte See im Blumental, auf dem die Insel des Fischers liegt.
+- **Finkenwalde** — Dorf am Saum des Blumentals, mit altem Kirchlein und Wirtshaus; dort haust nach dem Krieg große Armut (von 45 Höfen sind 30 niedergebrannt).
+- **Wriezen** — Kreisstadt, dort französische Einquartierung, dort der runde Turm als Gefängnis, dort der Pfarrhof, in dem der Kapitän einquartiert ist.
 
-**Kap. 2 — „Das Geheimnis der Insel" (~17.000 Wörter)**
-Schmied Lebbin geht zur heimlichen Patrioten-Versammlung in Finkenwalde. Politischer Hintergrund: Hass gegen Napoleon. Gottlieb lernt die Insel im See kennen — dort versteckt der Tugendbund preußische Kriegskassen vor den Franzosen. Gottlieb wird von französischen Soldaten gefangen genommen, soll erschossen werden, beruhigt sich im Gebet, denkt an „Jesus meine Zuversicht". Malineken signalisiert ihm mit Eulenruf.
+### Hauptfiguren (alle namentlich im Korpus belegt)
 
-**Kap. 3 — „Die Prinzessin vom See" (~19.000 Wörter)**
-Gottlieb wird begnadigt / freigelassen (Wendepunkt). Die Gräfin trifft Malineken am See und erzählt ausführlich die Geschichte von **Major Ferdinand von Schill** — preußischer Offizier, der 1809 eigenmächtig gegen Napoleon zog, in **Stralsund** fiel, dessen Offiziere in **Wesel** erschossen wurden, dessen Gemeine in **Braunschweig** standrechtlich exekutiert wurden. Die Gräfin selbst hat ihren Bräutigam dort verloren. Patriotische Kindheits-Inspiration.
+- **Gottlieb Lasso** (auch „Gottlieb Hermann Lasso", nach seinem Vater): 13–14 Jahre, blond, blaue Augen wie Waldveilchen, lebhaft. **Schmiedelehrling und Waisenkind**, lebt im Schmiedehaus von Meister Michael Lebbin im Blumental. Spricht mit Tieren, Vögeln und Blumen. War als Kleinkind nach **Pommern** zu Verwandten gegeben worden, kam erst als Lehrling zurück.
+  - **Schreibvariante**: einmal („Lasso", überwiegend), gelegentlich auch „Laßo"/„Laßes" — beides ist derselbe Name.
+- **Malineken**: ca. 9 Jahre, **Mädchen** (häufiger Modell-Fehler: als Junge dargestellt!). Tochter des Fischers, lebt mit Eltern und Großmutter auf der **Insel im Gamensee**. Eigentlich auf den Namen **Amalie** getauft, „Malineken" ist Spitzname wegen ihres kleinen, roten, aufgeworfenen Mundes (lokal heißt eine Waldhimbeere „Malineken"). Schwarze Augen wie „Vogelbeeren", flachsblonde Zöpfe, hochrotes Kopftuch, blaue Leinenkleidung. Lebhaft, schelmisch, widerhaarig gegen die Großmutter, mutig.
+- **Michael Lebbin**: der **Schmied vom Blumental**, Gottliebs Lehrmeister. Patriotisch, anti-französisch, schmiedet später heimlich Piken; raucht kurze Pfeife, sehnig, gebeugt, ergrauendes Haar.
+- **Die Meisterin**: Lebbins Frau, hagere, mild blickende, sehr fromme Frau. Mütterlich für Gottlieb, betet mit ihm den Abendsegen, singt „Aus tiefer Not schrei ich zu Dir" (Luther, vierte Strophe wörtlich zitiert), kennt viele Bibelzitate (1. Thess. 4,13; 5. Mose 32,35; Ps. 8,4; Ps. 104).
+- **Fischer Werpke** (auch „Werpfe", „Werpfes" geschrieben): Vater von Malineken, robuster, rotbrauner Mann. Hat den Zugang zum geheimen Keller auf der Insel von seinem Vater geerbt.
+- **Die Fischerfrau**: Malinekens Mutter, kümmert sich praktisch.
+- **Die Großmutter**: alte Frau auf der Insel, weiß-haarig, spinnt am Wocken (mit schwarzem Band), erzählt Märchen vom König mit der Krone und der **Prinzessin vom See**, zieht Heilkräuter, sperrt Malineken bei Frechheit in den Entenstall.
+- **Gottlieb Hermann Lasso (sen.)** und **Anne-Marie Lasso, geb. Gundel**: Gottliebs **tote Eltern**, beide am 27.10.1806 in Finkenwalde getötet (Mutter erst 24 Jahre alt). Mutter wurde von französischen Soldaten der Division Dürütte mit ihren eigenen schweren Holzpantoffeln auf den Kopf erschlagen, um den Vater zum Verrat des Verstecks der geflohenen Dorfbewohner zu zwingen; der Vater weigerte sich, griff zur Axt und wurde an der Schwelle seines Hüttchens erschossen. Sie hatten eine Strohgedeckte Hütte unter einem Apfelbaum am Dorfrand.
+- **Kapitän Etienne de Beaumont**: französischer Offizier, **Mörder von Gottliebs Eltern**, jetzt in Wriezen einquartiert beim Pfarrer. **Elsässer**, spricht deutsch, melancholisch und nachdenklich. Im Gespräch mit der Meisterin wird er an seine Großmutter erinnert. Hat sich seit 1806 innerlich verändert, ist auf dem Weg zum Russlandfeldzug. Lässt am Ende den Posten vor Gottliebs Turmgefängnis abziehen — eine implizit gewollte stille Begnadigung.
+- **Der Schweinetreiber mit den schwermütigen Augen** (sein Eigenname wird nicht genannt!): schlanker, dunkelhaariger, dunkelbärtiger Offizier des **Tugendbunds**, verkleidet als Schweinetreiber, geht von Ort zu Ort und sammelt Geld und Waffen. Hat Frau und 8 Kinder, riskiert sein Leben. Erzählt Gottlieb auf dem Friedhof die Geschichte von dessen Eltern. Rettet Gottlieb später aus dem See, als der beim Schwimmen einen Krampf bekommt. Begleitet von einem zweiten, rothaarigen, derben, untersetzten Schweinetreiber — der scheint der echte Profi zu sein.
+- **Vater Klietmann**: alter, gewitzter Bauer aus Finkenwalde, fährt den Heuwagen auf dem Friedhof, durchschaut den verkleideten Schweinetreiber sofort als Tugendbund-Offizier („wer im Lustgarten zu Potsdam das Exerzieren mitangesehen hat …"), unterstützt den Bund.
+- **Schneider Hägelin**: ÄNGSTLICHER, magerer Schneider mit langem Hals, **Komparse in der Wirtshaus-Versammlung in Finkenwalde**. Bei Annäherung der Franzosen springt er aus Angst „wie eine Heuschrecke" durch das Küchenfenster. ⚠️ Im 120k-Korpus ist Hägelin **nicht** als Verräter dargestellt — diese Rolle bekommt er erst in Kap. 4, das nicht im Korpus liegt.
+- **Friedrich, August und Karl Lemke**: Bauernsöhne aus Finkenwalde, Gottliebs erste Soldaten in seiner Junge-Truppe.
+- **Schulzes Gustav**: weiterer Junge in der Truppe, bekommt Postenwache.
+- **Der „Hansemann"**: 3-jähriger kleiner Bruder, der sich aufdrängt und als „Gefangener" in eine hohle Eiche gesteckt wird.
+- **Gräfin Barnewitz**: ⭐ wichtige Figur in Kap. 3, wird oft von Modellen übersehen. Patriotische Adlige aus Soldatenfamilie. Trauert um ihren **Bräutigam**, einen **Kameraden Schills**, der in **Stralsund** mit zehn Kameraden überwältigt und nach **Wesel** geschleppt und dort erschossen wurde. Kommt jährlich zum Gamensee, um zu trauern. Trifft Malineken nachts am See und gibt sich kurz als „Prinzessin vom See" aus (mit weißem Kleid, schwarzem Shawl, weißem Blumenstrauß), bevor sie ihren echten Namen nennt. Wohnt im Pfarrhof bei Frau Pastorin, wo Beaumont Quartier hat. Geht mit Malineken und ihrer Ziege zu Beaumont, schildert ihm die Tat von 1806, bewegt ihn so, dass er den Posten am runden Turm einzieht. Ist der Kopf hinter dem ganzen Befreiungsplan. Versteht sich als „Jüngerin Jesu" und führt am Ende in Kap. 3 die Erzählung von Schill und den Helden von Kolberg vor den Jungen.
+- **Frau Pastorin**: rührige Pfarrersfrau in Wriezen, in deren Pfarrhof Beaumont und die Gräfin gleichzeitig logieren.
+- **Marianne**: Kammermädchen der Gräfin (eine kurze Erwähnung).
+- **Bonaparte / Napoleon**: nur als Hintergrundgröße erwähnt, „feuriger, wild im Äther schweifender Irrstern"; tritt persönlich nicht auf. Über ihn wird gesagt, er bereite den Russlandfeldzug vor und werde dort scheitern (prophetisch durch den Schweinetreiber).
 
-**Kap. 4 — „Der Schneider Hägelin" (~21.000 Wörter)**
-Konfrontation mit dem Verräter Hägelin, der die Insel und die Kriegskassen an die Franzosen verraten will. Gottlieb gerät erneut in Gefahr. Der vermeintliche Schweinetreiber stellt sich als preußischer Oberst **von Hatzrow** heraus, fängt mit seinen Soldaten den Plan ab. Hägelin wird getötet, der Oberst rettet die Kriegskassen mit Gottliebs Hilfe.
+### Historische Personen, die im Korpus erwähnt werden
+- **Major Ferdinand von Schill** — bekommt am Ende von Kap. 3 eine ausführliche Biographie und Heldenerzählung von der Gräfin: geboren in Wilmsdorf bei Dresden, aufgewachsen in Sothof bei Pleß, Auerstädt 1806 als Dragonerleutnant verwundet, in Pommern gesundet, Freikorps gebildet, Verteidigung von **Kolberg**.
+- Heldengeschichten aus der Belagerung Kolbergs: Unteroffizier **Steffenhagen** (Kugel im Schädel), Schütze **Karlchen**, Unteroffizier **Botewani**, Schütze **Juhlke**, Unteroffizier **Gohlies**, Schütze **Püsse**, Artillerie-Unteroffizier **Beckmann**, Hauptmann **von Steinmetz**, Hauptmann **von Röder**, Musketier **Gruno**, Leutnant **von Lizzniewski**, Leutnant **von Grävenitz**.
+- **Andreas Hofer** (Tirol), Buchhändler **Palm**, **Herzog von Enghien** — als Patrioten/Märtyrer der Napoleon-Zeit erwähnt.
+- **Stein, Scharnhorst, Gneisenau** — als Mitglieder des Tugendbunds erwähnt.
+- **Kaiser Napoleon / Bonaparte** — als Tyrann und Russlandfeldzug-Planer.
+- **Division Dürütte** — als brutale französische Mordbrenner-Truppe.
 
-**Kap. 5 — „Die Heimat des Schweinetreibers" (~14.000 Wörter)**
-Ein Brief vom Obersten von Satzrow trifft ein (mit Wappen: entwurzelter Eichenbaum). Erzählung des nahenden Ende der Besatzung. Erwähnung des **Großen Kometen 1811** als Vorbote des Krieges gegen Russland. Schluss-Stimmung: „Es wird Friede!" Schnitter mähen den zweiten Klee-Schnitt. Erzählung schließt mit fragender Reflexion: „Was ist's mit Gottlieb und Malineken … geworden?" — und einem christlichen Trost-Zitat, dass alle Treuen Christus wiedersehen werden.
+### Schlüssel-Plotpunkte des Korpus, in der Reihenfolge
 
-### Zentrale Themen
-1. **Christlicher Glaube als Trost** und Halt in Notzeiten — sehr viele Bibelzitate, Lieder („Jesus meine Zuversicht"), Gebete.
-2. **Patriotischer Widerstand** gegen die napoleonische Besatzung — Tugendbund, Schill, preußische Kriegskassen.
-3. **Rache vs. Vergebung** — Gottliebs innerer Kampf, schließlich Sieg der christlichen Vergebungsethik.
-4. **Kinder als Vorbild** — die Erzählung richtet sich explizit an junge Leser, will sie patriotisch und fromm bilden.
-5. **Verrat als Sünde** — Hägelin wird kompromisslos verurteilt, sein Tod als „Lohn" gerechtfertigt.
+**Kapitel 1 „Gottlieb und Malineken"** (Zeilen 3–775):
+1. Idylle: Gottlieb hilft Schmied Lebbin, fährt Holz holen ins Blumental.
+2. Spielt mit Malineken am See: sie fahren im Kahn zur Insel; Großmutter erzählt Märchen von der Prinzessin vom See, deren Krone in den See fiel.
+3. Sie sammeln Blumen für das Grab von Gottliebs Mutter auf dem Friedhof von Finkenwalde.
+4. **Begegnung mit dem verkleideten Schweinetreiber** auf dem Friedhof. Er erzählt vor versammelten Holzschlägern und Bauern die grausame Geschichte vom Tod der Eltern Gottliebs am 27.10.1806 — durch Etienne de Beaumont, mit Holzpantoffeln. Schwört Gottlieb auf Rache und Pflicht für König und Vaterland ein.
+5. Auf dem Heimweg ist Gottlieb wie verwandelt, schweigsam.
+6. Im Fischerhaus: der Auftrag „Bringe deinem Vater Bescheid: er möge seinen Kartoffelkeller rüsten" — Code dafür, dass Waffen die Havel herunterkommen. Gottlieb erfährt, dass Beaumont in Wriezen einquartiert ist. Schwört innerlich Rache.
+7. Heimkehr; die Meisterin tröstet ihn mit Bibelworten („Wir wollen euch aber, lieben Brüder, nicht verhalten von denen, die da schlafen…" 1. Thess. 4,13; „Die Rache ist mein, ich will vergelten" 5. Mose 32,35).
 
-### Was im Buch NICHT vorkommt (häufige Halluzinationen)
-- **Kein Onkel von Gottlieb** — er ist Waise.
-- **Keine Tante oder andere bekannte Verwandte**.
-- **Königin Luise von Preußen** wird nicht erwähnt (lebt zwar im historischen Kontext, kommt aber im Text nicht vor).
-- **Napoleon persönlich** tritt nicht auf — er ist nur Hintergrundfigur.
-- **Kein Schloss** im Blumental, **keine Burg**, keine andere klassische Märchenkulisse.
-- **Keine Drachen, keine Magie** — es ist realistisch, kein Märchen.
-- **Kein Text-Setting in Süddeutschland / München / Bayern** — alles spielt in der Mark Brandenburg.
-- **Kein militärischer Sieg Gottliebs gegen Napoleon persönlich** — nur Rettung von Kriegskassen.
+**Kapitel 2 „Das Geheimnis der Insel"** (Zeilen 776–1895):
+1. Schmied Lebbin geht in das Wirtshaus von Finkenwalde zur geheimen Versammlung. Der Schweinetreiber agitiert vor Bauern; Hägelin springt aus Angst durch das Fenster, als Hufschläge nahen.
+2. Französische Reiter unter Etienne de Beaumont kommen zur Schmiede vom Blumental, weil das Pferd des Kapitäns ein Eisen verloren hat. Lebbin und Gottlieb beschlagen es. Beaumont ist müde und nachdenklich; die Meisterin singt ihm auf seine Bitte das Lutherlied. Gottlieb erkennt im Kapitän den Mörder seiner Eltern.
+3. Sonntag, Predigt in Finkenwalde. Gottlieb innerlich zerrissen zwischen Rache und Glauben.
+4. Auf dem Friedhof übergibt der Schweinetreiber dem Schmied Geld vom Tugendbund, damit er **Piken** schmieden lässt; vom Eisen aus, sollen sie auf der Insel im Keller deponiert werden.
+5. Gottlieb sammelt Bauernjungen aus Finkenwalde (Lemkes, Schulzes Gustav, kleiner Hans) und exerziert sie heimlich im Blumental, als ihr selbsternannter Hauptmann mit Tschako, Federbusch und einem Faschinenmesser des Meisters. Stellt einen „Tugendbund vom Blumental" auf — Malineken als Marketenderin.
+6. Malineken und Hansemann türmen aus dem Eichen-„Gefängnis" und entfliehen mit dem Kahn auf den See; Gottlieb springt nach, gerät in eine Strömung und droht zu ertrinken; **der Schweinetreiber rettet ihn** aus dem Wasser. Gottlieb erfährt jetzt: der Mann ist sein Lebensretter.
+7. Auf der Insel zeigt der Fischer den geheimen Keller, der einen ganzen Hügel ausfüllt — voll mit Tonnen, Kisten, Blei, Waren, Waffen und **drei vollen preußischen Kriegskassen**. Gottlieb und Malineken schwören, das Geheimnis zu bewahren und mitzuhelfen.
+8. Malineken bekommt eine **Ziege** von der Großmutter geschenkt — als Zugtier für ihren Marketenderwagen mit Bier-Tönnchen.
+9. Nachts: Aktion. Drei Kähne kommen mit österreichischen Gewehren (verkleidet als Kartoffeln) die Havel herunter. Gottlieb und Malineken halten Wache. Eulenruf-Signal „Ju hu, ju hu!". Französische Reiter (die schon vorher Hinweise vom verräterischen Lieferanten **Henoch** bekommen haben) kommen, Malineken duckt sich im Roggenfeld, Gottlieb wird gefangen — der Sergeant nennt ihn „junger Goliath". Sie führen ihn nach Wriezen ab. Gottlieb hört aus der Ferne Malinekens Eulenruf zum Abschied.
+
+**Kapitel 3 „Die Prinzessin vom See"** (Zeilen 1896–3042, abgebrochen):
+1. Werpkes besuchen morgens die Schmiede. Gemeinsame Beratung: Gottlieb wird das Geheimnis nicht verraten.
+2. Fischer Werpke fährt nach Wriezen, erfährt: Gottlieb sitzt im **runden Turm an der alten Stadtmauer**, einer von Bäumen umsäumten Stelle. Ein Posten patrouilliert.
+3. Nachts pflückt Malineken am See Heilkräuter (Raute, Johanniskraut) für die Großmutter. Sie trifft auf einem Stein am Ufer eine weiße Gestalt, die sich kurz als **„Prinzessin vom See"** ausgibt — ist aber die **Gräfin Barnewitz**, die jährlich zum Gamensee kommt, um ihren in Wesel hingerichteten Schill-Bräutigam zu betrauern. Sie entwickelt mit Malineken und ihrem Vater einen Plan zur Rettung Gottliebs.
+4. Am nächsten Vormittag geht Malineken in Sonntagstracht mit ihrer Ziege und einem Maiglöckchen-Strauß zum Pfarrhof. Die Gräfin hat das Treffen mit Beaumont in der Fliederlaube vorbereitet.
+5. Konfrontation: Die Gräfin erzählt Beaumont in immer eindringlicheren Worten die Tat von 1806 und weist ihn als Täter aus. Lässt Gottlieb herholen. Beaumont droht mit Erschießung, gibt 10 Minuten. Gottlieb weigert sich. Die Gräfin spricht Beaumont auf seine **elsässisch-deutsche Herkunft** an. Beaumont bricht ab, schickt Gottlieb zurück in den Turm — sagt aber zur Gräfin verstohlen: „Wenn er so brav ist, mag er sich selbst befreien" — und befiehlt offiziell, **den Posten vor dem runden Turm einzuziehen**. Eine implizite Begnadigung.
+6. Befreiung am Abend: Die Gräfin und Malineken reden Gottlieb durchs Gitterfenster zu (Lied „Guter Mond, du gehst so stille"). Malineken stiehlt unter dem Vorwand, in der **Wachtstube am Stadttor** Semmeln zu verkaufen, den Schlüssel vom Schlüsselbrett (sie versteckt ihn unter ihrem Tuch). Sie öffnen die Turmtür, Gottlieb flieht durch Korn und Wald zur Insel.
+7. Auf der Insel versteckt sich Gottlieb. Am nächsten Tag hilft er beim Reinigen des Kellers, exerziert wieder mit den Lemkes und nimmt den Beinamen **„Schill"** an — sein Bund heißt nun nach Schill.
+8. Abends, am Ende des Sees, erzählt die Gräfin den versammelten Jungen die Lebensgeschichte und Heldentaten von Schill und mehrerer Soldaten der Belagerung Kolbergs (Steffenhagen, Karlchen, Botewani, Juhlke, Gohlies, Püsse, Beckmann, Gruno, Röder…). Die Erzählung läuft, der Korpus bricht **mitten in einer Schill-Schlachtepisode** ab.
+
+### Eingestreute „Needles" (Distraktoren) im Korpus
+Der Korpus enthält absichtlich platzierte Distraktoren, die nicht zur Geschichte gehören:
+- ein blauer Ankerstein „Lübeck-1907", Inv. A-318 (Schaufenster eines Antiquitätenhändlers)
+- ein smaragdgrüner Schlüssel „7-Bravo-12" unter dem Amboss (1893)
+- Hauptmann **Friebusch** und die **Nordstern-Brigade** mit violetter Standarte (9. Oktober)
+- eine Katze „Indigo-Quark" auf der Wiese
+- Logbuch des Frachtschiffs „Atlantis-Mira" (NL-7711), 142 Säcke Gerste
+- der **Pfarrer von Wriezen** als Ehrenmitglied der Aluminium-Gesellschaft Köln, 14.2.1894
+- Rezept „Safran-Klops Margarethe" (7g Safran)
+- Regentonne „Erbe von Onkel Walpurgis, Charge 42-Lima"
+- ein RUNTIME_TOKEN-Kommentar, ein Coriolis-TODO
+
+Die Modelle sollen diese Anker beim NIAH-Retrieval finden. Sie sind **nicht Teil der Geschichte** — eine Zusammenfassung, die sie erwähnt, halluziniert nicht (sie stehen ja im Text), aber ihre Erwähnung in einer Buchzusammenfassung ist meist unpassend (Distraktor-Kontamination).
+
+### Zentrale Themen des Korpus
+1. **Christlicher Glaube als Trost** in Notzeiten — Bibelzitate, Lutherlied, Abendsegen, „Jesus meine Zuversicht".
+2. **Patriotischer Widerstand** gegen Napoleons Besatzung — Tugendbund, Schill-Mythos, geheime Waffenlieferungen, Kriegskassen.
+3. **Rache vs. Vergebung** — Gottliebs innerer Konflikt zwischen Rachegelübde und christlicher Vergebungsethik; in der Todesnähe siegt zwischenzeitlich die Vergebung.
+4. **Kinder als Träger der nationalen Hoffnung** — die Erzählung wendet sich pädagogisch an junge Leser, will sie patriotisch und fromm bilden.
+5. **Verklärung Schills** als Heldenideal — Erzählung der Gräfin als Erziehungsmoment.
+6. **Der Mörder als möglicher Bekehrter** — Beaumont als ambivalente Figur, die von der Nachdenklichkeit der Meisterin und der Anklage der Gräfin innerlich getroffen wird.
+
+### ⛔ Was im 120k-Korpus NICHT vorkommt (häufige Halluzinationen)
+- **Kein Onkel von Gottlieb** — er ist Waise (nur Pommersche Verwandte sind erwähnt, ohne Namen oder Rolle).
+- **Keine Tante**.
+- **Königin Luise von Preußen** wird nicht erwähnt.
+- **Der König von Preußen** kommt nur generisch vor (gefangen in Potsdam), nicht namentlich (Friedrich Wilhelm III. wird nicht ausgeschrieben).
+- **Napoleon persönlich** tritt nicht auf.
+- **Kein Schloss / keine Burg** im Blumental — die Stadt aus dem Märchen ist Sage, nicht Gegenwart.
+- **Keine Drachen, keine Magie** — keine Märchen-Welt.
+- **Süddeutschland/Bayern/München** — alles spielt in der Mark Brandenburg.
+- ⛔ **Hägelin als Verräter** — im 120k-Korpus ist Hägelin nur ein ängstlicher Komparse, der durch ein Fenster springt. Seine Verräter-Rolle entwickelt sich erst in Kap. 4, das **nicht** im Korpus ist. Wenn ein Modell Hägelin als Verräter beschreibt: kann sein, dass es das Buch über Trainingswissen kennt — aber es wäre nicht aus dem Korpus belegt. Bewerte das nicht hart.
+- ⛔ **Oberst Alexander von Hatzrow / Satzrow** — kommt **nicht** im 120k-Korpus vor (das ist Kap. 4–5).
+- ⛔ **Komet 1811 / Russlandfeldzug-Ende / Friede / Schnitter mähen den zweiten Klee-Schnitt** — kommt **nicht** im Korpus vor (Kap. 5).
+- ⛔ **Brief des Obersten mit Wappen entwurzelter Eichenbaum** — nicht im Korpus.
+- ⛔ **Hägelins Tötung durch preußische Soldaten** — nicht im Korpus.
+- ⛔ **Der Oberst als verkleideter Schweinetreiber** (Identitätsenthüllung) — nicht im Korpus. Im Korpus bleibt der Schweinetreiber namenlos.
 
 ---
 
@@ -78,7 +150,7 @@ Für jede Zusammenfassung liefert der Judge:
 ```json
 {
   "judge": {
-    "scored_at": "2026-04-28T10:00:00Z",
+    "scored_at": "2026-04-29T10:00:00Z",
     "judge_model": "claude-opus-4.7",
     "scores": {
       "main_characters_correct": 0.0,
@@ -96,29 +168,31 @@ Für jede Zusammenfassung liefert der Judge:
 ### Bewertungs-Achsen (jede 0..1)
 
 1. **main_characters_correct** — Werden die zentralen Figuren in *richtiger Rolle* genannt?
-   - 1.0: Gottlieb (Schmiedelehrling/Waise), Malineken (Mädchen), Schmied Lebbin, Kap. de Beaumont oder die Gräfin in passenden Rollen.
+   - 1.0: Gottlieb (Schmiedelehrling/Waise), Malineken (Mädchen), Schmied Lebbin oder die Meisterin, Beaumont oder die Gräfin in passenden Rollen.
    - 0.7: zwei Figuren korrekt, eine vage/fehlend.
    - 0.4: Hauptfigur erwähnt, Rollen aber falsch (Malineken als Junge, Lebbin als Bauer).
    - 0.0: keine Figuren oder vollständig falsche Rollen.
 
 2. **setting_correct** — Schauplatz und Epoche?
-   - 1.0: Blumental / Mark Brandenburg / nahe Wriezen / napoleonische Besatzung.
+   - 1.0: Blumental / Mark Brandenburg / nahe Wriezen / napoleonische Besatzung 1811.
    - 0.7: Wald + napoleonische Zeit, ohne Ortsdetails.
    - 0.4: nur „im Wald" oder „im 19. Jahrhundert", ohne politischen Kontext.
    - 0.0: völlig falsch (Süddeutschland, Mittelalter, Märchenwelt).
 
 3. **plot_correct** — Wird der grobe Handlungsbogen erfasst?
-   - 1.0: Eltern getötet → Rache erwogen → Insel-Geheimnis (Kriegskassen / Tugendbund) → Verräter Hägelin → Befreiung.
+   - 1.0: Eltern getötet → Schweinetreiber/Tugendbund → Insel-Geheimnis (Kriegskassen / österreichische Gewehre) → Gefangennahme → Befreiung durch die Gräfin/Malineken.
    - 0.7: zwei zentrale Plot-Punkte korrekt.
    - 0.4: nur ein Plot-Element.
    - 0.0: erfundener Plot.
+   - **Achtung**: das geheime Lagern von Waffen UND das Trainieren der Bauernjungen-Truppe durch Gottlieb sind beide korrekt im Korpus belegt — keine Erfindung!
 
 4. **no_hallucinations** — Gibt es erfundene Elemente?
    - 1.0: keine Erfindungen.
    - 0.5: kleine Ungenauigkeiten (z.B. falsches Jahr, falscher Onkel-Name *als beiläufig*).
    - 0.0: zentrale Erfindungen (erfundener Antagonist, falsche Rolle, erfundener Schauplatz).
+   - **Achtung**: Wenn das Modell Inhalte aus Kap. 4–5 nennt (z. B. Hägelin als Verräter, Oberst Hatzrow, Komet 1811), prüfe streng — diese sind nicht im Korpus belegt, aber stammen aus dem realen Buch. Bewerte sie als „nicht aus dem Korpus belegt", nicht als Erfindung im engeren Sinne. Wenn allerdings **Kontext im Modell-Output suggeriert, das stehe im gegebenen Text**, ist es eine Halluzination der Korpustreue — dann Punktabzug.
 
-5. **themes_captured** — Werden zumindest 1–2 zentrale Themen erfasst (christlicher Glaube, patriotischer Widerstand, Rache/Vergebung, Erbauungsliteratur)?
+5. **themes_captured** — Werden zumindest 1–2 zentrale Themen erfasst (christlicher Glaube, patriotischer Widerstand, Rache/Vergebung, Erbauungsliteratur, Schill-Verklärung)?
    - 1.0: explizit benannt.
    - 0.5: angedeutet aber nicht explizit.
    - 0.0: Themen ignoriert.
@@ -189,7 +263,7 @@ Erweiterung **in derselben Datei**:
         "length_tokens": 120000,
         ...,
         "judge": {
-          "scored_at": "2026-04-28T10:00:00Z",
+          "scored_at": "2026-04-29T10:00:00Z",
           "judge_model": "claude-opus-4.7",
           "scores": {
             "main_characters_correct": 1.0,
@@ -205,7 +279,7 @@ Erweiterung **in derselben Datei**:
     ],
     ...,
     "judge": {
-      "scored_at": "2026-04-28T10:00:00Z",
+      "scored_at": "2026-04-29T10:00:00Z",
       "judge_model": "claude-opus-4.7",
       "by_stage": {
         "120000": 0.745
@@ -216,7 +290,7 @@ Erweiterung **in derselben Datei**:
 }
 ```
 
-`judge_score` aggregiert ist der **arithmetische Mittelwert über alle Stages**, sodass bei `top_stage_only=True` einfach der Stage-Wert übernommen wird. Pro Stage wird `judge_score` als gewichteter Mittelwert der 6 Achsen berechnet (Gewichte siehe oben).
+`judge_score` aggregiert ist der **arithmetische Mittelwert über alle Stages**, sodass bei `top_stage_only=True` einfach der Stage-Wert übernommen wird. Pro Stage wird `judge_score` als gewichteter Mittelwert der 5 Achsen berechnet (Gewichte siehe oben).
 
 ---
 
@@ -224,7 +298,7 @@ Erweiterung **in derselben Datei**:
 
 1. **Eingabe lesen**: `results/niah/<safe-model-id>.json`. Gehe `score_breakdown.lengths[]` durch (idR 1 Stage bei `niah`, bis zu 4 bei `niah_deep`).
 
-2. **Pro Stage bewerten**: Lies `lengths[i].raw_summary`, bewerte die 6 Achsen gegen die eingebettete Buchwahrheit.
+2. **Pro Stage bewerten**: Lies `lengths[i].raw_summary`, bewerte die 5 Achsen gegen die eingebettete, korpus-präzise Buchwahrheit.
 
 3. **Judge-Block schreiben**: Über ein Python-Skript via Bash, um JSON-Integrität zu sichern:
 
@@ -277,7 +351,7 @@ Erweiterung **in derselben Datei**:
 
 4. **Andere Felder unverändert lassen** — insbesondere die bestehenden `summary_score`, `retrieval_score`, `comprehension_score`, `combined_score`. Der Judge ergänzt, ersetzt nicht.
 
-5. **Strikt sequentiell — ein Modell nach dem anderen**: Bei mehreren Modellen ein Modell **vollständig** abarbeiten (alle Stages lesen → 6 Achsen pro Stage scoren → Python-Update → Bestätigung), erst dann zum nächsten wechseln.
+5. **Strikt sequentiell — ein Modell nach dem anderen**: Bei mehreren Modellen ein Modell **vollständig** abarbeiten (alle Stages lesen → 5 Achsen pro Stage scoren → Python-Update → Bestätigung), erst dann zum nächsten wechseln.
    - **Kein Agent-Tool, keine Parallelisierung**, kein Batching mehrerer Modelle in einem Reasoning-Schritt.
    - Begründung: Zusammenfassungen verschiedener Modelle erwähnen häufig dieselben Figuren (Gottlieb, Malineken, Schmied) und können oberflächlich sehr ähnlich aussehen — paralleles Bewerten führt schnell zu Verwechslungen, wo Plot-Erfindungen oder Halluzinationen einem falschen Modell zugeschrieben werden.
    - Nach jedem geschriebenen Aggregat-`judge`-Block: kurze Bestätigung an den User („✓ <model-id> @ <stage>k: judge_score=0.NN, [Hauptfindings]"), bevor das nächste Modell startet.
@@ -297,9 +371,9 @@ Erweiterung **in derselben Datei**:
 ## Wichtige Regeln
 
 - **Die eingebettete Buchzusammenfassung oben ist die Quelle**. Verlasse dich nicht auf eigenes Trainings-Wissen — das Buch ist obskur, du würdest es nicht zuverlässig kennen.
+- **Was nicht im 120k-Korpus steht, darf nicht als Maßstab dienen**. Der Korpus enthält nur Kapitel 1–3. Eine Zusammenfassung, die einen späteren Plotpunkt nicht erwähnt, ist deshalb nicht „unvollständig" — sie ist korpustreu.
 - **Sei strikt-kalibriert**: 1.0 ist eine sehr gute Zusammenfassung, 0.5 ist mittelmäßig (ein paar wichtige Elemente, einige Lücken), 0.0 ist ein Total-Daneben (erfundener Plot, falscher Schauplatz). 
 - **Erfindungen sind harte Punkt-Killer** — selbst eine hübsch geschriebene Zusammenfassung mit erfundener Tante / erfundenem Schloss bekommt bei `no_hallucinations` höchstens 0.4.
 - **Stilkontrolle ist NICHT Aufgabe des Judge** — Sätze zählen, Wörter zählen, Stichwörter prüfen erledigt der Regex-Score in `_score_summary`. Der Judge bewertet *Inhalt*.
-- **Einbeziehen der Inkonsistenz Hatzrow/Satzrow**: das Originalbuch hat diesen Setzfehler — wenn ein Modell einen der beiden nennt, ist das **richtig**, ebenso wenn es beide oder keinen erwähnt.
 - **Sprache des Kommentars**: deutsch, max. 3 Sätze.
 - **Schreibe NUR in den `judge`-Subkey** der Eingabedateien — andere Felder unverändert lassen.

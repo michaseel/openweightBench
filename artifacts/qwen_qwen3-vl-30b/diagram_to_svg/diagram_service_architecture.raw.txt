@@ -1,0 +1,171 @@
+<svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+  <style>
+    .label { font: bold 16px sans-serif; fill: #000; }
+    .box { fill: #fff; stroke: #000; stroke-width: 2; }
+    .box-external { fill: #fff; stroke: #c00; stroke-width: 2; }
+    .box-async { fill: #fff; stroke: #000; stroke-width: 2; stroke-dasharray: 4,4; }
+    .text { font: 14px sans-serif; fill: #000; }
+    .text-small { font: 12px sans-serif; fill: #000; }
+    .title { font: bold 20px sans-serif; fill: #000; }
+    .note { font: 14px sans-serif; fill: #000; }
+    .note-green { font: 14px sans-serif; fill: #008000; }
+    .note-blue { font: 14px sans-serif; fill: #000080; }
+    .note-red { font: 14px sans-serif; fill: #c00; }
+    .legend { font: 14px sans-serif; fill: #000; }
+    .legend-item { font: 14px sans-serif; fill: #000; }
+  </style>
+
+  <!-- Background -->
+  <rect width="1200" height="800" fill="#fff" />
+
+  <!-- Title -->
+  <text x="40" y="60" class="title">System Architecture</text>
+
+  <!-- Goals -->
+  <text x="40" y="120" class="label">Goals:</text>
+  <text x="40" y="140" class="text-small">- Scalability</text>
+  <text x="40" y="160" class="text-small">- Reliability</text>
+  <text x="40" y="180" class="text-small">- Security</text>
+  <text x="40" y="200" class="text-small">- Maintainability</text>
+
+  <!-- Notes -->
+  <text x="40" y="240" class="label">Notes:</text>
+  <text x="40" y="260" class="note-green">- Use Docker for all services</text>
+  <text x="40" y="280" class="note-green">- CI/CD with GitHub Actions</text>
+  <text x="40" y="300" class="note-green">- Logs → ELK Stack</text>
+
+  <!-- Legend -->
+  <text x="900" y="100" class="legend">Legend:</text>
+  <line x1="900" y1="120" x2="940" y2="120" stroke="#000" stroke-width="2" />
+  <text x="945" y="125" class="legend-item">Sync</text>
+  <line x1="900" y1="140" x2="940" y2="140" stroke="#000" stroke-width="2" stroke-dasharray="4,4" />
+  <text x="945" y="145" class="legend-item">Async</text>
+  <rect x="900" y="160" width="20" height="20" fill="#fff" stroke="#c00" stroke-width="2" />
+  <text x="925" y="175" class="legend-item">External</text>
+
+  <!-- Components -->
+  <!-- Frontend -->
+  <g id="frontend">
+    <rect x="200" y="100" width="120" height="60" class="box" />
+    <text x="210" y="120" class="text">Frontend</text>
+    <text x="210" y="140" class="text-small">(React)</text>
+  </g>
+
+  <!-- API Gateway -->
+  <g id="api_gateway">
+    <rect x="350" y="100" width="120" height="60" class="box" />
+    <text x="360" y="120" class="text">API Gateway</text>
+    <text x="360" y="140" class="text-small">(Kong)</text>
+  </g>
+
+  <!-- Auth Service -->
+  <g id="auth_service">
+    <rect x="500" y="100" width="120" height="60" class="box" />
+    <text x="510" y="120" class="text">Auth Service</text>
+    <text x="510" y="140" class="text-small">(JWT)</text>
+  </g>
+
+  <!-- User DB -->
+  <g id="user_db">
+    <rect x="650" y="100" width="120" height="60" class="box" />
+    <text x="660" y="120" class="text">User DB</text>
+    <text x="660" y="140" class="text-small">(PostgreSQL)</text>
+  </g>
+
+  <!-- Backend -->
+  <g id="backend">
+    <rect x="500" y="200" width="120" height="60" class="box" />
+    <text x="510" y="220" class="text">Backend</text>
+    <text x="510" y="240" class="text-small">(Python/FastAPI)</text>
+  </g>
+
+  <!-- Database -->
+  <g id="database">
+    <rect x="650" y="200" width="120" height="60" class="box" />
+    <text x="660" y="220" class="text">Database</text>
+    <text x="660" y="240" class="text-small">(PostgreSQL)</text>
+  </g>
+
+  <!-- External API -->
+  <g id="external_api">
+    <rect x="350" y="300" width="120" height="60" class="box-external" />
+    <text x="360" y="320" class="text">External API</text>
+    <text x="360" y="340" class="text-small">(Payment Provider)</text>
+  </g>
+
+  <!-- Message Queue -->
+  <g id="message_queue">
+    <rect x="500" y="300" width="120" height="60" class="box" />
+    <text x="510" y="320" class="text">Message Queue</text>
+    <text x="510" y="340" class="text-small">(RabbitMQ)</text>
+  </g>
+
+  <!-- Worker Service -->
+  <g id="worker_service">
+    <rect x="650" y="300" width="120" height="60" class="box" />
+    <text x="660" y="320" class="text">Worker Service</text>
+    <text x="660" y="340" class="text-small">(Python)</text>
+  </g>
+
+  <!-- File Storage -->
+  <g id="file_storage">
+    <rect x="650" y="400" width="120" height="60" class="box" />
+    <text x="660" y="420" class="text">File Storage</text>
+    <text x="660" y="440" class="text-small">(S3)</text>
+  </g>
+
+  <!-- Monitoring -->
+  <g id="monitoring">
+    <rect x="500" y="400" width="120" height="60" class="box" />
+    <text x="510" y="420" class="text">Monitoring</text>
+    <text x="510" y="440" class="text-small">(Prometheus + Grafana)</text>
+  </g>
+
+  <!-- Connections -->
+  <!-- Frontend to API Gateway -->
+  <line x1="320" y1="130" x2="350" y2="130" stroke="#000" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="330" y="110" class="text-small">HTTPS</text>
+
+  <!-- API Gateway to Auth Service -->
+  <polyline points="470,130 470,100 500,100" stroke="#000" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Auth Service to User DB -->
+  <polyline points="620,130 620,100 650,100" stroke="#000" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- User DB to Auth Service -->
+  <polyline points="650,130 650,100 500,100" stroke="#000" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- API Gateway to Backend -->
+  <polyline points="470,130 470,200 500,200" stroke="#000" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Backend to Database -->
+  <polyline points="620,230 620,200 650,200" stroke="#000" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- API Gateway to External API -->
+  <polyline points="470,130 470,300 350,300" stroke="#000" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- API Gateway to Message Queue -->
+  <polyline points="470,130 470,300 500,300" stroke="#000" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Message Queue to Worker Service -->
+  <polyline points="620,330 620,300 650,300" stroke="#000" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Worker Service to File Storage -->
+  <polyline points="770,330 770,400 650,400" stroke="#000" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Message Queue to Monitoring -->
+  <polyline points="620,330 620,400 500,400" stroke="#000" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Backend to Monitoring -->
+  <polyline points="620,230 620,400 500,400" stroke="#000" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- External API to Monitoring -->
+  <polyline points="350,330 350,400 500,400" stroke="#000" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Arrow marker -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#000" />
+    </marker>
+  </defs>
+</svg>

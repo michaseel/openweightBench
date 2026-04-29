@@ -1,0 +1,202 @@
+<svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg" width="1200" height="800">
+    <style>
+        .text { font-family: 'Arial', sans-serif; font-size: 14px; fill: #000; }
+        .title { font-family: 'Arial', sans-serif; font-size: 20px; font-weight: bold; fill: #000; }
+        .label { font-family: 'Arial', sans-serif; font-size: 16px; fill: #000; }
+        .box-title { font-family: 'Arial', sans-serif; font-size: 18px; font-weight: bold; fill: #000; }
+        .item { font-family: 'Arial', sans-serif; font-size: 14px; fill: #000; }
+        .marker { fill: #000; }
+    </style>
+
+    <!-- Background -->
+    <rect width="1200" height="800" fill="#fff" />
+
+    <!-- Main Diagram -->
+    <g id="eisenhower-matrix">
+        <!-- Title -->
+        <text x="600" y="50" class="title" text-anchor="middle">Eisenhower - Matrix - Marketing</text>
+
+        <!-- Axes -->
+        <line x1="300" y1="100" x2="300" y2="700" stroke="#000" stroke-width="2"/>
+        <line x1="300" y1="700" x2="900" y2="700" stroke="#000" stroke-width="2"/>
+
+        <!-- Labels -->
+        <text x="250" y="400" class="label" text-anchor="end" transform="rotate(-90 250,400)">Wichtigkeit</text>
+        <text x="600" y="750" class="label" text-anchor="middle">Dringlichkeit</text>
+
+        <!-- Quadrants -->
+        <!-- Top-Left: Wichtig + Nicht dringend -->
+        <g id="top-left">
+            <rect x="300" y="100" width="300" height="300" stroke="#000" stroke-width="2"/>
+            <text x="450" y="140" class="box-title" text-anchor="middle">Wichtig + Nicht dringend</text>
+            <text x="320" y="180" class="item">• Content-Strategie</text>
+            <text x="320" y="210" class="item">• Brand schärfen</text>
+            <text x="320" y="240" class="item">• SEO aufräumen</text>
+            <text x="320" y="270" class="item">• Zielgruppen verstehen</text>
+            <circle cx="450" cy="300" r="30" stroke="#000" stroke-width="1" fill="none"/>
+            <line x1="450" y1="300" x2="470" y2="320" stroke="#000" stroke-width="1"/>
+            <line x1="450" y1="300" x2="430" y2="320" stroke="#000" stroke-width="1"/>
+            <line x1="450" y1="300" x2="450" y2="340" stroke="#000" stroke-width="1"/>
+        </g>
+
+        <!-- Top-Right: Wichtig + Dringend -->
+        <g id="top-right">
+            <rect x="600" y="100" width="300" height="300" stroke="#000" stroke-width="2"/>
+            <text x="750" y="140" class="box-title" text-anchor="middle">Wichtig + Dringend</text>
+            <text x="620" y="180" class="item">• Kampagne retten</text>
+            <text x="620" y="210" class="item">• Shitstorm beantworten</text>
+            <text x="620" y="240" class="item">• Newsletter mit falschem Link fixen</text>
+            <text x="620" y="270" class="item">• Chef will bis 14 Uhr "viral gehen"</text>
+            <polygon points="750,300 770,320 730,320" fill="#000"/>
+            <text x="750" y="340" class="item" font-size="16" font-weight="bold">VIRAL??</text>
+        </g>
+
+        <!-- Bottom-Left: Nicht wichtig + Nicht dringend -->
+        <g id="bottom-left">
+            <rect x="300" y="400" width="300" height="300" stroke="#000" stroke-width="2"/>
+            <text x="450" y="440" class="box-title" text-anchor="middle">Nicht wichtig + Nicht dringend</text>
+            <text x="320" y="480" class="item">• Merch-Ideen mit Glitzer</text>
+            <text x="320" y="510" class="item">• Buzzword-Bingo</text>
+            <text x="320" y="540" class="item">• TikTok-Tanz mit dem Maskottchen</text>
+            <text x="320" y="570" class="item">• Hashtag brainstormen</text>
+            <text x="320" y="600" class="item">#innovation #synergy #wow</text>
+            <image x="450" y="550" width="60" height="60" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2260%22%20height=%2260%22%3E%3Ccircle%20cx=%2230%22%20cy=%2230%22%20r=%2225%22%20fill=%22%23ff00ff%22%20/%3E%3Cpolygon%20points=%2230,10%2040,30%2020,30%22%20fill=%22%23ffffff%22%20/%3E%3C/svg%3E"/>
+        </g>
+
+        <!-- Bottom-Right: Nicht wichtig + Dringend -->
+        <g id="bottom-right">
+            <rect x="600" y="400" width="300" height="300" stroke="#000" stroke-width="2"/>
+            <text x="750" y="440" class="box-title" text-anchor="middle">Nicht wichtig + Dringend</text>
+            <text x="620" y="480" class="item">• Noch ein Last-Minute-Meeting</text>
+            <text x="620" y="510" class="item">• Kann das Logo größer?</text>
+            <text x="620" y="540" class="item">• LinkedIn-Post für "Welttag der Büroklammer"</text>
+            <text x="620" y="570" class="item">• Folie 27 schöner machen</text>
+        </g>
+
+        <!-- Axis Labels -->
+        <text x="250" y="100" class="label" text-anchor="end">hoch</text>
+        <text x="250" y="700" class="label" text-anchor="end">niedrig</text>
+        <text x="950" y="750" class="label" text-anchor="middle">hoch</text>
+        <text x="350" y="750" class="label" text-anchor="middle">niedrig</text>
+
+        <!-- Additional Elements -->
+        <!-- Heart -->
+        <path d="M150 500 Q170 480 190 500 Q210 520 190 540 Q170 520 150 500 Q130 480 110 500 Q90 520 110 540 Q130 520 150 500 Z" fill="none" stroke="#000" stroke-width="2"/>
+        <text x="100" y="550" class="text" font-size="12">Erledigen,</text>
+        <text x="100" y="570" class="text" font-size="12">wenn das</text>
+        <text x="100" y="590" class="text" font-size="12">Internet</text>
+        <text x="100" y="610" class="text" font-size="12">wieder da</text>
+        <text x="100" y="630" class="text" font-size="12">ist. 😊</text>
+
+        <!-- Coffee Cup -->
+        <g id="coffee">
+            <path d="M1050 150 Q1070 130 1090 150 Q1110 170 1090 190 Q1070 170 1050 150 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 170 Q1070 150 1090 170 Q1110 190 1090 210 Q1070 190 1050 170 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 190 Q1070 170 1090 190 Q1110 210 1090 230 Q1070 210 1050 190 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 210 Q1070 190 1090 210 Q1110 230 1090 250 Q1070 230 1050 210 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 230 Q1070 210 1090 230 Q1110 250 1090 270 Q1070 250 1050 230 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 250 Q1070 230 1090 250 Q1110 270 1090 290 Q1070 270 1050 250 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 270 Q1070 250 1090 270 Q1110 290 1090 310 Q1070 290 1050 270 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 290 Q1070 270 1090 290 Q1110 310 1090 330 Q1070 310 1050 290 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 310 Q1070 290 1090 310 Q1110 330 1090 350 Q1070 330 1050 310 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 330 Q1070 310 1090 330 Q1110 350 1090 370 Q1070 350 1050 330 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 350 Q1070 330 1090 350 Q1110 370 1090 390 Q1070 370 1050 350 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 370 Q1070 350 1090 370 Q1110 390 1090 410 Q1070 390 1050 370 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 390 Q1070 370 1090 390 Q1110 410 1090 430 Q1070 410 1050 390 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 410 Q1070 390 1090 410 Q1110 430 1090 450 Q1070 430 1050 410 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 430 Q1070 410 1090 430 Q1110 450 1090 470 Q1070 450 1050 430 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 450 Q1070 430 1090 450 Q1110 470 1090 490 Q1070 470 1050 450 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 470 Q1070 450 1090 470 Q1110 490 1090 510 Q1070 490 1050 470 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 490 Q1070 470 1090 490 Q1110 510 1090 530 Q1070 510 1050 490 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 510 Q1070 490 1090 510 Q1110 530 1090 550 Q1070 530 1050 510 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 530 Q1070 510 1090 530 Q1110 550 1090 570 Q1070 550 1050 530 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 550 Q1070 530 1090 550 Q1110 570 1090 590 Q1070 570 1050 550 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 570 Q1070 550 1090 570 Q1110 590 1090 610 Q1070 590 1050 570 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 590 Q1070 570 1090 590 Q1110 610 1090 630 Q1070 610 1050 590 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 610 Q1070 590 1090 610 Q1110 630 1090 650 Q1070 630 1050 610 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 630 Q1070 610 1090 630 Q1110 650 1090 670 Q1070 650 1050 630 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 650 Q1070 630 1090 650 Q1110 670 1090 690 Q1070 670 1050 650 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 670 Q1070 650 1090 670 Q1110 690 1090 710 Q1070 690 1050 670 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 690 Q1070 670 1090 690 Q1110 710 1090 730 Q1070 710 1050 690 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 710 Q1070 690 1090 710 Q1110 730 1090 750 Q1070 730 1050 710 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 730 Q1070 710 1090 730 Q1110 750 1090 770 Q1070 750 1050 730 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 750 Q1070 730 1090 750 Q1110 770 1090 790 Q1070 770 1050 750 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 770 Q1070 750 1090 770 Q1110 790 1090 810 Q1070 790 1050 770 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 790 Q1070 770 1090 790 Q1110 810 1090 830 Q1070 810 1050 790 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 810 Q1070 790 1090 810 Q1110 830 1090 850 Q1070 830 1050 810 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 830 Q1070 810 1090 830 Q1110 850 1090 870 Q1070 850 1050 830 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 850 Q1070 830 1090 850 Q1110 870 1090 890 Q1070 870 1050 850 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 870 Q1070 850 1090 870 Q1110 890 1090 910 Q1070 890 1050 870 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 890 Q1070 870 1090 890 Q1110 910 1090 930 Q1070 910 1050 890 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 910 Q1070 890 1090 910 Q1110 930 1090 950 Q1070 930 1050 910 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 930 Q1070 910 1090 930 Q1110 950 1090 970 Q1070 950 1050 930 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 950 Q1070 930 1090 950 Q1110 970 1090 990 Q1070 970 1050 950 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 970 Q1070 950 1090 970 Q1110 990 1090 1010 Q1070 990 1050 970 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 990 Q1070 970 1090 990 Q1110 1010 1090 1030 Q1070 1010 1050 990 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1010 Q1070 990 1090 1010 Q1110 1030 1090 1050 Q1070 1030 1050 1010 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1030 Q1070 1010 1090 1030 Q1110 1050 1090 1070 Q1070 1050 1050 1030 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1050 Q1070 1030 1090 1050 Q1110 1070 1090 1090 Q1070 1070 1050 1050 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1070 Q1070 1050 1090 1070 Q1110 1090 1090 1110 Q1070 1090 1050 1070 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1090 Q1070 1070 1090 1090 Q1110 1110 1090 1130 Q1070 1110 1050 1090 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1110 Q1070 1090 1090 1110 Q1110 1130 1090 1150 Q1070 1130 1050 1110 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1130 Q1070 1110 1090 1130 Q1110 1150 1090 1170 Q1070 1150 1050 1130 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1150 Q1070 1130 1090 1150 Q1110 1170 1090 1190 Q1070 1170 1050 1150 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1170 Q1070 1150 1090 1170 Q1110 1190 1090 1210 Q1070 1190 1050 1170 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1190 Q1070 1170 1090 1190 Q1110 1210 1090 1230 Q1070 1190 1050 1170 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1210 Q1070 1190 1090 1210 Q1110 1230 1090 1250 Q1070 1210 1050 1190 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1230 Q1070 1210 1090 1230 Q1110 1250 1090 1270 Q1070 1230 1050 1210 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1250 Q1070 1230 1090 1250 Q1110 1270 1090 1290 Q1070 1250 1050 1230 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1270 Q1070 1250 1090 1270 Q1110 1290 1090 1310 Q1070 1270 1050 1250 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1290 Q1070 1270 1090 1290 Q1110 1310 1090 1330 Q1070 1290 1050 1270 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1310 Q1070 1290 1090 1310 Q1110 1330 1090 1350 Q1070 1310 1050 1290 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1330 Q1070 1310 1090 1330 Q1110 1350 1090 1370 Q1070 1330 1050 1310 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1350 Q1070 1330 1090 1350 Q1110 1370 1090 1390 Q1070 1350 1050 1330 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1370 Q1070 1350 1090 1370 Q1110 1390 1090 1410 Q1070 1370 1050 1350 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1390 Q1070 1370 1090 1390 Q1110 1410 1090 1430 Q1070 1390 1050 1370 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1410 Q1070 1390 1090 1410 Q1110 1430 1090 1450 Q1070 1410 1050 1390 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1430 Q1070 1410 1090 1430 Q1110 1450 1090 1470 Q1070 1430 1050 1410 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1450 Q1070 1430 1090 1450 Q1110 1470 1090 1490 Q1070 1450 1050 1430 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1470 Q1070 1450 1090 1470 Q1110 1490 1090 1510 Q1070 1470 1050 1450 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1490 Q1070 1470 1090 1490 Q1110 1510 1090 1530 Q1070 1490 1050 1470 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1510 Q1070 1490 1090 1510 Q1110 1530 1090 1550 Q1070 1510 1050 1490 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1530 Q1070 1510 1090 1530 Q1110 1550 1090 1570 Q1070 1530 1050 1510 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1550 Q1070 1530 1090 1550 Q1110 1570 1090 1590 Q1070 1550 1050 1530 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1570 Q1070 1550 1090 1570 Q1110 1590 1090 1610 Q1070 1570 1050 1550 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1590 Q1070 1570 1090 1590 Q1110 1610 1090 1630 Q1070 1590 1050 1570 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1610 Q1070 1590 1090 1610 Q1110 1630 1090 1650 Q1070 1610 1050 1590 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1630 Q1070 1610 1090 1630 Q1110 1650 1090 1670 Q1070 1630 1050 1610 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1650 Q1070 1630 1090 1650 Q1110 1670 1090 1690 Q1070 1650 1050 1630 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1670 Q1070 1650 1090 1670 Q1110 1690 1090 1710 Q1070 1670 1050 1650 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1690 Q1070 1670 1090 1690 Q1110 1710 1090 1730 Q1070 1690 1050 1670 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1710 Q1070 1690 1090 1710 Q1110 1730 1090 1750 Q1070 1710 1050 1690 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1730 Q1070 1710 1090 1730 Q1110 1750 1090 1770 Q1070 1730 1050 1710 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1750 Q1070 1730 1090 1750 Q1110 1770 1090 1790 Q1070 1750 1050 1730 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1770 Q1070 1750 1090 1770 Q1110 1790 1090 1810 Q1070 1770 1050 1750 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1790 Q1070 1770 1090 1790 Q1110 1810 1090 1830 Q1070 1790 1050 1770 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1810 Q1070 1790 1090 1810 Q1110 1830 1090 1850 Q1070 1810 1050 1790 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1830 Q1070 1810 1090 1830 Q1110 1850 1090 1870 Q1070 1830 1050 1810 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1850 Q1070 1830 1090 1850 Q1110 1870 1090 1890 Q1070 1850 1050 1830 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1870 Q1070 1850 1090 1870 Q1110 1890 1090 1910 Q1070 1870 1050 1850 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1890 Q1070 1870 1090 1890 Q1110 1910 1090 1930 Q1070 1890 1050 1870 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1910 Q1070 1890 1090 1910 Q1110 1930 1090 1950 Q1070 1910 1050 1890 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1930 Q1070 1910 1090 1930 Q1110 1950 1090 1970 Q1070 1930 1050 1910 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1950 Q1070 1930 1090 1950 Q1110 1970 1090 1990 Q1070 1950 1050 1930 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1970 Q1070 1950 1090 1970 Q1110 1990 1090 2010 Q1070 1970 1050 1950 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 1990 Q1070 1970 1090 1990 Q1110 2010 1090 2030 Q1070 1990 1050 1970 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 2010 Q1070 1990 1090 2010 Q1110 2030 1090 2050 Q1070 2010 1050 1990 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 2030 Q1070 2010 1090 2030 Q1110 2050 1090 2070 Q1070 2030 1050 2010 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 2050 Q1070 2030 1090 2050 Q1110 2070 1090 2090 Q1070 2050 1050 2030 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 2070 Q1070 2050 1090 2070 Q1110 2090 1090 2110 Q1070 2070 1050 2050 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 2090 Q1070 2070 1090 2090 Q1110 2110 1090 2130 Q1070 2090 1050 2070 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 2110 Q1070 2090 1090 2110 Q1110 2130 1090 2150 Q1070 2110 1050 2090 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 2130 Q1070 2110 1090 2130 Q1110 2150 1090 2170 Q1070 2130 1050 2110 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 2150 Q1070 2130 1090 2150 Q1110 2170 1090 2190 Q1070 2150 1050 2130 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 2170 Q1070 2150 1090 2170 Q1110 2190 1090 2210 Q1070 2170 1050 2150 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 2190 Q1070 2170 1090 2190 Q1110 2210 1090 2230 Q1070 2190 1050 2170 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 2210 Q1070 2190 1090 2210 Q1110 2230 1090 2250 Q1070 2210 1050 2190 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 2230 Q1070 2210 1090 2230 Q1110 2250 1090 2270 Q1070 2230 1050 2210 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 2250 Q1070 2230 1090 2250 Q1110 2270 1090 2290 Q1070 2250 1050 2230 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 2270 Q1070 2250 1090 2270 Q1110 2290 1090 2310 Q1070 2270 1050 2250 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 2290 Q1070 2270 1090 2290 Q1110 2310 1090 2330 Q1070 2290 1050 2270 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 2310 Q1070 2290 1090 2310 Q1110 2330 1090 2350 Q1070 2310 1050 2290 Z" fill="none" stroke="#000" stroke-width="2"/>
+            <path d="M1050 2330 Q1070 2310 1090 2330 Q
