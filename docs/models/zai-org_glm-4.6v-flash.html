@@ -1,0 +1,744 @@
+<!doctype html>
+<html lang="en" class="bg-stone-50 text-stone-900 antialiased">
+<head>
+<meta charset="utf-8">
+<title>zai-org/glm-4.6v-flash — Open Weight Bench</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+<script type="module">
+  // Lazy-load mermaid.js only if a .mermaid block is present on the page.
+  if (document.querySelector('.mermaid')) {
+    const m = await import('https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs');
+    m.default.initialize({ startOnLoad: false, theme: 'neutral', securityLevel: 'loose' });
+    const escapeHtml = (value) => value
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+    for (const [i, el] of [...document.querySelectorAll('.mermaid')].entries()) {
+      const code = el.textContent.trim();
+      try {
+        const { svg } = await m.default.render(`owb-mermaid-${Date.now()}-${i}`, code);
+        el.innerHTML = svg;
+      } catch (err) {
+        el.classList.add('text-red-700', 'bg-red-50', 'border-red-200');
+        el.innerHTML = `
+          <div class="text-xs font-semibold uppercase tracking-wider">Mermaid syntax error</div>
+          <div class="mt-1 text-xs">${escapeHtml(err?.message || String(err))}</div>
+          <pre class="mt-3 text-xs whitespace-pre-wrap text-stone-800">${escapeHtml(code)}</pre>
+        `;
+      }
+    }
+  }
+</script>
+<style>
+  body { font-feature-settings: "ss01","cv11"; }
+  .num { font-variant-numeric: tabular-nums; }
+  .row-link:hover { background: rgb(245 245 244 / 1); }
+  .preview-pop {
+    position: fixed; pointer-events: none; z-index: 50;
+    transform: translate(16px, 16px);
+    background: white; border: 1px solid rgb(231 229 228); border-radius: 8px;
+    box-shadow: 0 12px 30px -10px rgb(0 0 0 / 0.25);
+    overflow: hidden; max-width: 480px;
+  }
+  .preview-pop img { display: block; max-width: 480px; max-height: 320px; }
+  .text-pop {
+    position: fixed; pointer-events: none; z-index: 60;
+    transform: translate(12px, 12px);
+    max-width: 360px; white-space: normal;
+    background: rgb(28 25 23); color: rgb(250 250 249);
+    border: 1px solid rgb(87 83 78); border-radius: 6px;
+    box-shadow: 0 12px 30px -10px rgb(0 0 0 / 0.35);
+    padding: 0.5rem 0.625rem; font-size: 0.75rem; line-height: 1.35;
+  }
+  /* Lightbox for click-to-zoom on screenshots/diagrams */
+  .lightbox-overlay {
+    position: fixed; inset: 0; background: rgb(0 0 0 / 0.45);
+    display: none; align-items: center; justify-content: center;
+    z-index: 100; padding: 2rem;
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='rgba(28,25,23,0.85)' stroke='white' stroke-width='2'/><path d='M11 11 L21 21 M21 11 L11 21' stroke='white' stroke-width='2.5' stroke-linecap='round' fill='none'/></svg>") 16 16, pointer;
+  }
+  .lightbox-overlay.active { display: flex; }
+  .lightbox-panel {
+    max-width: 96vw; max-height: 94vh; overflow: auto;
+    background: white; border-radius: 6px;
+    box-shadow: 0 24px 70px -20px rgb(0 0 0 / 0.7);
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='rgba(28,25,23,0.85)' stroke='white' stroke-width='2'/><path d='M11 11 L21 21 M21 11 L11 21' stroke='white' stroke-width='2.5' stroke-linecap='round' fill='none'/></svg>") 16 16, pointer;
+  }
+  .lightbox-panel img {
+    display: block; max-width: none; width: auto; height: auto;
+    min-width: min(90vw, 900px); max-height: none;
+  }
+  .lightbox-panel .mermaid-zoom-content {
+    padding: 1.5rem; min-width: min(92vw, 1100px);
+  }
+  .lightbox-panel .mermaid-zoom-content svg {
+    display: block; width: max-content; min-width: 100%;
+    max-width: none; height: auto;
+  }
+  .zoomable, .zoomable-mermaid {
+    cursor: zoom-in;
+  }
+  .zoom-frame {
+    position: relative;
+  }
+  .zoom-button {
+    position: absolute; top: 0.5rem; right: 0.5rem; z-index: 5;
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 2rem; height: 2rem; border-radius: 0.375rem;
+    background: rgb(255 255 255 / 0.92);
+    border: 1px solid rgb(214 211 209);
+    color: rgb(41 37 36);
+    box-shadow: 0 4px 14px -8px rgb(0 0 0 / 0.45);
+    cursor: zoom-in; font-size: 1rem; line-height: 1;
+  }
+  .zoom-button:hover {
+    background: white; border-color: rgb(120 113 108);
+  }
+</style>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="border-b border-stone-200 bg-white">
+    <div class="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
+      <a href="../index.html" class="flex items-baseline gap-3">
+        <span class="text-xl font-semibold tracking-tight">Open Weight Bench</span>
+        <span class="text-xs text-stone-500 hidden sm:inline">Local LLMs on Apple Silicon</span>
+      </a>
+      <nav class="text-sm text-stone-500 flex items-center gap-4">
+        <a class="hover:text-stone-900" href="https://michaelseel.com" target="_blank" rel="noopener">michaelseel.com</a>
+        <a class="hover:text-stone-900" href="https://github.com/michaseel/openweightBench" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+    </div>
+    <div class="max-w-6xl mx-auto px-6">
+      <nav class="-mb-px flex gap-6 overflow-x-auto text-sm">
+        <a href="../index.html"
+           class="py-3 border-b-2 border-stone-900 text-stone-900 font-medium">
+          Overview
+        </a>
+          <a href="../benchmarks/coding.html"
+             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
+            Coding
+          </a>
+          <a href="../benchmarks/vision.html"
+             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
+            Vision
+          </a>
+          <a href="../benchmarks/niah.html"
+             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
+            Needle in a Haystack
+          </a>
+          <a href="../benchmarks/tool_use.html"
+             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
+            Tool Use
+          </a>
+          <a href="../benchmarks/diagram_to_svg.html"
+             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
+            Diagram → SVG
+          </a>
+          <a href="../benchmarks/hallucination.html"
+             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
+            Hallucination
+          </a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-7xl mx-auto w-full px-6 py-8">
+
+<section class="mb-8">
+  <div class="text-xs text-stone-500"><a href="../index.html" class="hover:text-stone-900">← Overview</a></div>
+  <h1 class="mt-2 text-2xl font-semibold tracking-tight num">zai-org/glm-4.6v-flash</h1>
+  <div class="mt-2 flex flex-wrap gap-2 text-xs">
+    <span class="px-2 py-1 rounded border"
+          style="background-color: #f97316; color: #fff; border-color: #f97316;"
+          data-tooltip="Vendor / publisher of the model. Colour indicates the model family.">zai-org</span>
+      <span class="px-2 py-1 rounded bg-stone-100 border border-stone-200 num"
+            data-tooltip="Dense model: 9B parameters — all active per token.">
+        9B
+· dense      </span>
+    <span class="px-2 py-1 rounded bg-stone-100 border border-stone-200 num"
+          data-tooltip="File format and quantisation of the weights (e.g. Q8_0 = 8-bit, MXFP4 = 4-bit mixed precision). Lower bit width = lower RAM, potentially slightly reduced quality.">mlx / 4bit</span>
+    <span class="px-2 py-1 rounded bg-stone-100 border border-stone-200 num"
+          data-tooltip="Maximum context length of the model in tokens (k = 1024). Inputs beyond this are truncated by the backend.">ctx 128k</span>
+      <span class="px-2 py-1 rounded bg-stone-100 border border-stone-200 num"
+            data-tooltip="Release date from the HuggingFace model card (createdAt).">released 2025-12-07</span>
+      <span class="px-2 py-1 rounded bg-amber-100 border border-amber-300 text-amber-900"
+            data-tooltip="Accepts images as input (VLM).">vision</span>
+      <span class="px-2 py-1 rounded bg-emerald-50 border border-emerald-200 text-emerald-700"
+            data-tooltip="Trained for tool / function calling — can invoke external tools.">tool_use</span>
+  </div>
+</section>
+
+<div class="lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-8 lg:items-start">
+  <aside class="hidden lg:block sticky top-4 self-start">
+    <nav class="bg-white border border-stone-200 rounded-lg p-4 max-h-[calc(100vh-2rem)] overflow-y-auto">
+      <div class="text-xs uppercase tracking-wider text-stone-500">Model</div>
+      <div class="mt-1 text-sm font-semibold text-stone-900 break-all leading-snug num">zai-org/glm-4.6v-flash</div>
+      <dl class="mt-3 grid grid-cols-2 gap-2 text-xs">
+        <div>
+          <dt class="text-stone-500">Peak RAM</dt>
+          <dd class="font-semibold text-stone-900 num">6.6 GB</dd>
+        </div>
+        <div>
+          <dt class="text-stone-500">Wall total</dt>
+          <dd class="font-semibold text-stone-900 num">19.8 min</dd>
+        </div>
+      </dl>
+      <div class="mt-4 pt-3 border-t border-stone-200 text-xs uppercase tracking-wider text-stone-500">Benchmarks</div>
+      <ul class="mt-2 space-y-0.5">
+          <li>
+            <a href="#coding" class="flex items-center justify-between gap-2 py-1.5 px-2 rounded hover:bg-stone-50 group">
+              <span class="text-sm text-stone-700 group-hover:text-stone-900 truncate">coding</span>
+              <span class="flex items-baseline gap-2 num shrink-0">
+                <span class="text-sm font-semibold text-red-500">
+!
+                </span>
+                <span class="text-[10px] text-stone-400 w-10 text-right">15m</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="#diagram_to_svg" class="flex items-center justify-between gap-2 py-1.5 px-2 rounded hover:bg-stone-50 group">
+              <span class="text-sm text-stone-700 group-hover:text-stone-900 truncate">diagram_to_svg</span>
+              <span class="flex items-baseline gap-2 num shrink-0">
+                <span class="text-sm font-semibold text-amber-700">
+0.62
+                </span>
+                <span class="text-[10px] text-stone-400 w-10 text-right">5m</span>
+              </span>
+            </a>
+          </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <div class="min-w-0">
+
+<section id="coding" class="mb-12 scroll-mt-24">
+  <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
+    <h2 class="text-lg font-medium tracking-tight">coding</h2>
+    <a href="../benchmarks/coding.html" class="text-xs text-stone-500 hover:text-stone-900">all models in this bench →</a>
+  </div>
+
+    <div class="mt-3 px-4 py-3 rounded bg-red-50 border border-red-200 text-red-700 text-sm">
+      <strong>Error:</strong> Client error &#39;400 Bad Request&#39; for url &#39;http://127.0.0.1:1234/api/v0/chat/completions&#39;
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400
+    </div>
+
+  <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+    <div class="md:col-span-1 bg-white border-2 border-stone-300 rounded-lg p-5 flex flex-col justify-center">
+      <div class="text-xs uppercase tracking-wider text-stone-500">Score</div>
+      <div class="mt-1 text-5xl font-bold num leading-none text-stone-400">
+error
+      </div>
+    </div>
+    <div class="md:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">tok/s</dt>
+        <dd class="mt-1 text-xl font-semibold num">0</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Tokens</dt>
+        <dd class="mt-1 text-xl font-semibold num">—</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Wall</dt>
+        <dd class="mt-1 text-xl font-semibold num">900.0 s</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">RAM</dt>
+        <dd class="mt-1 text-xl font-semibold num">—</dd>
+      </div>
+    </div>
+  </div>
+
+    <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Worum geht es? Was wird getestet?
+      </summary>
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: From a ~200-word prompt the model must generate a fully functional Kanban board as a single-file HTML with drag &amp; drop, localStorage persistence, edit/delete and a confetti animation — in a single chat without iteration. The prompt also includes a small `data-testid` contract so a Playwright test can drive the app remotely.
+
+Three signals feed into the score:
+(1) Static — a linter checks concrete constraints in the HTML (columns, Tailwind, localStorage call, no framework, no window.alert/prompt, …).
+(2) Functional — Playwright runs a small CRUD sequence: create a card, delete a card with confirmation, reload — does state persist? — and checks whether any JS console errors occur during the entire flow. Drag &amp; drop and confetti are deliberately not tested functionally (too many implementation variants).
+(3) Qualitative — LLM-as-judge rates screenshot and code (visual + code quality + render↔code consistency).
+
+Score = mean over the available signals.
+
+Why models fail: reasoning models burn their tokens in thinking instead of writing. Sliding-window models (Gemma 4) lose the constraints at the start of the prompt. Small models (&lt;3B) often fail to produce coherent HTML — or ignore the data-testid contract, which makes the functional tests fail in droves.</div>
+    </details>
+
+    <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Prompt
+      </summary>
+      <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">You are a careful front-end engineer.</pre>
+          </div>
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Developer prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">Create a fully functional Kanban board in a single HTML file using vanilla JavaScript (no frameworks like react).
+
+Requirements:
+- Columns: Backlog, In Progress, Review, Done.
+- Cards must be:
+  - draggable across columns,
+  - editable in place,
+  - persisted in localStorage (state survives reloads) - please use your own namespace,
+  - deletable with a confirmation prompt.
+- Each column provides an &#34;Add card&#34; action.
+- Style with Tailwind via CDN.
+- Add subtle CSS transitions and trigger a confetti animation when a card moves to &#34;Done&#34;.
+- Thoroughly comment the code.
+- dont use window.alert or window.prompt to add/edit/delete cards
+- if there are no cards yet, create some dummy cards
+- modern and vibrant design
+
+Stable test selectors (mandatory — these data-testid attributes are used by an automated functional test; do not omit, rename, or split them across multiple elements):
+- Column containers: data-testid=&#34;column-backlog&#34;, data-testid=&#34;column-in-progress&#34;, data-testid=&#34;column-review&#34;, data-testid=&#34;column-done&#34;.
+- Every &#34;Add card&#34; button (one per column): data-testid=&#34;add-card&#34;.
+- Every card element: data-testid=&#34;card&#34;.
+- Inside each card, the delete trigger: data-testid=&#34;delete-card&#34;.
+- The confirm button of the delete-confirmation dialog/modal: data-testid=&#34;confirm-delete&#34;.
+- The input/textarea where a new card title is typed: data-testid=&#34;card-input&#34;. Pressing Enter in this input MUST commit the new card.
+
+As answer return the plain HTML of the working application (script and styles included)</pre>
+          </div>
+      </div>
+    </details>
+
+        <a href="../assets/artifacts/zai-org_glm-4.6v-flash/coding/output.html" target="_blank"
+           class="mt-5 block bg-emerald-600 hover:bg-emerald-700 text-white text-center font-semibold text-lg rounded px-6 py-5 shadow-sm transition">
+          ▶ Open generated app in a new tab ↗
+        </a>
+
+
+
+
+
+
+    <div class="mt-4 text-xs text-stone-500">
+      Artefacts:
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/zai-org_glm-4.6v-flash/coding/output.html" target="_blank">Generierte App</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/zai-org_glm-4.6v-flash/coding/raw_response.txt" target="_blank">Raw model response</a>
+    </div>
+</section>
+<section id="diagram_to_svg" class="mb-12 scroll-mt-24">
+  <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
+    <h2 class="text-lg font-medium tracking-tight">diagram_to_svg</h2>
+    <a href="../benchmarks/diagram_to_svg.html" class="text-xs text-stone-500 hover:text-stone-900">all models in this bench →</a>
+  </div>
+
+
+  <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+    <div class="md:col-span-1 bg-white border-2 border-amber-400 rounded-lg p-5 flex flex-col justify-center">
+      <div class="text-xs uppercase tracking-wider text-stone-500">Score</div>
+      <div class="mt-1 text-5xl font-bold num leading-none text-amber-700">
+0.62
+      </div>
+    </div>
+    <div class="md:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">tok/s</dt>
+        <dd class="mt-1 text-xl font-semibold num">62</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Tokens</dt>
+        <dd class="mt-1 text-xl font-semibold num">16422</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Wall</dt>
+        <dd class="mt-1 text-xl font-semibold num">287.9 s</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">RAM</dt>
+        <dd class="mt-1 text-xl font-semibold num">6.6 GB</dd>
+      </div>
+    </div>
+  </div>
+
+    <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Worum geht es? Was wird getestet?
+      </summary>
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: Photo of a hand-drawn diagram (architecture, sequence, quadrant matrix) → model must produce an inline-SVG representation of the same diagram.
+
+Two score signals:
+(1) Deterministic — SVG is parseable, has an &lt;svg&gt; root, enough elements and at least one &lt;text&gt;; all expected terms (boxes, labels) appear in the text content. Validity and term coverage each count for 15% of the final score.
+(2) Qualitative — the `diagram-svg-judge` skill screenshots the SVG and visually compares it to the original along fixed axes (completeness, connections, arrow direction, grouping, layout readability, diagram-type fidelity, aesthetics). The judge counts 70%; aesthetics is double-weighted within the judge.
+
+Why models fail: SVG generation requires spatial reasoning (positioning boxes, computing paths, setting viewBox) — noticeably harder than declarative Mermaid syntax. Weak VLMs often produce only an empty &lt;svg&gt; or an element salad without topology.</div>
+    </details>
+
+    <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Prompt
+      </summary>
+      <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">Du bist Spezialist für Diagramm-Erkennung und SVG. Du gibst sauberes, parsbares SVG zurück, das jeder Browser ohne externe Ressourcen rendern kann.</pre>
+          </div>
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Developer prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">Auf dem Bild siehst du ein Diagramm (Architektur, Flowchart, Sequenz, Quadrant o.ä.). Erstelle eine SVG-Repräsentation des Diagramms.
+
+Anforderungen:
+- Antworte ausschließlich mit dem rohen SVG-Code, beginnend mit &lt;svg ...&gt; und endend mit &lt;/svg&gt;. Keine Erklärungen, keine Markdown-Fences.
+- Setze ein viewBox-Attribut (z.B. viewBox=&#34;0 0 1200 800&#34;), damit das Bild skaliert.
+- Nur Inline-Inhalt, keine externen Referenzen (kein &lt;image href&gt;, kein @import, kein xlink:href auf URLs).
+- Alle im Diagramm sichtbaren Beschriftungen müssen als &lt;text&gt;-Elemente vorhanden und lesbar (Font-Size ≥ 12) sein.
+- Verbindungen als &lt;line&gt;, &lt;polyline&gt; oder &lt;path&gt; mit deutlichem stroke. Pfeilspitzen via &lt;marker&gt;.
+- Gruppiere zusammengehörige Teile mit &lt;g&gt;-Tags und sinnvollen id-Attributen.
+- Wähle ausreichend Kontrast: dunkler Stroke auf weißem/hellem Hintergrund.
+- Vermeide Überlappungen — plane das Layout so, dass Boxen nicht über Pfeilen liegen und Texte nicht aus ihren Boxen herausragen.
+- Behalte die Struktur des Originals bei: Anzahl der Boxen, ihre Verbindungen und ihre Anordnung sollen vergleichbar sein.</pre>
+          </div>
+      </div>
+    </details>
+
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div class="font-medium num">diagram_eisenhower.png</div>
+          <div class="text-sm">
+              <span class="text-emerald-700 font-medium">✓ SVG parseable · 57 elements · 31 text nodes</span>
+<span class="ml-3 font-bold num text-emerald-700">0.92</span>          </div>
+        </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
+            <div class="p-3 bg-stone-50">
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Source</div>
+              <div class="zoom-frame">
+                <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom source" title="Zoom source">⛶</button>
+                <img src="../assets/artifacts/zai-org_glm-4.6v-flash/diagram_to_svg/diagram_eisenhower.png" class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded" alt="diagram_eisenhower.png">
+              </div>
+            </div>
+            <div class="p-3">
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">SVG render</div>
+              <div class="zoom-frame">
+                <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom SVG render" title="Zoom SVG render">⛶</button>
+                <img src="../assets/artifacts/zai-org_glm-4.6v-flash/diagram_to_svg/diagram_eisenhower.svg" class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded" alt="SVG render diagram_eisenhower.png">
+              </div>
+            </div>
+          </div>
+          <div class="border-t border-stone-100 px-4 py-2">
+            <a class="text-xs text-stone-600 underline" href="../assets/artifacts/zai-org_glm-4.6v-flash/diagram_to_svg/diagram_eisenhower.svg" target="_blank">Open SVG file ↗</a>
+          </div>
+            <div class="border-t border-stone-100 px-4 py-3">
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Deterministic grader</div>
+              <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+                <li class="border rounded px-3 py-2 border-emerald-200 bg-emerald-50">
+                  <div class="flex items-baseline justify-between gap-3">
+                    <span class="font-medium text-stone-900">SVG validity</span>
+                    <span class="font-bold num text-emerald-700">1.00</span>
+                  </div>
+                  <div class="mt-1 text-stone-600">
+<span class="num">57</span> elements · <span class="num">31</span> text nodes · root <span class="num">&lt;svg&gt;</span>
+                  </div>
+                </li>
+                <li class="border rounded px-3 py-2 border-emerald-200 bg-emerald-50">
+                  <div class="flex items-baseline justify-between gap-3">
+                    <span class="font-medium text-stone-900">Term coverage</span>
+                    <span class="font-bold num text-emerald-700">0.83</span>
+                  </div>
+                  <div class="mt-1 text-stone-600 num">20/24 matched</div>
+                    <div class="mt-1 text-stone-500">
+                      missing:
+Content-Strategie, Buzzword-Bingo, Last-Minute-Meeting, Weltag der Büroklammer                    </div>
+                </li>
+              </ul>
+            </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div class="font-medium num">diagram_service_architecture.png</div>
+          <div class="text-sm">
+              <span class="text-red-700 font-medium">✗ SVG not parseable</span>
+<span class="ml-3 font-bold num text-red-600">0.00</span>          </div>
+        </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
+            <div class="p-3 bg-stone-50">
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Source</div>
+              <div class="zoom-frame">
+                <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom source" title="Zoom source">⛶</button>
+                <img src="../assets/artifacts/zai-org_glm-4.6v-flash/diagram_to_svg/diagram_service_architecture.png" class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded" alt="diagram_service_architecture.png">
+              </div>
+            </div>
+            <div class="p-3">
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">SVG render</div>
+              <div class="zoom-frame">
+                <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom SVG render" title="Zoom SVG render">⛶</button>
+                <img src="../assets/artifacts/zai-org_glm-4.6v-flash/diagram_to_svg/diagram_service_architecture.svg" class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded" alt="SVG render diagram_service_architecture.png">
+              </div>
+            </div>
+          </div>
+          <div class="border-t border-stone-100 px-4 py-2">
+            <a class="text-xs text-stone-600 underline" href="../assets/artifacts/zai-org_glm-4.6v-flash/diagram_to_svg/diagram_service_architecture.svg" target="_blank">Open SVG file ↗</a>
+          </div>
+            <div class="border-t border-stone-100 px-4 py-3">
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Deterministic grader</div>
+              <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+                <li class="border rounded px-3 py-2 border-red-200 bg-red-50">
+                  <div class="flex items-baseline justify-between gap-3">
+                    <span class="font-medium text-stone-900">SVG validity</span>
+                    <span class="font-bold num text-red-600">0.00</span>
+                  </div>
+                  <div class="mt-1 text-stone-600">
+Parse error: <span class="num">unclosed token: line 125, column 4</span>
+                  </div>
+                </li>
+                <li class="border rounded px-3 py-2 border-red-200 bg-red-50">
+                  <div class="flex items-baseline justify-between gap-3">
+                    <span class="font-medium text-stone-900">Term coverage</span>
+                    <span class="font-bold num text-red-600">0.00</span>
+                  </div>
+                  <div class="mt-1 text-stone-600 num">0/20 matched</div>
+                    <div class="mt-1 text-stone-500">
+                      missing:
+Frontend, React, API Gateway, Kong, Auth Service, JWT …                    </div>
+                </li>
+              </ul>
+            </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div class="font-medium num">diagram_sso_sequence.png</div>
+          <div class="text-sm">
+              <span class="text-emerald-700 font-medium">✓ SVG parseable · 48 elements · 20 text nodes</span>
+<span class="ml-3 font-bold num text-emerald-700">0.93</span>          </div>
+        </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
+            <div class="p-3 bg-stone-50">
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Source</div>
+              <div class="zoom-frame">
+                <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom source" title="Zoom source">⛶</button>
+                <img src="../assets/artifacts/zai-org_glm-4.6v-flash/diagram_to_svg/diagram_sso_sequence.png" class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded" alt="diagram_sso_sequence.png">
+              </div>
+            </div>
+            <div class="p-3">
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">SVG render</div>
+              <div class="zoom-frame">
+                <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom SVG render" title="Zoom SVG render">⛶</button>
+                <img src="../assets/artifacts/zai-org_glm-4.6v-flash/diagram_to_svg/diagram_sso_sequence.svg" class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded" alt="SVG render diagram_sso_sequence.png">
+              </div>
+            </div>
+          </div>
+          <div class="border-t border-stone-100 px-4 py-2">
+            <a class="text-xs text-stone-600 underline" href="../assets/artifacts/zai-org_glm-4.6v-flash/diagram_to_svg/diagram_sso_sequence.svg" target="_blank">Open SVG file ↗</a>
+          </div>
+            <div class="border-t border-stone-100 px-4 py-3">
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Deterministic grader</div>
+              <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+                <li class="border rounded px-3 py-2 border-emerald-200 bg-emerald-50">
+                  <div class="flex items-baseline justify-between gap-3">
+                    <span class="font-medium text-stone-900">SVG validity</span>
+                    <span class="font-bold num text-emerald-700">1.00</span>
+                  </div>
+                  <div class="mt-1 text-stone-600">
+<span class="num">48</span> elements · <span class="num">20</span> text nodes · root <span class="num">&lt;svg&gt;</span>
+                  </div>
+                </li>
+                <li class="border rounded px-3 py-2 border-emerald-200 bg-emerald-50">
+                  <div class="flex items-baseline justify-between gap-3">
+                    <span class="font-medium text-stone-900">Term coverage</span>
+                    <span class="font-bold num text-emerald-700">0.87</span>
+                  </div>
+                  <div class="mt-1 text-stone-600 num">13/15 matched</div>
+                    <div class="mt-1 text-stone-500">
+                      missing:
+Nein, Ja                    </div>
+                </li>
+              </ul>
+            </div>
+      </div>
+
+
+    <div class="mt-4 text-xs text-stone-500">
+      Artefacts:
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/zai-org_glm-4.6v-flash/diagram_to_svg/diagram_eisenhower.png" target="_blank">Source diagram_eisenhower</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/zai-org_glm-4.6v-flash/diagram_to_svg/diagram_eisenhower.svg" target="_blank">SVG diagram_eisenhower</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/zai-org_glm-4.6v-flash/diagram_to_svg/diagram_eisenhower.render.png" target="_blank">Render diagram_eisenhower</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/zai-org_glm-4.6v-flash/diagram_to_svg/diagram_service_architecture.png" target="_blank">Source diagram_service_architecture</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/zai-org_glm-4.6v-flash/diagram_to_svg/diagram_service_architecture.svg" target="_blank">SVG diagram_service_architecture</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/zai-org_glm-4.6v-flash/diagram_to_svg/diagram_sso_sequence.png" target="_blank">Source diagram_sso_sequence</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/zai-org_glm-4.6v-flash/diagram_to_svg/diagram_sso_sequence.svg" target="_blank">SVG diagram_sso_sequence</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/zai-org_glm-4.6v-flash/diagram_to_svg/diagram_sso_sequence.render.png" target="_blank">Render diagram_sso_sequence</a>
+    </div>
+</section>
+
+  </div>
+</div>
+
+  </main>
+
+  <footer class="border-t border-stone-200 mt-12">
+    <div class="max-w-6xl mx-auto px-6 py-6 text-xs text-stone-500 flex items-center justify-between gap-4 flex-wrap">
+      <div>
+        Generated locally · Open Weight Bench ·
+        <a href="https://michaelseel.com" target="_blank" rel="noopener" class="hover:text-stone-900 underline decoration-dotted">michaelseel.com</a>
+        ·
+        <a href="https://github.com/michaseel/openweightBench" target="_blank" rel="noopener" class="hover:text-stone-900 underline decoration-dotted">GitHub</a>
+      </div>
+      <div>Score scale 0..1, higher is better. Values come from a MacBook Pro M4 Max, 128 GB RAM.</div>
+    </div>
+  </footer>
+
+<script>
+  // Sortable tables: click <th data-sort> to sort by that column.
+  document.querySelectorAll('table.sortable').forEach(table => {
+    const tbody = table.querySelector('tbody');
+    table.querySelectorAll('th[data-sort]').forEach((th, idx) => {
+      th.classList.add('cursor-pointer', 'select-none');
+      th.addEventListener('click', () => {
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        const asc = th.dataset.sortAsc !== 'true';
+        th.dataset.sortAsc = asc;
+        rows.sort((a, b) => {
+          const av = a.cells[idx].dataset.sort ?? a.cells[idx].textContent.trim();
+          const bv = b.cells[idx].dataset.sort ?? b.cells[idx].textContent.trim();
+          const an = parseFloat(av), bn = parseFloat(bv);
+          if (!isNaN(an) && !isNaN(bn)) return asc ? an - bn : bn - an;
+          return asc ? av.localeCompare(bv) : bv.localeCompare(av);
+        });
+        rows.forEach(r => tbody.appendChild(r));
+      });
+    });
+  });
+
+  // Lightbox: click .zoomable images or .zoomable-mermaid blocks to inspect fullscreen.
+  (() => {
+    let overlay = null;
+    function ensure() {
+      if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.className = 'lightbox-overlay';
+        overlay.innerHTML = '<div class="lightbox-panel"></div>';
+        overlay.addEventListener('click', () => overlay.classList.remove('active'));
+        document.body.appendChild(overlay);
+      }
+      return overlay;
+    }
+    function openImage(src, alt = '') {
+      const box = ensure();
+      const panel = box.querySelector('.lightbox-panel');
+      panel.innerHTML = '';
+      const img = document.createElement('img');
+      img.src = src;
+      img.alt = alt;
+      panel.appendChild(img);
+      box.classList.add('active');
+    }
+    function openMermaid(source) {
+      const box = ensure();
+      const panel = box.querySelector('.lightbox-panel');
+      panel.innerHTML = '';
+      const content = document.createElement('div');
+      content.className = 'mermaid-zoom-content';
+      content.innerHTML = source.innerHTML;
+      panel.appendChild(content);
+      box.classList.add('active');
+    }
+    document.addEventListener('click', e => {
+      const zoomButton = e.target.closest('[data-zoom-button]');
+      if (zoomButton) {
+        e.preventDefault();
+        e.stopPropagation();
+        const frame = zoomButton.closest('.zoom-frame');
+        const frameImg = frame?.querySelector('img.zoomable');
+        if (frameImg) {
+          openImage(frameImg.src, frameImg.alt || '');
+          return;
+        }
+        const frameMermaid = frame?.querySelector('.zoomable-mermaid');
+        if (frameMermaid) {
+          openMermaid(frameMermaid);
+        }
+        return;
+      }
+      const img = e.target.closest('img.zoomable');
+      if (img) {
+        openImage(img.src, img.alt || '');
+        return;
+      }
+      const mermaid = e.target.closest('.zoomable-mermaid');
+      if (mermaid) {
+        openMermaid(mermaid);
+      }
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && overlay) overlay.classList.remove('active');
+    });
+  })();
+
+  // Immediate text tooltip for elements with data-tooltip.
+  (() => {
+    let pop = null;
+    function ensure() {
+      if (pop) return pop;
+      pop = document.createElement('div');
+      pop.className = 'text-pop';
+      pop.style.display = 'none';
+      document.body.appendChild(pop);
+      return pop;
+    }
+    function place(e, p) {
+      let x = e.clientX + 12;
+      let y = e.clientY + 12;
+      const pad = 8;
+      const w = p.offsetWidth;
+      const h = p.offsetHeight;
+      if (x + w > window.innerWidth - pad) x = e.clientX - w - 12;
+      if (y + h > window.innerHeight - pad) y = e.clientY - h - 12;
+      p.style.left = x + 'px';
+      p.style.top = y + 'px';
+    }
+    document.querySelectorAll('[data-tooltip]').forEach(el => {
+      el.addEventListener('mouseenter', e => {
+        const p = ensure();
+        p.textContent = el.dataset.tooltip || '';
+        p.style.display = 'block';
+        place(e, p);
+      });
+      el.addEventListener('mousemove', e => {
+        if (pop && pop.style.display !== 'none') place(e, pop);
+      });
+      el.addEventListener('mouseleave', () => {
+        if (pop) pop.style.display = 'none';
+      });
+    });
+  })();
+
+  // Hover preview: rows with data-preview="<image-url>" show a floating thumbnail.
+  (() => {
+    let pop = null;
+    function ensure() {
+      if (pop) return pop;
+      pop = document.createElement('div');
+      pop.className = 'preview-pop';
+      pop.style.display = 'none';
+      pop.innerHTML = '<img alt="">';
+      document.body.appendChild(pop);
+      return pop;
+    }
+    document.querySelectorAll('[data-preview]').forEach(el => {
+      el.addEventListener('mouseenter', e => {
+        const p = ensure();
+        p.querySelector('img').src = el.dataset.preview;
+        p.style.display = 'block';
+      });
+      el.addEventListener('mousemove', e => {
+        const p = ensure();
+        p.style.left = e.clientX + 'px';
+        p.style.top  = e.clientY + 'px';
+      });
+      el.addEventListener('mouseleave', () => {
+        if (pop) pop.style.display = 'none';
+      });
+    });
+  })();
+</script>
+</body>
+</html>

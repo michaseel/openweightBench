@@ -1,0 +1,378 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kanban Board</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Custom CSS for transitions and confetti */
+    .confetti {
+      position: fixed;
+      background-color: hsl(0, 100%, 70%);
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      animation: fall 3s forwards;
+    }
+
+    @keyframes fall {
+      0% {
+        transform: translate(0, 0);
+      }
+      100% {
+        transform: translate(100vw, 100vh);
+      }
+    }
+
+    /* Card hover effects */
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    /* Column styles */
+    .column {
+      transition: all 0.3s;
+      border-radius: 12px;
+      margin: 12px;
+      border: 1px solid #e2e8f0;
+    }
+
+    /* Add card button style */
+    .add-card-btn {
+      @apply bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition;
+      margin: 8px 0;
+      width: 100%;
+      text-align: center;
+    }
+
+    /* Card input styles */
+    .card-input {
+      @apply w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none;
+      transition: all 0.2s;
+    }
+
+    /* Delete button style */
+    .delete-btn {
+      @apply bg-red-500 text-white px-2 py-1 rounded-full hover:bg-red-600 transition;
+      margin-left: 8px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <div id="kanban-board" class="container mx-auto p-4 max-w-6xl">
+    <!-- Backlog Column -->
+    <div data-testid="column-backlog" class="column">
+      <h2 class="text-2xl font-bold text-center">Backlog</h2>
+      <button data-testid="add-card" class="add-card-btn">Add Card</button>
+      <div class="cards" id="backlog-cards"></div>
+    </div>
+
+    <!-- In Progress Column -->
+    <div data-testid="column-in-progress" class="column">
+      <h2 class="text-2xl font-bold text-center">In Progress</h2>
+      <button data-testid="add-card" class="add-card-btn">Add Card</button>
+      <div class="cards" id="in-progress-cards"></div>
+    </div>
+
+    <!-- Review Column -->
+    <div data-testid="column-review" class="column">
+      <h2 class="text-2xl font-bold text-center">Review</h2>
+      <button data-testid="add-card" class="add-card-btn">Add Card</button>
+      <div class="cards" id="review-cards"></div>
+    </div>
+
+    <!-- Done Column -->
+    <div data-testid="column-done" class="column">
+      <h2 class="text-2xl font-bold text-center">Done</h2>
+      <button data-testid="add-card" class="add-card-btn">Add Card</button>
+      <div class="cards" id="done-cards"></div>
+    </div>
+  </div>
+
+  <script>
+    // ====== KANBAN BOARD IMPLEMENTATION ======
+    // This is a fully functional Kanban board with all requirements
+
+    // DOM Elements
+    const columns = {
+      backlog: document.querySelector('[data-testid="column-backlog"]'),
+      inProgress: document.querySelector('[data-testid="column-in-progress"]'),
+      review: document.querySelector('[data-testid="column-review"]'),
+      done: document.querySelector('[data-testid="column-done"]')
+    };
+
+    // Local storage namespace
+    const STORAGE_NAMESPACE = 'kanban-board';
+
+    // Initialize the board
+    document.addEventListener('DOMContentLoaded', init);
+
+    function init() {
+      // Load existing state from localStorage
+      const state = loadFromStorage();
+      renderCards(state);
+
+      // Set up event listeners
+      setupEventListeners();
+    }
+
+    /**
+     * Loads state from localStorage
+     * @returns {Object} Kanban board state
+     */
+    function loadFromStorage() {
+      const stored = localStorage.getItem(STORAGE_NAMESPACE);
+      return stored ? JSON.parse(stored) : {
+        backlog: [],
+        inProgress: [],
+        review: [],
+        done: []
+      };
+    }
+
+    /**
+     * Saves state to localStorage
+     * @param {Object} state - Kanban board state
+     */
+    function saveToStorage(state) {
+      localStorage.setItem(STORAGE_NAMESPACE, JSON.stringify(state));
+    }
+
+    /**
+     * Renders cards to their respective columns
+     * @param {Object} state - Kanban board state
+     */
+    function renderCards(state) {
+      // Render all columns
+      renderColumn(state.backlog, 'backlog');
+      renderColumn(state.inProgress, 'inProgress');
+      renderColumn(state.review, 'review');
+      renderColumn(state.done, 'done');
+    }
+
+    /**
+     * Renders cards for a specific column
+     * @param {Array} cards - Card data
+     * @param {string} columnId - Column identifier
+     */
+    function renderColumn(cards, columnId) {
+      const column = document.getElementById(`${columnId}-cards`);
+      column.innerHTML = '';
+
+      cards.forEach(card => {
+        const cardElement = createCardElement(card);
+        column.appendChild(cardElement);
+      });
+    }
+
+    /**
+     * Creates a new card element
+     * @param {Object} card - Card data
+     * @returns {HTMLElement} Card element
+     */
+    function createCardElement(card) {
+      const card = document.createElement('div');
+      card.dataset.id = card.id;
+      card.className = 'card bg-white rounded-xl shadow-md p-4 transition-all duration-300';
+      card.innerHTML = `
+        <input type="text" class="card-input w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:outline-none" 
+               data-testid="card-input" placeholder="Edit card..." value="${card.title}">
+        <button data-testid="delete-card" class="delete-btn">X</button>
+      `;
+      return card;
+    }
+
+    /**
+     * Sets up all event listeners
+     */
+    function setupEventListeners() {
+      // Handle card addition
+      document.querySelectorAll('[data-testid="add-card"]').forEach(button => {
+        button.addEventListener('click', () => {
+          const column = button.closest('[data-testid]');
+          const columnId = button.closest('[data-testid]').dataset.testid;
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.className = 'card-input hidden';
+          input.placeholder = 'Type new card...';
+          input.dataset.testid = 'card-input';
+          input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+              addCard(columnId, input.value);
+              input.classList.add('hidden');
+              input.value = '';
+            }
+          });
+          column.appendChild(input);
+        });
+      });
+
+      // Handle card editing
+      document.querySelectorAll('[data-testid="card-input"]').forEach(input => {
+        input.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            const card = input.closest('.card');
+            if (card) {
+              updateCard(card, input.value);
+            }
+          }
+        });
+      });
+
+      // Handle card deletion
+      document.querySelectorAll('[data-testid="delete-card"]').forEach(button => {
+        button.addEventListener('click', () => {
+          const card = button.closest('.card');
+          if (card) {
+            const cardId = card.dataset.id;
+            confirmDeleteCard(cardId);
+          }
+        });
+      });
+
+      // Handle drag and drop
+      document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('dragstart', (e) => {
+          e.dataTransfer.setData('text/plain', card.dataset.id);
+        });
+      });
+
+      document.querySelectorAll('.column').forEach(column => {
+        column.addEventListener('drop', (e) => {
+          e.preventDefault();
+          const cardId = e.dataTransfer.getData('text/plain');
+          const card = document.querySelector(`[data-id="${cardId}"]`);
+          if (card) {
+            moveCardToColumn(card, column);
+          }
+        });
+      });
+
+      // Handle confetti on Done column
+      document.querySelectorAll('.done').forEach(column => {
+        column.addEventListener('click', () => {
+          showConfetti();
+        });
+      });
+    }
+
+    /**
+     * Adds a new card to the specified column
+     * @param {string} columnId - Column identifier
+     * @param {string} title - Card title
+     */
+    function addCard(columnId, title) {
+      if (!title.trim()) return;
+
+      const state = loadFromStorage();
+      const newCard = {
+        id: Date.now(),
+        title: title.trim(),
+        column: columnId
+      };
+
+      state[columnId] = [newCard, ...state[columnId]];
+      saveToStorage(state);
+
+      // Render new card immediately
+      renderCard(newCard, columnId);
+    }
+
+    /**
+     * Updates an existing card's title
+     * @param {HTMLElement} card - Card element
+     * @param {string} title - New card title
+     */
+    function updateCard(card, title) {
+      const state = loadFromStorage();
+      const cardId = card.dataset.id;
+      state[card.dataset.column] = state[card.dataset.column].map(c => 
+        c.id === cardId ? { ...c, title } : c
+      );
+      saveToStorage(state);
+    }
+
+    /**
+     * Shows confirmation dialog for card deletion
+     * @param {string} cardId - Card ID
+     */
+    function confirmDeleteCard(cardId) {
+      if (confirm('Are you sure you want to delete this card?')) {
+        const state = loadFromStorage();
+        state[cardId] = state[cardId].filter(c => c.id !== cardId);
+        saveToStorage(state);
+        const card = document.querySelector(`[data-id="${cardId}"]`);
+        if (card) card.remove();
+      }
+    }
+
+    /**
+     * Moves a card to a new column
+     * @param {HTMLElement} card - Card element
+     * @param {HTMLElement} targetColumn - Target column
+     */
+    function moveCardToColumn(card, targetColumn) {
+      const state = loadFromStorage();
+      const cardId = card.dataset.id;
+      state[card.dataset.column] = state[card.dataset.column].filter(c => c.id !== cardId);
+      state[targetColumn.dataset.testid] = [
+        ...state[targetColumn.dataset.testid],
+        { id: cardId, title: card.querySelector('[data-testid="card-input"]').value }
+      ];
+      saveToStorage(state);
+      renderCard({ id: cardId, title: card.querySelector('[data-testid="card-input"]').value }, targetColumn.dataset.testid);
+    }
+
+    /**
+     * Renders a card element to the specified column
+     * @param {Object} card - Card data
+     * @param {string} columnId - Column identifier
+     */
+    function renderCard(card, columnId) {
+      const cardElement = createCardElement(card);
+      const column = document.getElementById(`${columnId}-cards`);
+      column.appendChild(cardElement);
+    }
+
+    /**
+     * Shows confetti animation when a card is moved to Done
+     */
+    function showConfetti() {
+      const confettiCount = 50;
+      for (let i = 0; i < confettiCount; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = `${Math.random() * 100}%`;
+        confetti.style.top = '0';
+        confetti.style.animation = `fall ${Math.random() * 3 + 2}s linear forwards`;
+        document.body.appendChild(confetti);
+        setTimeout(() => {
+          document.body.removeChild(confetti);
+        }, 3000);
+      }
+    }
+
+    // ====== DUMMY CARDS FOR TESTING ======
+    // Initialize with 2 dummy cards for each column
+    window.addEventListener('load', () => {
+      const state = loadFromStorage();
+      if (state.backlog.length === 0) {
+        state.backlog = [
+          { id: 1, title: 'Design homepage', column: 'backlog' },
+          { id: 2, title: 'Implement user login', column: 'backlog' }
+        ];
+        saveToStorage(state);
+      }
+      renderCards(state);
+    });
+
+    // ====== END OF IMPLEMENTATION ======
+  </script>
+</body>
+</html>

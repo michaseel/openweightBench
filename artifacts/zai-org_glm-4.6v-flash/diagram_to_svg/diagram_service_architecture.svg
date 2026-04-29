@@ -1,0 +1,141 @@
+<svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Arrow marker for sync lines -->
+    <marker id="arrow-sync" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#000"/>
+    </marker>
+    
+    <!-- Arrow marker for async lines -->
+    <marker id="arrow-async" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#000"/>
+    </marker>
+    
+    <!-- Arrow marker for external lines -->
+    <marker id="arrow-external" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#000"/>
+    </marker>
+  </defs>
+  
+  <!-- Title -->
+  <text x="150" y="50" font-family="Arial, sans-serif" font-size="20" font-weight="bold">System Architecture</text>
+  
+  <!-- Legend -->
+  <g id="legend" transform="translate(950, 40)">
+    <text x="-20" y="0" font-family="Arial, sans-serif" font-size="12">Sync</text>
+    <line x1="-10" y1="5" x2="0" y2="5" stroke="#000" stroke-width="1.5"/>
+    <text x="-20" y="15" font-family="Arial, sans-serif" font-size="12">Async</text>
+    <line x1="-10" y1="20" x2="0" y2="20" stroke="#000" stroke-width="1.5" stroke-dasharray="3,3"/>
+    <text x="-20" y="35" font-family="Arial, sans-serif" font-size="12">External</text>
+    <rect x="-10" y="40" width="20" height="15" fill="#f00"/>
+  </g>
+  
+  <!-- Goals Section -->
+  <g id="goals" transform="translate(50, 120)">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="14" font-weight="bold">Goals:</text>
+    <text x="0" y="25" font-family="Arial, sans-serif" font-size="12">- Scalability</text>
+    <text x="0" y="45" font-family="Arial, sans-serif" font-size="12">- Reliability</text>
+    <text x="0" y="65" font-family="Arial, sans-serif" font-size="12">- Security</text>
+    <text x="0" y="85" font-family="Arial, sans-serif" font-size="12">- Maintainability</text>
+  </g>
+  
+  <!-- Main Diagram -->
+  <g id="main-diagram" transform="translate(300, 150)">
+    <!-- Frontend Box -->
+    <rect id="frontend" x="-100" y="0" width="120" height="60" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="-80" y="30" font-family="Arial, sans-serif" font-size="12">Frontend</text>
+    <text x="-80" y="45" font-family="Arial, sans-serif" font-size="12">(React)</text>
+    
+    <!-- API Gateway Box -->
+    <rect id="api-gateway" x="0" y="-30" width="120" height="60" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="20" y="-0" font-family="Arial, sans-serif" font-size="12">API Gateway</text>
+    <text x="20" y="15" font-family="Arial, sans-serif" font-size="12">(Kong)</text>
+    
+    <!-- Auth Service Box -->
+    <rect id="auth-service" x="150" y="-60" width="120" height="60" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="170" y="-30" font-family="Arial, sans-serif" font-size="12">Auth Service</text>
+    <text x="170" y="-15" font-family="Arial, sans-serif" font-size="12">(JWT)</text>
+    
+    <!-- Backend Box -->
+    <rect id="backend" x="150" y="-120" width="120" height="60" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="170" y="-90" font-family="Arial, sans-serif" font-size="12">Backend</text>
+    <text x="170" y="-75" font-family="Arial, sans-serif" font-size="12">(Python / FastAPI)</text>
+    
+    <!-- External API Box -->
+    <rect id="external-api" x="-50" y="-180" width="120" height="60" fill="#fff" stroke="#000" stroke-width="2"/>
+    <rect id="external-api-red" x="-50" y="-180" width="120" height="60" fill="#f00" opacity="0.2"/>
+    <text x="-30" y="-150" font-family="Arial, sans-serif" font-size="12">External API</text>
+    <text x="-30" y="-135" font-family="Arial, sans-serif" font-size="12">(Payment Provider)</text>
+    
+    <!-- Message Queue Box -->
+    <rect id="message-queue" x="150" y="-240" width="120" height="60" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="170" y="-210" font-family="Arial, sans-serif" font-size="12">Message Queue</text>
+    <text x="170" y="-195" font-family="Arial, sans-serif" font-size="12">(RabbitMQ)</text>
+    
+    <!-- Worker Service Box -->
+    <rect id="worker-service" x="300" y="-300" width="120" height="60" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="320" y="-270" font-family="Arial, sans-serif" font-size="12">Worker Service</text>
+    <text x="320" y="-255" font-family="Arial, sans-serif" font-size="12">(Python)</text>
+    
+    <!-- File Storage Box -->
+    <rect id="file-storage" x="450" y="-300" width="80" height="40" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="470" y="-280" font-family="Arial, sans-serif" font-size="12">File Storage</text>
+    <text x="470" y="-265" font-family="Arial, sans-serif" font-size="12">(S3)</text>
+    
+    <!-- Monitoring Box -->
+    <rect id="monitoring" x="150" y="-360" width="120" height="60" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="170" y="-330" font-family="Arial, sans-serif" font-size="12">Monitoring</text>
+    <text x="170" y="-315" font-family="Arial, sans-serif" font-size="12">(Prometheus + Grafana)</text>
+    
+    <!-- Connections -->
+    
+    <!-- Frontend to API Gateway (HTTPS, sync) -->
+    <line id="frontend-to-api" x1="-80" y1="30" x2="0" y2="-5" stroke="#000" stroke-width="2" marker-end="url(#arrow-sync)"/>
+    <text x="-40" y="15" font-family="Arial, sans-serif" font-size="10">HTTPS</text>
+    
+    <!-- API Gateway to Auth Service (sync) -->
+    <line id="api-to-auth" x1="60" y1="-5" x2="170" y2="-30" stroke="#000" stroke-width="2" marker-end="url(#arrow-sync)"/>
+    
+    <!-- API Gateway to Backend (sync) -->
+    <line id="api-to-backend" x1="60" y1="-5" x2="170" y2="-90" stroke="#000" stroke-width="2" marker-end="url(#arrow-sync)"/>
+    
+    <!-- Auth Service to User DB (sync) -->
+    <line id="auth-to-user-db" x1="170" y1="-30" x2="270" y2="-60" stroke="#000" stroke-width="2" marker-end="url(#arrow-sync)"/>
+    <rect id="user-db" x="270" y="-80" width="100" height="40" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="300" y="-60" font-family="Arial, sans-serif" font-size="12">User DB</text>
+    <text x="300" y="-45" font-family="Arial, sans-serif" font-size="12">(PostgreSQL)</text>
+    
+    <!-- Backend to Database (sync) -->
+    <line id="backend-to-db" x1="170" y1="-90" x2="270" y2="-120" stroke="#000" stroke-width="2" marker-end="url(#arrow-sync)"/>
+    <rect id="database" x="270" y="-140" width="100" height="40" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="300" y="-120" font-family="Arial, sans-serif" font-size="12">Database</text>
+    <text x="300" y="-105" font-family="Arial, sans-serif" font-size="12">(PostgreSQL)</text>
+    
+    <!-- API Gateway to External API (async) -->
+    <polyline id="api-to-external" points="60, -5 20, -30 -50, -180" stroke="#000" stroke-width="2" fill="none" marker-end="url(#arrow-async)"/>
+    
+    <!-- Backend to Message Queue (sync) -->
+    <line id="backend-to-message-queue" x1="170" y1="-90" x2="170" y2="-210" stroke="#000" stroke-width="2" marker-end="url(#arrow-sync)"/>
+    
+    <!-- Message Queue to Worker Service (async) -->
+    <polyline id="message-queue-to-worker" points="270, -210 300, -270 320, -270" stroke="#000" stroke-width="2" fill="none" marker-end="url(#arrow-async)"/>
+    
+    <!-- Worker Service to File Storage (async) -->
+    <line id="worker-to-file-storage" x1="320" y1="-270" x2="470" y2="-280" stroke="#000" stroke-width="2" marker-end="url(#arrow-async)"/>
+    
+    <!-- Monitoring to Message Queue (sync?) Wait, original diagram has Monitoring connected from Worker Service and Message Queue. So lines are dashed (async) for both connections.
+    
+    Let's adjust:
+    
+    Monitoring to Message Queue line: dashed, async
+    Monitoring to Worker Service line: dashed, async
+    
+    So:
+    
+    <polyline id="monitoring-to-message-queue" points="170, -330 270, -210 300, -270" stroke="#000" stroke-width="2" fill="none" marker-end="url(#arrow-async)"/>
+    
+    <polyline id="monitoring-to-worker" points="170, -330 320, -270 450, -300" stroke="#000" stroke-width="2" fill="none" marker-end="url(#arrow-async)"/>
+    
+    Now, check if all elements are included and connections match the original diagram. Also ensure that text is within boxes, font sizes are at least 12px, and connections have appropriate markers.
+
+After reviewing the code, it should be a valid SVG representation of the whiteboard diagram. 
+</svg>

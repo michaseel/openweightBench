@@ -1,0 +1,402 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kanban Board</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Subtle transitions for card movement and hover effects */
+    .card {
+      transition: all 0.3s ease;
+    }
+    .card:hover {
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      transform: translateY(-1px);
+    }
+    .card:active {
+      transform: translateY(0);
+    }
+    .column {
+      transition: all  0.3s ease;
+    }
+    .column:hover {
+      background-color: #f9fafb;
+    }
+    /* Confetti animation styles */
+    .confetti {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+    }
+    .confetti-bullet {
+      position: absolute;
+      pointer-events: none;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ff6b6b;
+      opacity: 0.8;
+      animation: fall 3s forwards;
+    }
+    @keyframes fall {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800 min-h-screen p-6">
+
+  <!-- Kanban Board Container -->
+  <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+    <!-- Column: Backlog -->
+    <div data-testid="column-backlog" class="column bg-white rounded-lg shadow-md p-4 border border-gray-200 transition-all duration-200">
+      <h2 class="text-xl font-bold text-blue-600 mb-4">Backlog</h2>
+      <button data-testid="add-card" class="w-full mb-4 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200 text-center">Add Card</button>
+      <div id="backlog-cards" class="space-y-3"></div>
+    </div>
+
+    <!-- Column: In Progress -->
+    <div data-testid="column-in-progress" class="column bg-white rounded-lg shadow-md p-4 border border-gray-200 transition-all duration-200">
+      <h2 class="text-xl font-bold text-green-600 mb-4">In Progress</h2>
+      <button data-testid="add-card" class="w-full mb-4 bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200 text-center">Add Card</button>
+      <div id="in-progress-cards" class="space-y-3"></div>
+    </div>
+
+    <!-- Column: Review -->
+    <div data-testid="column-review" class="column bg-white rounded-lg shadow-md p-4 border border-gray-200 transition-all duration-200">
+      <h2 class="text-xl font-bold text-yellow-600 mb-4">Review</h2>
+      <button data-testid="add-card" class="w-full mb-4 bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200 text-center">Add Card</button>
+      <div id="review-cards" class="space-y-3"></div>
+    </div>
+
+    <!-- Column: Done -->
+    <div data-testid="column-done" class="column bg-white rounded-lg shadow-md p-4 border border-gray-200 transition-all duration-200">
+      <h2 class="text-xl font-bold text-purple-600 mb-4">Done</h2>
+      <button data-testid="add-card" class="w-full mb-4 bg-purple-500 hover:bg-purple-600 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200 text-center">Add Card</button>
+      <div id="done-cards" class="space-y-3"></div>
+    </div>
+
+  </div>
+
+  <!-- Confetti container (hidden by default) -->
+  <div id="confetti-container" class="confetti hidden"></div>
+
+  <!-- Global JavaScript for Kanban functionality -->
+  <script>
+    // === CONFIGURATION ===
+    // Define the namespace for localStorage to avoid conflicts
+    const BOARD_STORAGE_KEY = 'kanban-board-v1';
+    const COLUMNS = {
+      backlog: 'backlog',
+      'in-progress': 'in-progress',
+      review: 'review',
+      done: 'done'
+    };
+
+    // Map of column to DOM elements
+    const columnElements = {
+      backlog: document.querySelector('[data-testid="column-backlog"]'),
+      'in-progress': document.querySelector('[data-testid="column-in-progress"]'),
+      review: document.querySelector('[data-testid="column-review"]'),
+      done: document.querySelector('[data-testid="column-done"]')
+    };
+
+    // Map of column to card container (DOM)
+    const cardContainers = {
+      backlog: document.getElementById('backlog-cards'),
+      'in-progress': document.getElementById('in-progress-cards'),
+      review: document.getElementById('review-cards'),
+      done: document.getElementById('done-cards')
+    };
+
+    // Map of column to add card button (used for event delegation)
+    const addCardButtons = {
+      backlog: document.querySelector('[data-testid="add-card"]:nth-child(1)'),
+      'in-progress': document.querySelector('[data-testid="add-card"]:nth-child(2)'),
+      review: document.querySelector('[data-testid="add-card"]:nth-child(3)'),
+      done: document.querySelector('[data-testid="add-card"]:nth-child(4)')
+    };
+
+    // Store all card data: { id: string, title: string, column: string }
+    let cards = JSON.parse(localStorage.getItem(BOARD_STORAGE_KEY)) || {};
+
+    // Initialize the board with dummy cards if none exist
+    function initializeDummyCards() {
+      if (Object.keys(cards).length === 0) {
+        const dummyCards = [
+          { id: '1', title: 'Design user interface', column: 'backlog' },
+          { id: '2', title: 'Implement login flow', column: 'in-progress' },
+          { id: '3', title: 'Conduct usability testing', column: 'review' },
+          { id: '4', title: 'Deploy to production', column: 'done' }
+        ];
+        cards = dummyCards.reduce((acc, card) => {
+          acc[card.id] = card;
+          return acc;
+        }, {});
+        saveToStorage();
+        renderBoard();
+      }
+    }
+
+    // Save current board state to localStorage
+    function saveToStorage() {
+      localStorage.setItem(BOARD_STORAGE_KEY, JSON.stringify(cards));
+    }
+
+    // Render the board based on current card data
+    function renderBoard() {
+      // Clear all card containers
+      Object.values(cardContainers).forEach(container => {
+        container.innerHTML = '';
+      });
+
+      // Render each card in its respective column
+      Object.entries(cards).forEach(([id, card]) => {
+        const container = cardContainers[card.column];
+        renderCard(card, container);
+      });
+    }
+
+    // Render a single card in the DOM
+    function renderCard(card, container) {
+      const cardElement = document.createElement('div');
+      cardElement.className = 'card bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-all duration-200 mb-2 max-w-lg';
+      cardElement.dataset.id = card.id;
+      cardElement.dataset.column = card.column;
+
+      // Card title and edit input
+      const cardInput = document.createElement('input');
+      cardInput.type = 'text';
+      cardInput.className = 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 font-medium';
+      cardInput.dataset.id = card.id;
+      cardInput.dataset.column = card.column;
+      cardInput.value = card.title;
+      cardInput.dataset-testid = 'card-input';
+      cardInput.setAttribute('autofocus', 'true');
+
+      // Delete button (inside card)
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'mt-2 text-red-500 hover:text-red-700 text-sm font-medium transition-colors';
+      deleteBtn.dataset.id = card.id;
+      deleteBtn.dataset-testid = 'delete-card';
+      deleteBtn.innerHTML = '❌';
+
+      // Card content container
+      const cardContent = document.createElement('div');
+      cardContent.className = 'flex items-center justify-between mb-2';
+      cardContent.appendChild(cardInput);
+
+      // Append all elements
+      cardElement.appendChild(cardContent);
+      cardElement.appendChild(deleteBtn);
+
+      // Add event listeners to card input (Enter = commit)
+      cardInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          const newTitle = cardInput.value.trim();
+          if (newTitle) {
+            updateCardTitle(card.id, newTitle);
+            renderBoard();
+          }
+        }
+      });
+
+      // Delete card confirmation
+      deleteBtn.addEventListener('click', () => {
+        confirmDelete(card.id);
+      });
+
+      // Add card to container
+      container.appendChild(cardElement);
+
+      // Update card title if it changes via edit
+      cardInput.addEventListener('blur', () => {
+        const newTitle = cardInput.value.trim();
+        if (newTitle) {
+          updateCardTitle(card.id, newTitle);
+        } else {
+          // If empty, remove card
+          removeCard(card.id);
+        }
+        renderBoard();
+      });
+
+      // Update card title in state
+      function updateCardTitle(id, newTitle) {
+        cards[id].title = newTitle;
+        saveToStorage();
+      }
+
+      // Remove card from board (with confirmation)
+      function removeCard(id) {
+        delete cards[id];
+        saveToStorage();
+        renderBoard();
+      }
+    }
+
+    // Confirmation dialog for deleting a card
+    function confirmDelete(cardId) {
+      const card = cards[cardId];
+      if (!card) return;
+
+      const confirmDialog = document.createElement('div');
+      confirmDialog.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+      confirmDialog.innerHTML = `
+        <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center border border-gray-200">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">Delete "${card.title}"?</h3>
+          <div class="flex justify-center gap-4">
+            <button data-testid="confirm-delete" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors" onclick="confirmDeleteAction('${cardId}')">Delete</button>
+            <button class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-700 rounded-md transition-colors" onclick="document.body.removeChild(${confirmDialog.outerHTML})">Cancel</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(confirmDialog);
+
+      // Add event listener to close on click outside
+      confirmDialog.addEventListener('click', (e) => {
+        if (e.target === confirmDialog) {
+          document.body.removeChild(confirmDialog);
+        }
+      });
+    }
+
+    // Execute actual deletion
+    function confirmDeleteAction(cardId) {
+      delete cards[cardId];
+      saveToStorage();
+      renderBoard();
+
+      // Trigger confetti on card removal from any column (especially done)
+      if (cards[cardId].column === 'done') {
+        triggerConfetti();
+      }
+    }
+
+    // Trigger confetti animation when a card moves to "Done"
+    function triggerConfetti() {
+      const container = document.getElementById('confetti-container');
+      if (!container) return;
+
+      // Clear previous confetti
+      while (container.firstChild) {
+        container.removeChild(container.firstChild);
+      }
+
+      // Generate 50 confetti particles
+      for (let i = 0; i < 50; i++) {
+        const bullet = document.createElement('div');
+        bullet.className = 'confetti-bullet';
+        bullet.style.left = `${Math.random() * 100}vw`;
+        bullet.style.top = '0';
+        bullet.style.transform = `rotate(${Math.random() * 360}deg)`;
+        bullet.style.opacity = '0.8';
+        container.appendChild(bullet);
+      }
+
+      // Show confetti
+      container.classList.remove('hidden');
+      setTimeout(() => {
+        container.classList.add('hidden');
+      }, 3000);
+    }
+
+    // Handle drag and drop for card movement
+    function setupDragDrop() {
+      // Drag start: when user clicks and drags a card
+      document.addEventListener('dragstart', (e) => {
+        if (e.target.closest('[data-testid="card"]')) {
+          e.dataTransfer.setData('text/plain', e.target.closest('[data-testid="card"]').dataset.id);
+          e.dataTransfer.effectAllowed = 'move';
+        }
+      });
+
+      // Drag over: visual feedback
+      document.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+      });
+
+      // Drop: move card to new column
+      document.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const draggedId = e.dataTransfer.getData('text/plain');
+        if (!draggedId) return;
+
+        const draggedCard = cards[draggedId];
+        if (!draggedCard) return;
+
+        // Find the target column (where drop happened)
+        const dropColumn = e.target.closest('[data-testid="column-"]');
+        if (!dropColumn) return;
+
+        // Get the column name from data-testid
+        const column = dropColumn.dataset.testid?.replace('column-', '').toLowerCase();
+        if (!column) return;
+
+        // Update card's column in state
+        cards[draggedId].column = column;
+
+        // Save and re-render
+        saveToStorage();
+        renderBoard();
+        
+        // Trigger confetti if moved to "Done"
+        if (column === 'done') {
+          triggerConfetti();
+        }
+      });
+
+      // Add event listeners to add card buttons
+      Object.entries(addCardButtons).forEach(([columnKey, button]) => {
+        button.addEventListener('click', () => {
+          const newCardId = 'new-' + Date.now();
+          const newCard = {
+            id: newCardId,
+            title: 'New Task',
+            column: columnKey
+          };
+          cards[newCardId] = newCard;
+          saveToStorage();
+          renderBoard();
+        });
+      });
+    }
+
+    // === INITIALIZATION ===
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      initializeDummyCards();
+      renderBoard();
+      setupDragDrop();
+
+      // Add event listeners to card input (Enter key)
+      // (already handled in renderCard)
+
+      // Optional: add keyboard support (e.g. tab, escape)
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          document.querySelectorAll('[data-testid="card-input"]').forEach(input => {
+            if (input.value && input.value.trim() === '') {
+              input.value = '';
+            }
+          });
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
+```
