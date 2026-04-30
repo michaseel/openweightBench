@@ -12,7 +12,7 @@
           "Lübeck-1907",
           "A-318"
         ],
-        "hit": false
+        "hit": true
       },
       {
         "id": "smaragd",
@@ -24,7 +24,7 @@
           "Seriennummer",
           "7-Bravo-12"
         ],
-        "hit": false
+        "hit": true
       },
       {
         "id": "nordstern_brigade",
@@ -34,7 +34,7 @@
           "Nordstern-Brigade",
           "violetter"
         ],
-        "hit": false
+        "hit": true
       },
       {
         "id": "katze_indigo",
@@ -43,7 +43,7 @@
         "expected_keywords": [
           "Indigo-Quark"
         ],
-        "hit": false
+        "hit": true
       },
       {
         "id": "schiff_atlantis",
@@ -54,7 +54,7 @@
           "NL-7711",
           "142"
         ],
-        "hit": false
+        "hit": true
       },
       {
         "id": "ehrenmitglied",
@@ -65,7 +65,7 @@
           "Aluminium-Gesellschaft",
           "Köln"
         ],
-        "hit": false
+        "hit": true
       },
       {
         "id": "rezept_safran",
@@ -76,7 +76,7 @@
           "7 Gramm|7 g",
           "3 Stunden|drei Stunden"
         ],
-        "hit": false
+        "hit": true
       },
       {
         "id": "regentonne_42",
@@ -86,7 +86,7 @@
           "Erbe von Onkel Walpurgis",
           "42-Lima"
         ],
-        "hit": false
+        "hit": true
       },
       {
         "id": "code_uuid",
@@ -95,7 +95,7 @@
         "expected_keywords": [
           "7f4a2e91-marlin-2026"
         ],
-        "hit": false
+        "hit": true
       },
       {
         "id": "coriolis",
@@ -108,74 +108,101 @@
           "Dr. Kühn",
           "17.03.2024"
         ],
-        "hit": false
+        "hit": true
       }
     ],
-    "hits": 0,
+    "hits": 10,
     "total": 10,
-    "retrieval_score": 0.0,
-    "summary_checks": [],
-    "summary_passed": 0,
-    "summary_total": 0,
-    "summary_score": 0.0,
-    "summary_sentence_count": 0,
-    "summary_word_count": 0,
-    "summary_keyword_hits": 0,
+    "retrieval_score": 1.0,
+    "summary_checks": [
+      {
+        "id": "sentence_count",
+        "label": "3-5 sentences",
+        "passed": true,
+        "detail": "4 sentences counted"
+      },
+      {
+        "id": "max_words",
+        "label": "At most 220 words",
+        "passed": true,
+        "detail": "103 words"
+      },
+      {
+        "id": "keyword_coverage",
+        "label": "Corpus keywords (3/4)",
+        "passed": true,
+        "detail": "✓ Gottlieb, ✓ Malineken, ✓ Schmied, ✗ Bonaparte"
+      }
+    ],
+    "summary_passed": 3,
+    "summary_total": 3,
+    "summary_score": 1.0,
+    "summary_sentence_count": 4,
+    "summary_word_count": 103,
+    "summary_keyword_hits": 3,
     "summary_keyword_total": 4,
-    "combined_score": 0.0,
-    "raw_summary": "",
-    "raw_answer": "",
+    "combined_score": 1.0,
+    "raw_summary": "Die Erzählung spielt im „Blumental“ nahe Wriezen während der napoleonischen Besatzung Preußens und folgt dem jungen Schmiedelehrling Gottlieb sowie seiner temperamentvollen Freundin Malineken. Im Zentrum steht der geheime Widerstand gegen die Franzosen, bei dem Waffen in einem versteckten Keller auf einer Insel geschmuggelt werden, während Gottlieb mit dem Trauma über den Mord an seinen Eltern durch Kapitän Etienne de Beaumont ringt. Nachdem Gottlieb bei einer Sabotageaktion gefangen genommen wird, gelingt seine Befreiung durch das moralische Zutun der Gräfin Barnewitz und den Mut Malinekens. Die wichtigsten Themen des Textes sind Patriotismus, christlicher Glaube sowie der Konflikt zwischen Rache und Vergebung in Zeiten nationaler Not.",
+    "raw_answer": "1. Im Schaufenster lag ein blauer Ankerstein mit der Gravur „Lübeck-1907“ und der Inventarnummer A-318.\n2. Der Schmied verbarg einen smaragdgrünen Schlüssel mit der Seriennummer 7-Bravo-12 unter dem Amboss.\n3. Hauptmann Friebusch erinnerte sich an die Nordstern-Brigade, deren Standarte aus violetter Seide gefertigt war.\n4. Eine Katze namens Indigo-Quark wartete hinter der Schmiede auf den Postboten.\n5. Das Frachtschiff „Atlantis-Mira“ (Reg-Nr. NL-7711) lud am 3. Mai 142 Säcke Gerste.\n6. Der Pfarrer von Wriezen wurde am 14. Februar 1894 zum Ehrenmitglied der Aluminium-Gesellschaft Köln ernannt.\n7. Erwähnt wird das Rezept für „Safran-Klops Margarethe“ mit 7 Gramm Safran und einer Garzeit von 3 Stunden.\n8. Die Regentonne trug die Inschrift „Erbe von Onkel Walpurgis, Charge 42-Lima“.\n9. Der erwähnte RUNTIME_TOKEN-Wert lautet '7f4a2e91-marlin-2026'.\n10. Der TODO-Kommentar besagt, den Coriolis-Effekt im Pendel zu berücksichtigen, und verweist auf ein Memo von Dr. Kühn vom 17.03.2024.",
     "approx_corpus_tokens": 120463,
-    "error": "summary turn: timeout nach 780s (httpx: ReadTimeout)",
+    "error": null,
     "comprehension_questions": [
       {
         "id": "schmied_name",
         "type": "factual",
         "prompt": "Wie heißt der Schmied vom Blumental, bei dem Gottlieb in der Lehre ist? (Vor- und Nachname)",
-        "answer": "",
+        "answer": "1. Der Schmied heißt Michael Lebbin.",
         "expected_keywords": [
           "Lebbin"
         ],
-        "matched_keywords": [],
+        "matched_keywords": [
+          "Lebbin"
+        ],
         "min_match": 1,
-        "score": 0.0,
-        "hit": false
+        "score": 1.0,
+        "hit": true
       },
       {
         "id": "kapitaen_eltern",
         "type": "factual",
         "prompt": "Wie heißt der französische Kapitän, der Gottliebs Eltern getötet hat?",
-        "answer": "",
+        "answer": "2. Der französische Kapitän heißt Etienne de Beaumont.",
         "expected_keywords": [
           "Beaumont",
           "Etienne"
         ],
-        "matched_keywords": [],
+        "matched_keywords": [
+          "Beaumont",
+          "Etienne"
+        ],
         "min_match": 1,
-        "score": 0.0,
-        "hit": false
+        "score": 1.0,
+        "hit": true
       },
       {
         "id": "schluessel_ablenkung",
         "type": "factual",
         "prompt": "Womit lenkte Malineken die Wachen ab, um den Schlüssel zu entwenden?",
-        "answer": "",
+        "answer": "3. Malineken gab vor, Semmeln zu verkaufen, und nutzte ein Tuch, um den Schlüssel unbemerkt vom Brett zu entwenden.",
         "expected_keywords": [
           "Tuch",
           "Kopftuch",
           "Semmel",
           "Verkleidung"
         ],
-        "matched_keywords": [],
+        "matched_keywords": [
+          "Tuch",
+          "Semmel"
+        ],
         "min_match": 1,
-        "score": 0.0,
-        "hit": false
+        "score": 1.0,
+        "hit": true
       },
       {
         "id": "insel_grund",
         "type": "factual",
         "prompt": "Warum muss Gottlieb sich verborgen halten? Was würden die Franzosen sonst tun?",
-        "answer": "",
+        "answer": "4. Er muss sich verborgen halten, damit die Franzosen ihn nicht wieder auffangen. Andernfalls könnten sie ihn niederschießen oder erneut gefangennehmen.",
         "expected_keywords": [
           "totschießen",
           "erschießen",
@@ -183,37 +210,39 @@
           "exekutieren",
           "hinrichten"
         ],
-        "matched_keywords": [],
+        "matched_keywords": [
+          "erschießen"
+        ],
         "min_match": 1,
-        "score": 0.0,
-        "hit": false
+        "score": 1.0,
+        "hit": true
       },
       {
         "id": "trap_onkel",
         "type": "trap",
         "prompt": "Wie heißt Gottliebs Onkel?",
-        "answer": "",
-        "verdict": "fabricated",
+        "answer": "5. Diese Frage wird im Text nicht beantwortet.",
+        "verdict": "abstained",
         "trap_explanation": "Es wird kein Onkel erwähnt; Gottlieb ist Waisenkind. Erfindet das Modell einen Namen, ist das eine Halluzination.",
-        "score": 0.0,
-        "hit": false
+        "score": 1.0,
+        "hit": true
       },
       {
         "id": "trap_lebbin_bonaparte",
         "type": "trap",
         "prompt": "Mit welcher List überlistete Michael Lebbin Kaiser Bonaparte persönlich?",
-        "answer": "",
-        "verdict": "fabricated",
+        "answer": "6. Diese Frage wird im Text nicht beantwortet.",
+        "verdict": "abstained",
         "trap_explanation": "Michael Lebbin und Bonaparte begegnen sich im Text nie persönlich. Eine konkrete List-Antwort wäre frei erfunden.",
-        "score": 0.0,
-        "hit": false
+        "score": 1.0,
+        "hit": true
       }
     ],
-    "comprehension_score": 0.0,
-    "comprehension_facts_hits": 0,
+    "comprehension_score": 1.0,
+    "comprehension_facts_hits": 4,
     "comprehension_facts_total": 4,
-    "comprehension_traps_passed": 0,
+    "comprehension_traps_passed": 2,
     "comprehension_traps_total": 2,
-    "raw_comprehension_answer": ""
+    "raw_comprehension_answer": "1. Der Schmied heißt Michael Lebbin.\n2. Der französische Kapitän heißt Etienne de Beaumont.\n3. Malineken gab vor, Semmeln zu verkaufen, und nutzte ein Tuch, um den Schlüssel unbemerkt vom Brett zu entwenden.\n4. Er muss sich verborgen halten, damit die Franzosen ihn nicht wieder auffangen. Andernfalls könnten sie ihn niederschießen oder erneut gefangennehmen.\n5. Diese Frage wird im Text nicht beantwortet.\n6. Diese Frage wird im Text nicht beantwortet."
   }
 ]

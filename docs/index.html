@@ -268,7 +268,7 @@
         </div>
         <p class="mt-2 text-sm text-stone-600">Three sub-benchmarks in one chat (prefill only once): corpus summary · needle retrieval (10 hidden facts in 120k tokens — uniform across all models) · 6 comprehension questions about the book (4 factual answers + 2 hallucination traps).</p>
         <div class="mt-4 flex items-center gap-6 text-xs text-stone-500">
-            <span>Top score <span class="font-mono num text-stone-900">99%</span></span>
+            <span>Top score <span class="font-mono num text-stone-900">100%</span></span>
             <span>Median <span class="font-mono num text-stone-900">43</span> tok/s</span>
           <span class="ml-auto text-stone-400 group-hover:text-stone-700">open →</span>
         </div>
@@ -402,6 +402,15 @@
         <text x="478.0" y="403" font-size="10" fill="#57534e" text-anchor="middle">Cumulative wall-time (s) →</text>
         <text x="16" y="194.0" font-size="10" fill="#57534e" text-anchor="middle" transform="rotate(-90 16 194.0)">Overall score</text>
 
+          <a href="models/google_gemma-4-31b.html" class="os-dot" data-total-ram="29.93">
+            <circle cx="702.5983651630871" cy="46.13539929711078" r="9" fill="#dc2626" fill-opacity="0.78"
+                    stroke="#dc2626" stroke-width="1.75"
+                    style="cursor:pointer"
+                    data-tooltip="gemma-4-31b · Score 92% · Wall 2983s · ~30 GB RAM (64k)"/>
+              <text x="702.5983651630871" y="46.13539929711078" text-anchor="middle" dominant-baseline="central"
+                    font-size="8" font-weight="700" fill="#fff"
+                    pointer-events="none">31</text>
+          </a>
           <a href="models/qwen_qwen3.6-27b.html" class="os-dot" data-total-ram="26.79">
             <circle cx="784.0530122113347" cy="50.72208607960607" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
@@ -410,15 +419,6 @@
               <text x="784.0530122113347" y="50.72208607960607" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none">27</text>
-          </a>
-          <a href="models/google_gemma-4-31b.html" class="os-dot" data-total-ram="29.93">
-            <circle cx="454.9870512871836" cy="51.09732644203996" r="9" fill="#dc2626" fill-opacity="0.78"
-                    stroke="#dc2626" stroke-width="1.75"
-                    style="cursor:pointer"
-                    data-tooltip="gemma-4-31b · Score 91% · Wall 1844s · ~30 GB RAM (64k)"/>
-              <text x="454.9870512871836" y="51.09732644203996" text-anchor="middle" dominant-baseline="central"
-                    font-size="8" font-weight="700" fill="#fff"
-                    pointer-events="none">31</text>
           </a>
           <a href="models/google_gemma-4-26b-a4b@q8_0.html" class="os-dot" data-total-ram="40.58">
             <circle cx="231.05466531542535" cy="60.96687782248921" r="9" fill="#dc2626" fill-opacity="0.78"
@@ -955,6 +955,36 @@ stroke-dasharray="2.5,1.5"                    style="cursor:pointer"
         </tr>
       </thead>
       <tbody class="divide-y divide-stone-100">
+          <tr class="cursor-pointer row-link" onclick="window.location='models/google_gemma-4-31b.html'">
+            <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-4-31b" title="google/gemma-4-31b">gemma-4-31b</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 4bit</td>
+            <td class="px-3 py-2 num text-right font-bold text-emerald-700" data-sort="0.9200698883604808">
+              92%
+            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="18966.6">
+18.5 GB            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="2982.940594500047">
+              2983 s
+            </td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.8800000000000001">
+                    88%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.9290024224912735">
+                    93%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.9976">
+                    100%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="1.0">
+                    100%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.8355185185185184">
+                    84%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.9583333333333334">
+                    96%
+                  </td>
+          </tr>
           <tr class="cursor-pointer row-link" onclick="window.location='models/qwen_qwen3.6-27b.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3.6-27b" title="qwen/qwen3.6-27b">qwen3.6-27b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 4bit</td>
@@ -983,34 +1013,6 @@ stroke-dasharray="2.5,1.5"                    style="cursor:pointer"
                   </td>
                   <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.75">
                     75%
-                  </td>
-          </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/google_gemma-4-31b.html'">
-            <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-4-31b" title="google/gemma-4-31b">gemma-4-31b</td>
-            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 4bit</td>
-            <td class="px-3 py-2 num text-right font-bold text-emerald-700" data-sort="0.9059735044260229">
-              91%
-            </td>
-            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="18966.6">
-18.5 GB            </td>
-            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="1844.1621462500188">
-              1844 s
-            </td>
-                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.8800000000000001">
-                    88%
-                  </td>
-                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.9290024224912735">
-                    93%
-                  </td>
-                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
-                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="1.0">
-                    100%
-                  </td>
-                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.8355185185185184">
-                    84%
-                  </td>
-                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.9583333333333334">
-                    96%
                   </td>
           </tr>
           <tr class="cursor-pointer row-link" onclick="window.location='models/google_gemma-4-26b-a4b@q8_0.html'">
