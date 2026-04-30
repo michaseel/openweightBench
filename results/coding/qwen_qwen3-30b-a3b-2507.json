@@ -1,0 +1,201 @@
+{
+  "task": "coding",
+  "model_id": "qwen/qwen3-30b-a3b-2507",
+  "model_info": {
+    "id": "qwen/qwen3-30b-a3b-2507",
+    "type": "llm",
+    "publisher": "qwen",
+    "arch": "qwen3_moe",
+    "compatibility_type": "mlx",
+    "quantization": "4bit",
+    "state": "not-loaded",
+    "max_context_length": 262144,
+    "capabilities": [
+      "tool_use"
+    ],
+    "loaded_context_length": null
+  },
+  "started_at": "2026-04-29T23:47:47.929989Z",
+  "completed_at": "2026-04-29T23:49:02.048620Z",
+  "metrics": {
+    "wall_seconds": 74.11787137493957,
+    "tokens_generated": 4679,
+    "tokens_per_second": 95.0626315798322,
+    "time_to_first_token_ms": 454.0,
+    "peak_rss_mb": 16394.6
+  },
+  "score": 0.6666666666666666,
+  "score_breakdown": {
+    "looks_like_html": true,
+    "html_length": 19247,
+    "raw_length": 19259,
+    "lint_checks": [
+      {
+        "id": "col_backlog",
+        "label": "Spalte 'Backlog'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_in_progress",
+        "label": "Spalte 'In Progress'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_review",
+        "label": "Spalte 'Review'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_done",
+        "label": "Spalte 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "drag_drop",
+        "label": "HTML5 drag & drop or sortable lib",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "local_storage",
+        "label": "localStorage persistence",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "tailwind_cdn",
+        "label": "Tailwind via CDN",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "confetti",
+        "label": "Confetti animation on 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Add card button",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "vanilla_js",
+        "label": "Vanilla JS (no React/Vue/Angular/Svelte)",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_alert_prompt",
+        "label": "No window.alert/prompt for CRUD",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "editable_cards",
+        "label": "Editable cards (contenteditable / input)",
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "lint_passed": 12,
+    "lint_total": 12,
+    "lint_score": 1.0,
+    "e2e_checks": [
+      {
+        "id": "renders",
+        "label": "Page loads with all 4 columns",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Add card via button",
+        "passed": false,
+        "detail": "Page.wait_for_selector: Timeout 2000ms exceeded.\nCall log:\n  - waiting for locator(\"[data-testid=\\\"card-input\\\"]\") to be visible\n"
+      },
+      {
+        "id": "no_double_add",
+        "label": "Card is added exactly 1× (no double submit)",
+        "passed": false,
+        "detail": "skipped — add flow failed"
+      },
+      {
+        "id": "delete_card",
+        "label": "Delete card via button + confirmation",
+        "passed": false,
+        "detail": "no cards available to delete"
+      },
+      {
+        "id": "persistence",
+        "label": "Cards survive a reload",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_console_errors",
+        "label": "No JS console errors",
+        "passed": false,
+        "detail": "pageerror: handleDragStart is not defined; pageerror: handleDragStart is not defined"
+      }
+    ],
+    "e2e_passed": 2,
+    "e2e_total": 6,
+    "e2e_score": 0.3333333333333333,
+    "judge": {
+      "scored_at": "2026-04-29T23:49:18.869851+00:00",
+      "judge_model": "openai/gpt-5.4",
+      "scores": {
+        "board_renders": 0.5,
+        "column_completeness": 1.0,
+        "cards_present": 0.0,
+        "ui_affordances": 0.5,
+        "design_quality": 0.6,
+        "code_structure": 0.6,
+        "dom_safety": 0.0,
+        "robustness": 0.2,
+        "code_quality": 0.2,
+        "render_matches_code": 0.0
+      },
+      "judge_score": 0.3450000000000001,
+      "comment_visual": "Das Board rendert sichtbar mit vier sauber beschrifteten Spalten und Add-Card-Buttons, aber es sind keinerlei Karten zu sehen. Optisch ist das Layout ordentlich und modern genug, wirkt aber durch die komplett leeren Spalten unfertig.",
+      "comment_code": "Der Code ist grundsätzlich in Funktionen aufgeteilt, hat aber mehrere gravierende Fehler. Besonders kritisch sind innerHTML mit unescaped card.title sowie offensichtliche Laufzeitbugs in der Edit- und Add-Card-Logik; außerdem fehlt belastbares Error-Handling für localStorage/JSON.parse.",
+      "comment_consistency": "Starke Diskrepanz zwischen Anspruch und Render: Der Code will Dummy-Karten erzeugen und rendern, der Screenshot zeigt dennoch nur leere Spalten. Das spricht klar für einen Init-/Runtime-Fehler, daher render_matches_code = 0."
+    }
+  },
+  "raw_response": "```html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\" />\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>\n  <title>Kanban Board</title>\n  <!-- Tailwind CSS via CDN -->\n  <script src=\"https://cdn.tailwindcss.com\"></script>\n  <!-- Custom styles and confetti -->\n  <style>\n    /* Custom Tailwind overrides */\n    .kanban-column {\n      min-height: 300px;\n      background-color: #f1f5f9;\n      border-radius: 0.75rem;\n      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);\n      transition: all 0.2s ease;\n    }\n\n    .kanban-column:hover {\n      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);\n    }\n\n    .card {\n      background-color: #ffffff;\n      border-radius: 0.5rem;\n      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);\n      padding: 0.75rem;\n      margin-bottom: 0.5rem;\n      cursor: move;\n      transition: all 0.2s ease;\n      border-left: 4px solid transparent;\n    }\n\n    .card:hover {\n      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);\n      transform: translateY(-2px);\n    }\n\n    .card.done {\n      border-left-color: #10b981;\n    }\n\n    .card.editing {\n      background-color: #f8f9fa;\n    }\n\n    .input-edit {\n      font-size: 0.875rem;\n      padding: 0.25rem;\n      border: 1px solid #d1d5db;\n      border-radius: 0.375rem;\n      width: 100%;\n      outline: none;\n      transition: border-color 0.2s;\n    }\n\n    .input-edit:focus {\n      border-color: #3b82f6;\n    }\n\n    .modal {\n      display: none;\n      position: fixed;\n      z-index: 50;\n      left: 0;\n      top: 0;\n      width: 100%;\n      height: 100%;\n      background-color: rgba(0, 0, 0, 0.5);\n      justify-content: center;\n      align-items: center;\n    }\n\n    .modal-content {\n      background-color: #ffffff;\n      border-radius: 0.75rem;\n      padding: 1.5rem;\n      width: 320px;\n      max-width: 90%;\n      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);\n      text-align: center;\n    }\n\n    .modal h3 {\n      font-size: 1.25rem;\n      font-weight: 600;\n      color: #1f2937;\n      margin-botto",
+  "artifacts": [
+    {
+      "kind": "html",
+      "label": "Generierte App",
+      "path": "artifacts/qwen_qwen3-30b-a3b-2507/coding/output.html",
+      "mime": "text/html"
+    },
+    {
+      "kind": "text",
+      "label": "Raw model response",
+      "path": "artifacts/qwen_qwen3-30b-a3b-2507/coding/raw_response.txt",
+      "mime": "text/plain"
+    },
+    {
+      "kind": "image",
+      "label": "Screenshot der gerenderten App",
+      "path": "artifacts/qwen_qwen3-30b-a3b-2507/coding/screenshot.png",
+      "mime": "image/png"
+    }
+  ],
+  "error": null,
+  "hardware": {
+    "platform": "macOS-26.4.1-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "ram_total_gb": 128.0,
+    "cpu_count": 16
+  },
+  "bench_version": "0.1.0"
+}

@@ -1,0 +1,78 @@
+<svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#000"/>
+    </marker>
+  </defs>
+
+  <g id="boxes">
+    <!-- Benutzer -->
+    <rect x="100" y="350" width="80" height="60" fill="#fff" stroke="#000"/>
+    <text x="140" y="395" font-size="12">Benutzer</text>
+    <path d="M100 370 L80 420 M120 370 L140 420" stroke="#000"/>
+
+    <!-- App / Service Provider -->
+    <rect x="350" y="280" width="140" height="60" fill="#fff" stroke="#000"/>
+    <text x="420" y="315" font-size="12">App / Service Provider</text>
+
+    <!-- Identity Provider (IdP) -->
+    <rect x="650" y="280" width="140" height="60" fill="#fff" stroke="#000"/>
+    <text x="720" y="315" font-size="12">Identity Provider (IdP)</text>
+
+    <!-- Login-Seite -->
+    <rect x="650" y="420" width="140" height="60" fill="#fff" stroke="#000"/>
+    <text x="720" y="455" font-size="12">Login-Seite</text>
+
+    <!-- Anmeldedaten korrekt? -->
+    <rect x="650" y="520" width="140" height="60" fill="#fff" stroke="#000"/>
+    <text x="720" y="555" font-size="12">Anmeldedaten korrekt?</text>
+
+    <!-- Zugriff gewährt -->
+    <rect x="100" y="520" width="80" height="60" fill="#fff" stroke="#000"/>
+    <text x="140" y="555" font-size="12">Zugriff gewährt</text>
+  </g>
+
+  <g id="arrows">
+    <!-- Benutzer zu App -->
+    <line x1="180" y1="375" x2="340" y2="310" stroke="#000" marker-end="url(#arrowhead)"/>
+    <text x="260" y="345" font-size="12">1. Zugang zur App</text>
+
+    <!-- App zu IdP -->
+    <line x1="490" y1="310" x2="650" y2="310" stroke="#000" marker-end="url(#arrowhead)"/>
+    <text x="570" y="290" font-size="12">2. Weiterleitung zur Login-Seite</text>
+
+    <!-- IdP zu Login-Seite -->
+    <line x1="720" y1="340" x2="720" y2="420" stroke="#000" marker-end="url(#arrowhead)"/>
+    <text x="740" y="380" font-size="12">3. Login-Seite anzeigen</text>
+
+    <!-- Login-Seite zu Anmeldedaten korrekt? -->
+    <line x1="720" y1="480" x2="720" y2="520" stroke="#000" marker-end="url(#arrowhead)"/>
+    <text x="740" y="500" font-size="12">4. Authentifizierung</text>
+
+    <!-- Anmeldedaten korrekt? zu Ja -->
+    <line x1="720" y1="550" x2="680" y2="580" stroke="#000" marker-end="url(#arrowhead)"/>
+    <text x="650" y="570" font-size="12">Ja</text>
+
+    <!-- Anmeldedaten korrekt? zu Nein -->
+    <line x1="760" y1="550" x2="800" y2="580" stroke="#000" marker-end="url(#arrowhead)"/>
+    <text x="780" y="570" font-size="12">Nein</text>
+
+    <!-- Ja zu Token/Assertion -->
+    <line x1="680" y1="580" x2="720" y2="640" stroke="#000" marker-end="url(#arrowhead)"/>
+    <text x="720" y="610" font-size="12">5. Token / Assertion (SSO-Response)</text>
+
+    <!-- Nein zu Benutzer gibt Anmeldedaten ein -->
+    <line x1="800" y1="580" x2="760" y2="450" stroke="#000" marker-end="url(#arrowhead)"/>
+    <text x="780" y="520" font-size="12">Benutzer gibt Anmeldedaten ein</text>
+
+    <!-- Token/Assertion zu App -->
+    <line x1="720" y1="640" x2="350" y2="340" stroke="#000" marker-end="url(#arrowhead)"/>
+    <text x="540" y="490" font-size="12">6. Redirect zurück zur App mit Token</text>
+
+    <!-- App zu Zugriff gewährt -->
+    <line x1="420" y1="340" x2="180" y2="550" stroke="#000" marker-end="url(#arrowhead)"/>
+    <text x="280" y="450" font-size="12">7. Zugriff auf Ressource</text>
+  </g>
+
+  <text x="50" y="40" font-size="16">SSO - Ablaufdiagramm</text>
+</svg>

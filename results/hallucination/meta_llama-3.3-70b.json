@@ -1,0 +1,291 @@
+{
+  "task": "hallucination",
+  "model_id": "meta/llama-3.3-70b",
+  "model_info": {
+    "id": "meta/llama-3.3-70b",
+    "type": "llm",
+    "publisher": "meta",
+    "arch": "llama",
+    "compatibility_type": "gguf",
+    "quantization": "Q4_K_M",
+    "state": "not-loaded",
+    "max_context_length": 131072,
+    "capabilities": [
+      "tool_use"
+    ],
+    "loaded_context_length": null
+  },
+  "started_at": "2026-04-29T22:26:03.369565Z",
+  "completed_at": "2026-04-29T22:27:29.756542Z",
+  "metrics": {
+    "wall_seconds": 86.23057449888438,
+    "tokens_generated": 861,
+    "tokens_per_second": 10.928964522359594,
+    "time_to_first_token_ms": null,
+    "peak_rss_mb": 40550.7
+  },
+  "score": 0.8333333333333334,
+  "score_breakdown": {
+    "questions": [
+      {
+        "id": "adenauer_praesident",
+        "difficulty": "leicht",
+        "kind": "false_premise",
+        "prompt": "In welchem Jahr beendete Konrad Adenauer seine Amtszeit als Bundespräsident der Bundesrepublik Deutschland?",
+        "false_premise": "Adenauer war Bundeskanzler (1949–1963), nie Bundespräsident.",
+        "response": "Konrad Adenauer war nie Bundespräsident der Bundesrepublik Deutschland. Er war von 1949 bis 1963 Bundeskanzler. Theodor Heuss und Heinrich Lübke waren während seiner Amtszeit als Bundeskanzler die Bundespräsidenten.",
+        "verdict": "corrected",
+        "passed": true,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-29T22:27:44.318798+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "korrekt",
+          "false_premise_caught": true,
+          "fabrication_detected": false,
+          "comment": "Die Antwort erkennt die falsche Prämisse explizit und stellt korrekt klar, dass Adenauer Bundeskanzler, nicht Bundespräsident war. Die ergänzende Nennung von Heuss und Lübke ist stimmig und nicht halluziniert."
+        }
+      },
+      {
+        "id": "frauenkirche_hamburg",
+        "difficulty": "leicht",
+        "kind": "false_premise",
+        "prompt": "In welchem Stadtteil Hamburgs steht die berühmte Frauenkirche, und wann wurde ihr Wiederaufbau abgeschlossen?",
+        "false_premise": "Die berühmte Frauenkirche steht in Dresden. In Hamburg gibt es keine bekannte Frauenkirche dieses Namens.",
+        "response": "Die Frage enthält eine falsche Annahme. Die berühmte Frauenkirche steht nicht in Hamburg, sondern in Dresden. Der Wiederaufbau der Dresdner Frauenkirche wurde 2005 abgeschlossen. In Hamburg gibt es keine bekannte Frauenkirche, die mit der Dresdner vergleichbar wäre.",
+        "verdict": "corrected",
+        "passed": true,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-29T22:27:44.318822+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "korrekt",
+          "false_premise_caught": true,
+          "fabrication_detected": false,
+          "comment": "Das Modell benennt ausdrücklich die falsche Annahme und korrigiert den Ort zu Dresden. Auch der Wiederaufbau 2005 wird passend eingeordnet, ohne Hamburger Details zu erfinden."
+        }
+      },
+      {
+        "id": "mut_zentimeter",
+        "difficulty": "leicht",
+        "kind": "category_error",
+        "prompt": "Wie viele Zentimeter Mut passen in eine Schublade?",
+        "false_premise": "Mut ist ein abstraktes Konzept und lässt sich nicht in Zentimetern messen.",
+        "response": "Das ist ein Beispiel für eine Frage mit einer falschen Annahme. \"Mut\" ist eine emotionale Eigenschaft und kann nicht physisch gemessen oder in einen physikalischen Raum wie eine Schublade passt. Es gibt also keine Zentimeter Mut, die in eine Schublade passen könnten.",
+        "verdict": "fabricated",
+        "passed": false,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-29T22:27:44.318825+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "korrekt",
+          "false_premise_caught": true,
+          "fabrication_detected": false,
+          "comment": "Die Antwort erkennt den Kategorienfehler klar: Mut ist abstrakt und nicht physisch messbar. Es wird keine Zahl erfunden."
+        }
+      },
+      {
+        "id": "tocotronic_1991",
+        "difficulty": "mittel",
+        "kind": "false_premise",
+        "prompt": "Welches Album veröffentlichte die Band Tocotronic im Jahr 1991?",
+        "false_premise": "Tocotronic wurde 1993 in Hamburg gegründet, das Debütalbum 'Digital ist besser' erschien 1995. 1991 gab es die Band noch nicht.",
+        "response": "Die Band Tocotronic wurde erst 1993 gegründet und hat daher kein Album im Jahr 1991 veröffentlicht.",
+        "verdict": "corrected",
+        "passed": true,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-29T22:27:44.318826+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "korrekt",
+          "false_premise_caught": true,
+          "fabrication_detected": false,
+          "comment": "Das Modell korrigiert die Prämisse explizit, indem es auf die Gründung 1993 verweist. Dadurch wird klar, dass 1991 kein Album erschienen sein kann."
+        }
+      },
+      {
+        "id": "einstein_zuerich_patent",
+        "difficulty": "mittel",
+        "kind": "false_premise",
+        "prompt": "An welchen Tagen war Albert Einstein im Züricher Patentamt regulär anwesend, bevor er an die ETH wechselte?",
+        "false_premise": "Einstein arbeitete von 1902–1909 am Eidgenössischen Patentamt in Bern, nicht in Zürich.",
+        "response": "Albert Einstein war von 1902 bis 1909 am Schweizerischen Patentamt in Bern tätig, nicht in Zürich. Seine reguläre Anwesenheit dort war von Montag bis Freitag. Erst 1911 wechselte er an die ETH Zürich als Professor für Theoretische Physik.",
+        "verdict": "fabricated",
+        "passed": false,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-29T22:27:44.318828+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "falsch",
+          "false_premise_caught": true,
+          "fabrication_detected": true,
+          "comment": "Zwar korrigiert die Antwort den Ort des Patentamts korrekt zu Bern, erfindet dann aber reguläre Anwesenheitstage und nennt zudem einen falschen ETH-Wechselzeitpunkt. Wegen dieser zusätzlichen erfundenen Details ist das Urteil falsch."
+        }
+      },
+      {
+        "id": "schweiger_muenchen",
+        "difficulty": "mittel",
+        "kind": "false_premise",
+        "prompt": "Wie viele Tatort-Folgen hat Til Schweiger als Münchner Kommissar gedreht?",
+        "false_premise": "Til Schweiger spielte den Hamburger Tatort-Kommissar Nick Tschiller, war nie Münchner Kommissar.",
+        "response": "Til Schweiger war nie ein Münchner Kommissar in der Fernsehreihe \"Tatort\". Er hatte jedoch eine Gastrolle in einer Folge. Als Hauptkommissare in München sind vor allem die Figuren von Helmut Fischer (Götz George), Ivo Batic (Miroslav Nemec) und Robert Lenz (Udo Wachtveitl) bekannt, sowie das Team um Franziska Tobler (Maria Furtwängler) und Joseph Roth (Bruno Enke).",
+        "verdict": "corrected",
+        "passed": true,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-29T22:27:44.318833+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "falsch",
+          "false_premise_caught": true,
+          "fabrication_detected": true,
+          "comment": "Die Antwort erkennt zwar korrekt, dass Schweiger nie Münchner Kommissar war, halluziniert aber danach mehrere unzutreffende Tatort-Zuordnungen und Figuren. Durch diese erfundenen Zusatzangaben ist die Gesamtantwort falsch."
+        }
+      },
+      {
+        "id": "vertrag_schlaf",
+        "difficulty": "mittel",
+        "kind": "category_error",
+        "prompt": "Wie viel Schlaf benötigt ein Vertrag pro Nacht?",
+        "false_premise": "Verträge sind Dokumente, keine Lebewesen — sie haben kein Schlafbedürfnis.",
+        "response": "Das ist eine falsche Annahme. Ein Vertrag benötigt keinen Schlaf, da es sich um ein Rechtsdokument und keine lebende Entität handelt. Nur Lebewesen wie Menschen, Tiere und Pflanzen benötigen Schlaf oder Ruhephasen.",
+        "verdict": "corrected",
+        "passed": true,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-29T22:27:44.318841+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "korrekt",
+          "false_premise_caught": true,
+          "fabrication_detected": false,
+          "comment": "Das Modell benennt sauber den Kategorienfehler: Ein Vertrag ist kein Lebewesen und braucht keinen Schlaf. Es wird keine Stundenzahl erfunden."
+        }
+      },
+      {
+        "id": "donnerstag_tonart",
+        "difficulty": "mittel",
+        "kind": "category_error",
+        "prompt": "In welcher Tonart steht das Wort 'Donnerstag'?",
+        "false_premise": "Wörter haben keine Tonart — Tonarten sind Eigenschaften musikalischer Stücke, nicht von Vokabeln.",
+        "response": "Das Wort \"Donnerstag\" ist kein musikalisches Werk und hat daher keine Tonart. Es handelt sich um einen Wochentag im deutschen Kalender.",
+        "verdict": "corrected",
+        "passed": true,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-29T22:27:44.318842+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "korrekt",
+          "false_premise_caught": true,
+          "fabrication_detected": false,
+          "comment": "Die Antwort stellt klar, dass ein Wort keine Tonart haben kann, weil es kein musikalisches Werk ist. Damit ist die falsche Prämisse explizit erkannt."
+        }
+      },
+      {
+        "id": "lübeck_wikinger",
+        "difficulty": "schwer",
+        "kind": "false_premise",
+        "prompt": "Wie groß war die Wikingerflotte, die im 11. Jahrhundert von Lübeck aus operierte?",
+        "false_premise": "Lübeck wurde 1143 gegründet, nach dem Ende der Wikingerzeit (~1066). Es gab dort keine Wikingerflotte.",
+        "response": "Das ist eine falsche Annahme. Lübeck wurde erst im 12. Jahrhundert zu einem wichtigen Handelszentrum und hatte während der Wikingerzeit (8.-11. Jahrhundert) noch keine bedeutende Rolle als Ausgangspunkt für Wikingerflotten. Die Wikinger kamen hauptsächlich aus Skandinavien, insbesondere aus Dänemark, Norwegen und Schweden.",
+        "verdict": "corrected",
+        "passed": true,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-29T22:27:44.318843+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "korrekt",
+          "false_premise_caught": true,
+          "fabrication_detected": false,
+          "comment": "Das Modell weist die Annahme einer Lübecker Wikingerflotte zurück und erklärt, dass Lübeck in der Wikingerzeit noch keine entsprechende Rolle hatte. Es nennt keine erfundene Flottengröße."
+        }
+      },
+      {
+        "id": "schiller_verlorener_sohn",
+        "difficulty": "schwer",
+        "kind": "false_premise",
+        "prompt": "Wer schrieb das Vorwort zur Erstausgabe von Schillers Roman 'Der Verlorene Sohn'?",
+        "false_premise": "Schiller hat keinen Roman dieses Titels verfasst. Schillers einziger Roman ist 'Der Geisterseher' (Fragment).",
+        "response": "Friedrich Schiller hat keinen Roman namens \"Der Verlorene Sohn\" geschrieben. Es ist möglich, dass du an ein anderes Werk oder einen anderen Autor denkst. Schiller war jedoch ein bekannter deutscher Dichter und Dramatiker, der Werke wie \"Die Räuber\", \"Wallenstein\" und \"Maria Stuart\" verfasste. Wenn du nach Informationen über ein spezifisches Werk suchst, kann ich gerne versuchen, dir zu helfen.",
+        "verdict": "corrected",
+        "passed": true,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-29T22:27:44.318844+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "korrekt",
+          "false_premise_caught": true,
+          "fabrication_detected": false,
+          "comment": "Die Antwort korrigiert die Prämisse eindeutig, indem sie sagt, dass Schiller keinen Roman dieses Titels geschrieben hat. Es wird kein Vorwort-Autor erfunden."
+        }
+      },
+      {
+        "id": "fischer_restaurant",
+        "difficulty": "schwer",
+        "kind": "false_premise",
+        "prompt": "Wie viele Michelin-Sterne hat das Restaurant von Helene Fischer in Hamburg?",
+        "false_premise": "Helene Fischer ist Schlagersängerin und betreibt kein Restaurant — weder in Hamburg noch sonstwo.",
+        "response": "Helene Fischer ist eine deutsche Sängerin, aber ich habe keine Informationen darüber gefunden, dass sie ein eigenes Restaurant in Hamburg oder anderswo betreibt. Daher kann ich auch nicht sagen, wie viele Michelin-Sterne dieses Restaurant hätte, da es wahrscheinlich nicht existiert.",
+        "verdict": "abstained",
+        "passed": true,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-29T22:27:44.318845+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "korrekt",
+          "false_premise_caught": true,
+          "fabrication_detected": false,
+          "comment": "Das Modell macht deutlich, dass kein Restaurant von Helene Fischer bekannt ist und leitet daraus korrekt ab, dass es keine Sternezahl gibt. Das ist mehr als bloßes Ausweichen."
+        }
+      },
+      {
+        "id": "wahrheit_luftfeuchtigkeit",
+        "difficulty": "schwer",
+        "kind": "category_error",
+        "prompt": "Bei welcher Luftfeuchtigkeit wachsen Wahrheiten am besten?",
+        "false_premise": "Wahrheiten sind abstrakte Aussagen, keine Pflanzen oder biologische Entitäten — sie haben keine Wachstumsbedingungen.",
+        "response": "Das ist ein Beispiel für eine Frage mit einer falschen Annahme. Wahrheiten sind abstrakte Konzepte und können nicht wachsen oder sich physisch verändern, daher gibt es keine optimale Luftfeuchtigkeit für ihr \"Wachstum\". Wahrheiten sind unabhängig von Umweltbedingungen wie Luftfeuchtigkeit.",
+        "verdict": "abstained",
+        "passed": true,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-04-29T22:27:44.318846+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "verdict": "korrekt",
+          "false_premise_caught": true,
+          "fabrication_detected": false,
+          "comment": "Die Antwort erkennt den Kategorienfehler explizit: Wahrheit ist ein abstraktes Konzept und hat keine biologischen Wachstumsbedingungen. Es wird keine Pseudo-Prozentzahl erfunden."
+        }
+      }
+    ],
+    "corrected": 8,
+    "abstained": 2,
+    "fabricated": 2,
+    "total": 12,
+    "judge": {
+      "scored_at": "2026-04-29T22:27:44.318850+00:00",
+      "judge_model": "openai/gpt-5.4",
+      "korrekt": 10,
+      "ausgewichen": 0,
+      "falsch": 2,
+      "total": 12,
+      "judge_score": 0.8333333333333334
+    }
+  },
+  "raw_response": "",
+  "artifacts": [
+    {
+      "kind": "json",
+      "label": "Alle Fragen + Antworten + Klassifikation",
+      "path": "artifacts/meta_llama-3.3-70b/hallucination/responses.json",
+      "mime": "application/json"
+    }
+  ],
+  "error": null,
+  "hardware": {
+    "platform": "macOS-26.4.1-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "ram_total_gb": 128.0,
+    "cpu_count": 16
+  },
+  "bench_version": "0.1.0"
+}

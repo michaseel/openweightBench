@@ -1,0 +1,291 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kanban Board</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Add some subtle transitions */
+        .card {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        /* Confetti animation */
+        @keyframes confetti {
+            0% {
+                transform: translate(0, 0);
+            }
+            100% {
+                transform: translate(0, -100vh);
+            }
+        }
+        
+        .confetti {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: #ff69b4;
+            animation: confetti 2s ease-in-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto p-4 mt-6">
+        <!-- Columns -->
+        <div class="flex flex-wrap justify-center mb-4">
+            <div data-testid="column-backlog" class="w-full md:w-1/4 xl:w-1/4 p-6 bg-gray-100 rounded-lg m-2">
+                <h2 class="text-lg font-bold">Backlog</h2>
+                <button data-testid="add-card" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Add card</button>
+                <div id="backlog-cards"></div>
+            </div>
+            <div data-testid="column-in-progress" class="w-full md:w-1/4 xl:w-1/4 p-6 bg-gray-100 rounded-lg m-2">
+                <h2 class="text-lg font-bold">In Progress</h2>
+                <button data-testid="add-card" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Add card</button>
+                <div id="in-progress-cards"></div>
+            </div>
+            <div data-testid="column-review" class="w-full md:w-1/4 xl:w-1/4 p-6 bg-gray-100 rounded-lg m-2">
+                <h2 class="text-lg font-bold">Review</h2>
+                <button data-testid="add-card" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Add card</button>
+                <div id="review-cards"></div>
+            </div>
+            <div data-testid="column-done" class="w-full md:w-1/4 xl:w-1/4 p-6 bg-gray-100 rounded-lg m-2">
+                <h2 class="text-lg font-bold">Done</h2>
+                <button data-testid="add-card" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Add card</button>
+                <div id="done-cards"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete confirmation modal -->
+    <div id="delete-modal" class="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center hidden">
+        <div class="bg-white rounded-lg p-4">
+            <p>Are you sure you want to delete this card?</p>
+            <button data-testid="confirm-delete" id="confirm-delete-btn" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Delete</button>
+            <button id="cancel-delete-btn" class="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Confetti container -->
+    <div id="confetti-container"></div>
+
+    <script>
+        // Get the columns
+        const backlogColumn = document.querySelector('[data-testid="column-backlog"]');
+        const inProgressColumn = document.querySelector('[data-testid="column-in-progress"]');
+        const reviewColumn = document.querySelector('[data-testid="column-review"]');
+        const doneColumn = document.querySelector('[data-testid="column-done"]');
+
+        // Get the add card buttons
+        const addCardButtons = document.querySelectorAll('[data-testid="add-card"]');
+
+        // Get the delete confirmation modal
+        const deleteModal = document.getElementById('delete-modal');
+        const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+        const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+
+        // Get the confetti container
+        const confettiContainer = document.getElementById('confetti-container');
+
+        // Initialize the cards
+        let cards = JSON.parse(localStorage.getItem('kanban-cards')) || [
+            { id: 1, title: 'Card 1', column: 'backlog' },
+            { id: 2, title: 'Card 2', column: 'in-progress' },
+            { id: 3, title: 'Card 3', column: 'review' },
+            { id: 4, title: 'Card 4', column: 'done' }
+        ];
+
+        // Function to render the cards
+        function renderCards() {
+            // Clear the columns
+            const columns = [backlogColumn, inProgressColumn, reviewColumn, doneColumn];
+            columns.forEach(column => {
+                const cardContainer = column.querySelector('div');
+                cardContainer.innerHTML = '';
+            });
+
+            // Render the cards
+            cards.forEach(card => {
+                const column = getColumn(card.column);
+                const cardHtml = `
+                    <div data-testid="card" class="card bg-white rounded-lg p-4 mb-2" draggable="true">
+                        <textarea data-testid="card-input" class="w-full h-10 p-2 border border-gray-400 rounded-lg">${card.title}</textarea>
+                        <button data-testid="delete-card" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Delete</button>
+                    </div>
+                `;
+                column.querySelector('div').insertAdjacentHTML('beforeend', cardHtml);
+            });
+        }
+
+        // Function to get the column element
+        function getColumn(columnName) {
+            switch (columnName) {
+                case 'backlog':
+                    return backlogColumn;
+                case 'in-progress':
+                    return inProgressColumn;
+                case 'review':
+                    return reviewColumn;
+                case 'done':
+                    return doneColumn;
+                default:
+                    return null;
+            }
+        }
+
+        // Function to handle card drag and drop
+        function handleDragAndDrop() {
+            const cardsElements = document.querySelectorAll('[data-testid="card"]');
+
+            cardsElements.forEach(card => {
+                card.addEventListener('dragstart', e => {
+                    e.dataTransfer.setData('text', card.dataset.cardId);
+                });
+            });
+
+            const columns = [backlogColumn, inProgressColumn, reviewColumn, doneColumn];
+
+            columns.forEach(column => {
+                column.addEventListener('dragover', e => {
+                    e.preventDefault();
+                });
+
+                column.addEventListener('drop', e => {
+                    e.preventDefault();
+                    const cardId = e.dataTransfer.getData('text');
+                    const card = cards.find(c => c.id === parseInt(cardId));
+                    if (card) {
+                        switch (column.dataset.testid) {
+                            case 'column-backlog':
+                                card.column = 'backlog';
+                                break;
+                            case 'column-in-progress':
+                                card.column = 'in-progress';
+                                break;
+                            case 'column-review':
+                                card.column = 'review';
+                                break;
+                            case 'column-done':
+                                card.column = 'done';
+                                // Trigger confetti animation
+                                triggerConfetti();
+                                break;
+                            default:
+                                return;
+                        }
+                        localStorage.setItem('kanban-cards', JSON.stringify(cards));
+                        renderCards();
+                    }
+                });
+            });
+        }
+
+        // Function to handle add card button click
+        function handleAddCardButtonClick() {
+            addCardButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const column = getColumnName(button.parentNode);
+                    const newCardId = cards.length + 1;
+                    cards.push({ id: newCardId, title: '', column });
+                    localStorage.setItem('kanban-cards', JSON.stringify(cards));
+                    renderCards();
+                });
+            });
+        }
+
+        // Function to handle delete card button click
+        function handleDeleteCardButtonClick() {
+            const deleteButtons = document.querySelectorAll('[data-testid="delete-card"]');
+
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const cardId = getCardId(button.parentNode);
+                    deleteModal.style.display = 'flex';
+                    confirmDeleteBtn.addEventListener('click', () => {
+                        cards = cards.filter(c => c.id !== cardId);
+                        localStorage.setItem('kanban-cards', JSON.stringify(cards));
+                        renderCards();
+                        deleteModal.style.display = 'none';
+                    });
+                    cancelDeleteBtn.addEventListener('click', () => {
+                        deleteModal.style.display = 'none';
+                    });
+                });
+            });
+        }
+
+        // Function to handle edit card
+        function handleEditCard() {
+            const cardInputs = document.querySelectorAll('[data-testid="card-input"]');
+
+            cardInputs.forEach(input => {
+                input.addEventListener('input', () => {
+                    const cardId = getCardId(input.parentNode);
+                    const newTitle = input.value;
+                    cards = cards.map(c => {
+                        if (c.id === cardId) {
+                            c.title = newTitle;
+                        }
+                        return c;
+                    });
+                    localStorage.setItem('kanban-cards', JSON.stringify(cards));
+                });
+
+                input.addEventListener('keypress', e => {
+                    if (e.key === 'Enter') {
+                        const cardId = getCardId(input.parentNode);
+                        const newTitle = input.value;
+                        cards = cards.map(c => {
+                            if (c.id === cardId) {
+                                c.title = newTitle;
+                            }
+                            return c;
+                        });
+                        localStorage.setItem('kanban-cards', JSON.stringify(cards));
+                    }
+                });
+            });
+        }
+
+        // Function to get the column name
+        function getColumnName(element) {
+            switch (element.dataset.testid) {
+                case 'column-backlog':
+                    return 'backlog';
+                case 'column-in-progress':
+                    return 'in-progress';
+                case 'column-review':
+                    return 'review';
+                case 'column-done':
+                    return 'done';
+                default:
+                    return null;
+            }
+        }
+
+        // Function to get the card id
+        function getCardId(element) {
+            const card = cards.find(c => c.title === element.querySelector('textarea').value);
+            return card.id;
+        }
+
+        // Function to trigger confetti animation
+        function triggerConfetti() {
+            confettiContainer.innerHTML = '<div class="confetti"></div>';
+            setTimeout(() => {
+                confettiContainer.innerHTML = '';
+            }, 2000);
+        }
+
+        renderCards();
+        handleDragAndDrop();
+        handleAddCardButtonClick();
+        handleDeleteCardButtonClick();
+        handleEditCard();
+    </script>
+</body>
+</html>
+```

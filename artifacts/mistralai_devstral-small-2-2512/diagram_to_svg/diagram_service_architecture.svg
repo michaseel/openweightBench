@@ -1,0 +1,297 @@
+<svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#000"/>
+    </marker>
+    <style>
+      .box { fill: #fff; stroke: #000; stroke-width: 1.5; }
+      .sync { stroke-dasharray: "none"; }
+      .async { stroke-dasharray: "5,5"; }
+      .external { fill: #ffcccc; stroke: #f00; }
+      .text { font-family: Arial, sans-serif; font-size: 14px; fill: #000; }
+      .title { font-weight: bold; font-size: 16px; }
+    </style>
+  </defs>
+
+  <g id="legend">
+    <line x1="1050" y1="30" x2="1100" y2="30" stroke="#000" stroke-width="2"/>
+    <text x="1110" y="35" class="text">Sync</text>
+    <line x1="1050" y1="60" x2="1100" y2="60" stroke="#000" stroke-width="2" stroke-dasharray="5,5"/>
+    <text x="1110" y="65" class="text">Async</text>
+    <rect x="1048" y="90" width="20" height="20" class="external"/>
+    <text x="1110" y="105" class="text">External</text>
+  </g>
+
+  <g id="goals">
+    <rect x="50" y="100" width="200" height="80" rx="5"/>
+    <text x="60" y="120" class="title">Goals:</text>
+    <text x="60" y="140" class="text">- Scalability</text>
+    <text x="60" y="160" class="text">- Reliability</text>
+    <text x="60" y="180" class="text">- Security</text>
+    <text x="60" y="200" class="text">- Maintainability</text>
+  </g>
+
+  <g id="notes">
+    <rect x="50" y="280" width="200" height="100" rx="5"/>
+    <text x="60" y="300" class="title">Notes:</text>
+    <text x="60" y="320" class="text">- Use Docker for all services</text>
+    <text x="60" y="340" class="text">- CI/CD with GitHub Actions</text>
+    <text x="60" y="360" class="text">- Logs → ELK Stack</text>
+  </g>
+
+  <g id="frontend">
+    <rect x="400" y="150" width="120" height="60" class="box"/>
+    <text x="410" y="185" class="title">Frontend (React)</text>
+  </g>
+
+  <g id="api-gateway">
+    <rect x="580" y="140" width="120" height="60" class="box"/>
+    <text x="590" y="175" class="title">API Gateway (Kong)</text>
+  </g>
+
+  <g id="auth-service">
+    <rect x="780" y="120" width="140" height="60" class="box"/>
+    <text x="790" y="155" class="title">Auth Service (JWT)</text>
+  </g>
+
+  <g id="backend">
+    <rect x="780" y="240" width="140" height="60" class="box"/>
+    <text x="790" y="275" class="title">Backend (Python/FastAPI)</text>
+  </g>
+
+  <g id="external-api">
+    <rect x="400" y="280" width="120" height="60" class="box external"/>
+    <text x="410" y="315" class="title">External API (Payment Provider)</text>
+  </g>
+
+  <g id="message-queue">
+    <rect x="780" y="360" width="140" height="60" class="box"/>
+    <text x="790" y="395" class="title">Message Queue (RabbitMQ)</text>
+  </g>
+
+  <g id="worker-service">
+    <rect x="980" y="360" width="140" height="60" class="box"/>
+    <text x="990" y="395" class="title">Worker Service (Python)</text>
+  </g>
+
+  <g id="monitoring">
+    <rect x="780" y="460" width="140" height="60" class="box"/>
+    <text x="790" y="495" class="title">Monitoring (Prometheus + Grafana)</text>
+  </g>
+
+  <g id="databases">
+    <rect x="980" y="120" width="60" height="40" class="box"/>
+    <text x="985" y="145" class="title">User DB (PostgreSQL)</text>
+    <rect x="980" y="240" width="60" height="40" class="box"/>
+    <text x="985" y="265" class="title">Database (PostgreSQL)</text>
+    <rect x="980" y="360" width="60" height="40" class="box"/>
+    <text x="985" y="385" class="title">File Storage (S3)</text>
+  </g>
+
+  <line x1="520" y1="180" x2="580" y2="170" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="700" y1="170" x2="780" y2="150" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="200" x2="980" y2="200" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="240" x2="980" y2="260" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="300" x2="980" y2="300" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="980" y1="420" x2="780" y2="450" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780" y1="420" x2="980" y2="390" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="780

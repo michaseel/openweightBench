@@ -1,0 +1,201 @@
+{
+  "task": "coding",
+  "model_id": "nvidia/nemotron-3-super",
+  "model_info": {
+    "id": "nvidia/nemotron-3-super",
+    "type": "llm",
+    "publisher": "nvidia",
+    "arch": "nemotron_h_moe",
+    "compatibility_type": "gguf",
+    "quantization": "Q4_K_M",
+    "state": "not-loaded",
+    "max_context_length": 1048576,
+    "capabilities": [
+      "tool_use"
+    ],
+    "loaded_context_length": null
+  },
+  "started_at": "2026-04-29T22:54:50.633919Z",
+  "completed_at": "2026-04-29T23:04:20.548049Z",
+  "metrics": {
+    "wall_seconds": 569.9122244999744,
+    "tokens_generated": 12548,
+    "tokens_per_second": 30.40258532653479,
+    "time_to_first_token_ms": 1686.0,
+    "peak_rss_mb": 82064.8
+  },
+  "score": 0.6666666666666666,
+  "score_breakdown": {
+    "looks_like_html": true,
+    "html_length": 12163,
+    "raw_length": 12165,
+    "lint_checks": [
+      {
+        "id": "col_backlog",
+        "label": "Spalte 'Backlog'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_in_progress",
+        "label": "Spalte 'In Progress'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_review",
+        "label": "Spalte 'Review'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_done",
+        "label": "Spalte 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "drag_drop",
+        "label": "HTML5 drag & drop or sortable lib",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "local_storage",
+        "label": "localStorage persistence",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "tailwind_cdn",
+        "label": "Tailwind via CDN",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "confetti",
+        "label": "Confetti animation on 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Add card button",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "vanilla_js",
+        "label": "Vanilla JS (no React/Vue/Angular/Svelte)",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_alert_prompt",
+        "label": "No window.alert/prompt for CRUD",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "editable_cards",
+        "label": "Editable cards (contenteditable / input)",
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "lint_passed": 12,
+    "lint_total": 12,
+    "lint_score": 1.0,
+    "e2e_checks": [
+      {
+        "id": "renders",
+        "label": "Page loads with all 4 columns",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Add card via button",
+        "passed": false,
+        "detail": "card was not created (count unchanged)"
+      },
+      {
+        "id": "no_double_add",
+        "label": "Card is added exactly 1× (no double submit)",
+        "passed": false,
+        "detail": "no add happened, so not verifiable"
+      },
+      {
+        "id": "delete_card",
+        "label": "Delete card via button + confirmation",
+        "passed": false,
+        "detail": "Page.wait_for_selector: Timeout 2000ms exceeded.\nCall log:\n  - waiting for locator(\"[data-testid=\\\"confirm-delete\\\"]\") to be visible\n    9 × locator resolved to hidden <button data-testid=\"confirm-del"
+      },
+      {
+        "id": "persistence",
+        "label": "Cards survive a reload",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_console_errors",
+        "label": "No JS console errors",
+        "passed": false,
+        "detail": "pageerror: Cannot set properties of null (setting 'innerHTML'); pageerror: deleteModal is not defined; pageerror: Cannot set properties of null (setting 'innerHTML')"
+      }
+    ],
+    "e2e_passed": 2,
+    "e2e_total": 6,
+    "e2e_score": 0.3333333333333333,
+    "judge": {
+      "scored_at": "2026-04-29T23:04:41.087580+00:00",
+      "judge_model": "openai/gpt-5.4",
+      "scores": {
+        "board_renders": 1.0,
+        "column_completeness": 1.0,
+        "cards_present": 0.5,
+        "ui_affordances": 0.5,
+        "design_quality": 0.7,
+        "code_structure": 0.8,
+        "dom_safety": 0.9,
+        "robustness": 0.6,
+        "code_quality": 0.7,
+        "render_matches_code": 0.4
+      },
+      "judge_score": 0.68,
+      "comment_visual": "Das Board rendert sauber mit vier klar beschrifteten Spalten und funktionierenden Eingabefeldern. Sichtbare Karten gibt es im Screenshot aber nur im Backlog, obwohl der Code eigentlich Dummy-Karten für alle Spalten anlegt; Drag-&-Drop-Hinweise sind zudem visuell kaum erkennbar.",
+      "comment_code": "Der Code ist insgesamt ordentlich in Funktionen gegliedert und nutzt für Kartentitel sicher textContent statt rohem HTML. Schwächen sind ein offensichtlicher Laufzeitfehler durch die ungebundene Variable deleteModal sowie fehlende Absicherung bei localStorage/saveState und teils inkonsistente Data-Keys.",
+      "comment_consistency": "Hier gibt es eine deutliche, aber nicht totale Diskrepanz: Der Code befüllt bei leerem State alle vier Spalten mit Dummy-Karten, im Screenshot erscheinen dennoch nur zwei Karten im Backlog. Das spricht für Logik-/State-Probleme oder für bereits persistierten Zustand, daher Konsistenz nur mittel bis schwach."
+    }
+  },
+  "raw_response": "\n\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<title>Kanban Board</title>\n<script src=\"https://cdn.tailwindcss.com\"></script>\n<style>\n  /* Confetti particles */\n  .confetti {\n    position: fixed;\n    top: -10px;\n    pointer-events: none;\n    animation: fall linear forwards;\n  }\n  @keyframes fall {\n    to {\n      transform: translateY(100vh) rotate(360deg);\n      opacity: 0;\n    }\n  }\n  /* Drag visual feedback */\n  .dragging {\n    opacity: 0.5;\n  }\n  /* Hide utility */\n  .hidden { display: none; }\n</style>\n</head>\n<body class=\"bg-gray-50 min-h-screen p-4\">\n  <h1 class=\"text-2xl font-bold mb-6 text-center\">Kanban Board</h1>\n  <div class=\"flex gap-4\" id=\"board\">\n    <!-- Backlog Column -->\n    <div data-testid=\"column-backlog\" class=\"flex-1 bg-white rounded-lg shadow p-4 space-y-3\">\n      <h2 class=\"text-lg font-semibold\">Backlog</h2>\n      <div class=\"space-y-2\" id=\"column-backlog-cards\"></div>\n      <button data-testid=\"add-card\" class=\"self-start px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition\">Add card</button>\n      <input type=\"text\" data-testid=\"card-input\" data-column=\"backlog\" class=\"mt-2 w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500\" placeholder=\"Type card title...\">\n    </div>\n    <!-- In Progress Column -->\n    <div data-testid=\"column-in-progress\" class=\"flex-1 bg-white rounded-lg shadow p-4 space-y-3\">\n      <h2 class=\"text-lg font-semibold\">In Progress</h2>\n      <div class=\"space-y-2\" id=\"column-in-progress-cards\"></div>\n      <button data-testid=\"add-card\" class=\"self-start px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition\">Add card</button>\n      <input type=\"text\" data-testid=\"card-input\" data-column=\"inprogress\" class=\"mt-2 w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500\" placeholder=\"Type card title...\">\n    </div>\n    <!-- Review Column -->\n    <div data-testid=\"column-review\" class=",
+  "artifacts": [
+    {
+      "kind": "html",
+      "label": "Generierte App",
+      "path": "artifacts/nvidia_nemotron-3-super/coding/output.html",
+      "mime": "text/html"
+    },
+    {
+      "kind": "text",
+      "label": "Raw model response",
+      "path": "artifacts/nvidia_nemotron-3-super/coding/raw_response.txt",
+      "mime": "text/plain"
+    },
+    {
+      "kind": "image",
+      "label": "Screenshot der gerenderten App",
+      "path": "artifacts/nvidia_nemotron-3-super/coding/screenshot.png",
+      "mime": "image/png"
+    }
+  ],
+  "error": null,
+  "hardware": {
+    "platform": "macOS-26.4.1-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "ram_total_gb": 128.0,
+    "cpu_count": 16
+  },
+  "bench_version": "0.1.0"
+}

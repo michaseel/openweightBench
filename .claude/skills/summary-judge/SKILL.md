@@ -75,7 +75,7 @@ Schauplatz:
 
 **Kapitel 1 „Gottlieb und Malineken"** (Zeilen 3–775):
 1. Idylle: Gottlieb hilft Schmied Lebbin, fährt Holz holen ins Blumental.
-2. Spielt mit Malineken am See: sie fahren im Kahn zur Insel; Großmutter erzählt Märchen von der Prinzessin vom See, deren Krone in den See fiel.
+2. Spielt mit Malineken am See: sie fahren im Kahn zur Insel; Großmutter erzählt das **Märchen von der Prinzessin vom See** ausführlich (Korpus-Zeilen ~205–290): Vor Zeiten habe es im Blumentalwald eine **große Stadt mit Mauern, Türmen und Toren** gegeben; der König ließ eine prächtige **Zauberkrone** anfertigen (Diamanten, Saphire, Perlen), an der ein Zauber hing — ginge sie verloren, ginge das ganze Reich unter. Während der König im Krieg war, vernachlässigte die schöne Prinzessin die Wache; ein böser **Zauberer** schlich sich als altes Männlein in das Schloss, raubte die Krone, schwang sich als großer schwarzer Vogel davon, ließ aber die verzauberte Krone über dem See fallen — sie versank. Die Prinzessin und ihr Hofstaat wurden in **Fische verwandelt**, das Kriegsvolk und der König versteinerten, das Reich versank. Nur in Vollmondnächten darf die Prinzessin wieder Mensch werden und sitzt klagend auf einem Stein am Ufer. **Diese Märchenerzählung ist Teil des Korpus** — eine Modellzusammenfassung, die „verlorenes Königreich", „verfluchte/verzauberte Krone", „versunkene Stadt", „in Fische verwandelte Hofgesellschaft" oder „Prinzessin vom See" als Märchenmotiv erwähnt, halluziniert **nicht**. Die Märchenfigur ist von der Gräfin Barnewitz zu unterscheiden, die sich in Kap. 3 nur kurz als „Prinzessin vom See" ausgibt.
 3. Sie sammeln Blumen für das Grab von Gottliebs Mutter auf dem Friedhof von Finkenwalde.
 4. **Begegnung mit dem verkleideten Schweinetreiber** auf dem Friedhof. Er erzählt vor versammelten Holzschlägern und Bauern die grausame Geschichte vom Tod der Eltern Gottliebs am 27.10.1806 — durch Etienne de Beaumont, mit Holzpantoffeln. Schwört Gottlieb auf Rache und Pflicht für König und Vaterland ein.
 5. Auf dem Heimweg ist Gottlieb wie verwandelt, schweigsam.
@@ -132,7 +132,7 @@ Die Modelle sollen diese Anker beim NIAH-Retrieval finden. Sie sind **nicht Teil
 - **Der König von Preußen** kommt nur generisch vor (gefangen in Potsdam), nicht namentlich (Friedrich Wilhelm III. wird nicht ausgeschrieben).
 - **Napoleon persönlich** tritt nicht auf.
 - **Kein Schloss / keine Burg** im Blumental — die Stadt aus dem Märchen ist Sage, nicht Gegenwart.
-- **Keine Drachen, keine Magie** — keine Märchen-Welt.
+- **Keine Drachen, keine Magie auf der Erzählebene** — die *Rahmenhandlung* ist realistisch. Aber: das **Märchen der Großmutter** (verzauberte Krone, schwarzer Vogel-Zauberer, in Fische verwandelte Prinzessin, versunkene Stadt) ist Binnenerzählung im Korpus und **darf vom Modell als Element der Geschichte erwähnt werden**, ohne dass das als Halluzination zählt.
 - **Süddeutschland/Bayern/München** — alles spielt in der Mark Brandenburg.
 - ⛔ **Hägelin als Verräter** — im 120k-Korpus ist Hägelin nur ein ängstlicher Komparse, der durch ein Fenster springt. Seine Verräter-Rolle entwickelt sich erst in Kap. 4, das **nicht** im Korpus ist. Wenn ein Modell Hägelin als Verräter beschreibt: kann sein, dass es das Buch über Trainingswissen kennt — aber es wäre nicht aus dem Korpus belegt. Bewerte das nicht hart.
 - ⛔ **Oberst Alexander von Hatzrow / Satzrow** — kommt **nicht** im 120k-Korpus vor (das ist Kap. 4–5).

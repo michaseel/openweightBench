@@ -1,0 +1,201 @@
+{
+  "task": "coding",
+  "model_id": "meta/llama-3.3-70b",
+  "model_info": {
+    "id": "meta/llama-3.3-70b",
+    "type": "llm",
+    "publisher": "meta",
+    "arch": "llama",
+    "compatibility_type": "gguf",
+    "quantization": "Q4_K_M",
+    "state": "not-loaded",
+    "max_context_length": 131072,
+    "capabilities": [
+      "tool_use"
+    ],
+    "loaded_context_length": null
+  },
+  "started_at": "2026-04-29T22:20:47.063103Z",
+  "completed_at": "2026-04-29T22:25:51.624654Z",
+  "metrics": {
+    "wall_seconds": 304.5685872499598,
+    "tokens_generated": 2369,
+    "tokens_per_second": 10.458511889025733,
+    "time_to_first_token_ms": 4224.0,
+    "peak_rss_mb": 40550.7
+  },
+  "score": 0.9166666666666667,
+  "score_breakdown": {
+    "looks_like_html": true,
+    "html_length": 12125,
+    "raw_length": 12137,
+    "lint_checks": [
+      {
+        "id": "col_backlog",
+        "label": "Spalte 'Backlog'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_in_progress",
+        "label": "Spalte 'In Progress'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_review",
+        "label": "Spalte 'Review'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_done",
+        "label": "Spalte 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "drag_drop",
+        "label": "HTML5 drag & drop or sortable lib",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "local_storage",
+        "label": "localStorage persistence",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "tailwind_cdn",
+        "label": "Tailwind via CDN",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "confetti",
+        "label": "Confetti animation on 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Add card button",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "vanilla_js",
+        "label": "Vanilla JS (no React/Vue/Angular/Svelte)",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_alert_prompt",
+        "label": "No window.alert/prompt for CRUD",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "editable_cards",
+        "label": "Editable cards (contenteditable / input)",
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "lint_passed": 12,
+    "lint_total": 12,
+    "lint_score": 1.0,
+    "e2e_checks": [
+      {
+        "id": "renders",
+        "label": "Page loads with all 4 columns",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Add card via button",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_double_add",
+        "label": "Card is added exactly 1× (no double submit)",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "delete_card",
+        "label": "Delete card via button + confirmation",
+        "passed": false,
+        "detail": "Page.wait_for_selector: Timeout 2000ms exceeded.\nCall log:\n  - waiting for locator(\"[data-testid=\\\"confirm-delete\\\"]\") to be visible\n    9 × locator resolved to hidden <button id=\"confirm-delete-btn\" "
+      },
+      {
+        "id": "persistence",
+        "label": "Cards survive a reload",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_console_errors",
+        "label": "No JS console errors",
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "e2e_passed": 5,
+    "e2e_total": 6,
+    "e2e_score": 0.8333333333333334,
+    "judge": {
+      "scored_at": "2026-04-29T22:26:10.590618+00:00",
+      "judge_model": "openai/gpt-5.4",
+      "scores": {
+        "board_renders": 1.0,
+        "column_completeness": 1.0,
+        "cards_present": 1.0,
+        "ui_affordances": 0.5,
+        "design_quality": 0.6,
+        "code_structure": 0.6,
+        "dom_safety": 0.2,
+        "robustness": 0.3,
+        "code_quality": 0.4,
+        "render_matches_code": 0.7
+      },
+      "judge_score": 0.5900000000000001,
+      "comment_visual": "Das Board rendert klar mit allen vier erwarteten Spalten und je einer sichtbaren Karte. Add-Card-Buttons sind gut erkennbar, aber Drag/Edit-Affordances sind visuell kaum vermittelt; das Layout wirkt ordentlich, jedoch eher schlicht als produktreif.",
+      "comment_code": "Die Grundstruktur ist nachvollziehbar mit getrennten Funktionen für Rendern und Events, aber es gibt mehrere gravierende Schwächen: User-Inhalte werden per innerHTML/insertAdjacentHTML eingefügt, localStorage/JSON.parse laufen ohne Schutz, und mehrere Logikfehler gefährden die Funktionalität. Besonders problematisch sind fehlende cardId-Datenattribute für Drag-and-Drop, die Nutzung von dataset.testid statt data-testid sowie wiederholt registrierte Modal-Listener.",
+      "comment_consistency": "Screenshot und Code passen im Grundbild zusammen: vier Spalten, vier Karten, Buttons. Allerdings verspricht der Code mehr Interaktivität, als verlässlich funktionieren dürfte; insbesondere Drag-and-Drop und Teile der Kartenzuordnung wirken im Code fehlerhaft, obwohl der statische Render sichtbar korrekt ist."
+    }
+  },
+  "raw_response": "```html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Kanban Board</title>\n    <link href=\"https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css\" rel=\"stylesheet\">\n    <style>\n        /* Add some subtle transitions */\n        .card {\n            transition: all 0.3s ease-in-out;\n        }\n        \n        /* Confetti animation */\n        @keyframes confetti {\n            0% {\n                transform: translate(0, 0);\n            }\n            100% {\n                transform: translate(0, -100vh);\n            }\n        }\n        \n        .confetti {\n            position: absolute;\n            top: 0;\n            left: 0;\n            width: 100%;\n            height: 100vh;\n            background-color: #ff69b4;\n            animation: confetti 2s ease-in-out forwards;\n        }\n    </style>\n</head>\n<body>\n    <div class=\"container mx-auto p-4 mt-6\">\n        <!-- Columns -->\n        <div class=\"flex flex-wrap justify-center mb-4\">\n            <div data-testid=\"column-backlog\" class=\"w-full md:w-1/4 xl:w-1/4 p-6 bg-gray-100 rounded-lg m-2\">\n                <h2 class=\"text-lg font-bold\">Backlog</h2>\n                <button data-testid=\"add-card\" class=\"bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded\">Add card</button>\n                <div id=\"backlog-cards\"></div>\n            </div>\n            <div data-testid=\"column-in-progress\" class=\"w-full md:w-1/4 xl:w-1/4 p-6 bg-gray-100 rounded-lg m-2\">\n                <h2 class=\"text-lg font-bold\">In Progress</h2>\n                <button data-testid=\"add-card\" class=\"bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded\">Add card</button>\n                <div id=\"in-progress-cards\"></div>\n            </div>\n            <div data-testid=\"column-review\" class=\"w-full md:w-1/4 xl:w-1/4 p-6 bg-gray-100 rounded-lg m-2\">\n                <h2 class=\"text-lg font-bold\">Review</h",
+  "artifacts": [
+    {
+      "kind": "html",
+      "label": "Generierte App",
+      "path": "artifacts/meta_llama-3.3-70b/coding/output.html",
+      "mime": "text/html"
+    },
+    {
+      "kind": "text",
+      "label": "Raw model response",
+      "path": "artifacts/meta_llama-3.3-70b/coding/raw_response.txt",
+      "mime": "text/plain"
+    },
+    {
+      "kind": "image",
+      "label": "Screenshot der gerenderten App",
+      "path": "artifacts/meta_llama-3.3-70b/coding/screenshot.png",
+      "mime": "image/png"
+    }
+  ],
+  "error": null,
+  "hardware": {
+    "platform": "macOS-26.4.1-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "ram_total_gb": 128.0,
+    "cpu_count": 16
+  },
+  "bench_version": "0.1.0"
+}

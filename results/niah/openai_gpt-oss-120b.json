@@ -270,62 +270,61 @@
         "comprehension_traps_total": 2,
         "raw_comprehension_answer": "1. Der Schmied vom Blumental heißt **Michael Lebbin** – Vor‑ und Nachname sind Michael Lebbin.  \n2. Der französische Hauptmann, dem Gottliebs Eltern zum Opfer fielen, ist **Etienne de Beaumont**.  \n3. Malineken stahl den großen Schlüssel, indem sie das **Tabakstuch** über das **Schlüsselbrett** warf und so unbemerkt mit‑nehmen konnte.  \n4. Gottlieb muss sich verstecken, weil die französischen Soldaten sonst den abgeschlossenen Raum betreten und ihn wieder einsperren würden; ein offenes Fenster würde ihm die Flucht ermöglichen, doch das Verstecken verhindert, dass er von den Franzosen entdeckt wird.  \n5. Der Text nennt keinen Onkel von Gottlieb – es gibt keine Angabe zu einem „Onkel“, daher kann diese Frage nicht aus dem vorliegenden Material beantwortet werden.",
         "judge": {
-          "scored_at": "2026-04-29T06:46:28.042450+00:00",
+          "scored_at": "2026-04-29T22:15:00.715828+00:00",
           "judge_model": "openai/gpt-5.4",
-          "judge_score": 0.405,
+          "judge_score": 0.763,
           "axes": {
-            "main_characters": 0.55,
+            "main_characters": 0.9,
             "setting": 1.0,
-            "plot": 0.35,
-            "themes": 0.8,
-            "code_text_mix_recognized": 1.0,
-            "no_hallucinations": 0.1
+            "plot": 0.7,
+            "themes": 0.9,
+            "no_hallucinations": 0.6
           },
-          "comment": "Schauplatz, Epoche und Gottlieb/Malineken sind weitgehend richtig erfasst, ebenso die Themen Rache, Glaube und Besatzung. Der Plot wird aber stark verfälscht: kein Waffenkeller, keine Prinzessin mit verfluchter Krone, kein verlorenes Königreich; außerdem ist der Schweinetreiber nicht Michael Lebbin, sondern der verkleidete Oberst."
+          "comment": "Schauplatz, Zeit und die Hauptfiguren sind weitgehend korrekt erfasst; auch Rache-, Glaubens- und Widerstandsthemen stimmen gut. Abzug gibt es, weil die „Prinzessin vom See“ missverständlich als reale, zu befreiende Figur behandelt wird und die wichtige Gefangennahme/Befreiung Gottliebs durch Gräfin Barnewitz und Malineken fehlt."
         },
         "comprehension_judge": {
-          "scored_at": "2026-04-29T06:46:33.747728+00:00",
+          "scored_at": "2026-04-29T22:15:08.666960+00:00",
           "judge_model": "openai/gpt-5.4",
-          "judge_score": 0.75,
+          "judge_score": 0.5833333333333334,
           "questions": [
             {
               "id": "schmied_name",
               "score": 1.0,
               "verdict": "correct",
-              "comment": "Michael Lebbin ist korrekt genannt."
+              "comment": "Michael Lebbin ist korrekt."
             },
             {
               "id": "kapitaen_eltern",
               "score": 1.0,
               "verdict": "correct",
-              "comment": "Etienne de Beaumont ist korrekt."
+              "comment": "Etienne de Beaumont ist korrekt benannt."
             },
             {
               "id": "schluessel_ablenkung",
-              "score": 1.0,
-              "verdict": "correct",
-              "comment": "Die Antwort nennt das Tuch über dem Schlüsselbrett; das trifft den gesuchten Vorgang ausreichend."
+              "score": 0.5,
+              "verdict": "partially_correct",
+              "comment": "Der Bezug auf Tuch/Schlüsselbrett passt teilweise, aber die eigentliche Ablenkung über den Vorwand des Semmelverkaufs in der Wachtstube fehlt bzw. ist verfälscht."
             },
             {
               "id": "insel_grund",
               "score": 0.0,
               "verdict": "incorrect",
-              "comment": "Falsch begründet: Gottlieb muss sich verborgen halten, weil die Franzosen ihn sonst erschießen bzw. totschießen würden."
+              "comment": "Falsch: Gottlieb muss sich verborgen halten, weil die Franzosen ihn sonst erschießen würden, nicht bloß wieder einsperren."
             },
             {
               "id": "trap_onkel",
               "score": 1.0,
               "verdict": "correct",
-              "comment": "Die Falle wird sauber zurückgewiesen; Gottlieb hat keinen genannten Onkel."
+              "comment": "Die Falle wird sauber zurückgewiesen; ein Onkel wird im Korpus nicht genannt."
             },
             {
               "id": "trap_lebbin_bonaparte",
-              "score": 0.5,
-              "verdict": "partial",
-              "comment": "Keine Halluzination zu Bonaparte, aber die Falle wird nicht explizit zurückgewiesen; stattdessen wird off-topic eine frühere Antwortliste wiederholt."
+              "score": 0.0,
+              "verdict": "incorrect",
+              "comment": "Die Falle wird nicht beantwortet bzw. zurückgewiesen, sondern es wird ein irrelevanter Antwortblock wiederholt; keine korrekte Ablehnung der falschen Prämisse."
             }
           ],
-          "comment": "Vier Antworten sind klar korrekt, eine faktische Antwort ist klar falsch. Bei der Bonaparte-Falle halluziniert das Modell zwar nichts, weist die Prämisse aber auch nicht sauber zurück."
+          "comment": "Zwei Fakten und die Onkel-Falle sind korrekt. Schwächen: Schlüssel-Szene nur teilweise getroffen, Todesdrohung gegen Gottlieb verfehlt und die Bonaparte-Falle nicht sauber zurückgewiesen."
         }
       }
     ],
@@ -340,11 +339,11 @@
       "comprehension": 0.3
     },
     "judge": {
-      "scored_at": "2026-04-29T06:46:33.747741+00:00",
+      "scored_at": "2026-04-29T22:15:08.666979+00:00",
       "judge_model": "openai/gpt-5.4",
-      "judge_score": 0.5775,
-      "summary_judge_score": 0.405,
-      "comprehension_judge_score": 0.75
+      "judge_score": 0.6731666666666667,
+      "summary_judge_score": 0.763,
+      "comprehension_judge_score": 0.5833333333333334
     }
   },
   "raw_response": "",
