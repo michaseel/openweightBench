@@ -500,18 +500,38 @@ def _overall_weight(task: str) -> float:
     return 1.0
 
 
+_MISSING_TASK_PENALTY = 0.10  # Abschlag in Prozentpunkten auf den Modell-Eigenschnitt.
+
+
 def _overall_score(cells: dict[str, dict]) -> tuple[float | None, float]:
+    """Gewichteter Mittelwert über alle Tasks. Fehlende oder errored Tasks
+    werden mit (Eigenschnitt des Modells − 10pp, ≥ 0) imputiert und gehen
+    mit voller Gewichtung ein. So führt eine Lücke nie zu besseren Noten
+    als ein Modell, das die Tasks ehrlich gefahren hat — ohne aber so hart
+    zu strafen wie ein 0-Score-Penalty. Preliminary-Tasks (Judge ausstehend)
+    gehen mit ihrem Linter-/Regex-Score ein."""
+    valid: list[tuple[float, float]] = []
+    for task, cell in cells.items():
+        score = cell.get("score")
+        if cell.get("error") or score is None:
+            continue
+        valid.append((_overall_weight(task), float(score)))
+    if not valid:
+        return None, 0.0
+    own_avg = sum(w * s for w, s in valid) / sum(w for w, _ in valid)
+    imputed = max(0.0, own_avg - _MISSING_TASK_PENALTY)
+
     total = 0.0
     weight_sum = 0.0
     for task, cell in cells.items():
-        score = cell.get("score")
-        if score is None or cell.get("error") or cell.get("preliminary"):
-            continue
         weight = _overall_weight(task)
-        total += float(score) * weight
+        score = cell.get("score")
+        if cell.get("error") or score is None:
+            score_value = imputed
+        else:
+            score_value = float(score)
+        total += score_value * weight
         weight_sum += weight
-    if weight_sum == 0:
-        return None, 0.0
     return total / weight_sum, weight_sum
 
 
@@ -663,10 +683,12 @@ def build_site(
         )
         # task name → score (None on error/missing)
         cells: dict[str, dict] = {}
+        incomplete_tasks: list[str] = []
         for tname, _ in tabs:
             r = scores_per_task.get(tname)
             if r is None:
                 cells[tname] = {"score": None, "error": None, "wall": None, "preliminary": False}
+                incomplete_tasks.append(tname)
             else:
                 cells[tname] = {
                     "score": _effective_score(r),
@@ -674,6 +696,8 @@ def build_site(
                     "wall": r.metrics.wall_seconds,
                     "preliminary": _is_preliminary(r),
                 }
+                if r.error is not None:
+                    incomplete_tasks.append(tname)
         overall_score, overall_weight = _overall_score(cells)
         overall_rows.append(
             {
@@ -688,6 +712,8 @@ def build_site(
                 "released": meta.released(info) or "",
                 "ram_mb": ram_mb,
                 "total_wall": total_wall,
+                "incomplete_tasks": incomplete_tasks,
+                "task_count": len(tabs),
                 "overall_score": overall_score,
                 "overall_weight": overall_weight,
                 "cells": cells,
@@ -695,8 +721,15 @@ def build_site(
         )
     overall_rows.sort(key=lambda r: -(r["overall_score"] if r["overall_score"] is not None else -1))
     overall_scatter_rows = []
+    overall_scatter_excluded = 0
     for r in overall_rows:
         if r["overall_score"] is None or r["total_wall"] <= 0:
+            continue
+        if r["incomplete_tasks"]:
+            # Modelle mit fehlenden/errored Tasks würden im Cumulative-vs-Score
+            # Scatter unfair gut dastehen (weniger Wall-Zeit, künstlich hoher
+            # Schnitt). Lieber komplett auslassen als kosmetisch markieren.
+            overall_scatter_excluded += 1
             continue
         weights_gb, kv_gb, total_gb = _ram_estimate(r["ram_mb"])
         overall_scatter_rows.append(
@@ -726,6 +759,7 @@ def build_site(
         all_models=store.all_known_models(),
         overall_rows=overall_rows,
         overall_scatter_rows=overall_scatter_rows,
+        overall_scatter_excluded=overall_scatter_excluded,
         overall_scatter_rows_json=json.dumps(overall_scatter_rows, ensure_ascii=False),
     )
     (out_dir / "index.html").write_text(landing)

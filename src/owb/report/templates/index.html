@@ -107,7 +107,7 @@
 <section class="mt-12">
   <h2 class="text-lg font-medium tracking-tight">Overall summary across all models</h2>
   <p class="mt-1 text-sm text-stone-600">
-    Score 0–100&nbsp;% per benchmark. Overall = weighted mean: Coding counts double, Tool Use half. RAM = on-disk size of the model (Q4 file). Wall = cumulative bench time across all tasks.
+    Score 0–100&nbsp;% per benchmark. Overall = weighted mean: Coding counts double, Tool Use half. Missing or errored tasks are imputed at the model's own average minus 10&nbsp;pp (clamped at 0) with full weight — a gap never inflates the overall score, but the penalty isn't a flat zero either. RAM = on-disk size of the model (Q4 file). Wall = cumulative bench time across all tasks. The cumulative-vs-score scatter only shows models that completed every benchmark, so the comparison stays apples-to-apples; the table below includes everyone.
   </p>
 
   {% if overall_scatter_rows %}
@@ -154,7 +154,7 @@
           <svg width="14" height="14"><circle cx="7" cy="7" r="5.5" fill="#475569" fill-opacity="0.78" stroke="#475569" stroke-width="2" stroke-dasharray="3,2"/></svg>
           MoE
         </span>
-        <span><span id="os-count">{{ overall_scatter_rows|length }}</span>/{{ overall_scatter_rows|length }} visible</span>
+        <span><span id="os-count">{{ overall_scatter_rows|length }}</span>/{{ overall_scatter_rows|length }} visible{% if overall_scatter_excluded %} · {{ overall_scatter_excluded }} excluded (incomplete data){% endif %}</span>
       </div>
       <svg viewBox="0 0 {{ sp_w }} {{ sp_h }}" class="w-full num" style="height:408px" preserveAspectRatio="xMidYMid meet">
         <line x1="{{ sp_pad_l }}" y1="{{ sp_pad_t + sp_inner_h }}" x2="{{ sp_pad_l + sp_inner_w }}" y2="{{ sp_pad_t + sp_inner_h }}" stroke="#d6d3d1" stroke-width="1"/>
