@@ -31,6 +31,17 @@ class ModelInfo(_Base):
 
     @property
     def supports_tools(self) -> bool:
+        """Whether the tool-use bench should run against this model.
+
+        LM Studio's capability list is not reliably populated — for some models
+        (e.g. meta/muse-glimmer, which demonstrably emits correct tool_calls)
+        it comes back empty. An empty list therefore means "unknown", and the
+        bench tries anyway: a model that really cannot call tools scores badly,
+        which is more informative than an unexplained gap in the table. Only an
+        explicitly populated list that omits `tool_use` counts as a no.
+        """
+        if not self.capabilities:
+            return True
         return "tool_use" in self.capabilities
 
     @property

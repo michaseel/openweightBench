@@ -1,0 +1,46 @@
+{#
+  Model filter bar: size (RAM cap) + release year. Governs everything on the
+  page — chart dots dim, table rows drop out. Wired up by window.owbFilter
+  (see _layout.html).
+
+  Context:
+    scope                 id prefix, e.g. "os" (landing) or "sp" (bench page)
+    filter_years          available release years, newest first
+    filter_year_default   year preselected in the dropdown
+#}
+<div class="flex flex-wrap items-center gap-x-6 gap-y-2 bg-stone-50 border border-stone-200 rounded-lg px-4 py-2.5 text-sm">
+  <span class="text-xs font-medium uppercase tracking-wider text-stone-500">Filter</span>
+
+  <div class="flex items-center gap-2">
+    <label for="{{ scope }}-ram-filter" class="text-stone-600">Max RAM</label>
+    <select id="{{ scope }}-ram-filter" class="bg-white border border-stone-300 rounded px-2 py-1 num">
+      <option value="0">all</option>
+      <option value="16">16 GB</option>
+      <option value="32">32 GB</option>
+      <option value="48">48 GB</option>
+      <option value="64">64 GB</option>
+      <option value="128" selected>128 GB</option>
+    </select>
+  </div>
+
+  {% if filter_years %}
+    <div class="flex items-center gap-2">
+      <label for="{{ scope }}-year-filter" class="text-stone-600">Released</label>
+      {# Values: "m<N>" = last N months (relative to the viewer's date),
+         "y<YYYY>" = that calendar year only, "" = no restriction. #}
+      <select id="{{ scope }}-year-filter" class="bg-white border border-stone-300 rounded px-2 py-1 num">
+        <option value="m6">last 6 months</option>
+        <option value="m12">last 12 months</option>
+        <option value="m24">last 24 months</option>
+        {% for y in filter_years %}
+          <option value="y{{ y }}"{% if y == filter_year_default %} selected{% endif %}>{{ y }} only</option>
+        {% endfor %}
+        <option value="">all</option>
+      </select>
+    </div>
+  {% endif %}
+
+  <span class="text-xs text-stone-500 ml-auto num">
+    <span id="{{ scope }}-table-count">–</span> of {{ filter_total }} models shown
+  </span>
+</div>

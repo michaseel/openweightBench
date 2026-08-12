@@ -110,6 +110,12 @@
     Score 0–100&nbsp;% per benchmark. Overall = weighted mean: Coding counts double, Tool Use half. Missing or errored tasks are imputed at the model's own average minus 10&nbsp;pp (clamped at 0) with full weight — a gap never inflates the overall score, but the penalty isn't a flat zero either. RAM = on-disk size of the model (Q4 file). Wall = cumulative bench time across all tasks. The cumulative-vs-score scatter only shows models that completed every benchmark, so the comparison stays apples-to-apples; the table below includes everyone.
   </p>
 
+  <div class="mt-4">
+    {% set scope = "os" %}
+    {% set filter_total = overall_rows|length %}
+    {% include "_filter_bar.html" %}
+  </div>
+
   {% if overall_scatter_rows %}
     {% set sp_w = 920 %}
     {% set sp_h = 408 %}
@@ -132,17 +138,6 @@
     <div class="mt-4 bg-white border border-stone-200 rounded-lg p-4 relative" id="overall-scatter">
       <div class="flex items-baseline justify-between gap-3 flex-wrap mb-2">
         <h3 class="text-sm font-semibold tracking-tight text-stone-800 uppercase">Cumulative wall-time vs. overall score</h3>
-        <div class="flex items-center gap-2 text-sm">
-          <label for="os-ram-filter" class="text-stone-600">Max RAM</label>
-          <select id="os-ram-filter" class="bg-white border border-stone-300 rounded px-2 py-1 num">
-            <option value="0">all</option>
-            <option value="16">16 GB</option>
-            <option value="32">32 GB</option>
-            <option value="48">48 GB</option>
-            <option value="64">64 GB</option>
-            <option value="128" selected>128 GB</option>
-          </select>
-        </div>
       </div>
       <div class="text-xs text-stone-500 flex flex-wrap items-center gap-x-3 gap-y-1 mb-2">
         <span>Colour = vendor · Number = total params (B) · RAM estimate for 64k ctx</span>
@@ -177,7 +172,7 @@
           {% set y = sp_pad_t + sp_inner_h - (sp_inner_h * m.score) %}
           {% set lbl = ("%.0f"|format(m.params_b)) if m.params_b else "" %}
           {% set lbl_size = 6 if lbl|length > 2 else 8 %}
-          <a href="models/{{ m.model_id|safe_id }}.html" class="os-dot" data-total-ram="{{ m.total_ram_gb or '' }}">
+          <a href="models/{{ m.model_id|safe_id }}.html" class="os-dot" data-total-ram="{{ m.total_ram_gb or '' }}" data-released="{{ m.released or '' }}">
             <circle cx="{{ x }}" cy="{{ y }}" r="9" fill="{{ m.color }}" fill-opacity="0.78"
                     stroke="{{ m.color }}" stroke-width="1.75"
                     {% if m.is_moe %}stroke-dasharray="2.5,1.5"{% endif %}
@@ -193,46 +188,10 @@
       </svg>
     </div>
 
-    <script>
-    (() => {
-      const sel = document.getElementById('os-ram-filter');
-      if (!sel) return;
-      const dots = document.querySelectorAll('#overall-scatter .os-dot');
-      const countEl = document.getElementById('os-count');
-
-      // Grey out options for which no model qualifies.
-      Array.from(sel.options).forEach(opt => {
-        const cap = parseFloat(opt.value);
-        if (!cap) return;
-        const matches = Array.from(dots).some(g => {
-          const ram = parseFloat(g.dataset.totalRam || '');
-          return ram && ram <= cap;
-        });
-        if (!matches) {
-          opt.disabled = true;
-          opt.textContent = opt.textContent + ' — no models';
-        }
-      });
-
-      function applyFilter() {
-        const cap = parseFloat(sel.value);
-        let visible = 0;
-        dots.forEach(g => {
-          const ram = parseFloat(g.dataset.totalRam || '');
-          const filtered = !!cap && (!ram || ram > cap);
-          g.classList.toggle('os-filtered', filtered);
-          if (!filtered) visible++;
-        });
-        if (countEl) countEl.textContent = visible;
-      }
-      sel.addEventListener('change', applyFilter);
-      applyFilter();
-    })();
-    </script>
   {% endif %}
 
   <div class="mt-4 bg-white border border-stone-200 rounded-lg overflow-x-auto">
-    <table class="sortable w-full text-sm">
+    <table id="overall-table" class="sortable w-full text-sm">
       <thead class="bg-stone-50 border-b border-stone-200 text-left text-stone-600">
         <tr>
           <th data-sort class="px-3 py-2 font-medium">Model</th>
@@ -247,7 +206,8 @@
       </thead>
       <tbody class="divide-y divide-stone-100">
         {% for r in overall_rows %}
-          <tr class="cursor-pointer row-link" onclick="window.location='models/{{ r.model_id|safe_id }}.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="{{ r.total_ram_gb or '' }}" data-released="{{ r.released or '' }}"
+              onclick="window.location='models/{{ r.model_id|safe_id }}.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="{{ r.model_id|short_id }}" title="{{ r.model_id }}">{{ r.model_id|short_id }}</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">{{ r.quant }}</td>
             <td class="px-3 py-2 num text-right font-bold {% if r.overall_score is none %}text-stone-300{% elif r.overall_score >= 0.7 %}text-emerald-700{% elif r.overall_score > 0 %}text-amber-700{% else %}text-red-600{% endif %}" data-sort="{{ r.overall_score if r.overall_score is not none else -1 }}">
@@ -286,7 +246,27 @@
       </tbody>
     </table>
   </div>
-  <p class="mt-2 text-xs text-stone-500">Click a row to open the model detail page. Columns are sortable.</p>
+  <p class="mt-2 text-xs text-stone-500">Click a row to open the model detail page. Columns are sortable. The filter above hides table rows and dims the corresponding dots in the chart.</p>
+
+  <script>
+  (() => {
+    owbFilter({
+      ramSelect: 'os-ram-filter',
+      yearSelect: 'os-year-filter',
+      groups: [
+        // Table first: it holds every model, so its count is the honest one.
+        { els: document.querySelectorAll('#overall-table .os-tr'), cls: 'owb-hidden' },
+        { els: document.querySelectorAll('#overall-scatter .os-dot'), cls: 'os-filtered' },
+      ],
+      onApply: ([tableVisible, dotsVisible]) => {
+        const t = document.getElementById('os-table-count');
+        if (t) t.textContent = tableVisible;
+        const d = document.getElementById('os-count');
+        if (d) d.textContent = dotsVisible;
+      },
+    });
+  })();
+  </script>
 </section>
 {% endif %}
 

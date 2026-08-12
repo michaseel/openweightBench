@@ -51,6 +51,14 @@
          class="hidden sm:block shrink-0 w-48 md:w-64 aspect-square self-start object-cover rounded-lg border border-stone-200 bg-stone-50"
          loading="lazy" onerror="this.style.display='none'">
   </div>
+
+  {% if rows %}
+    <div class="mt-5">
+      {% set scope = "sp" %}
+      {% set filter_total = rows|length %}
+      {% include "_filter_bar.html" %}
+    </div>
+  {% endif %}
 </section>
 
 {% if scatter_rows %}
@@ -71,17 +79,6 @@
   <section class="mb-8">
     <div class="flex items-baseline justify-between flex-wrap gap-2 mb-2">
       <h2 class="text-sm font-semibold tracking-tight text-stone-800 uppercase">Wall-time vs. quality</h2>
-      <div class="flex items-center gap-2 text-sm">
-        <label for="sp-ram-filter" class="text-stone-600">Max RAM</label>
-        <select id="sp-ram-filter" class="bg-white border border-stone-300 rounded px-2 py-1 num">
-          <option value="0">all</option>
-          <option value="16">16 GB</option>
-          <option value="32">32 GB</option>
-          <option value="48">48 GB</option>
-          <option value="64">64 GB</option>
-          <option value="128" selected>128 GB</option>
-        </select>
-      </div>
     </div>
     <p class="text-xs text-stone-500 mb-3">
       X = wall-time for <em>this</em> bench · Y = score (0–100&nbsp;%) in this bench. Optimum is top-left — fast and good. RAM estimate for 64k context: 4&nbsp;GB system + model weights + max(2&nbsp;GB, 40% of weights) for KV cache.
@@ -122,7 +119,7 @@
           {% set y = sp_pad_t + sp_inner_h - (sp_inner_h * m.score) %}
           {% set lbl = ("%.0f"|format(m.params_b)) if m.params_b else "" %}
           {% set lbl_size = 6 if lbl|length > 2 else 8 %}
-          <g class="sp-dot" data-model-id="{{ m.model_id }}" data-total-ram="{{ m.total_ram_gb or '' }}" data-moe="{{ '1' if m.is_moe else '0' }}" style="cursor:pointer">
+          <g class="sp-dot" data-model-id="{{ m.model_id }}" data-total-ram="{{ m.total_ram_gb or '' }}" data-released="{{ m.released or '' }}" data-moe="{{ '1' if m.is_moe else '0' }}" style="cursor:pointer">
             <circle cx="{{ x }}" cy="{{ y }}" r="9" fill="{{ m.color }}" fill-opacity="0.78"
                     stroke="{{ m.color }}" stroke-width="1.75"
                     {% if m.is_moe %}stroke-dasharray="2.5,1.5"{% endif %}
@@ -146,7 +143,7 @@
       <ol id="sp-list" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1.5 text-sm">
         {% for m in scatter_rows|sort(attribute='score', reverse=True) %}
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="{{ m.model_id }}" data-total-ram="{{ m.total_ram_gb or '' }}">
+              data-model-id="{{ m.model_id }}" data-total-ram="{{ m.total_ram_gb or '' }}" data-released="{{ m.released or '' }}">
             <span class="text-xs text-stone-400 w-5 text-right num">{{ loop.index }}.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:{{ m.color }}"></span>
             <a href="../models/{{ m.model_id|safe_id }}.html#{{ task_name }}" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="{{ m.model_id }}">{{ m.short_id }}</a>
@@ -165,9 +162,8 @@
   <script id="sp-data" type="application/json">{{ scatter_rows_json | safe }}</script>
   <script>
   (() => {
-    const sel = document.getElementById('sp-ram-filter');
-    if (!sel) return;
     const card = document.getElementById('sp-card');
+    if (!card) return;
     const dots = card.querySelectorAll('.sp-dot');
     const rows = document.querySelectorAll('#sp-list .sp-row');
     const tip = document.getElementById('sp-tooltip');
@@ -176,44 +172,10 @@
       JSON.parse(document.getElementById('sp-data').textContent).map(m => [m.model_id, m])
     );
 
-    // Grey out (rather than remove) options for which no model qualifies.
-    Array.from(sel.options).forEach(opt => {
-      const cap = parseFloat(opt.value);
-      if (!cap) return;
-      const matches = Array.from(dots).some(g => {
-        const ram = parseFloat(g.dataset.totalRam || '');
-        return ram && ram <= cap;
-      });
-      if (!matches) {
-        opt.disabled = true;
-        opt.textContent = opt.textContent + ' — no models';
-      }
-    });
-
-    // Decides whether a model falls below the current RAM cap
-    // (true = greyed out, false = within the filter).
-    function isFiltered(g) {
-      const cap = parseFloat(sel.value);
-      if (!cap) return false;
-      const ram = parseFloat(g.dataset.totalRam || '');
-      return !ram || ram > cap;
-    }
-
-    function applyFilter() {
-      let visible = 0;
-      dots.forEach(g => {
-        const filtered = isFiltered(g);
-        g.classList.toggle('sp-filtered', filtered);
-        if (!filtered) visible++;
-      });
-      rows.forEach(li => {
-        li.classList.toggle('sp-filtered', isFiltered(li));
-      });
-      countEl.textContent = visible;
-      emphasize(null);
-    }
-    sel.addEventListener('change', applyFilter);
-    applyFilter();
+    // The chart's own filter groups are wired up further down, together with
+    // the result table, so a single filter bar governs both. Redrawing the
+    // dots after a filter change needs emphasize(), hence the handle.
+    window.spEmphasize = emphasize;
 
     function emphasize(modelId) {
       dots.forEach(g => {
@@ -510,7 +472,7 @@
 {% block table %}
 <section>
   <div class="bg-white border border-stone-200 rounded-lg overflow-hidden">
-    <table class="sortable w-full text-sm">
+    <table id="sp-table" class="sortable w-full text-sm">
       <thead class="bg-stone-50 border-b border-stone-200 text-left text-stone-600">
         <tr>
           <th data-sort class="px-4 py-2 font-medium">Model</th>
@@ -539,7 +501,8 @@
               {% set rns.preview = artifact_url(a.path) %}
             {% endfor %}
           {% endif %}
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="{{ r.total_ram_gb or '' }}" data-released="{{ r.released or '' }}"
               {% if rns.preview %}data-preview="{{ rns.preview }}"{% endif %}
               onclick="window.location='{{ model_detail_url(r.model_id) }}#{{ task_name }}'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="{{ r.model_id|short_id }}" title="{{ r.model_id }}">
@@ -584,7 +547,35 @@
   </div>
   <p class="mt-3 text-xs text-stone-500">
     Click a row to open the model detail page. Hover shows available render previews. Column headers are sortable.
+    The filter at the top of the page hides table rows and dims the matching dots in the chart.
   </p>
+
+  {% if rows %}
+    <script>
+    (() => {
+      // One filter bar for the whole page. Wired up here, after the table, so
+      // it works on benches that have no scatter chart too.
+      owbFilter({
+        ramSelect: 'sp-ram-filter',
+        yearSelect: 'sp-year-filter',
+        groups: [
+          // Table first: it lists every model of this bench, including the
+          // errored ones the scatter drops, so its count is the honest one.
+          { els: document.querySelectorAll('#sp-table .sp-tr'), cls: 'owb-hidden' },
+          { els: document.querySelectorAll('#sp-card .sp-dot'), cls: 'sp-filtered' },
+          { els: document.querySelectorAll('#sp-list .sp-row'), cls: 'sp-filtered' },
+        ],
+        onApply: ([tableVisible, dotsVisible]) => {
+          const t = document.getElementById('sp-table-count');
+          if (t) t.textContent = tableVisible;
+          const c = document.getElementById('sp-count');
+          if (c) c.textContent = dotsVisible;
+          if (window.spEmphasize) window.spEmphasize(null);
+        },
+      });
+    })();
+    </script>
+  {% endif %}
 </section>
 {% endblock %}
 

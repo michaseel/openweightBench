@@ -307,25 +307,35 @@ class LMStudioClient:
         Returns True on success. Use this before tasks that need a large
         context window — JIT loading defaults to a small context (~20k).
 
-        Variant-spezifische Modelle (z.B. ``…@q8_0``) gehen über das
-        ``lmstudio``-Python-SDK, weil ``lms load`` nur die Default-Variante
-        akzeptiert. Standard-IDs gehen weiter über die ``lms``-CLI.
+        Goes through the ``lms`` CLI, which addresses models by *model key*.
+        Some keys contain an ``@`` (e.g. ``ornith-1.0-9b@q4_k_m``, shipped as
+        its own repo) and load fine. A non-selected quant variant of a
+        multi-variant model (e.g. ``google/gemma-4-e2b@q8_0``, see
+        `is_loadable_key`) is rejected with "Model not found" — the REST API
+        resolves those ids, but the loader does not, so they cannot be loaded
+        at a chosen context length.
+
+        The ``lmstudio`` Python SDK is only a fallback for a missing CLI. It is
+        not a workaround for variants: ``load_new_instance`` returns a handle
+        for them without loading anything.
         """
-        if "@" in model_id:
+        cmd = ["lms", "load", model_id, "--gpu", gpu, "--ttl", str(ttl_seconds), "-y"]
+        if context_length is not None:
+            cmd.extend(["--context-length", str(context_length)])
+        try:
+            res = subprocess.run(cmd, capture_output=True, text=True, timeout=900)
+            if res.returncode == 0:
+                return True
+        except subprocess.TimeoutExpired:
+            return False
+        except FileNotFoundError:
             return self._load_via_sdk(
                 model_id,
                 context_length=context_length,
                 gpu=gpu,
                 ttl_seconds=ttl_seconds,
             )
-        cmd = ["lms", "load", model_id, "--gpu", gpu, "--ttl", str(ttl_seconds), "-y"]
-        if context_length is not None:
-            cmd.extend(["--context-length", str(context_length)])
-        try:
-            res = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
-            return res.returncode == 0
-        except (FileNotFoundError, subprocess.TimeoutExpired):
-            return False
+        return False
 
     def _load_via_sdk(
         self,
@@ -352,6 +362,37 @@ class LMStudioClient:
                 return bool(m and m.identifier)
         except Exception:  # noqa: BLE001
             return False
+
+    def is_loadable_key(self, model_id: str) -> bool:
+        """Whether ``lms load`` can address this id, i.e. whether it is a model
+        key rather than a non-selected quant variant.
+
+        ``lms ls --json`` lists one entry per model with its ``modelKey`` plus
+        the ``variants`` it holds. Only the key itself (and the variant LM
+        Studio has selected) is loadable; the other variants exist for the REST
+        API but not for the loader. Assumes loadable when ``lms`` is
+        unavailable, so a missing CLI doesn't look like a variant problem.
+        """
+        entries = self._ls_entries()
+        if not entries:
+            return True
+        for e in entries:
+            if e.get("modelKey") == model_id:
+                return True
+            if e.get("selectedVariant") == model_id:
+                return True
+        return False
+
+    def _ls_entries(self) -> list[dict[str, Any]]:
+        try:
+            res = subprocess.run(
+                ["lms", "ls", "--json"], capture_output=True, text=True, timeout=15
+            )
+            if res.returncode != 0:
+                return []
+            return json.loads(res.stdout) or []
+        except (FileNotFoundError, subprocess.TimeoutExpired, json.JSONDecodeError):
+            return []
 
     def loaded_context_length(self, model_id: str) -> int | None:
         for m in self.loaded_models():

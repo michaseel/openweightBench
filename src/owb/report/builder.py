@@ -12,6 +12,7 @@ from __future__ import annotations
 import json
 import re
 import shutil
+from collections import Counter
 from pathlib import Path
 from typing import Any
 
@@ -224,6 +225,23 @@ def _ram_estimate(ram_mb: float | None) -> tuple[float | None, float | None, flo
     )
 
 
+def _filter_years(released: list[str], min_models: int = 8) -> tuple[list[int], int | None]:
+    """Years offered by the report's release-window filter (newest first) plus
+    the year it should default to.
+
+    A year option matches that year exactly, so the default is the newest year
+    that actually holds `min_models` models. Without that floor the first model
+    of a fresh calendar year would silently become the default view and hide
+    everything else. Models without a release date are never hidden by the
+    filter and therefore don't count towards the floor."""
+    counts = Counter(int(r[:4]) for r in released if r)
+    years = sorted(counts, reverse=True)
+    if not years:
+        return [], None
+    default = next((y for y in years if counts[y] >= min_models), years[0])
+    return years, default
+
+
 def _build_task_scatter(rows: list[dict]) -> list[dict]:
     """Pro Bench-Seite: ein Punkt pro Modell mit Score (Y) und Wall-Time (X)
     für genau diesen Bench. Wall-Time auf der X-Achse, weil Zeit die intuitiv
@@ -255,6 +273,7 @@ def _build_task_scatter(rows: list[dict]) -> list[dict]:
                 "label_color": _label_color_for(r["color_key"]),
                 "params_b": r.get("params_b"),
                 "is_moe": r.get("is_moe", False),
+                "released": r.get("released") or "",
             }
         )
     return out
@@ -581,6 +600,9 @@ def _row(result: TaskResult, meta: ModelMeta) -> dict[str, Any]:
         "ctx_k": m.max_context_length // 1024,
         "released": meta.released(m) or "",
         "ram_mb": result.metrics.peak_rss_mb,
+        # Same 64k-context estimate the scatter uses, so one RAM filter can
+        # govern both the chart and the table.
+        "total_ram_gb": _ram_estimate(result.metrics.peak_rss_mb)[2],
         "tps": result.metrics.tokens_per_second,
         "ttft_ms": result.metrics.time_to_first_token_ms,
         "wall_s": result.metrics.wall_seconds,
@@ -711,6 +733,7 @@ def build_site(
                 "ctx_k": info.max_context_length // 1024,
                 "released": meta.released(info) or "",
                 "ram_mb": ram_mb,
+                "total_ram_gb": _ram_estimate(ram_mb)[2],
                 "total_wall": total_wall,
                 "incomplete_tasks": incomplete_tasks,
                 "task_count": len(tabs),
@@ -741,6 +764,7 @@ def build_site(
                 "params_b": r["params_b"],
                 "is_moe": r["is_moe"],
                 "quant": r["quant"],
+                "released": r["released"],
                 "score": r["overall_score"],
                 "wall_s": r["total_wall"],
                 "ram_gb": (r["ram_mb"] / 1024) if r["ram_mb"] else None,
@@ -752,11 +776,19 @@ def build_site(
             }
         )
 
+    # Release-year filter options are derived from all benchmarked models, so
+    # every page offers the same choices even if a single bench lacks a year.
+    filter_years, filter_year_default = _filter_years(
+        [r["released"] for r in overall_rows]
+    )
+
     # Landing page.
     landing = env.get_template("index.html").render(
         cards=landing_cards,
         tabs=tabs,
         all_models=store.all_known_models(),
+        filter_years=filter_years,
+        filter_year_default=filter_year_default,
         overall_rows=overall_rows,
         overall_scatter_rows=overall_scatter_rows,
         overall_scatter_excluded=overall_scatter_excluded,
@@ -784,6 +816,8 @@ def build_site(
             tabs=tabs,
             current_tab=tname,
             rows=rows,
+            filter_years=filter_years,
+            filter_year_default=filter_year_default,
             description=_BENCH_DESCRIPTIONS.get(tname, ""),
             explainer=_BENCH_EXPLAINERS.get(tname, ""),
             prompt=system_prompts.get(tname),

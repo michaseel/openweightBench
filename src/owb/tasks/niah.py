@@ -444,7 +444,23 @@ class NIAHTask(Task):
             messages = [self._build_summary_message(context)]
             summary = ""
             answer = ""
-            err = None if ctx_ok else f"context-load failed: model konnte nicht mit {target + CONTEXT_HEADROOM_TOKENS} Tokens geladen werden"
+            # Two very different causes, so name them apart: a quant variant
+            # LM Studio's loader cannot address at all is a tooling limit, not
+            # a context-window limit of the model.
+            wanted_ctx = target + CONTEXT_HEADROOM_TOKENS
+            if ctx_ok:
+                err = None
+            elif not client.is_loadable_key(model.id):
+                err = (
+                    f"variant not loadable: LM Studio lädt nur den Model-Key bzw. die "
+                    f"ausgewählte Variante — '{model.id}' ist per REST erreichbar, aber "
+                    f"nicht mit {wanted_ctx} Tokens ladbar. NIAH braucht diesen Load."
+                )
+            else:
+                err = (
+                    f"context-load failed: model konnte nicht mit {wanted_ctx} "
+                    f"Tokens geladen werden"
+                )
             if err is None:
                 try:
                     resp_sum = client.chat(
