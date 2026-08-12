@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kanban Board</title>
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Custom styles for transitions, confetti, and modal -->
+  <style>
+    /* ─── Base transition helpers ─── */
+    .card-enter {
+      animation: cardAppear 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    @keyframes cardAppear {
+      from { opacity: 0; transform: translateY(-12px) scale(0.95); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Drag-over highlight on columns */
+    .column-drop-highlight {
+      background-color: rgba(99, 102, 241, 0.08);
+      border-color: rgba(99, 102, 241, 0.5);
+    }
+
+    /* Card drag ghost styling */
+    .card-dragging {
+      opacity: 0.4;
+      transform: rotate(2deg);
+    }
+
+    /* Modal overlay fade-in */
+    .modal-overlay {
+      animation: fadeIn 0.2s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    /* Modal content scale-in */
+    .modal-content {
+      animation: scaleIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.8); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    /* Confetti particle */
+    .confetti-piece {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      pointer-events: none;
+      z-index: 9999;
+      animation: confettiFall linear forwards;
+    }
+
+    @keyframes confettiFall {
+      0%   { opacity: 1; transform: translateY(0) rotate(0deg); }
+      100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
+    }
+
+    /* Scrollbar styling */
+    .kanban-column::-webkit-scrollbar { width: 5px; }
+    .kanban-column::-webkit-scrollbar-track { background: transparent; }
+    .kanban-column::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.3); border-radius: 999px; }
+    .kanban-column::-webkit-scrollbar-thumb:hover { background: rgba(139, 92, 246, 0.5); }
+
+    /* Card hover lift */
+    .kanban-card {
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .kanban-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Column gradient backgrounds */
+    .col-backlog   { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-color: rgba(245, 158, 11, 0.3); }
+    .col-in-progress{ background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border-color: rgba(59, 130, 246, 0.3); }
+    .col-review     { background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%); border-color: rgba(139, 92, 246, 0.3); }
+    .col-done       { background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); border-color: rgba(16, 185, 129, 0.3); }
+
+    /* Input focus ring for card-input */
+    .card-input:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.4);
+    }
+  </style>
+
+  <!-- Tailwind config for custom colors -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+</head>
+
+<body class="bg-gray-50 min-h-screen font-sans">
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- HEADER                                      -->
+  <!-- ═══════════════════════════════════════════ -->
+  <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <!-- Kanban icon (SVG) -->
+        <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 17V7a2 2 0 012-2h4a2 2 0 012 2v10a2 2 0 01-2 2h-4a2 2 0 01-2-2z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5h6" />
+        </svg>
+        <h1 class="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+          Kanban Board
+        </h1>
+      </div>
+      <!-- Reset button (optional convenience) -->
+      <button id="reset-board"
+              class="text-sm px-3 py-1.5 rounded-lg border border-gray-300 text-gray-500 hover:bg-gray-100 transition-colors">
+        Reset Board
+      </button>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- BOARD CONTAINER                             -->
+  <!-- ═══════════════════════════════════════════ -->
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <div id="board" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+      <!-- ── Column: Backlog ─────────────────────── -->
+      <section data-testid="column-backlog"
+               class="kanban-column col-backlog border-2 rounded-2xl p-4 flex flex-col min-h-[500px] transition-all duration-200">
+        <!-- Column header -->
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-bold text-gray-800 text-lg flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+            Backlog
+          </h2>
+          <span id="count-backlog" class="text-xs font-medium text-gray-500 bg-white/60 px-2 py-0.5 rounded-full">0</span>
+        </div>
+
+        <!-- Cards container (draggable drop zone) -->
+        <div class="cards-container flex-1 space-y-3 overflow-x-hidden" data-column="backlog"></div>
+
+        <!-- Add card button -->
+        <button data-testid="add-card" data-column="backlog"
+                class="mt-3 w-full py-2 rounded-xl border-2 border-dashed border-gray-400 text-gray-500 hover:border-indigo-400 hover:text-indigo-600 transition-all duration-200 flex items-center justify-center gap-1 text-sm font-medium">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          Add card
+        </button>
+
+        <!-- Inline input for new cards (hidden by default) -->
+        <div class="add-card-form hidden mt-3">
+          <textarea data-testid="card-input" rows="2" placeholder="Card title..."
+                    class="w-full px-3 py-2 rounded-xl border border-gray-300 text-sm card-input resize-none"></textarea>
+          <div class="flex gap-2 mt-2">
+            <button class="add-card-confirm px-4 py-1.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors">Add</button>
+            <button class="add-card-cancel px-3 py-1.5 text-gray-500 text-sm rounded-lg hover:bg-gray-200 transition-colors">Cancel</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Column: In Progress ─────────────────── -->
+      <section data-testid="column-in-progress"
+               class="kanban-column col-in-progress border-2 rounded-2xl p-4 flex flex-col min-h-[500px] transition-all duration-200">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-bold text-gray-800 text-lg flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+            In Progress
+          </h2>
+          <span id="count-in-progress" class="text-xs font-medium text-gray-500 bg-white/60 px-2 py-0.5 rounded-full">0</span>
+        </div>
+        <div class="cards-container flex-1 space-y-3 overflow-x-hidden" data-column="in-progress"></div>
+        <button data-testid="add-card" data-column="in-progress"
+                class="mt-3 w-full py-2 rounded-xl border-2 border-dashed border-gray-400 text-gray-500 hover:border-indigo-400 hover:text-indigo-600 transition-all duration-200 flex items-center justify-center gap-1 text-sm font-medium">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          Add card
+        </button>
+        <div class="add-card-form hidden mt-3">
+          <textarea data-testid="card-input" rows="2" placeholder="Card title..."
+                    class="w-full px-3 py-2 rounded-xl border border-gray-300 text-sm card-input resize-none"></textarea>
+          <div class="flex gap-2 mt-2">
+            <button class="add-card-confirm px-4 py-1.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors">Add</button>
+            <button class="add-card-cancel px-3 py-1.5 text-gray-500 text-sm rounded-lg hover:bg-gray-200 transition-colors">Cancel</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Column: Review ──────────────────────── -->
+      <section data-testid="column-review"
+               class="kanban-column col-review border-2 rounded-2xl p-4 flex flex-col min-h-[500px] transition-all duration-200">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-bold text-gray-800 text-lg flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-purple-500"></span>
+            Review
+          </h2>
+          <span id="count-review" class="text-xs font-medium text-gray-500 bg-white/60 px-2 py-0.5 rounded-full">0</span>
+        </div>
+        <div class="cards-container flex-1 space-y-3 overflow-x-hidden" data-column="review"></div>
+        <button data-testid="add-card" data-column="review"
+                class="mt-3 w-full py-2 rounded-xl border-2 border-dashed border-gray-400 text-gray-500 hover:border-indigo-400 hover:text-indigo-600 transition-all duration-200 flex items-center justify-center gap-1 text-sm font-medium">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          Add card
+        </button>
+        <div class="add-card-form hidden mt-3">
+          <textarea data-testid="card-input" rows="2" placeholder="Card title..."
+                    class="w-full px-3 py-2 rounded-xl border border-gray-300 text-sm card-input resize-none"></textarea>
+          <div class="flex gap-2 mt-2">
+            <button class="add-card-confirm px-4 py-1.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors">Add</button>
+            <button class="add-card-cancel px-3 py-1.5 text-gray-500 text-sm rounded-lg hover:bg-gray-200 transition-colors">Cancel</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Column: Done ────────────────────────── -->
+      <section data-testid="column-done"
+               class="kanban-column col-done border-2 rounded-2xl p-4 flex flex-col min-h-[500px] transition-all duration-200">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-bold text-gray-800 text-lg flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+            Done
+          </h2>
+          <span id="count-done" class="text-xs font-medium text-gray-500 bg-white/60 px-2 py-0.5 rounded-full">0</span>
+        </div>
+        <div class="cards-container flex-1 space-y-3 overflow-x-hidden" data-column="done"></div>
+        <button data-testid="add-card" data-column="done"
+                class="mt-3 w-full py-2 rounded-xl border-2 border-dashed border-gray-400 text-gray-500 hover:border-indigo-400 hover:text-indigo-600 transition-all duration-200 flex items-center justify-center gap-1 text-sm font-medium">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          Add card
+        </button>
+        <div class="add-card-form hidden mt-3">
+          <textarea data-testid="card-input" rows="2" placeholder="Card title..."
+                    class="w-full px-3 py-2 rounded-xl border border-gray-300 text-sm card-input resize-none"></textarea>
+          <div class="flex gap-2 mt-2">
+            <button class="add-card-confirm px-4 py-1.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors">Add</button>
+            <button class="add-card-cancel px-3 py-1.5 text-gray-500 text-sm rounded-lg hover:bg-gray-200 transition-colors">Cancel</button>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /board grid -->
+  </main>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- DELETE CONFIRMATION MODAL                   -->
+  <!-- Hidden by default; shown via JS             -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div id="delete-modal" class="fixed inset-0 z-50 hidden items-center justify-center">
+    <!-- Backdrop overlay -->
+    <div class="modal-overlay absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+    <!-- Modal content card -->
+    <div class="modal-content relative bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4">
+      <!-- Icon -->
+      <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4 mx-auto">
+        <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+        </svg>
+      </div>
+      <h3 class="text-lg font-bold text-gray-800 text-center mb-2">Delete this card?</h3>
+      <p id="delete-modal-message" class="text-sm text-gray-500 text-center mb-6"></p>
+      <!-- Action buttons -->
+      <div class="flex gap-3 justify-center">
+        <button data-testid="cancel-delete"
+                class="px-5 py-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100 transition-colors text-sm font-medium">
+          Cancel
+        </button>
+        <button data-testid="confirm-delete"
+                class="px-5 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors text-sm font-medium shadow-md shadow-red-200">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- JAVASCRIPT – Application Logic              -->
+  <!-- ═══════════════════════════════════════════ -->
+  <script>
+    // ────────────────────────────────────────────
+    // Namespace: Prevent collisions with other scripts
+    // using the same localStorage key.
+    // ────────────────────────────────────────────
+    const APP_NAMESPACE = 'kanban-app-state';
+
+    // ────────────────────────────────────────────
+    // Column definitions (order & metadata)
+    // ────────────────────────────────────────────
+    const COLUMNS = ['backlog', 'in-progress', 'review', 'done'];
+
+    // ────────────────────────────────────────────
+    // Dummy data: used when no cards exist yet so
+    // the board isn't empty on first load.
+    // ────────────────────────────────────────────
+    const DUMMY_CARDS = [
+      { id: uid(), title: 'Set up project repository', column: 'backlog' },
+      { id: uid(), title: 'Design wireframes',        column: 'backlog' },
+      { id: uid(), title: 'Write unit tests',         column: 'in-progress' },
+      { id: uid(), title: 'Implement auth flow',      column: 'in-progress' },
+      { id: uid(), title: 'Code review on PR #42',   column: 'review' },
+      { id: uid(), title: 'Fix responsive layout bug',column: 'done' },
+    ];
+
+    // ────────────────────────────────────────────
+    // State management – load / save to localStorage
+    // under our namespaced key.
+    // ────────────────────────────────────────────
+
+    /** Generate a unique ID (simple timestamp + random) */
+    function uid() {
+      return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    }
+
+    /** Load board state from localStorage; returns an object keyed by column. */
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(APP_NAMESPACE);
+        if (raw) return JSON.parse(raw);
+      } catch (_) { /* corrupted data – fall through to defaults */ }
+
+      // First visit or no valid data → seed dummy cards
+      const state = {};
+      COLUMNS.forEach(col => { state[col] = []; });
+      DUMMY_CARDS.forEach(card => {
+        if (state[card.column]) state[card.column].push(card);
+      });
+      return state;
+    }
+
+    /** Persist current state to localStorage. */
+    function saveState(state) {
+      try {
+        localStorage.setItem(APP_NAMESPACE, JSON.stringify(state));
+      } catch (_) { /* quota exceeded – silently ignore */ }
+    }
+
+    // ────────────────────────────────────────────
+    // Application state (kept in memory; synced to storage)
+    // ────────────────────────────────────────────
+    let boardState = loadState();
+
+    // Track the card currently being dragged { id, column }
+    let dragData = null;
+
+    // Track which column has an open "add card" form (only one at a time)
+    let activeAddColumn = null;
+
+    // Track which card is in edit mode and its current text
+    let editingCardId = null;
+
+    // ────────────────────────────────────────────
+    // DOM references – cached for performance
+    // ────────────────────────────────────────────
+    const boardEl        = document.getElementById('board');
+    const deleteModal    = document.getElementById('delete-modal');
+    const deleteMsg      = document.getElementById('delete-modal-message');
+
+    // ─────────────────═══════════════════════════
+    // RENDERING
+    // ═══════════════════════════════════════════
+
+    /** Render all columns and their cards from current state. */
+    function render() {
+      COLUMNS.forEach(col => {
+        const container = document.querySelector(`[data-column="${col}"]`);
+        if (!container) return;
+
+        // Clear existing cards (but keep the add-card form area intact)
+        container.innerHTML = '';
+
+        boardState[col].forEach(card => {
+          container.appendChild(createCardElement(card));
+        });
+
+        // Update column counter
+        const countEl = document.getElementById(`count-${col}`);
+        if (countEl) countEl.textContent = boardState[col].length;
+      });
+    }
+
+    /** Create a single card DOM element. */
+    function createCardElement(card) {
+      const el = document.createElement('div');
+      el.setAttribute('data-testid', 'card');
+      el.setAttribute('draggable', 'true');
+      el.dataset.id = card.id;
+      el.className = 'kanban-card bg-white rounded-xl p-3 shadow-sm border border-gray-100 cursor-grab active:cursor-grabbing select-none';
+
+      // Card content wrapper
+      const inner = document.createElement('div');
+      inner.className = 'flex items-start justify-between gap-2 group/card';
+
+      // Title (click to edit in place)
+      const titleEl = document.createElement('span');
+      titleEl.className = 'text-sm text-gray-700 font-medium leading-snug flex-1 break-words card-title cursor-text';
+      titleEl.textContent = card.title;
+      titleEl.addEventListener('dblclick', () => enterEditMode(card.id, titleEl));
+
+      // Delete button (visible on hover via group)
+      const deleteBtn = document.createElement('button');
+      deleteBtn.setAttribute('data-testid', 'delete-card');
+      deleteBtn.className = 'opacity-0 group-hover/card:opacity-100 transition-opacity p-1 text-gray-400 hover:text-red-500 rounded';
+      deleteBtn.title = 'Delete card';
+      deleteBtn.innerHTML = '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>';
+      deleteBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showDeleteModal(card.id, card.title);
+      });
+
+      inner.appendChild(titleEl);
+      inner.appendChild(deleteBtn);
+      el.appendChild(inner);
+
+      // ── Drag events on the card element ──
+      el.addEventListener('dragstart', (e) => {
+        dragData = { id: card.id, column: findCardColumn(card.id) };
+        el.classList.add('card-dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        // Set a transparent drag image for a cleaner look
+        const ghost = el.cloneNode(true);
+        ghost.style.width = `${el.offsetWidth}px`;
+        ghost.classList.remove('card-dragging');
+        ghost.style.opacity = '0.6';
+        e.dataTransfer.setDragImage(ghost, 20, 20);
+      });
+
+      el.addEventListener('dragend', () => {
+        el.classList.remove('card-dragging');
+        dragData = null;
+        // Remove all drop highlights
+        document.querySelectorAll('.column-drop-highlight').forEach(el => el.classList.remove('column-drop-highlight'));
+      });
+
+      return el;
+    }
+
+    /** Find which column an card ID belongs to. */
+    function findCardColumn(cardId) {
+      for (const col of COLUMNS) {
+        if (boardState[col].some(c => c.id === cardId)) return col;
+      }
+      return null;
+    }
+
+    // ─────────────────═══════════════════════════
+    // DRAG AND DROP – Column-level handlers
+    // ═══════════════════════════════════════════
+
+    /** Attach drag-over / drop listeners to every cards-container. */
+    function initDragDrop() {
+      document.querySelectorAll('.cards-container').forEach(container => {
+        const col = container.dataset.column;
+
+        container.addEventListener('dragover', (e) => {
+          e.preventDefault();               // Allow dropping
+          e.dataTransfer.dropEffect = 'move';
+          container.closest('[data-testid]').classList.add('column-drop-highlight');
+        });
+
+        container.addEventListener('dragleave', (e) => {
+          // Only remove highlight if we actually left the column area
+          if (!container.contains(e.relatedTarget)) {
+            container.closest('[data-testid]').classList.remove('column-drop-highlight');
+          }
+        });
+
+        container.addEventListener('drop', (e) => {
+          e.preventDefault();
+          container.closest('[data-testid]').classList.remove('column-drop-highlight');
+
+          if (!dragData) return;
+
+          const sourceCol = dragData.column;
+          const destCol   = col;
+          const cardId    = dragData.id;
+
+          // Remove card from source column
+          boardState[sourceCol] = boardState[sourceCol].filter(c => c.id !== cardId);
+
+          // Add to destination column
+          boardState[destCol].push({ id: cardId, title: findCardTitle(cardId) });
+
+          saveState(boardState);
+          render();
+
+          // Trigger confetti if dropped into "Done" (and it wasn't already there)
+          if (destCol === 'done' && sourceCol !== 'done') {
+            triggerConfetti();
+          }
+        });
+      });
+    }
+
+    /** Look up a card's title from current state. */
+    function findCardTitle(cardId) {
+      for (const col of COLUMNS) {
+        const found = boardState[col].find(c => c.id === cardId);
+        if (found) return found.title;
+      }
+      return 'Untitled';
+    }
+
+    // ─────────────────═══════════════════════════
+    // ADD CARD – Inline form per column
+    // ═══════════════════════════════════════════
+
+    /** Wire up all "Add card" buttons. */
+    function initAddCard() {
+      document.querySelectorAll('[data-testid="add-card"]').forEach(btn => {
+        btn.addEventListener('click', () => openAddForm(btn.dataset.column));
+      });
+    }
+
+    /** Show the inline input form for a given column; hide others. */
+    function openAddForm(column) {
+      // Close any previously open form
+      closeAllForms();
+
+      activeAddColumn = column;
+      const section   = document.querySelector(`[data-column="${column}"]`).closest('[data-testid]');
+      const form      = section.querySelector('.add-card-form');
+      const input     = section.querySelector('[data-testid="card-input"]');
+
+      if (!form || !input) return;
+
+      form.classList.remove('hidden');
+      input.value = '';
+      setTimeout(() => input.focus(), 50);
+
+      // Enter commits the card
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          commitNewCard(column, input.value.trim());
+        }
+        if (e.key === 'Escape') {
+          closeAllForms();
+        }
+      });
+
+      // Confirm button
+      const confirmBtn = section.querySelector('.add-card-confirm');
+      confirmBtn.onclick = () => commitNewCard(column, input.value.trim());
+
+      // Cancel button
+      const cancelBtn = section.querySelector('.add-card-cancel');
+      cancelBtn.onclick = closeAllForms;
+    }
+
+    /** Create a new card in the given column. */
+    function commitNewCard(column, title) {
+      if (!title || !title.trim()) return;           // Ignore empty titles
+      const trimmed = title.trim();
+
+      boardState[column].push({ id: uid(), title: trimmed });
+      saveState(boardState);
+      render();
+      closeAllForms();
+    }
+
+    /** Hide all inline add-card forms. */
+    function closeAllForms() {
+      document.querySelectorAll('.add-card-form').forEach(f => f.classList.add('hidden'));
+      activeAddColumn = null;
+    }
+
+    // ─────────────────═══════════════════════════
+    // EDIT IN PLACE – Double-click to edit title
+    // ═══════════════════════════════════════════
+
+    /** Replace a card's title span with an editable textarea. */
+    function enterEditMode(cardId, titleEl) {
+      const col = findCardColumn(cardId);
+      if (!col) return;
+      const card = boardState[col].find(c => c.id === cardId);
+      if (!card) return;
+
+      editingCardId = cardId;
+      const parent  = titleEl.parentElement;
+      const textarea = document.createElement('textarea');
+      textarea.className = 'w-full px-2 py-1 rounded-lg border border-indigo-300 text-sm text-gray-700 font-medium resize-none card-input leading-snug';
+      textarea.value = card.title;
+      textarea.rows = 2;
+
+      // Commit on Enter (no shift), cancel on Escape
+      textarea.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          exitEditMode(cardId, col, card, textarea);
+        }
+        if (e.key === 'Escape') {
+          editingCardId = null;
+          render(); // Re-render to discard changes
+        }
+      });
+
+      textarea.addEventListener('blur', () => {
+        // Small delay so the Enter keyup doesn't trigger a premature blur
+        setTimeout(() => {
+          if (editingCardId === cardId) exitEditMode(cardId, col, card, textarea);
+        }, 150);
+      });
+
+      parent.replaceChild(textarea, titleEl);
+      textarea.focus();
+      textarea.select();
+    }
+
+    /** Save edit and restore the title span. */
+    function exitEditMode(cardId, column, card, textarea) {
+      const newTitle = textarea.value.trim();
+      if (newTitle) {
+        card.title = newTitle;
+        saveState(boardState);
+      }
+      editingCardId = null;
+      render();
+    }
+
+    // ─────────────────═══════════════════════════
+    // DELETE – Custom modal (no window.alert/prompt)
+    // ═══════════════════════════════════════════
+
+    /** Show the confirmation dialog for deleting a card. */
+    function showDeleteModal(cardId, title) {
+      deleteMsg.textContent = `"${title}" will be permanently removed.`;
+      deleteModal.classList.remove('hidden');
+      deleteModal.classList.add('flex');
+
+      // Wire confirm button (once is enough; we re-query each time for safety)
+      const confirmBtn = deleteModal.querySelector('[data-testid="confirm-delete"]');
+      confirmBtn.onclick = () => {
+        deleteCard(cardId);
+        closeDeleteModal();
+      };
+
+      const cancelBtn = deleteModal.querySelector('[data-testid="cancel-delete"]');
+      cancelBtn.onclick = closeDeleteModal;
+
+      // Close on backdrop click
+      deleteModal.addEventListener('click', (e) => {
+        if (e.target === deleteModal || e.target.classList.contains('modal-overlay')) {
+          closeDeleteModal();
+        }
+      });
+
+      // Focus the confirm button for accessibility
+      confirmBtn.focus();
+    }
+
+    /** Close the delete confirmation modal. */
+    function closeDeleteModal() {
+      deleteModal.classList.add('hidden');
+      deleteModal.classList.remove('flex');
+    }
+
+    /** Remove a card from its column and persist. */
+    function deleteCard(cardId) {
+      for (const col of COLUMNS) {
+        const idx = boardState[col].findIndex(c => c.id === cardId);
+        if (idx !== -1) {
+          boardState[col].splice(idx, 1);
+          saveState(boardState);
+          render();
+          return;
+        }
+      }
+    }
+
+    // ─────────────────═══════════════════════════
+    // CONFETTI – Lightweight particle animation
+    // ═══════════════════════════════════════════
+
+    /** Spawn a burst of colorful confetti particles across the screen. */
+    function triggerConfetti() {
+      const colors = [
+        '#f43f5e', '#ec4899', '#a855f7', '#8b5cf6',
+        '#6366f1', '#3b82f6', '#10b981', '#f59e0b',
+        '#ef4444', '#14b8a6',
+      ];
+
+      const particleCount = 60;
+
+      for (let i = 0; i < particleCount; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+
+        // Randomize appearance and trajectory
+        const color       = colors[Math.floor(Math.random() * colors.length)];
+        const size         = Math.random() * 8 + 6;          // 6–14px
+        const left         = Math.random() * 100;            // 0–100vw
+        const duration     = Math.random() * 2 + 1.5;       // 1.5–3.5s
+        const delay        = Math.random() * 0.6;           // 0–0.6s stagger
+        const shape        = Math.random() > 0.5 ? '50%' : '2px'; // circle or square
+
+        piece.style.cssText = `
+          background: ${color};
+          width:  ${size}px;
+          height: ${size}px;
+          border-radius: ${shape};
+          left: ${left}vw;
+          top: -20px;
+          animation-duration: ${duration}s;
+          animation-delay: ${delay}s;
+        `;
+
+        document.body.appendChild(piece);
+
+        // Remove from DOM after animation completes
+        setTimeout(() => piece.remove(), (duration + delay) * 1000 + 200);
+      }
+    }
+
+    // ─────────────────═══════════════════════════
+    // RESET – Wipe localStorage & re-seed dummies
+    // ═══════════════════════════════════════════
+
+    function initReset() {
+      const resetBtn = document.getElementById('reset-board');
+      if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+          localStorage.removeItem(APP_NAMESPACE);
+          boardState = loadState();
+          render();
+        });
+      }
+    }
+
+    // ─────────────────═══════════════════════════
+    // INITIALIZATION – Run on DOM ready
+    // ═══════════════════════════════════════════
+
+    function init() {
+      render();
+      initDragDrop();
+      initAddCard();
+      initReset();
+    }
+
+    // Wait for the DOM to be fully parsed before wiring everything up.
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,229 @@
+{
+  "task": "diagram_to_svg",
+  "model_id": "meta/muse-glimmer",
+  "model_info": {
+    "id": "meta/muse-glimmer",
+    "type": "vlm",
+    "publisher": "meta",
+    "arch": "muse-glimmer",
+    "compatibility_type": "gguf",
+    "quantization": null,
+    "state": "not-loaded",
+    "max_context_length": 131072,
+    "capabilities": [],
+    "loaded_context_length": null
+  },
+  "started_at": "2026-08-11T16:00:06.130753Z",
+  "completed_at": "2026-08-11T16:28:08.450811Z",
+  "metrics": {
+    "wall_seconds": 481.02976904204115,
+    "tokens_generated": 4420,
+    "tokens_per_second": 9.93127961196666,
+    "time_to_first_token_ms": null,
+    "peak_rss_mb": 17316.0
+  },
+  "score": 1.0,
+  "score_breakdown": {
+    "diagrams": [
+      {
+        "id": "diagram_eisenhower",
+        "image_name": "diagram_eisenhower.png",
+        "image_path": "artifacts/meta_muse-glimmer/diagram_to_svg/diagram_eisenhower.png",
+        "svg_path": "artifacts/meta_muse-glimmer/diagram_to_svg/diagram_eisenhower.svg",
+        "render_path": null,
+        "raw_length": 0,
+        "svg_length": 0,
+        "grade": {
+          "score": 0.0,
+          "parsed": false,
+          "has_root": false,
+          "element_count": 0,
+          "text_count": 0,
+          "matched_terms": [],
+          "missing_terms": [
+            "Wichtig",
+            "Dringend",
+            "Nicht wichtig",
+            "Nicht dringend",
+            "Content-Strategie",
+            "Brand schärfen",
+            "SEO",
+            "Zielgruppen",
+            "Kampagne retten",
+            "Shitstorm",
+            "Newsletter",
+            "falschem Link",
+            "viral gehen",
+            "Merch-Ideen",
+            "Glitzer",
+            "Buzzword-Bingo",
+            "TikTok",
+            "Maskottchen",
+            "Hashtag",
+            "Last-Minute-Meeting",
+            "Logo größer",
+            "LinkedIn-Post",
+            "Weltag der Büroklammer",
+            "Folie 27"
+          ],
+          "parse_error": "leeres SVG"
+        },
+        "score": 0.0,
+        "error": "timeout nach 600s (httpx: ReadTimeout)"
+      },
+      {
+        "id": "diagram_service_architecture",
+        "image_name": "diagram_service_architecture.png",
+        "image_path": "artifacts/meta_muse-glimmer/diagram_to_svg/diagram_service_architecture.png",
+        "svg_path": "artifacts/meta_muse-glimmer/diagram_to_svg/diagram_service_architecture.svg",
+        "render_path": null,
+        "raw_length": 0,
+        "svg_length": 0,
+        "grade": {
+          "score": 0.0,
+          "parsed": false,
+          "has_root": false,
+          "element_count": 0,
+          "text_count": 0,
+          "matched_terms": [],
+          "missing_terms": [
+            "Frontend",
+            "React",
+            "API Gateway",
+            "Kong",
+            "Auth Service",
+            "JWT",
+            "User DB",
+            "Backend",
+            "FastAPI",
+            "Database",
+            "External API",
+            "Payment Provider",
+            "Message Queue",
+            "RabbitMQ",
+            "Worker Service",
+            "File Storage",
+            "S3",
+            "Monitoring",
+            "Prometheus",
+            "Grafana"
+          ],
+          "parse_error": "leeres SVG"
+        },
+        "score": 0.0,
+        "error": "timeout nach 600s (httpx: ReadTimeout)"
+      },
+      {
+        "id": "diagram_sso_sequence",
+        "image_name": "diagram_sso_sequence.png",
+        "image_path": "artifacts/meta_muse-glimmer/diagram_to_svg/diagram_sso_sequence.png",
+        "svg_path": "artifacts/meta_muse-glimmer/diagram_to_svg/diagram_sso_sequence.svg",
+        "render_path": "artifacts/meta_muse-glimmer/diagram_to_svg/diagram_sso_sequence.render.png",
+        "raw_length": 5057,
+        "svg_length": 5057,
+        "grade": {
+          "score": 1.0,
+          "parsed": true,
+          "has_root": true,
+          "element_count": 59,
+          "text_count": 27,
+          "matched_terms": [
+            "Benutzer",
+            "App",
+            "Service Provider",
+            "Identity Provider",
+            "IdP",
+            "Login-Seite",
+            "Anmeldedaten",
+            "Authentifizierung",
+            "Token",
+            "Assertion",
+            "SSO-Response",
+            "Zugriff",
+            "Ressourcen",
+            "Nein",
+            "Ja"
+          ],
+          "missing_terms": [],
+          "parse_error": null
+        },
+        "score": 1.0,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-08-11T16:28:15.165150+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "scores": {
+            "completeness": 0.95,
+            "labels": 0.94,
+            "connections": 0.84,
+            "direction": 0.88,
+            "layout_readability": 0.9,
+            "diagram_kind_match": 0.97,
+            "aesthetic_quality": 0.79
+          },
+          "judge_score": 0.8825,
+          "comment": "Fast alle zentralen Elemente des Originals sind vorhanden: Benutzer, App/Service Provider, Identity Provider, Login-Seite, Entscheidungsdiamant und „Zugriff gewährt“. Die Beschriftungen sind weitgehend korrekt, nur kleinere Abweichungen in Positionierung und Zeilenumbrüchen fallen auf. Inhaltlich problematisch ist vor allem der gestrichelte „Benutzer gibt Anmeldedaten ein“-Pfad: Im Original zeigt er nach links zur Login-Seite, im Render läuft er erst nach rechts und dann nach unten, wodurch die Verbindung und Richtung unklarer bzw. teilweise falsch wirken. Das Layout ist insgesamt sauber und gut lesbar, aber gegenüber dem Whiteboard etwas steifer und der rechte Rückkopplungspfad beim „Nein“-Fall ist topologisch weniger überzeugend."
+        }
+      }
+    ],
+    "judge": {
+      "scored_at": "2026-08-11T16:28:15.165170+00:00",
+      "judge_model": "openai/gpt-5.4",
+      "judge_score": 0.8825
+    }
+  },
+  "raw_response": "",
+  "artifacts": [
+    {
+      "kind": "image",
+      "label": "Source diagram_eisenhower",
+      "path": "artifacts/meta_muse-glimmer/diagram_to_svg/diagram_eisenhower.png",
+      "mime": "image/jpeg"
+    },
+    {
+      "kind": "text",
+      "label": "SVG diagram_eisenhower",
+      "path": "artifacts/meta_muse-glimmer/diagram_to_svg/diagram_eisenhower.svg",
+      "mime": "image/svg+xml"
+    },
+    {
+      "kind": "image",
+      "label": "Source diagram_service_architecture",
+      "path": "artifacts/meta_muse-glimmer/diagram_to_svg/diagram_service_architecture.png",
+      "mime": "image/jpeg"
+    },
+    {
+      "kind": "text",
+      "label": "SVG diagram_service_architecture",
+      "path": "artifacts/meta_muse-glimmer/diagram_to_svg/diagram_service_architecture.svg",
+      "mime": "image/svg+xml"
+    },
+    {
+      "kind": "image",
+      "label": "Source diagram_sso_sequence",
+      "path": "artifacts/meta_muse-glimmer/diagram_to_svg/diagram_sso_sequence.png",
+      "mime": "image/jpeg"
+    },
+    {
+      "kind": "text",
+      "label": "SVG diagram_sso_sequence",
+      "path": "artifacts/meta_muse-glimmer/diagram_to_svg/diagram_sso_sequence.svg",
+      "mime": "image/svg+xml"
+    },
+    {
+      "kind": "image",
+      "label": "Render diagram_sso_sequence",
+      "path": "artifacts/meta_muse-glimmer/diagram_to_svg/diagram_sso_sequence.render.png",
+      "mime": "image/png"
+    }
+  ],
+  "error": null,
+  "hardware": {
+    "platform": "macOS-26.5.2-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "ram_total_gb": 128.0,
+    "cpu_count": 16
+  },
+  "bench_version": "0.1.0"
+}

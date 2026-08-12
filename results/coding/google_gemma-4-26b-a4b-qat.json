@@ -1,0 +1,201 @@
+{
+  "task": "coding",
+  "model_id": "google/gemma-4-26b-a4b-qat",
+  "model_info": {
+    "id": "google/gemma-4-26b-a4b-qat",
+    "type": "vlm",
+    "publisher": "google",
+    "arch": "gemma4",
+    "compatibility_type": "mlx",
+    "quantization": "4bit",
+    "state": "not-loaded",
+    "max_context_length": 262144,
+    "capabilities": [
+      "tool_use"
+    ],
+    "loaded_context_length": null
+  },
+  "started_at": "2026-06-18T10:21:50.687938Z",
+  "completed_at": "2026-06-18T10:23:40.198801Z",
+  "metrics": {
+    "wall_seconds": 109.50944583304226,
+    "tokens_generated": 8127,
+    "tokens_per_second": 99.50688626037822,
+    "time_to_first_token_ms": 1492.0,
+    "peak_rss_mb": 14916.7
+  },
+  "score": 0.8333333333333333,
+  "score_breakdown": {
+    "looks_like_html": true,
+    "html_length": 20471,
+    "raw_length": 20483,
+    "lint_checks": [
+      {
+        "id": "col_backlog",
+        "label": "Spalte 'Backlog'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_in_progress",
+        "label": "Spalte 'In Progress'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_review",
+        "label": "Spalte 'Review'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_done",
+        "label": "Spalte 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "drag_drop",
+        "label": "HTML5 drag & drop or sortable lib",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "local_storage",
+        "label": "localStorage persistence",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "tailwind_cdn",
+        "label": "Tailwind via CDN",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "confetti",
+        "label": "Confetti animation on 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Add card button",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "vanilla_js",
+        "label": "Vanilla JS (no React/Vue/Angular/Svelte)",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_alert_prompt",
+        "label": "No window.alert/prompt for CRUD",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "editable_cards",
+        "label": "Editable cards (contenteditable / input)",
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "lint_passed": 12,
+    "lint_total": 12,
+    "lint_score": 1.0,
+    "e2e_checks": [
+      {
+        "id": "renders",
+        "label": "Page loads with all 4 columns",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Add card via button",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_double_add",
+        "label": "Card is added exactly 1× (no double submit)",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "delete_card",
+        "label": "Delete card via button + confirmation",
+        "passed": false,
+        "detail": "before delete 6, after 6"
+      },
+      {
+        "id": "persistence",
+        "label": "Cards survive a reload",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_console_errors",
+        "label": "No JS console errors",
+        "passed": false,
+        "detail": "pageerror: Cannot read properties of null (reading 'addEventListener'); pageerror: Cannot read properties of null (reading 'addEventListener')"
+      }
+    ],
+    "e2e_passed": 4,
+    "e2e_total": 6,
+    "e2e_score": 0.6666666666666666,
+    "judge": {
+      "scored_at": "2026-06-18T10:23:59.859825+00:00",
+      "judge_model": "openai/gpt-5.4",
+      "scores": {
+        "board_renders": 1.0,
+        "column_completeness": 1.0,
+        "cards_present": 1.0,
+        "ui_affordances": 0.8,
+        "design_quality": 0.85,
+        "code_structure": 0.8,
+        "dom_safety": 0.7,
+        "robustness": 0.45,
+        "code_quality": 0.65,
+        "render_matches_code": 0.95
+      },
+      "judge_score": 0.805,
+      "comment_visual": "Das Board rendert vollständig mit allen vier Spalten und mehreren gut lesbaren Karten. Add-Card-Buttons sind klar sichtbar, das Design wirkt modern und ordentlich, auch wenn Drag/Edit nur indirekt erkennbar sind.",
+      "comment_code": "Der Code ist insgesamt sauber in Funktionen gegliedert und rendert die Karten logisch aus einem State-Objekt. Positiv ist die Nutzung von textContent für Kartentexte, aber innerHTML wird für das Delete-Icon genutzt und Robustheit ist nur mittel: localStorage/JSON.parse laufen ohne try/catch, dazu gibt es kleinere Qualitätsmängel wie doppelte Löschlogik und einen Tippfehler in einer Tailwind-Klasse.",
+      "comment_consistency": "Screenshot und Code passen sehr gut zusammen: Die im State definierten fünf Beispielkarten erscheinen genau in den vier Spalten, ebenso die Add-Buttons und der allgemeine Look. Es gibt keine kritische Diskrepanz zwischen versprochener Funktionalität und Render-Ergebnis."
+    }
+  },
+  "raw_response": "```html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Modern Kanban Board</title>\n    <!-- Tailwind CSS for modern styling -->\n    <script src=\"https://cdn.tailwindcss.com\"></script>\n    <!-- Canvas Confetti for celebrations -->\n    <script src=\"https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js\"></script>\n    <style>\n        /* Custom transitions for smooth UI interactions */\n        .card-transition {\n            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);\n        }\n        .column-drop-zone.drag-over {\n            background-color: rgba(226, 232, 240, 0.5);\n            border: 2px dashed #64748b;\n        }\n        /* Custom scrollbar for the board */\n        .custom-scrollbar::-webkit-scrollbar {\n            height: 8px;\n        }\n        .custom-scrollbar::-webkit-scrollbar-track {\n            background: #f1f1f1;\n        }\n        .custom-scrollbar::-webkit-scrollbar-thumb {\n            background: #cbd5e1;\n            border-radius: 4px;\n        }\n        .custom-scrollbar::-webkit-scrollbar-thumb:hover {\n            background: #94a3b8;\n        }\n    </style>\n</head>\n<body class=\"bg-slate-50 min-h-screen font-sans text-slate-900\">\n\n    <!-- Header -->\n    <header class=\"bg-white border-b border-slate-200 py-6 px-8 mb-8 shadow-sm\">\n        <div class=\"max-w-7xl mx-auto flex justify-between items-center\">\n            <h1 class=\"text-3xl font-extrabold tracking-tight text-slate-800\">\n                Kanban <span class=\"text-indigo-600\">Flow</span>\n            </h1>\n            <p class=\"text-slate-500 text-sm font-medium\">Drag, drop, and organize your workflow</p>\n        </div>\n    </header>\n\n    <!-- Kanban Board Container -->\n    <main class=\"max-w-7xl mx-auto px-4 sm:px-6 lg:px-8\">\n        <div class=\"flex flex-row gap-6 overflow-x-auto pb-8 custom-scrollbar min-h-[70vh] items-start\">\n            \n            <!-- Bac",
+  "artifacts": [
+    {
+      "kind": "html",
+      "label": "Generierte App",
+      "path": "artifacts/google_gemma-4-26b-a4b-qat/coding/output.html",
+      "mime": "text/html"
+    },
+    {
+      "kind": "text",
+      "label": "Raw model response",
+      "path": "artifacts/google_gemma-4-26b-a4b-qat/coding/raw_response.txt",
+      "mime": "text/plain"
+    },
+    {
+      "kind": "image",
+      "label": "Screenshot der gerenderten App",
+      "path": "artifacts/google_gemma-4-26b-a4b-qat/coding/screenshot.png",
+      "mime": "image/png"
+    }
+  ],
+  "error": null,
+  "hardware": {
+    "platform": "macOS-26.5-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "ram_total_gb": 128.0,
+    "cpu_count": 16
+  },
+  "bench_version": "0.1.0"
+}

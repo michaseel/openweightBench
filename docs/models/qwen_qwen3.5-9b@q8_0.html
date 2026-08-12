@@ -32,10 +32,116 @@
     }
   }
 </script>
+<script>
+  // Shared model filter (RAM cap + release window), used by the landing page
+  // and every bench page. Participating elements carry `data-total-ram` (GB,
+  // 64k-context estimate) and `data-released` (YYYY-MM[-DD]).
+  //
+  // Release-window option values: "m<N>" = the last N months, "y<YYYY>" = that
+  // calendar year and nothing else, "" = no restriction. Both are compared at
+  // whole-calendar-month granularity, so a YYYY-MM date without a day resolves
+  // without guessing. "Last N months" counts back from the viewer's own clock,
+  // not the build date — the report stays online and a window pinned to the
+  // build would quietly drift into meaning something else.
+  //
+  // Missing values never hide a model, for either criterion: the RAM figure
+  // comes from a runtime measurement and the date from curated metadata, so a
+  // gap means "not known", not "doesn't qualify". A freshly benchmarked model
+  // that nobody has annotated yet must not silently drop out of the report —
+  // the RAM and Released columns show "—" so the gap is visible in place.
+  //
+  // Each group names the class to toggle, so callers choose the presentation:
+  // charts dim their dots (comparison stays visible), tables hide their rows
+  // (that's the point of filtering a 60-row table). The first return value of
+  // apply() is the per-group count of models still shown.
+  window.owbFilter = function (cfg) {
+    const ram = document.getElementById(cfg.ramSelect);
+    const year = document.getElementById(cfg.yearSelect);
+    const groups = (cfg.groups || []).map(g => ({ els: Array.from(g.els), cls: g.cls }));
+    if (!ram && !year) return null;
+
+    // Month index (year * 12 + month) so windows are plain integer ranges.
+    function releaseMonth(el) {
+      const rel = el.dataset.released || '';
+      if (rel.length < 7) return null;
+      return parseInt(rel.slice(0, 4), 10) * 12 + parseInt(rel.slice(5, 7), 10);
+    }
+
+    function windowFor(value) {
+      if (!value) return null;
+      if (value[0] === 'm') {
+        const now = new Date();
+        const nowMonth = now.getFullYear() * 12 + now.getMonth() + 1;
+        return { from: nowMonth - parseInt(value.slice(1), 10) + 1, to: Infinity };
+      }
+      const y = parseInt(value.slice(1), 10);
+      return { from: y * 12 + 1, to: y * 12 + 12 };
+    }
+
+    function inWindow(el, value) {
+      const win = windowFor(value);
+      if (!win) return true;
+      const m = releaseMonth(el);
+      if (m === null) return true;
+      return m >= win.from && m <= win.to;
+    }
+
+    function excluded(el) {
+      const cap = ram ? parseFloat(ram.value) : NaN;
+      if (cap) {
+        const gb = parseFloat(el.dataset.totalRam || '');
+        if (gb && gb > cap) return true;
+      }
+      if (year && !inWindow(el, year.value)) return true;
+      return false;
+    }
+
+    // Mark options that would empty the page rather than letting the user
+    // pick them and wonder where everything went.
+    const population = groups.flatMap(g => g.els);
+    function disableEmpty(sel, matches) {
+      if (!sel) return;
+      Array.from(sel.options).forEach(opt => {
+        // "all" (value "" or the RAM select's "0") always stays selectable.
+        if (!opt.value || opt.value === '0') return;
+        if (population.some(el => matches(el, opt.value))) return;
+        opt.disabled = true;
+        opt.textContent += ' — no models';
+      });
+    }
+    disableEmpty(ram, (el, v) => {
+      const gb = parseFloat(el.dataset.totalRam || '');
+      return !gb || gb <= parseFloat(v);
+    });
+    disableEmpty(year, inWindow);
+
+    function apply() {
+      const counts = groups.map(g => {
+        let visible = 0;
+        g.els.forEach(el => {
+          const off = excluded(el);
+          el.classList.toggle(g.cls, off);
+          if (!off) visible++;
+        });
+        return visible;
+      });
+      if (cfg.onApply) cfg.onApply(counts);
+      return counts;
+    }
+
+    if (ram) ram.addEventListener('change', apply);
+    if (year) year.addEventListener('change', apply);
+    apply();
+    return { apply, excluded };
+  };
+</script>
 <style>
   body { font-feature-settings: "ss01","cv11"; }
   .num { font-variant-numeric: tabular-nums; }
   .row-link:hover { background: rgb(245 245 244 / 1); }
+  /* Model filter: table rows drop out entirely, chart dots only dim (see
+     window.owbFilter). */
+  .owb-hidden { display: none !important; }
   .preview-pop {
     position: fixed; pointer-events: none; z-index: 50;
     transform: translate(16px, 16px);
@@ -1348,7 +1454,7 @@ Der Kahn war mittlerweile der Insel ganz nahe gekommen; die Kinder landeten an e
       </div>
       <div class="bg-white border border-stone-200 rounded p-3">
         <dt class="text-xs uppercase tracking-wider text-stone-500">RAM</dt>
-        <dd class="mt-1 text-xl font-semibold num">9.7 GB</dd>
+        <dd class="mt-1 text-xl font-semibold num">—</dd>
       </div>
     </div>
   </div>
@@ -1502,8 +1608,7 @@ Answer as a numbered list 1., 2., 3. with one short sentence each.</pre>
                 <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Model response to the needle questions</summary>
                 <pre class="mt-2 text-xs bg-stone-50 border border-stone-200 rounded p-3 overflow-x-auto whitespace-pre-wrap"></pre>
               </details>
-                <div class="mt-2 text-xs text-red-600">Error: summary turn: Client error &#39;400 Bad Request&#39; for url &#39;http://127.0.0.1:1234/api/v0/chat/completions&#39;
-For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400</div>
+                <div class="mt-2 text-xs text-red-600">Error: variant not loadable: LM Studio lädt nur den Model-Key bzw. die ausgewählte Variante — &#39;qwen/qwen3.5-9b@q8_0&#39; ist per REST erreichbar, aber nicht mit 128000 Tokens ladbar. NIAH braucht diesen Load.</div>
             </div>
           </div>
 

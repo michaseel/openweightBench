@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kanban Board</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<style>
+  /* Subtle transitions and drag feedback */
+  .card { transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease; }
+  .card:active { cursor:grabbing; }
+  .card.dragging { opacity:.6; transform: rotate(2deg) scale(.98); }
+  .column.drag-over { outline: 2px dashed rgb(99 102 241); outline-offset: -8px; }
+  /* Vibrant glass look */
+  .glass { backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+</style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-indigo-600 via-violet-600 to-fuchsia-600 text-white">
+<div class="max-w-7xl mx-auto p-6">
+  <header class="mb-6 flex items-center justify-between">
+    <h1 class="text-3xl font-bold tracking-tight">Kanban Board</h1>
+    <span class="text-sm opacity-80">Drag • Edit • Persist</span>
+  </header>
+
+  <main id="board" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+    <!-- Columns injected by JS -->
+  </main>
+</div>
+
+<!-- Delete confirmation modal -->
+<div id="delete-modal" class="fixed inset-0 hidden items-center justify-center bg-black/50 z-50">
+  <div class="glass bg-white/10 border border-white/20 rounded-2xl p-6 w-80 text-white shadow-xl">
+    <h2 class="text-xl font-semibold mb-3">Delete card?</h2>
+    <p class="opacity-80 mb-5 text-sm">This action cannot be undone.</p>
+    <div class="flex justify-end gap-3">
+      <button id="cancel-delete" class="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition">Cancel</button>
+      <button data-testid="confirm-delete" id="confirm-delete" class="px-4 py-2 rounded-lg bg-rose-500 hover:bg-rose-600 transition">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/**
+ * Vanilla JS Kanban Board
+ * - Drag & drop between columns
+ * - In-place editing
+ * - localStorage persistence with custom namespace
+ * - Delete with confirmation modal (no alert/prompt)
+ * - Confetti on move to Done
+ */
+
+const STORAGE_KEY = 'kanban-board-mynamespace-2025-v1';
+const columnsMeta = [
+  { key: 'backlog',     title: 'Backlog',     testid: 'column-backlog' },
+  { key: 'in-progress', title: 'In Progress', testid: 'column-in-progress' },
+  { key: 'review',      title: 'Review',      testid: 'column-review' },
+  { key: 'done',        title: 'Done',        testid: 'column-done' }
+];
+
+// State shape: { backlog: [{id,title}], in-progress:[...], ... }
+let state = loadState();
+
+function loadState() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (raw) {
+    try { return JSON.parse(raw); } catch {}
+  }
+  // Dummy data if empty
+  return {
+    backlog: [
+      { id: uid(), title: 'Design landing page' },
+      { id: uid(), title: 'Write specs for API' }
+    ],
+    'in-progress': [
+      { id: uid(), title: 'Implement drag & drop' }
+    ],
+    review: [
+      { id: uid(), title: 'Code review for board' }
+    ],
+    done: [
+      { id: uid(), title: 'Setup repository' }
+    ]
+  };
+}
+
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function uid() {
+  return Math.random().toString(36).slice(2) + Date.now().toString(36);
+}
+
+const boardEl = document.getElementById('board');
+
+// Render board
+function render() {
+  boardEl.innerHTML = '';
+  columnsMeta.forEach(col => {
+    const section = document.createElement('section');
+    section.className = 'glass bg-white/10 border border-white/15 rounded-2xl p-4 flex flex-col min-h-[420px]';
+    section.dataset.column = col.key;
+    section.dataset.testid = col.testid; // not used, attribute set below
+    section.setAttribute('data-testid', col.testid);
+
+    const header = document.createElement('div');
+    header.className = 'flex items-center justify-between mb-3';
+    header.innerHTML = `
+      <h2 class="font-semibold">${col.title}</h2>
+      <button data-testid="add-card" class="text-xs px-2 py-1 rounded bg-white/10 hover:bg-white/20 transition">+ Add</button>
+    `;
+    section.appendChild(header);
+
+    const cardsWrap = document.createElement('div');
+    cardsWrap.className = 'space-y-3 flex-1';
+    cardsWrap.id = `cards-${col.key}`;
+    section.appendChild(cardsWrap);
+
+    boardEl.appendChild(section);
+
+    // Render cards
+    const cards = state[col.key] || [];
+    cards.forEach(card => cardsWrap.appendChild(createCardEl(card, col.key)));
+
+    // Add card handler
+    header.querySelector('[data-testid="add-card"]').addEventListener('click', () => openAddInput(cardsWrap, col.key));
+
+    // Drag & drop handlers
+    section.addEventListener('dragover', e => {
+      e.preventDefault();
+      section.classList.add('drag-over');
+    });
+    section.addEventListener('dragleave', () => section.classList.remove('drag-over'));
+    section.addEventListener('drop', e => {
+      e.preventDefault();
+      section.classList.remove('drag-over');
+      const data = e.dataTransfer.getData('text/plain');
+      if (!data) return;
+      const { id, from } = JSON.parse(data);
+      const to = col.key;
+      if (from === to) return;
+      moveCard(id, from, to);
+    });
+  });
+}
+
+function createCardEl(card, columnKey) {
+  const el = document.createElement('div');
+  el.className = 'card group bg-white/10 border border-white/15 rounded-xl p-3 cursor-grab hover:bg-white/15';
+  el.draggable = true;
+  el.dataset.id = card.id;
+  el.dataset.column = columnKey;
+  el.setAttribute('data-testid', 'card');
+
+  el.innerHTML = `
+    <div class="flex items-start gap-2">
+      <div class="flex-1 title" contenteditable="true" spellcheck="false">${escapeHtml(card.title)}</div>
+      <button data-testid="delete-card" class="opacity-60 hover:opacity-100 text-xs px-1.5 py-0.5 rounded bg-white/10 hover:bg-rose-500/80 transition">✕</button>
+    </div>
+  `;
+
+  // Drag start
+  el.addEventListener('dragstart', e => {
+    el.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', JSON.stringify({ id: card.id, from: columnKey }));
+  });
+  el.addEventListener('dragend', () => el.classList.remove('dragging'));
+
+  // In-place edit
+  const titleEl = el.querySelector('.title');
+  let editing = false;
+  titleEl.addEventListener('focus', () => editing = true);
+  titleEl.addEventListener('blur', () => {
+    editing = false;
+    const newTitle = titleEl.innerText.trim();
+    if (newTitle && newTitle !== card.title) {
+      updateCardTitle(columnKey, card.id, newTitle);
+    }
+  });
+  titleEl.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      titleEl.blur();
+    }
+  });
+
+  // Delete
+  el.querySelector('[data-testid="delete-card"]').addEventListener('click', e => {
+    e.stopPropagation();
+    openDeleteConfirm(card.id, columnKey);
+  });
+
+  return el;
+}
+
+function openAddInput(container, columnKey) {
+  // Prevent multiple inputs
+  if (container.querySelector('[data-testid="card-input"]')) return;
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.placeholder = 'Card title...';
+  input.className = 'w-full px-3 py-2 rounded-lg bg-white/10 border border-white/20 outline-none focus:ring-2 ring-violet-400';
+  input.setAttribute('data-testid', 'card-input');
+  container.prepend(input);
+  input.focus();
+
+  const commit = () => {
+    const val = input.value.trim();
+    if (val) {
+      addCard(columnKey, val);
+    }
+    input.remove();
+  };
+  const cancel = () => input.remove();
+
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') commit();
+    if (e.key === 'Escape') cancel();
+  });
+  input.addEventListener('blur', () => {
+    // small delay to allow Enter handling
+    setTimeout(commit, 0);
+  });
+}
+
+function addCard(columnKey, title) {
+  const card = { id: uid(), title };
+  state[columnKey] = state[columnKey] || [];
+  state[columnKey].unshift(card);
+  saveState();
+  render();
+}
+
+function updateCardTitle(columnKey, id, title) {
+  const list = state[columnKey];
+  const card = list.find(c => c.id === id);
+  if (card) {
+    card.title = title || 'Untitled';
+    saveState();
+  }
+}
+
+function moveCard(id, fromKey, toKey) {
+  const fromList = state[fromKey];
+  const idx = fromList.findIndex(c => c.id === id);
+  if (idx === -1) return;
+  const [card] = fromList.splice(idx, 1);
+  state[toKey] = state[toKey] || [];
+  state[toKey].push(card);
+  saveState();
+  render();
+  if (toKey === 'done' && fromKey !== 'done') {
+    // Confetti celebration
+    confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
+  }
+}
+
+// Delete flow
+let pendingDelete = null;
+const deleteModal = document.getElementById('delete-modal');
+function openDeleteConfirm(id, columnKey) {
+  pendingDelete = { id, columnKey };
+  deleteModal.classList.remove('hidden');
+  deleteModal.classList.add('flex');
+}
+document.getElementById('cancel-delete').addEventListener('click', closeDeleteModal);
+document.getElementById('confirm-delete').addEventListener('click', () => {
+  if (!pendingDelete) return;
+  const { id, columnKey } = pendingDelete;
+  state[columnKey] = state[columnKey].filter(c => c.id !== id);
+  saveState();
+  closeDeleteModal();
+  render();
+});
+function closeDeleteModal() {
+  pendingDelete = null;
+  deleteModal.classList.add('hidden');
+  deleteModal.classList.remove('flex');
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// Initial render
+render();
+</script>
+</body>
+</html>

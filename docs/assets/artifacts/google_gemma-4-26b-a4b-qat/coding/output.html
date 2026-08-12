@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Kanban Board</title>
+    <!-- Tailwind CSS for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Canvas Confetti for celebrations -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        /* Custom transitions for smooth UI interactions */
+        .card-transition {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .column-drop-zone.drag-over {
+            background-color: rgba(226, 232, 240, 0.5);
+            border: 2px dashed #64748b;
+        }
+        /* Custom scrollbar for the board */
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans text-slate-900">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200 py-6 px-8 mb-8 shadow-sm">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <h1 class="text-3xl font-extrabold tracking-tight text-slate-800">
+                Kanban <span class="text-indigo-600">Flow</span>
+            </h1>
+            <p class="text-slate-500 text-sm font-medium">Drag, drop, and organize your workflow</p>
+        </div>
+    </header>
+
+    <!-- Kanban Board Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-row gap-6 overflow-x-auto pb-8 custom-scrollbar min-h-[70vh] items-start">
+            
+            <!-- Backlog Column -->
+            <div data-testid="column-backlog" class="column-drop-zone flex-1 min-w-[300px] bg-slate-100 rounded-xl p-4 flex flex-col transition-colors duration-200">
+                <div class="flex justify-between items-center mb-4 px-2">
+                    <h2 class="font-bold text-slate-700 uppercase tracking-wider text-sm">Backlog</h2>
+                    <span class="count-badge bg-slate-200 text-slate-600 px-2 py-0.5 rounded text-xs font-bold">0</span>
+                </div>
+                <div class="card-container space-y-3 flex-grow min-h-[100px]">
+                    <!-- Cards will be injected here -->
+                </div>
+                <button data-testid="add-card" class="mt-4 flex items-center justify-center w-full py-2 text-sm font-medium text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all duration-200 border border-transparent hover:border-indigo-100">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Add card
+                </button>
+            </div>
+
+            <!-- In Progress Column -->
+            <div data-testid="column-in-progress" class="column-drop-zone flex-1 min-w-[300px] bg-amber-50 rounded-xl p-4 flex flex-col transition-colors duration-200">
+                <div class="flex justify-between items-center mb-4 px-2">
+                    <h2 class="font-bold text-amber-700 uppercase tracking-wider text-sm">In Progress</h2>
+                    <span class="count-badge bg-amber-200 text-amber-700 px-2 py-0.5 rounded text-xs font-bold">0</span>
+                </div>
+                <div class="card-container space-y-3 flex-grow min-h-[100px]"></div>
+                <button data-testid="add-card" class="mt-4 flex items-center justify-center w-full py-2 text-sm font-medium text-amber-600 hover:text-amber-700 hover:bg-amber-100 rounded-lg transition-all duration-200 border border-transparent hover:border-amber-200">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Add card
+                </button>
+            </div>
+
+            <!-- Review Column -->
+            <div data-testid="column-review" class="column-drop-zone flex-1 min-w-[300px] bg-purple-50 rounded-xl p-4 flex flex-col transition-colors duration-200">
+                <div class="flex justify-between items-center mb-4 px-2">
+                    <h2 class="font-bold text-purple-700 uppercase tracking-wider text-sm">Review</h2>
+                    <span class="count-badge bg-purple-200 text-purple-700 px-2 py-0.5 rounded text-xs font-bold">0</span>
+                </div>
+                <div class="card-container space-y-3 flex-grow min-h-[100px]"></div>
+                <button data-testid="add-card" class="mt-4 flex items-center justify-center w-full py-2 text-sm font-medium text-purple-600 hover:text-purple-700 hover:bg-purple-100 rounded-lg transition-all duration-200 border border-transparent hover:border-purple-200">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Add card
+                </button>
+            </div>
+
+            <!-- Done Column -->
+            <div data-testid="column-done" class="column-drop-zone flex-1 min-w-[300px] bg-emerald-50 rounded-xl p-4 flex flex-col transition-colors duration-200">
+                <div class="flex justify-between items-center mb-4 px-2">
+                    <h2 class="font-bold text-emerald-700 uppercase tracking-wider text-sm">Done</h2>
+                    <span class="count-badge bg-emerald-200 text-emerald-700 px-2 py-0.5 rounded text-xs font-bold">0</span>
+                </div>
+                <div class="card-container space-space-y-3 flex-grow min-h-[100px]"></div>
+                <button data-testid="add-card" class="mt-4 flex items-center justify-center w-full py-2 text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:bg-emerald-100 rounded-lg transition-all duration-200 border border-transparent hover:border-emerald-200">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Add card
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add Card Modal -->
+    <div id="add-card-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all">
+            <div class="p-6">
+                <h3 class="text-xl font-bold text-slate-800 mb-4">New Task</h3>
+                <textarea 
+                    data-testid="card-input" 
+                    class="w-full h-32 p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none resize-none text-slate-700"
+                    placeholder="What needs to be done?"
+                ></textarea>
+                <div class="flex justify-end space-x-3 mt-4">
+                    <button id="close-add-modal" class="px-4 py-2 text-sm font-medium text-slate-500 hover:text-slate-700">Cancel</button>
+                    <button id="submit-add-card" class="px-6 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 transition-colors">Create Card</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden transform transition-all">
+            <div class="p-6 text-center">
+                <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800">Delete Task?</h3>
+                <p class="text-slate-500 text-sm mt-2">This action cannot be undone.</p>
+                <div class="flex justify-center space-x-3 mt-6">
+                    <button id="cancel-delete" class="px-4 py-2 text-sm font-medium text-slate-500 hover:text-slate-700">Cancel</button>
+                    <button data-testid="confirm-delete" class="px-6 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-700 transition-colors">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * STATE MANAGEMENT
+         */
+        const STORAGE_KEY = 'kanban_flow_state_v1';
+        const COLUMNS = ['backlog', 'in-progress', 'review', 'done'];
+        
+        let state = {
+            'backlog': [
+                { id: '1', text: 'Research UI trends for dashboard' },
+                { id: '2', text: 'Setup Tailwind configuration' }
+            ],
+            'in-progress': [
+                { id: '3', text: 'Implement drag and drop logic' }
+            ],
+            'review': [
+                { id: '4', text: 'Write unit tests for storage' }
+            ],
+            'done': [
+                { id: '5', text: 'Initialize Git repository' }
+            ]
+        };
+
+        // Load from localStorage
+        const savedState = localStorage.getItem(STORAGE_KEY);
+        if (savedState) {
+            state = JSON.parse(savedState);
+        }
+
+        const saveToStorage = () => {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        };
+
+        /**
+         * DOM ELEMENTS
+         */
+        const modals = {
+            add: document.getElementById('add-card-modal'),
+            delete: document.getElementById('delete-modal')
+        };
+        const cardInput = document.querySelector('[data-testid="card-input"]');
+        let currentColumnForNewCard = 'backlog';
+        let cardToDelete = null;
+
+        /**
+         * CORE FUNCTIONS
+         */
+
+        function render() {
+            COLUMNS.forEach(colId => {
+                const columnEl = document.querySelector(`[data-testid="column-${colId}"]`);
+                const container = columnEl.querySelector('.card-container');
+                const countBadge = columnEl.querySelector('.count-badge');
+                
+                // Clear existing
+                container.innerHTML = '';
+                
+                // Update badge
+                countBadge.textContent = state[colId].length;
+
+                // Render cards
+                state[colId].forEach(card => {
+                    const cardEl = createCardElement(card);
+                    container.appendChild(cardEl);
+                });
+            });
+        }
+
+        function createCardElement(card) {
+            const div = document.createElement('div');
+            div.setAttribute('data-testid', 'card');
+            div.className = 'card-transition bg-white p-4 rounded-lg shadow-sm border border-slate-200 cursor-grab active:cursor-grabbing hover:shadow-md relative group';
+            div.setAttribute('draggable', 'true');
+            div.dataset.id = card.id;
+
+            // Card Content (Text span for "editable in place")
+            const textSpan = document.createElement('span');
+            textSpan.className = 'text-sm text-slate-700 block pr-6 break-words leading-relaxed';
+            textSpan.textContent = card.text;
+            textSpan.onclick = (e) => enterEditMode(e, card.id);
+
+            // Delete Button
+            const deleteBtn = document.createElement('button');
+            deleteBtn.setAttribute('data-testid', 'delete-card');
+            deleteBtn.className = 'absolute top-3 right-2 text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-1';
+            deleteBtn.innerHTML = `
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 1.236A1 1 0 0017.64 9H6.36a1 1 0 00-.894.586L5 11h14V7z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-4 4l4 4m-4-4l-4 4"></path></svg>
+            `;
+            deleteBtn.onclick = (e) => {
+                e.stopPropagation();
+                openDeleteModal(card.id);
+            };
+
+            div.appendChild(textSpan);
+            div.appendChild(deleteBtn);
+
+            // Drag Events
+            div.addEventListener('dragstart', handleDragStart);
+            div.addEventListener('dragend', handleDragEnd);
+
+            return div;
+        }
+
+        /**
+         * INTERACTION HANDLERS
+         */
+
+        // Drag and Drop Logic
+        function handleDragStart(e) {
+            e.dataTransfer.setData('text/plain', e.target.dataset.id);
+            e.target.classList.add('opacity-50');
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('opacity-50');
+            document.querySelectorAll('.column-drop-zone').forEach(el => el.classList.remove('drag-over'));
+        }
+
+        function setupDragAndDrop() {
+            const zones = document.querySelectorAll('.column-drop-zone');
+            zones.forEach(zone => {
+                zone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    zone.classList.add('drag-over');
+                });
+
+                zone.addEventListener('dragleave', () => {
+                    zone.classList.remove('drag-over');
+                });
+
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('drag-over');
+                    
+                    const cardId = e.dataTransfer.getData('text/plain');
+                    const targetColumnId = zone.getAttribute('data-testid').replace('column-', '');
+                    
+                    moveCard(cardId, targetColumnId);
+                });
+            });
+        }
+
+        function moveCard(cardId, targetColId) {
+            let sourceColId = '';
+            let cardObj = null;
+
+            // Find card and source column
+            for (const col of COLUMNS) {
+                const index = state[col].findIndex(c => c.id === cardId);
+                if (index !== -1) {
+                    sourceColId = col;
+                    cardObj = state[col][index];
+                    break;
+                }
+            }
+
+            if (cardObj && sourceColId !== targetColId) {
+                // Remove from source
+                state[sourceColId].splice(state[sourceColId].indexOf(cardObj), 1);
+                // Add to target
+                state[targetColId].push(cardObj);
+                
+                // Confetti if moved to Done
+                if (targetColId === 'done') {
+                    confetti({
+                        particleCount: 100,
+                        spread: 70,
+                        origin: { y: 0.6 },
+                        colors: ['#10b981', '#34d399', '#6ee7b7']
+                    });
+                }
+                
+                saveToStorage();
+                render();
+            }
+        }
+
+        // Add Card Logic
+        function openAddModal(colId) {
+            currentColumnForNewCard = colId;
+            modals.add.classList.remove('hidden');
+            cardInput.value = '';
+            cardInput.focus();
+        }
+
+        function closeModal(modalType) {
+            if (modalType === 'add') modals.add.classList.add('hidden');
+            if (modalType === 'delete') modals.delete.classList.add('hidden');
+        }
+
+        // Delete Modal Logic
+        function openDeleteModal(cardId) {
+            cardToDelete = cardId;
+            modals.delete.classList.remove('hidden');
+        }
+
+        // Edit Logic (In-place)
+        function enterEditMode(e, cardId) {
+            const span = e.target;
+            const originalText = span.textContent;
+            
+            const input = document.createElement('input');
+            input.className = 'w-full text-sm p-1 border border-indigo-300 rounded outline-none bg-white';
+            input.value = originalText;
+            
+            const finishEdit = () => {
+                const newText = input.value.trim();
+                if (newText !== "" && newText !== originalText) {
+                    updateCardText(cardId, newText);
+                } else {
+                    render(); // Re-render to revert changes
+                }
+            };
+
+            input.onblur = finishEdit;
+            input.onkeydown = (event) => {
+                if (event.key === 'Enter') finishEdit();
+                if (event.key === 'Escape') render();
+            };
+
+            span.replaceWith(input);
+            input.focus();
+        }
+
+        function updateCardText(cardId, newText) {
+            for (const col of COLUMNS) {
+                const card = state[col].find(c => c.id === cardId);
+                if (card) {
+                    card.text = newText;
+                    break;
+                }
+            }
+            saveToStorage();
+            render();
+        }
+
+        /**
+         * INITIALIZATION & EVENT LISTENERS
+         */
+
+        function init() {
+            render();
+            setupDragAndDrop();
+
+            // Add Card Listeners
+            document.querySelectorAll('[data-testid="add-card"]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const colEl = e.currentTarget.closest('.column-drop-zone');
+                    const colId = colEl.getAttribute('data-testid').replace('column-', '');
+                    openAddModal(colId);
+                });
+            });
+
+            document.getElementById('close-add-modal').addEventListener('click', () => closeModal('add'));
+            
+            document.getElementById('submit-add-card').addEventListener('click', () => {
+                const text = cardInput.value.trim();
+                if (text) {
+                    const newCard = {
+                        id: Date.now().toString(),
+                        text: text
+                    };
+                    state[currentColumnForNewCard].push(newCard);
+                    saveToStorage();
+                    render();
+                    closeModal('add');
+                }
+            });
+
+            // Enter key in add modal
+            cardInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    document.getElementById('submit-add-card').click();
+                }
+            });
+
+            // Delete Modal Listeners
+            document.getElementById('cancel-delete').addEventListener('click', () => closeModal('delete'));
+            document.getElementById('confirm-delete').addEventListener('click', () => {
+                if (cardToDelete) {
+                    state[COLUMNS.find(col => state[col].some(c => c.id === cardToDelete))] = 
+                        state[COLUMNS.find(col => state[col].some(c => c.id === cardToDelete))].filter(c => c.id !== cardToDelete);
+                    
+                    // Simplified deletion logic for brevity in implementation
+                    for (const col of COLUMNS) {
+                        state[col] = state[col].filter(c => c.id !== cardToDelete);
+                    }
+                    
+                    saveToStorage();
+                    cardToDelete = null;
+                    render();
+                    closeModal('delete');
+                }
+            });
+        }
+
+        // Run app
+        init();
+
+    </script>
+</body>
+</html>

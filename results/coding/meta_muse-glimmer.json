@@ -1,0 +1,199 @@
+{
+  "task": "coding",
+  "model_id": "meta/muse-glimmer",
+  "model_info": {
+    "id": "meta/muse-glimmer",
+    "type": "vlm",
+    "publisher": "meta",
+    "arch": "muse-glimmer",
+    "compatibility_type": "gguf",
+    "quantization": null,
+    "state": "not-loaded",
+    "max_context_length": 131072,
+    "capabilities": [],
+    "loaded_context_length": null
+  },
+  "started_at": "2026-08-11T15:52:38.731574Z",
+  "completed_at": "2026-08-11T15:59:55.948229Z",
+  "metrics": {
+    "wall_seconds": 437.21309166704305,
+    "tokens_generated": 4584,
+    "tokens_per_second": 11.107904691754554,
+    "time_to_first_token_ms": 2209.707,
+    "peak_rss_mb": 17316.0
+  },
+  "score": 0.9166666666666667,
+  "score_breakdown": {
+    "looks_like_html": true,
+    "html_length": 9592,
+    "raw_length": 9593,
+    "lint_checks": [
+      {
+        "id": "col_backlog",
+        "label": "Spalte 'Backlog'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_in_progress",
+        "label": "Spalte 'In Progress'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_review",
+        "label": "Spalte 'Review'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_done",
+        "label": "Spalte 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "drag_drop",
+        "label": "HTML5 drag & drop or sortable lib",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "local_storage",
+        "label": "localStorage persistence",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "tailwind_cdn",
+        "label": "Tailwind via CDN",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "confetti",
+        "label": "Confetti animation on 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Add card button",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "vanilla_js",
+        "label": "Vanilla JS (no React/Vue/Angular/Svelte)",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_alert_prompt",
+        "label": "No window.alert/prompt for CRUD",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "editable_cards",
+        "label": "Editable cards (contenteditable / input)",
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "lint_passed": 12,
+    "lint_total": 12,
+    "lint_score": 1.0,
+    "e2e_checks": [
+      {
+        "id": "renders",
+        "label": "Page loads with all 4 columns",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Add card via button",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_double_add",
+        "label": "Card is added exactly 1× (no double submit)",
+        "passed": false,
+        "detail": "card was added 2× — multiple listeners or double submit"
+      },
+      {
+        "id": "delete_card",
+        "label": "Delete card via button + confirmation",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "persistence",
+        "label": "Cards survive a reload",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_console_errors",
+        "label": "No JS console errors",
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "e2e_passed": 5,
+    "e2e_total": 6,
+    "e2e_score": 0.8333333333333334,
+    "judge": {
+      "scored_at": "2026-08-11T16:00:10.662994+00:00",
+      "judge_model": "openai/gpt-5.4",
+      "scores": {
+        "board_renders": 1.0,
+        "column_completeness": 1.0,
+        "cards_present": 1.0,
+        "ui_affordances": 0.85,
+        "design_quality": 0.9,
+        "code_structure": 0.8,
+        "dom_safety": 0.6,
+        "robustness": 0.55,
+        "code_quality": 0.75,
+        "render_matches_code": 1.0
+      },
+      "judge_score": 0.835,
+      "comment_visual": "Das Board rendert vollständig mit allen vier Spalten, mehreren gut lesbaren Karten und klar sichtbaren Add-Buttons. Die UI wirkt modern und stimmig; Drag/Edit wird im Header kommuniziert, echte Edit-Affordanz direkt an den Karten ist aber eher implizit.",
+      "comment_code": "Der Code ist insgesamt sauber organisiert mit getrennten Funktionen für Laden, Rendern, Editieren, Verschieben und Löschen. Schwächer sind DOM-Sicherheit und Robustheit: Es wird teils innerHTML verwendet, localStorage-Zugriffe sind nicht abgesichert, und beim Drop fehlt Schutz gegen ungültiges JSON bzw. fehlende State-Listen.",
+      "comment_consistency": "Screenshot und Code passen sehr gut zusammen: genau die vier Spalten, die Dummy-Karten und die Add-Buttons aus dem Code sind sichtbar gerendert. Keine auffällige Diskrepanz zwischen deklarierter Funktionalität und sichtbarem Ergebnis."
+    }
+  },
+  "raw_response": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\" />\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n<title>Kanban Board</title>\n<script src=\"https://cdn.tailwindcss.com\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js\"></script>\n<style>\n  /* Subtle transitions and drag feedback */\n  .card { transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease; }\n  .card:active { cursor:grabbing; }\n  .card.dragging { opacity:.6; transform: rotate(2deg) scale(.98); }\n  .column.drag-over { outline: 2px dashed rgb(99 102 241); outline-offset: -8px; }\n  /* Vibrant glass look */\n  .glass { backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }\n</style>\n</head>\n<body class=\"min-h-screen bg-gradient-to-br from-indigo-600 via-violet-600 to-fuchsia-600 text-white\">\n<div class=\"max-w-7xl mx-auto p-6\">\n  <header class=\"mb-6 flex items-center justify-between\">\n    <h1 class=\"text-3xl font-bold tracking-tight\">Kanban Board</h1>\n    <span class=\"text-sm opacity-80\">Drag • Edit • Persist</span>\n  </header>\n\n  <main id=\"board\" class=\"grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5\">\n    <!-- Columns injected by JS -->\n  </main>\n</div>\n\n<!-- Delete confirmation modal -->\n<div id=\"delete-modal\" class=\"fixed inset-0 hidden items-center justify-center bg-black/50 z-50\">\n  <div class=\"glass bg-white/10 border border-white/20 rounded-2xl p-6 w-80 text-white shadow-xl\">\n    <h2 class=\"text-xl font-semibold mb-3\">Delete card?</h2>\n    <p class=\"opacity-80 mb-5 text-sm\">This action cannot be undone.</p>\n    <div class=\"flex justify-end gap-3\">\n      <button id=\"cancel-delete\" class=\"px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition\">Cancel</button>\n      <button data-testid=\"confirm-delete\" id=\"confirm-delete\" class=\"px-4 py-2 rounded-lg bg-rose-500 hover:bg-rose-600 transition\">Delete</button>\n    </div>\n  </div>\n</div>\n\n<script>\n/**\n * Vanilla JS Kanban Board\n * - D",
+  "artifacts": [
+    {
+      "kind": "html",
+      "label": "Generierte App",
+      "path": "artifacts/meta_muse-glimmer/coding/output.html",
+      "mime": "text/html"
+    },
+    {
+      "kind": "text",
+      "label": "Raw model response",
+      "path": "artifacts/meta_muse-glimmer/coding/raw_response.txt",
+      "mime": "text/plain"
+    },
+    {
+      "kind": "image",
+      "label": "Screenshot der gerenderten App",
+      "path": "artifacts/meta_muse-glimmer/coding/screenshot.png",
+      "mime": "image/png"
+    }
+  ],
+  "error": null,
+  "hardware": {
+    "platform": "macOS-26.5.2-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "ram_total_gb": 128.0,
+    "cpu_count": 16
+  },
+  "bench_version": "0.1.0"
+}

@@ -1,0 +1,143 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html,body{margin:0;background:#fff;font-family:system-ui,-apple-system,sans-serif}
+  .wrap{padding:24px;display:inline-block;background:#fff}
+  /* Force a concrete render box: many model-emitted SVGs only set viewBox.
+     Without a width here, an inline-block parent collapses the SVG to its
+     intrinsic ~300x150 (or smaller) and the screenshot becomes a tiny
+     blank tile. Fixed width + auto height uses viewBox aspect-ratio. */
+  .wrap svg{display:block;width:1200px;height:auto;max-width:none}
+</style></head><body><div class="wrap"><svg viewBox="0 0 1000 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="black" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1000" height="800" fill="white" />
+
+  <!-- Title -->
+  <text x="500" y="50" font-family="sans-serif" font-size="32" font-weight="bold" text-anchor="middle" fill="black">Eisenhower - Matrix - Marketing</text>
+
+  <!-- Axes -->
+  <g id="axes" stroke="black" stroke-width="2">
+    <!-- Y-axis -->
+    <line x1="150" y1="100" x2="150" y2="700" marker-end="url(#arrowhead)" />
+    <!-- X-axis -->
+    <line x1="150" y1="700" x2="850" y2="700" marker-end="url(#arrowhead)" />
+  </g>
+
+  <!-- Axis Labels -->
+  <g font-family="sans-serif" font-size="18" fill="black">
+    <text x="120" y="105" text-anchor="end">hoch</text>
+    <text x="120" y="705" text-anchor="end">niedrig</text>
+    <text x="150" y="740" text-anchor="middle">niedrig</text>
+    <text x="850" y="740" text-anchor="middle">hoch</text>
+    <text x="50" y="400" font-size="20" transform="rotate(-90, 50, 400)" text-anchor="middle">Wichtigkeit</text>
+    <text x="500" y="770" text-anchor="middle">Dringlichkeit</text>
+  </g>
+
+  <!-- Quadrants -->
+  <g id="quadrants">
+    <!-- Top-Left: Wichtig + Nicht dringend -->
+    <g id="q1">
+      <rect x="150" y="100" width="350" height="300" fill="none" stroke="black" stroke-width="2" />
+      <text x="170" y="135" font-family="sans-serif" font-size="20" font-weight="bold">Wichtig + Nicht dringend</text>
+      <g font-family="sans-serif" font-size="16" fill="black">
+        <text x="170" y="180">• Content - Strategie</text>
+        <text x="170" y="215">• Brand schärfen</text>
+        <text x="170" y="250">• SEO aufräumen</text>
+        <text x="170" y="285">• Zielgruppen verstehen</text>
+      </g>
+    </g>
+
+    <!-- Top-Right: Wichtig + Dringend -->
+    <g id="q2">
+      <rect x="500" y="100" width="350" height="300" fill="none" stroke="black" stroke-width="2" />
+      <text x="520" y="135" font-family="sans-serif" font-size="20" font-weight="bold">Wichtig + Dringend</text>
+      <g font-family="sans-serif" font-size="16" fill="black">
+        <text x="520" y="180">• Kampagne retten</text>
+        <text x="520" y="215">• Shitstorm beantworten</text>
+        <text x="520" y="250">• Newsletter mit falschem Link fixen</text>
+        <text x="520" y="285">• Chef will bis 14 Uhr "viral gehen"</text>
+      </g>
+    </g>
+
+    <!-- Bottom-Left: Nicht wichtig + Nicht dringend -->
+    <g id="q3">
+      <rect x="150" y="400" width="350" height="300" fill="none" stroke="black" stroke-width="2" />
+      <text x="170" y="435" font-family="sans-serif" font-size="20" font-weight="bold">Nicht wichtig + Nicht dringend</text>
+      <g font-family="sans-serif" font-size="16" fill="black">
+        <text x="170" y="475">• Merch-Ideen mit Glitzer</text>
+        <text x="170" y="510">• Buzzword-Bingo</text>
+        <text x="170" y="545">• TikTok-Tanz mit Maskottchen</text>
+        <text x="170" y="580">• Hashtag brainstormen #innovation #synergy #wow</text>
+      </g>
+    </g>
+
+    <!-- Bottom-Right: Nicht wichtig + Dringend -->
+    <g id="q4">
+      <rect x="500" y="400" width="350" height="300" fill="none" stroke="black" stroke-width="2" />
+      <text x="520" y="435" font-family="sans-serif" font-size="20" font-weight="bold">Nicht wichtig + Dringend</text>
+      <g font-family="sans-serif" font-size="16" fill="black">
+        <text x="520" y="475">• Noch ein Last-Minute-Meeting</text>
+        <text x="520" y="510">• Kann das Logo größer?</text>
+        <text x="520" y="545">• LinkedIn-Post für "Welttag der Büroklammer"</text>
+        <text x="520" y="580">• Folie 27 schöner machen</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Extra Elements -->
+  <g id="extras">
+    <!-- Heart (Bottom Left) -->
+    <g transform="translate(40, 550)">
+      <path d="M20,10 Q20,-10 40,0 Q60,-10 60,10 Q60,30 40,50 Q20,30 20,10" fill="none" stroke="black" stroke-width="2" />
+      <text x="70" y="10" font-family="sans-serif" font-size="14" fill="black">Erledigen, wenn das</text>
+      <text x="70" y="30" font-family="sans-serif" font-size="14" fill="black">Internet wieder da ist. :)</text>
+    </g>
+
+    <!-- Coffee (Top Right) -->
+    <g transform="translate(840, 80)">
+      <path d="M0,0 L30,0 L30,30 L0,30 Z" fill="none" stroke="black" stroke-width="2" />
+      <path d="M30,5 Q45,5 45,15 Q45,25 30,25" fill="none" stroke="black" stroke-width="2" />
+      <path d="M5, -10 Q10, -20 15, -10" fill="none" stroke="black" stroke-width="1" />
+      <path d="M15, -15 Q20, -25 25, -15" fill="none" stroke="black" stroke-width="1" />
+      <text x="40" y="10" font-family="sans-serif" font-size="14" fill="black" text-anchor="start">Kaffee zählt nicht.</text>
+      <text x="40" y="30" font-family="sans-serif" font-size="14" fill="black" text-anchor="start">Aber hilft. :)</text>
+    </g>
+
+    <!-- Starburst (Top Right) -->
+    <g transform="translate(720, 250)">
+      <path d="M0,-30 L5,-5 L25,-5 L10,10 L15,35 L0,15 L-15,35 L-10,10 L-25,-5 L-5,-5 Z" fill="white" stroke="black" stroke-width="1" />
+      <text x="0" y="5" font-family="sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="black">VIRAL???</text>
+    </g>
+
+    <!-- Megaphone (Top Right) -->
+    <g transform="translate(700, 360)">
+      <path d="M0,0 L30,-15 L30,15 Z" fill="none" stroke="black" stroke-width="2" />
+      <line x1="0" y1="0" x2="-20" y2="-10" stroke="black" stroke-width="2" />
+      <line x1="0" y1="0" x2="-20" y2="10" stroke="black" stroke-width="2" />
+    </g>
+
+    <!-- Unicorn (Bottom Left) -->
+    <g transform="translate(400, 650)">
+      <path d="M0,0 Q20,-30 40,0 Q40,30 20,40 Q0,30 0,0" fill="none" stroke="black" stroke-width="2" />
+      <path d="M15,-5 L25,-25" stroke="black" stroke-width="2" />
+    </g>
+
+    <!-- Brain (Bottom Left) -->
+    <g transform="translate(400, 600)">
+      <path d="M0,0 Q15,-15 30,0 Q30,15 15,20 Q0,15 0,0" fill="none" stroke="black" stroke-width="2" />
+    </g>
+
+    <!-- Dots (Bottom Right) -->
+    <g transform="translate(800, 750)">
+      <circle cx="0" cy="0" r="4" fill="black" />
+      <circle cx="15" cy="0" r="4" fill="black" />
+      <circle cx="30" cy="0" r="4" fill="black" />
+    </g>
+  </g>
+</svg></div></body></html>

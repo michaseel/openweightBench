@@ -32,10 +32,116 @@
     }
   }
 </script>
+<script>
+  // Shared model filter (RAM cap + release window), used by the landing page
+  // and every bench page. Participating elements carry `data-total-ram` (GB,
+  // 64k-context estimate) and `data-released` (YYYY-MM[-DD]).
+  //
+  // Release-window option values: "m<N>" = the last N months, "y<YYYY>" = that
+  // calendar year and nothing else, "" = no restriction. Both are compared at
+  // whole-calendar-month granularity, so a YYYY-MM date without a day resolves
+  // without guessing. "Last N months" counts back from the viewer's own clock,
+  // not the build date — the report stays online and a window pinned to the
+  // build would quietly drift into meaning something else.
+  //
+  // Missing values never hide a model, for either criterion: the RAM figure
+  // comes from a runtime measurement and the date from curated metadata, so a
+  // gap means "not known", not "doesn't qualify". A freshly benchmarked model
+  // that nobody has annotated yet must not silently drop out of the report —
+  // the RAM and Released columns show "—" so the gap is visible in place.
+  //
+  // Each group names the class to toggle, so callers choose the presentation:
+  // charts dim their dots (comparison stays visible), tables hide their rows
+  // (that's the point of filtering a 60-row table). The first return value of
+  // apply() is the per-group count of models still shown.
+  window.owbFilter = function (cfg) {
+    const ram = document.getElementById(cfg.ramSelect);
+    const year = document.getElementById(cfg.yearSelect);
+    const groups = (cfg.groups || []).map(g => ({ els: Array.from(g.els), cls: g.cls }));
+    if (!ram && !year) return null;
+
+    // Month index (year * 12 + month) so windows are plain integer ranges.
+    function releaseMonth(el) {
+      const rel = el.dataset.released || '';
+      if (rel.length < 7) return null;
+      return parseInt(rel.slice(0, 4), 10) * 12 + parseInt(rel.slice(5, 7), 10);
+    }
+
+    function windowFor(value) {
+      if (!value) return null;
+      if (value[0] === 'm') {
+        const now = new Date();
+        const nowMonth = now.getFullYear() * 12 + now.getMonth() + 1;
+        return { from: nowMonth - parseInt(value.slice(1), 10) + 1, to: Infinity };
+      }
+      const y = parseInt(value.slice(1), 10);
+      return { from: y * 12 + 1, to: y * 12 + 12 };
+    }
+
+    function inWindow(el, value) {
+      const win = windowFor(value);
+      if (!win) return true;
+      const m = releaseMonth(el);
+      if (m === null) return true;
+      return m >= win.from && m <= win.to;
+    }
+
+    function excluded(el) {
+      const cap = ram ? parseFloat(ram.value) : NaN;
+      if (cap) {
+        const gb = parseFloat(el.dataset.totalRam || '');
+        if (gb && gb > cap) return true;
+      }
+      if (year && !inWindow(el, year.value)) return true;
+      return false;
+    }
+
+    // Mark options that would empty the page rather than letting the user
+    // pick them and wonder where everything went.
+    const population = groups.flatMap(g => g.els);
+    function disableEmpty(sel, matches) {
+      if (!sel) return;
+      Array.from(sel.options).forEach(opt => {
+        // "all" (value "" or the RAM select's "0") always stays selectable.
+        if (!opt.value || opt.value === '0') return;
+        if (population.some(el => matches(el, opt.value))) return;
+        opt.disabled = true;
+        opt.textContent += ' — no models';
+      });
+    }
+    disableEmpty(ram, (el, v) => {
+      const gb = parseFloat(el.dataset.totalRam || '');
+      return !gb || gb <= parseFloat(v);
+    });
+    disableEmpty(year, inWindow);
+
+    function apply() {
+      const counts = groups.map(g => {
+        let visible = 0;
+        g.els.forEach(el => {
+          const off = excluded(el);
+          el.classList.toggle(g.cls, off);
+          if (!off) visible++;
+        });
+        return visible;
+      });
+      if (cfg.onApply) cfg.onApply(counts);
+      return counts;
+    }
+
+    if (ram) ram.addEventListener('change', apply);
+    if (year) year.addEventListener('change', apply);
+    apply();
+    return { apply, excluded };
+  };
+</script>
 <style>
   body { font-feature-settings: "ss01","cv11"; }
   .num { font-variant-numeric: tabular-nums; }
   .row-link:hover { background: rgb(245 245 244 / 1); }
+  /* Model filter: table rows drop out entirely, chart dots only dim (see
+     window.owbFilter). */
+  .owb-hidden { display: none !important; }
   .preview-pop {
     position: fixed; pointer-events: none; z-index: 50;
     transform: translate(16px, 16px);
@@ -224,12 +330,12 @@
       <div class="flex-1 p-5 min-w-0">
         <div class="flex items-baseline justify-between gap-3">
           <h2 class="text-lg font-medium tracking-tight">Coding</h2>
-          <span class="text-xs text-stone-500 shrink-0">55 models</span>
+          <span class="text-xs text-stone-500 shrink-0">63 models</span>
         </div>
         <p class="mt-2 text-sm text-stone-600">Single-shot code generation (Kanban board as an HTML file). Measures how fast and how functionally models solve a concrete UI task. Hovering over a model row shows a screenshot of the rendered app.</p>
         <div class="mt-4 flex items-center gap-6 text-xs text-stone-500">
             <span>Top score <span class="font-mono num text-stone-900">93%</span></span>
-            <span>Median <span class="font-mono num text-stone-900">78</span> tok/s</span>
+            <span>Median <span class="font-mono num text-stone-900">72</span> tok/s</span>
           <span class="ml-auto text-stone-400 group-hover:text-stone-700">open →</span>
         </div>
       </div>
@@ -244,12 +350,12 @@
       <div class="flex-1 p-5 min-w-0">
         <div class="flex items-baseline justify-between gap-3">
           <h2 class="text-lg font-medium tracking-tight">Vision</h2>
-          <span class="text-xs text-stone-500 shrink-0">30 models</span>
+          <span class="text-xs text-stone-500 shrink-0">34 models</span>
         </div>
         <p class="mt-2 text-sm text-stone-600">OCR for vision-capable models: four sub-tasks — handwritten meeting notes in three difficulty tiers (easy / medium / hard) plus an old book page set in Fraktur typeface.</p>
         <div class="mt-4 flex items-center gap-6 text-xs text-stone-500">
             <span>Top score <span class="font-mono num text-stone-900">98%</span></span>
-            <span>Median <span class="font-mono num text-stone-900">79</span> tok/s</span>
+            <span>Median <span class="font-mono num text-stone-900">77</span> tok/s</span>
           <span class="ml-auto text-stone-400 group-hover:text-stone-700">open →</span>
         </div>
       </div>
@@ -264,12 +370,12 @@
       <div class="flex-1 p-5 min-w-0">
         <div class="flex items-baseline justify-between gap-3">
           <h2 class="text-lg font-medium tracking-tight">Needle in a Haystack</h2>
-          <span class="text-xs text-stone-500 shrink-0">51 models</span>
+          <span class="text-xs text-stone-500 shrink-0">59 models</span>
         </div>
         <p class="mt-2 text-sm text-stone-600">Three sub-benchmarks in one chat (prefill only once): corpus summary · needle retrieval (10 hidden facts in 120k tokens — uniform across all models) · 6 comprehension questions about the book (4 factual answers + 2 hallucination traps).</p>
         <div class="mt-4 flex items-center gap-6 text-xs text-stone-500">
             <span>Top score <span class="font-mono num text-stone-900">100%</span></span>
-            <span>Median <span class="font-mono num text-stone-900">43</span> tok/s</span>
+            <span>Median <span class="font-mono num text-stone-900">41</span> tok/s</span>
           <span class="ml-auto text-stone-400 group-hover:text-stone-700">open →</span>
         </div>
       </div>
@@ -284,12 +390,12 @@
       <div class="flex-1 p-5 min-w-0">
         <div class="flex items-baseline justify-between gap-3">
           <h2 class="text-lg font-medium tracking-tight">Tool Use</h2>
-          <span class="text-xs text-stone-500 shrink-0">46 models</span>
+          <span class="text-xs text-stone-500 shrink-0">63 models</span>
         </div>
         <p class="mt-2 text-sm text-stone-600">Seven OpenAI-style function-calling scenarios across three difficulty tiers (easy / medium / hard). Toolset: list_files, read_file, apply_diff, get_weather. The model must pick tools, supply correct arguments, chain multiple calls and synthesise a final answer.</p>
         <div class="mt-4 flex items-center gap-6 text-xs text-stone-500">
             <span>Top score <span class="font-mono num text-stone-900">100%</span></span>
-            <span>Median <span class="font-mono num text-stone-900">83</span> tok/s</span>
+            <span>Median <span class="font-mono num text-stone-900">75</span> tok/s</span>
           <span class="ml-auto text-stone-400 group-hover:text-stone-700">open →</span>
         </div>
       </div>
@@ -304,12 +410,12 @@
       <div class="flex-1 p-5 min-w-0">
         <div class="flex items-baseline justify-between gap-3">
           <h2 class="text-lg font-medium tracking-tight">Diagram → SVG</h2>
-          <span class="text-xs text-stone-500 shrink-0">30 models</span>
+          <span class="text-xs text-stone-500 shrink-0">34 models</span>
         </div>
         <p class="mt-2 text-sm text-stone-600">Photo of a hand-drawn diagram (architecture, flowchart, sequence, quadrant) → model emits inline SVG. Original and render sit side-by-side; an LLM judge rates visual fidelity.</p>
         <div class="mt-4 flex items-center gap-6 text-xs text-stone-500">
-            <span>Top score <span class="font-mono num text-stone-900">91%</span></span>
-            <span>Median <span class="font-mono num text-stone-900">76</span> tok/s</span>
+            <span>Top score <span class="font-mono num text-stone-900">92%</span></span>
+            <span>Median <span class="font-mono num text-stone-900">74</span> tok/s</span>
           <span class="ml-auto text-stone-400 group-hover:text-stone-700">open →</span>
         </div>
       </div>
@@ -324,12 +430,12 @@
       <div class="flex-1 p-5 min-w-0">
         <div class="flex items-baseline justify-between gap-3">
           <h2 class="text-lg font-medium tracking-tight">Hallucination</h2>
-          <span class="text-xs text-stone-500 shrink-0">54 models</span>
+          <span class="text-xs text-stone-500 shrink-0">62 models</span>
         </div>
         <p class="mt-2 text-sm text-stone-600">12 questions with subtle but factually false premises. Does the model invent an answer, say &#39;I don&#39;t know&#39;, or correct the premise?</p>
         <div class="mt-4 flex items-center gap-6 text-xs text-stone-500">
             <span>Top score <span class="font-mono num text-stone-900">100%</span></span>
-            <span>Median <span class="font-mono num text-stone-900">80</span> tok/s</span>
+            <span>Median <span class="font-mono num text-stone-900">77</span> tok/s</span>
           <span class="ml-auto text-stone-400 group-hover:text-stone-700">open →</span>
         </div>
       </div>
@@ -343,6 +449,40 @@
     Score 0–100&nbsp;% per benchmark. Overall = weighted mean: Coding counts double, Tool Use half. Missing or errored tasks are imputed at the model's own average minus 10&nbsp;pp (clamped at 0) with full weight — a gap never inflates the overall score, but the penalty isn't a flat zero either. RAM = on-disk size of the model (Q4 file). Wall = cumulative bench time across all tasks. The cumulative-vs-score scatter only shows models that completed every benchmark, so the comparison stays apples-to-apples; the table below includes everyone.
   </p>
 
+  <div class="mt-4">
+<div class="flex flex-wrap items-center gap-x-6 gap-y-2 bg-stone-50 border border-stone-200 rounded-lg px-4 py-2.5 text-sm">
+  <span class="text-xs font-medium uppercase tracking-wider text-stone-500">Filter</span>
+
+  <div class="flex items-center gap-2">
+    <label for="os-ram-filter" class="text-stone-600">Max RAM</label>
+    <select id="os-ram-filter" class="bg-white border border-stone-300 rounded px-2 py-1 num">
+      <option value="0">all</option>
+      <option value="16">16 GB</option>
+      <option value="32">32 GB</option>
+      <option value="48">48 GB</option>
+      <option value="64">64 GB</option>
+      <option value="128" selected>128 GB</option>
+    </select>
+  </div>
+
+    <div class="flex items-center gap-2">
+      <label for="os-year-filter" class="text-stone-600">Released</label>
+      <select id="os-year-filter" class="bg-white border border-stone-300 rounded px-2 py-1 num">
+        <option value="m6">last 6 months</option>
+        <option value="m12">last 12 months</option>
+        <option value="m24">last 24 months</option>
+          <option value="y2026" selected>2026 only</option>
+          <option value="y2025">2025 only</option>
+          <option value="y2024">2024 only</option>
+        <option value="">all</option>
+      </select>
+    </div>
+
+  <span class="text-xs text-stone-500 ml-auto num">
+    <span id="os-table-count">–</span> of 63 models shown
+  </span>
+</div>  </div>
+
 
     <style>
       /* RAM filter: greyed out rather than hidden — comparison stays visible. */
@@ -352,17 +492,6 @@
     <div class="mt-4 bg-white border border-stone-200 rounded-lg p-4 relative" id="overall-scatter">
       <div class="flex items-baseline justify-between gap-3 flex-wrap mb-2">
         <h3 class="text-sm font-semibold tracking-tight text-stone-800 uppercase">Cumulative wall-time vs. overall score</h3>
-        <div class="flex items-center gap-2 text-sm">
-          <label for="os-ram-filter" class="text-stone-600">Max RAM</label>
-          <select id="os-ram-filter" class="bg-white border border-stone-300 rounded px-2 py-1 num">
-            <option value="0">all</option>
-            <option value="16">16 GB</option>
-            <option value="32">32 GB</option>
-            <option value="48">48 GB</option>
-            <option value="64">64 GB</option>
-            <option value="128" selected>128 GB</option>
-          </select>
-        </div>
       </div>
       <div class="text-xs text-stone-500 flex flex-wrap items-center gap-x-3 gap-y-1 mb-2">
         <span>Colour = vendor · Number = total params (B) · RAM estimate for 64k ctx</span>
@@ -374,7 +503,7 @@
           <svg width="14" height="14"><circle cx="7" cy="7" r="5.5" fill="#475569" fill-opacity="0.78" stroke="#475569" stroke-width="2" stroke-dasharray="3,2"/></svg>
           MoE
         </span>
-        <span><span id="os-count">22</span>/22 visible · 33 excluded (incomplete data)</span>
+        <span><span id="os-count">29</span>/29 visible · 34 excluded (incomplete data)</span>
       </div>
       <svg viewBox="0 0 920 408" class="w-full num" style="height:408px" preserveAspectRatio="xMidYMid meet">
         <line x1="54" y1="370" x2="902" y2="370" stroke="#d6d3d1" stroke-width="1"/>
@@ -392,256 +521,283 @@
           <line x1="54.0" y1="18" x2="54.0" y2="370" stroke="#f5f5f4" stroke-width="1" stroke-dasharray="2,3"/>
           <text x="54.0" y="386" font-size="10" fill="#78716c" text-anchor="middle">0s</text>
           <line x1="266.0" y1="18" x2="266.0" y2="370" stroke="#f5f5f4" stroke-width="1" stroke-dasharray="2,3"/>
-          <text x="266.0" y="386" font-size="10" fill="#78716c" text-anchor="middle">900s</text>
+          <text x="266.0" y="386" font-size="10" fill="#78716c" text-anchor="middle">1125s</text>
           <line x1="478.0" y1="18" x2="478.0" y2="370" stroke="#f5f5f4" stroke-width="1" stroke-dasharray="2,3"/>
-          <text x="478.0" y="386" font-size="10" fill="#78716c" text-anchor="middle">1800s</text>
+          <text x="478.0" y="386" font-size="10" fill="#78716c" text-anchor="middle">2250s</text>
           <line x1="690.0" y1="18" x2="690.0" y2="370" stroke="#f5f5f4" stroke-width="1" stroke-dasharray="2,3"/>
-          <text x="690.0" y="386" font-size="10" fill="#78716c" text-anchor="middle">2700s</text>
+          <text x="690.0" y="386" font-size="10" fill="#78716c" text-anchor="middle">3375s</text>
           <line x1="902.0" y1="18" x2="902.0" y2="370" stroke="#f5f5f4" stroke-width="1" stroke-dasharray="2,3"/>
-          <text x="902.0" y="386" font-size="10" fill="#78716c" text-anchor="middle">3600s</text>
+          <text x="902.0" y="386" font-size="10" fill="#78716c" text-anchor="middle">4500s</text>
         <text x="478.0" y="403" font-size="10" fill="#57534e" text-anchor="middle">Cumulative wall-time (s) →</text>
         <text x="16" y="194.0" font-size="10" fill="#57534e" text-anchor="middle" transform="rotate(-90 16 194.0)">Overall score</text>
 
-          <a href="models/google_gemma-4-31b.html" class="os-dot" data-total-ram="29.93">
-            <circle cx="756.6482289266778" cy="46.13539929711078" r="9" fill="#dc2626" fill-opacity="0.78"
+          <a href="models/google_gemma-4-31b.html" class="os-dot" data-total-ram="29.93" data-released="2026-03-12">
+            <circle cx="616.1185831413422" cy="46.13539929711078" r="9" fill="#dc2626" fill-opacity="0.78"
                     stroke="#dc2626" stroke-width="1.75"
                     style="cursor:pointer"
                     data-tooltip="gemma-4-31b · Score 92% · Wall 2983s · ~30 GB RAM (64k)"/>
-              <text x="756.6482289266778" y="46.13539929711078" text-anchor="middle" dominant-baseline="central"
+              <text x="616.1185831413422" y="46.13539929711078" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none">31</text>
           </a>
-          <a href="models/qwen_qwen3.6-27b.html" class="os-dot" data-total-ram="26.79">
-            <circle cx="844.890763228946" cy="50.72208607960607" r="9" fill="#7c3aed" fill-opacity="0.78"
+          <a href="models/qwen_qwen3.6-27b.html" class="os-dot" data-total-ram="26.79" data-released="2026-04-21">
+            <circle cx="686.7126105831568" cy="50.72208607960607" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
                     style="cursor:pointer"
                     data-tooltip="qwen3.6-27b · Score 91% · Wall 3358s · ~27 GB RAM (64k)"/>
-              <text x="844.890763228946" y="50.72208607960607" text-anchor="middle" dominant-baseline="central"
+              <text x="686.7126105831568" y="50.72208607960607" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none">27</text>
           </a>
-          <a href="models/google_gemma-4-26b-a4b@q8_0.html" class="os-dot" data-total-ram="40.58">
-            <circle cx="245.80922075837748" cy="66.38226243787386" r="9" fill="#dc2626" fill-opacity="0.78"
+          <a href="models/meta_muse-glimmer.html" class="os-dot" data-total-ram="27.67" data-released="2026-08-10">
+            <circle cx="861.5208564577206" cy="52.35181173826663" r="9" fill="#a21caf" fill-opacity="0.78"
+                    stroke="#a21caf" stroke-width="1.75"
+                    style="cursor:pointer"
+                    data-tooltip="muse-glimmer · Score 90% · Wall 4285s · ~28 GB RAM (64k)"/>
+              <text x="861.5208564577206" y="52.35181173826663" text-anchor="middle" dominant-baseline="central"
+                    font-size="8" font-weight="700" fill="#fff"
+                    pointer-events="none">30</text>
+          </a>
+          <a href="models/google_gemma-4-26b-a4b@q8_0.html" class="os-dot" data-total-ram="40.58" data-released="2026-03-12">
+            <circle cx="207.44737660670197" cy="66.38226243787386" r="9" fill="#dc2626" fill-opacity="0.78"
                     stroke="#dc2626" stroke-width="1.75"
 stroke-dasharray="2.5,1.5"                    style="cursor:pointer"
                     data-tooltip="gemma-4-26b-a4b · Score 86% · Wall 814s · ~41 GB RAM (64k)"/>
-              <text x="245.80922075837748" y="66.38226243787386" text-anchor="middle" dominant-baseline="central"
+              <text x="207.44737660670197" y="66.38226243787386" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none">26</text>
           </a>
-          <a href="models/qwen_qwen3.6-35b-a3b.html" class="os-dot" data-total-ram="32.78">
-            <circle cx="286.55801512308733" cy="67.13446482105041" r="9" fill="#7c3aed" fill-opacity="0.78"
+          <a href="models/qwen_qwen3.6-35b-a3b.html" class="os-dot" data-total-ram="32.78" data-released="2026-04-15">
+            <circle cx="240.04641209846983" cy="67.13446482105041" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
 stroke-dasharray="2.5,1.5"                    style="cursor:pointer"
                     data-tooltip="qwen3.6-35b-a3b · Score 86% · Wall 987s · ~33 GB RAM (64k)"/>
-              <text x="286.55801512308733" y="67.13446482105041" text-anchor="middle" dominant-baseline="central"
+              <text x="240.04641209846983" y="67.13446482105041" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none">35</text>
           </a>
-          <a href="models/qwen_qwen3.6-35b-a3b@q8_0.html" class="os-dot" data-total-ram="53.29">
-            <circle cx="233.5631253627672" cy="67.89448036272171" r="9" fill="#7c3aed" fill-opacity="0.78"
+          <a href="models/qwen_qwen3.6-35b-a3b@q8_0.html" class="os-dot" data-total-ram="53.29" data-released="2026-04-15">
+            <circle cx="197.65050029021378" cy="67.89448036272171" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
 stroke-dasharray="2.5,1.5"                    style="cursor:pointer"
                     data-tooltip="qwen3.6-35b-a3b · Score 86% · Wall 762s · ~53 GB RAM (64k)"/>
-              <text x="233.5631253627672" y="67.89448036272171" text-anchor="middle" dominant-baseline="central"
+              <text x="197.65050029021378" y="67.89448036272171" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none">35</text>
           </a>
-          <a href="models/qwen3.5-122b-a10b.html" class="os-dot" data-total-ram="101.95">
-            <circle cx="683.437561071793" cy="85.25232094767858" r="9" fill="#7c3aed" fill-opacity="0.78"
+          <a href="models/google_gemma-4-31b-qat.html" class="os-dot" data-total-ram="28.58" data-released="2026-03-12">
+            <circle cx="626.3658781683329" cy="75.99383153951726" r="9" fill="#dc2626" fill-opacity="0.78"
+                    stroke="#dc2626" stroke-width="1.75"
+                    style="cursor:pointer"
+                    data-tooltip="gemma-4-31b-qat · Score 84% · Wall 3037s · ~29 GB RAM (64k)"/>
+              <text x="626.3658781683329" y="75.99383153951726" text-anchor="middle" dominant-baseline="central"
+                    font-size="8" font-weight="700" fill="#fff"
+                    pointer-events="none">31</text>
+          </a>
+          <a href="models/qwen3.5-122b-a10b.html" class="os-dot" data-total-ram="101.95" data-released="2026-02-24">
+            <circle cx="557.5500488574344" cy="85.25232094767858" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
 stroke-dasharray="2.5,1.5"                    style="cursor:pointer"
                     data-tooltip="qwen3.5-122b-a10b · Score 81% · Wall 2672s · ~102 GB RAM (64k)"/>
-              <text x="683.437561071793" y="85.25232094767858" text-anchor="middle" dominant-baseline="central"
+              <text x="557.5500488574344" y="85.25232094767858" text-anchor="middle" dominant-baseline="central"
                     font-size="6" font-weight="700" fill="#fff"
                     pointer-events="none">122</text>
           </a>
-          <a href="models/mistralai_devstral-small-2-2512.html" class="os-dot" data-total-ram="22.41">
-            <circle cx="391.9252502520191" cy="88.41203230647938" r="9" fill="#475569" fill-opacity="0.78"
+          <a href="models/mistralai_devstral-small-2-2512.html" class="os-dot" data-total-ram="22.41" data-released="2025-12-09">
+            <circle cx="324.3402002016153" cy="88.41203230647938" r="9" fill="#475569" fill-opacity="0.78"
                     stroke="#475569" stroke-width="1.75"
                     style="cursor:pointer"
                     data-tooltip="devstral-small-2-2512 · Score 80% · Wall 1435s · ~22 GB RAM (64k)"/>
-              <text x="391.9252502520191" y="88.41203230647938" text-anchor="middle" dominant-baseline="central"
+              <text x="324.3402002016153" y="88.41203230647938" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none">24</text>
           </a>
-          <a href="models/qwen_qwen3.5-35b-a3b.html" class="os-dot" data-total-ram="32.78">
-            <circle cx="293.43782883727613" cy="90.48439549272985" r="9" fill="#7c3aed" fill-opacity="0.78"
+          <a href="models/qwen_qwen3.5-35b-a3b.html" class="os-dot" data-total-ram="32.78" data-released="2026-02-24">
+            <circle cx="245.55026306982091" cy="90.48439549272985" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
 stroke-dasharray="2.5,1.5"                    style="cursor:pointer"
                     data-tooltip="qwen3.5-35b-a3b · Score 79% · Wall 1016s · ~33 GB RAM (64k)"/>
-              <text x="293.43782883727613" y="90.48439549272985" text-anchor="middle" dominant-baseline="central"
+              <text x="245.55026306982091" y="90.48439549272985" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none">35</text>
           </a>
-          <a href="models/qwen_qwen3.5-9b@q8_0.html" class="os-dot" data-total-ram="17.62">
-            <circle cx="376.9627169320189" cy="96.2122887477912" r="9" fill="#7c3aed" fill-opacity="0.78"
+          <a href="models/qwen_qwen3.5-9b@q8_0.html" class="os-dot" data-total-ram="17.62" data-released="2026-02-27">
+            <circle cx="312.3701735456151" cy="96.2122887477912" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
                     style="cursor:pointer"
                     data-tooltip="qwen3.5-9b · Score 78% · Wall 1371s · ~18 GB RAM (64k)"/>
-              <text x="376.9627169320189" y="96.2122887477912" text-anchor="middle" dominant-baseline="central"
+              <text x="312.3701735456151" y="96.2122887477912" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none">9</text>
           </a>
-          <a href="models/google_gemma-4-26b-a4b.html" class="os-dot" data-total-ram="27.46">
-            <circle cx="254.39880132133555" cy="108.12759583256985" r="9" fill="#dc2626" fill-opacity="0.78"
+          <a href="models/google_gemma-4-26b-a4b.html" class="os-dot" data-total-ram="27.46" data-released="2026-03-12">
+            <circle cx="214.31904105706843" cy="108.12759583256985" r="9" fill="#dc2626" fill-opacity="0.78"
                     stroke="#dc2626" stroke-width="1.75"
 stroke-dasharray="2.5,1.5"                    style="cursor:pointer"
                     data-tooltip="gemma-4-26b-a4b · Score 74% · Wall 851s · ~27 GB RAM (64k)"/>
-              <text x="254.39880132133555" y="108.12759583256985" text-anchor="middle" dominant-baseline="central"
+              <text x="214.31904105706843" y="108.12759583256985" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none">26</text>
           </a>
-          <a href="models/qwen_qwen3-vl-30b.html" class="os-dot" data-total-ram="27.82">
-            <circle cx="405.7689201133698" cy="115.96628410816083" r="9" fill="#7c3aed" fill-opacity="0.78"
+          <a href="models/qwen_qwen3-vl-30b.html" class="os-dot" data-total-ram="27.82" data-released="2025-10-04">
+            <circle cx="335.41513609069585" cy="115.96628410816083" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
 stroke-dasharray="2.5,1.5"                    style="cursor:pointer"
                     data-tooltip="qwen3-vl-30b · Score 72% · Wall 1493s · ~28 GB RAM (64k)"/>
-              <text x="405.7689201133698" y="115.96628410816083" text-anchor="middle" dominant-baseline="central"
+              <text x="335.41513609069585" y="115.96628410816083" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none">30</text>
           </a>
-          <a href="models/qwen_qwen3.5-9b.html" class="os-dot" data-total-ram="12.54">
-            <circle cx="500.8637640455546" cy="125.76590510041271" r="9" fill="#7c3aed" fill-opacity="0.78"
+          <a href="models/qwen_qwen3.5-9b.html" class="os-dot" data-total-ram="12.54" data-released="2026-02-27">
+            <circle cx="411.4910112364437" cy="125.76590510041271" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
                     style="cursor:pointer"
                     data-tooltip="qwen3.5-9b · Score 69% · Wall 1897s · ~13 GB RAM (64k)"/>
-              <text x="500.8637640455546" y="125.76590510041271" text-anchor="middle" dominant-baseline="central"
+              <text x="411.4910112364437" y="125.76590510041271" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none">9</text>
           </a>
-          <a href="models/google_gemma-4-e4b.html" class="os-dot" data-total-ram="12.25">
-            <circle cx="197.69388700381904" cy="125.92018079047301" r="9" fill="#dc2626" fill-opacity="0.78"
+          <a href="models/google_gemma-4-e4b.html" class="os-dot" data-total-ram="12.25" data-released="2026-03-02">
+            <circle cx="168.95510960305523" cy="125.92018079047301" r="9" fill="#dc2626" fill-opacity="0.78"
                     stroke="#dc2626" stroke-width="1.75"
                     style="cursor:pointer"
                     data-tooltip="gemma-4-e4b · Score 69% · Wall 610s · ~12 GB RAM (64k)"/>
-              <text x="197.69388700381904" y="125.92018079047301" text-anchor="middle" dominant-baseline="central"
+              <text x="168.95510960305523" y="125.92018079047301" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none">8</text>
           </a>
-          <a href="models/google_gemma-4-e4b@q8_0.html" class="os-dot" data-total-ram="15.76">
-            <circle cx="170.69373938280623" cy="127.0319859233997" r="9" fill="#dc2626" fill-opacity="0.78"
+          <a href="models/google_gemma-4-e4b@q8_0.html" class="os-dot" data-total-ram="15.76" data-released="2026-03-02">
+            <circle cx="147.35499150624497" cy="127.0319859233997" r="9" fill="#dc2626" fill-opacity="0.78"
                     stroke="#dc2626" stroke-width="1.75"
                     style="cursor:pointer"
                     data-tooltip="gemma-4-e4b · Score 69% · Wall 495s · ~16 GB RAM (64k)"/>
-              <text x="170.69373938280623" y="127.0319859233997" text-anchor="middle" dominant-baseline="central"
+              <text x="147.35499150624497" y="127.0319859233997" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none">8</text>
           </a>
-          <a href="models/qwen3.5-9b-mlx.html" class="os-dot" data-total-ram="11.79">
-            <circle cx="383.7708427184489" cy="129.68373688711094" r="9" fill="#7c3aed" fill-opacity="0.78"
+          <a href="models/qwen3.5-9b-mlx.html" class="os-dot" data-total-ram="11.79" data-released="2026-02-27">
+            <circle cx="317.8166741747591" cy="129.68373688711094" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
                     style="cursor:pointer"
                     data-tooltip="qwen3.5-9b-mlx · Score 68% · Wall 1400s · ~12 GB RAM (64k)"/>
-              <text x="383.7708427184489" y="129.68373688711094" text-anchor="middle" dominant-baseline="central"
+              <text x="317.8166741747591" y="129.68373688711094" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none">9</text>
           </a>
-          <a href="models/google_gemma-4-e2b@q8_0.html" class="os-dot" data-total-ram="11.76">
-            <circle cx="120.96411524688514" cy="131.2440814679787" r="9" fill="#dc2626" fill-opacity="0.78"
+          <a href="models/google_gemma-4-e2b@q8_0.html" class="os-dot" data-total-ram="11.76" data-released="2026-03-02">
+            <circle cx="107.57129219750811" cy="131.2440814679787" r="9" fill="#dc2626" fill-opacity="0.78"
                     stroke="#dc2626" stroke-width="1.75"
                     style="cursor:pointer"
                     data-tooltip="gemma-4-e2b · Score 68% · Wall 284s · ~12 GB RAM (64k)"/>
-              <text x="120.96411524688514" y="131.2440814679787" text-anchor="middle" dominant-baseline="central"
+              <text x="107.57129219750811" y="131.2440814679787" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none">5</text>
           </a>
-          <a href="models/google_gemma-4-e2b.html" class="os-dot" data-total-ram="10.11">
-            <circle cx="141.89963098538678" cy="143.9981724110103" r="9" fill="#dc2626" fill-opacity="0.78"
+          <a href="models/google_gemma-3-12b.html" class="os-dot" data-total-ram="14.52" data-released="2025-03-01">
+            <circle cx="159.3705577650989" cy="131.50799490433727" r="9" fill="#dc2626" fill-opacity="0.78"
+                    stroke="#dc2626" stroke-width="1.75"
+                    style="cursor:pointer"
+                    data-tooltip="gemma-3-12b · Score 68% · Wall 559s · ~15 GB RAM (64k)"/>
+              <text x="159.3705577650989" y="131.50799490433727" text-anchor="middle" dominant-baseline="central"
+                    font-size="8" font-weight="700" fill="#fff"
+                    pointer-events="none">12</text>
+          </a>
+          <a href="models/google_gemma-4-26b-a4b-qat.html" class="os-dot" data-total-ram="24.39" data-released="2026-03-12">
+            <circle cx="262.28282834632114" cy="132.35435305284156" r="9" fill="#dc2626" fill-opacity="0.78"
+                    stroke="#dc2626" stroke-width="1.75"
+stroke-dasharray="2.5,1.5"                    style="cursor:pointer"
+                    data-tooltip="gemma-4-26b-a4b-qat · Score 68% · Wall 1105s · ~24 GB RAM (64k)"/>
+              <text x="262.28282834632114" y="132.35435305284156" text-anchor="middle" dominant-baseline="central"
+                    font-size="8" font-weight="700" fill="#fff"
+                    pointer-events="none">26</text>
+          </a>
+          <a href="models/google_gemma-3-27b.html" class="os-dot" data-total-ram="26.0" data-released="2025-03-01">
+            <circle cx="271.30275874031" cy="136.0731780119097" r="9" fill="#dc2626" fill-opacity="0.78"
+                    stroke="#dc2626" stroke-width="1.75"
+                    style="cursor:pointer"
+                    data-tooltip="gemma-3-27b · Score 66% · Wall 1153s · ~26 GB RAM (64k)"/>
+              <text x="271.30275874031" y="136.0731780119097" text-anchor="middle" dominant-baseline="central"
+                    font-size="8" font-weight="700" fill="#fff"
+                    pointer-events="none">27</text>
+          </a>
+          <a href="models/google_gemma-4-e2b.html" class="os-dot" data-total-ram="10.11" data-released="2026-03-02">
+            <circle cx="124.31970478830942" cy="143.9981724110103" r="9" fill="#dc2626" fill-opacity="0.78"
                     stroke="#dc2626" stroke-width="1.75"
                     style="cursor:pointer"
                     data-tooltip="gemma-4-e2b · Score 64% · Wall 373s · ~10 GB RAM (64k)"/>
-              <text x="141.89963098538678" y="143.9981724110103" text-anchor="middle" dominant-baseline="central"
+              <text x="124.31970478830942" y="143.9981724110103" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none">5</text>
           </a>
-          <a href="models/qwen3.5-4b.html" class="os-dot" data-total-ram="9.15">
-            <circle cx="333.53178732351347" cy="160.73054822131434" r="9" fill="#7c3aed" fill-opacity="0.78"
+          <a href="models/google_gemma-4-12b-qat.html" class="os-dot" data-total-ram="13.32" data-released="2026-03-12">
+            <circle cx="404.30681633183525" cy="157.98358756503768" r="9" fill="#dc2626" fill-opacity="0.78"
+                    stroke="#dc2626" stroke-width="1.75"
+                    style="cursor:pointer"
+                    data-tooltip="gemma-4-12b-qat · Score 60% · Wall 1859s · ~13 GB RAM (64k)"/>
+              <text x="404.30681633183525" y="157.98358756503768" text-anchor="middle" dominant-baseline="central"
+                    font-size="8" font-weight="700" fill="#fff"
+                    pointer-events="none">12</text>
+          </a>
+          <a href="models/qwen3.5-4b.html" class="os-dot" data-total-ram="9.15" data-released="2026-03-02">
+            <circle cx="277.6254298588108" cy="160.73054822131434" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
                     style="cursor:pointer"
                     data-tooltip="qwen3.5-4b · Score 59% · Wall 1187s · ~9 GB RAM (64k)"/>
-              <text x="333.53178732351347" y="160.73054822131434" text-anchor="middle" dominant-baseline="central"
+              <text x="277.6254298588108" y="160.73054822131434" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none">4</text>
           </a>
-          <a href="models/mistralai_ministral-3-14b-reasoning.html" class="os-dot" data-total-ram="15.89">
-            <circle cx="397.1834363051452" cy="173.14094103729116" r="9" fill="#475569" fill-opacity="0.78"
+          <a href="models/mistralai_ministral-3-14b-reasoning.html" class="os-dot" data-total-ram="15.89" data-released="2025-10-31">
+            <circle cx="328.54674904411615" cy="173.14094103729116" r="9" fill="#475569" fill-opacity="0.78"
                     stroke="#475569" stroke-width="1.75"
                     style="cursor:pointer"
                     data-tooltip="ministral-3-14b-reasoning · Score 56% · Wall 1457s · ~16 GB RAM (64k)"/>
-              <text x="397.1834363051452" y="173.14094103729116" text-anchor="middle" dominant-baseline="central"
+              <text x="328.54674904411615" y="173.14094103729116" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none">14</text>
           </a>
-          <a href="models/qwen3.5-2b.html" class="os-dot" data-total-ram="7.81">
-            <circle cx="151.77080099573254" cy="182.34131192559903" r="9" fill="#7c3aed" fill-opacity="0.78"
+          <a href="models/qwen3.5-2b.html" class="os-dot" data-total-ram="7.81" data-released="2026-03-02">
+            <circle cx="132.21664079658603" cy="182.34131192559903" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
                     style="cursor:pointer"
                     data-tooltip="qwen3.5-2b · Score 53% · Wall 415s · ~8 GB RAM (64k)"/>
-              <text x="151.77080099573254" y="182.34131192559903" text-anchor="middle" dominant-baseline="central"
+              <text x="132.21664079658603" y="182.34131192559903" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none">2</text>
           </a>
-          <a href="models/nvidia_nemotron-3-nano-omni.html" class="os-dot" data-total-ram="38.04">
-            <circle cx="356.35295874374765" cy="189.65310724083074" r="9" fill="#a3e635" fill-opacity="0.78"
+          <a href="models/nvidia_nemotron-3-nano-omni.html" class="os-dot" data-total-ram="38.04" data-released="2026-04-20">
+            <circle cx="295.8823669949981" cy="189.65310724083074" r="9" fill="#a3e635" fill-opacity="0.78"
                     stroke="#a3e635" stroke-width="1.75"
 stroke-dasharray="2.5,1.5"                    style="cursor:pointer"
                     data-tooltip="nemotron-3-nano-omni · Score 51% · Wall 1284s · ~38 GB RAM (64k)"/>
-              <text x="356.35295874374765" y="189.65310724083074" text-anchor="middle" dominant-baseline="central"
+              <text x="295.8823669949981" y="189.65310724083074" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#1c1917"
                     pointer-events="none">30</text>
           </a>
-          <a href="models/nvidia_nemotron-3-nano-omni@q8_0.html" class="os-dot" data-total-ram="49.86">
-            <circle cx="289.0712092255941" cy="195.31046007840817" r="9" fill="#a3e635" fill-opacity="0.78"
+          <a href="models/nvidia_nemotron-3-nano-omni@q8_0.html" class="os-dot" data-total-ram="49.86" data-released="2026-04-20">
+            <circle cx="242.05696738047524" cy="195.31046007840817" r="9" fill="#a3e635" fill-opacity="0.78"
                     stroke="#a3e635" stroke-width="1.75"
 stroke-dasharray="2.5,1.5"                    style="cursor:pointer"
                     data-tooltip="nemotron-3-nano-omni · Score 50% · Wall 998s · ~50 GB RAM (64k)"/>
-              <text x="289.0712092255941" y="195.31046007840817" text-anchor="middle" dominant-baseline="central"
+              <text x="242.05696738047524" y="195.31046007840817" text-anchor="middle" dominant-baseline="central"
                     font-size="8" font-weight="700" fill="#1c1917"
                     pointer-events="none">30</text>
+          </a>
+          <a href="models/google_gemma-3-4b.html" class="os-dot" data-total-ram="8.83" data-released="2025-02-20">
+            <circle cx="89.00000505845745" cy="203.78779323159938" r="9" fill="#dc2626" fill-opacity="0.78"
+                    stroke="#dc2626" stroke-width="1.75"
+                    style="cursor:pointer"
+                    data-tooltip="gemma-3-4b · Score 47% · Wall 186s · ~9 GB RAM (64k)"/>
+              <text x="89.00000505845745" y="203.78779323159938" text-anchor="middle" dominant-baseline="central"
+                    font-size="8" font-weight="700" fill="#fff"
+                    pointer-events="none">4</text>
           </a>
       </svg>
     </div>
 
-    <script>
-    (() => {
-      const sel = document.getElementById('os-ram-filter');
-      if (!sel) return;
-      const dots = document.querySelectorAll('#overall-scatter .os-dot');
-      const countEl = document.getElementById('os-count');
-
-      // Grey out options for which no model qualifies.
-      Array.from(sel.options).forEach(opt => {
-        const cap = parseFloat(opt.value);
-        if (!cap) return;
-        const matches = Array.from(dots).some(g => {
-          const ram = parseFloat(g.dataset.totalRam || '');
-          return ram && ram <= cap;
-        });
-        if (!matches) {
-          opt.disabled = true;
-          opt.textContent = opt.textContent + ' — no models';
-        }
-      });
-
-      function applyFilter() {
-        const cap = parseFloat(sel.value);
-        let visible = 0;
-        dots.forEach(g => {
-          const ram = parseFloat(g.dataset.totalRam || '');
-          const filtered = !!cap && (!ram || ram > cap);
-          g.classList.toggle('os-filtered', filtered);
-          if (!filtered) visible++;
-        });
-        if (countEl) countEl.textContent = visible;
-      }
-      sel.addEventListener('change', applyFilter);
-      applyFilter();
-    })();
-    </script>
 
   <div class="mt-4 bg-white border border-stone-200 rounded-lg overflow-x-auto">
-    <table class="sortable w-full text-sm">
+    <table id="overall-table" class="sortable w-full text-sm">
       <thead class="bg-stone-50 border-b border-stone-200 text-left text-stone-600">
         <tr>
           <th data-sort class="px-3 py-2 font-medium">Model</th>
@@ -658,7 +814,8 @@ stroke-dasharray="2.5,1.5"                    style="cursor:pointer"
         </tr>
       </thead>
       <tbody class="divide-y divide-stone-100">
-          <tr class="cursor-pointer row-link" onclick="window.location='models/google_gemma-4-31b.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="29.93" data-released="2026-03-12"
+              onclick="window.location='models/google_gemma-4-31b.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-4-31b" title="google/gemma-4-31b">gemma-4-31b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-emerald-700" data-sort="0.9200698883604808">
@@ -688,7 +845,8 @@ stroke-dasharray="2.5,1.5"                    style="cursor:pointer"
                     96%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/qwen_qwen3.6-27b.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="26.79" data-released="2026-04-21"
+              onclick="window.location='models/qwen_qwen3.6-27b.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3.6-27b" title="qwen/qwen3.6-27b">qwen3.6-27b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-emerald-700" data-sort="0.9070395281829373">
@@ -718,7 +876,39 @@ stroke-dasharray="2.5,1.5"                    style="cursor:pointer"
                     75%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/google_gemma-4-26b-a4b@q8_0.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="27.67" data-released="2026-08-10"
+              onclick="window.location='models/meta_muse-glimmer.html'">
+            <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="muse-glimmer" title="meta/muse-glimmer">muse-glimmer</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf</td>
+            <td class="px-3 py-2 num text-right font-bold text-emerald-700" data-sort="0.9024096257435607">
+              90%
+            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="17316.0">
+16.9 GB            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="4285.193224127055">
+              4285 s
+            </td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.8429166666666666">
+                    84%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.9647459006664784">
+                    96%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.964">
+                    96%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="1.0">
+                    100%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.9177499999999998">
+                    92%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.8333333333333334">
+                    83%
+                  </td>
+          </tr>
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="40.58" data-released="2026-03-12"
+              onclick="window.location='models/google_gemma-4-26b-a4b@q8_0.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-4-26b-a4b" title="google/gemma-4-26b-a4b@q8_0">gemma-4-26b-a4b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 8bit</td>
             <td class="px-3 py-2 num text-right font-bold text-emerald-700" data-sort="0.8625503908014948">
@@ -746,7 +936,8 @@ stroke-dasharray="2.5,1.5"                    style="cursor:pointer"
                     100%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/qwen_qwen3.6-35b-a3b.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="32.78" data-released="2026-04-15"
+              onclick="window.location='models/qwen_qwen3.6-35b-a3b.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3.6-35b-a3b" title="qwen/qwen3.6-35b-a3b">qwen3.6-35b-a3b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-emerald-700" data-sort="0.860413452212925">
@@ -776,7 +967,35 @@ stroke-dasharray="2.5,1.5"                    style="cursor:pointer"
                     75%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/qwen_qwen3.6-35b-a3b@q8_0.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="31.6" data-released="2026-06"
+              onclick="window.location='models/ornith-1.0-35b@q4_k_m.html'">
+            <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="ornith-1.0-35b" title="ornith-1.0-35b@q4_k_m">ornith-1.0-35b</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 4bit</td>
+            <td class="px-3 py-2 num text-right font-bold text-emerald-700" data-sort="0.8601566951566952">
+              86%
+            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="20186.2">
+19.7 GB            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="706.43887000205">
+              706 s
+            </td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.8908333333333334">
+                    89%
+                  </td>
+                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.9774999999999999">
+                    98%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="1.0">
+                    100%
+                  </td>
+                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.75">
+                    75%
+                  </td>
+          </tr>
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="53.29" data-released="2026-04-15"
+              onclick="window.location='models/qwen_qwen3.6-35b-a3b@q8_0.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3.6-35b-a3b" title="qwen/qwen3.6-35b-a3b@q8_0">qwen3.6-35b-a3b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 8bit</td>
             <td class="px-3 py-2 num text-right font-bold text-emerald-700" data-sort="0.8582543171513588">
@@ -804,7 +1023,39 @@ stroke-dasharray="2.5,1.5"                    style="cursor:pointer"
                     75%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/qwen_qwen3-coder-next.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="28.58" data-released="2026-03-12"
+              onclick="window.location='models/google_gemma-4-31b-qat.html'">
+            <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-4-31b-qat" title="google/gemma-4-31b-qat">gemma-4-31b-qat</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 4bit</td>
+            <td class="px-3 py-2 num text-right font-bold text-emerald-700" data-sort="0.835244796762735">
+              84%
+            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="17978.5">
+17.6 GB            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="3037.318928959314">
+              3037 s
+            </td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.8144166666666667">
+                    81%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.9290819196985178">
+                    93%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.9550000000000001">
+                    96%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="1.0">
+                    100%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.4995092592592593">
+                    50%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.9166666666666666">
+                    92%
+                  </td>
+          </tr>
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="67.39" data-released="2026-01-30"
+              onclick="window.location='models/qwen_qwen3-coder-next.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3-coder-next" title="qwen/qwen3-coder-next">qwen3-coder-next</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-emerald-700" data-sort="0.8259503459503461">
@@ -830,7 +1081,35 @@ stroke-dasharray="2.5,1.5"                    style="cursor:pointer"
                     67%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/qwen3.5-122b-a10b.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="96.79" data-released="2026-07-21"
+              onclick="window.location='models/poolside_laguna-s-2.1.html'">
+            <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="laguna-s-2.1" title="poolside/laguna-s-2.1">laguna-s-2.1</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 4bit</td>
+            <td class="px-3 py-2 num text-right font-bold text-emerald-700" data-sort="0.8090826210826211">
+              81%
+            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="67866.4">
+66.3 GB            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="1913.826770703774">
+              1914 s
+            </td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.865">
+                    86%
+                  </td>
+                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.966">
+                    97%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="1.0">
+                    100%
+                  </td>
+                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
+                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.5833333333333334">
+                    58%
+                  </td>
+          </tr>
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="101.95" data-released="2026-02-24"
+              onclick="window.location='models/qwen3.5-122b-a10b.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3.5-122b-a10b" title="qwen3.5-122b-a10b">qwen3.5-122b-a10b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-emerald-700" data-sort="0.808942270035004">
@@ -858,7 +1137,8 @@ stroke-dasharray="2.5,1.5"                    style="cursor:pointer"
                     88%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/glm-4.5-air-mlx.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="82.44" data-released="2025-07-28"
+              onclick="window.location='models/glm-4.5-air-mlx.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="glm-4.5-air-mlx" title="glm-4.5-air-mlx">glm-4.5-air-mlx</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-emerald-700" data-sort="0.8009890109890111">
@@ -882,7 +1162,8 @@ stroke-dasharray="2.5,1.5"                    style="cursor:pointer"
                     75%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/mistralai_devstral-small-2-2512.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="22.41" data-released="2025-12-09"
+              onclick="window.location='models/mistralai_devstral-small-2-2512.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="devstral-small-2-2512" title="mistralai/devstral-small-2-2512">devstral-small-2-2512</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-emerald-700" data-sort="0.7999658173111381">
@@ -912,7 +1193,8 @@ stroke-dasharray="2.5,1.5"                    style="cursor:pointer"
                     75%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/qwen3.5-27b-claude-4.6-opus-distilled-mlx.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="23.76" data-released="2026-03-04"
+              onclick="window.location='models/qwen3.5-27b-claude-4.6-opus-distilled-mlx.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3.5-27b-claude-4.6-opus-distilled-mlx" title="qwen3.5-27b-claude-4.6-opus-distilled-mlx">qwen3.5-27b-claude-4.6-opus-distilled-mlx</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-emerald-700" data-sort="0.7967032967032968">
@@ -936,7 +1218,8 @@ stroke-dasharray="2.5,1.5"                    style="cursor:pointer"
                     75%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/qwen_qwen3.5-35b-a3b.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="32.78" data-released="2026-02-24"
+              onclick="window.location='models/qwen_qwen3.5-35b-a3b.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3.5-35b-a3b" title="qwen/qwen3.5-35b-a3b">qwen3.5-35b-a3b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-emerald-700" data-sort="0.7940784218956538">
@@ -966,7 +1249,8 @@ stroke-dasharray="2.5,1.5"                    style="cursor:pointer"
                     92%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/bytedance_seed-oss-36b.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="30.53" data-released="2025-08-20"
+              onclick="window.location='models/bytedance_seed-oss-36b.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="seed-oss-36b" title="bytedance/seed-oss-36b">seed-oss-36b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-emerald-700" data-sort="0.7911461131461132">
@@ -992,7 +1276,8 @@ stroke-dasharray="2.5,1.5"                    style="cursor:pointer"
                     67%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/qwen_qwen3.5-9b@q8_0.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="17.62" data-released="2026-02-27"
+              onclick="window.location='models/qwen_qwen3.5-9b@q8_0.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3.5-9b" title="qwen/qwen3.5-9b@q8_0">qwen3.5-9b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 8bit</td>
             <td class="px-3 py-2 num text-right font-bold text-emerald-700" data-sort="0.7778059978755931">
@@ -1020,7 +1305,8 @@ stroke-dasharray="2.5,1.5"                    style="cursor:pointer"
                     83%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/openai_gpt-oss-120b.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="86.65" data-released="2025-08-04"
+              onclick="window.location='models/openai_gpt-oss-120b.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gpt-oss-120b" title="openai/gpt-oss-120b">gpt-oss-120b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-emerald-700" data-sort="0.7675122507122508">
@@ -1046,7 +1332,8 @@ stroke-dasharray="2.5,1.5"                    style="cursor:pointer"
                     92%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/qwen_qwen3-vl-8b.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="11.53" data-released="2025-10-11"
+              onclick="window.location='models/qwen_qwen3-vl-8b.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3-vl-8b" title="qwen/qwen3-vl-8b">qwen3-vl-8b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-emerald-700" data-sort="0.7641436137267158">
@@ -1077,7 +1364,35 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     58%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/google_gemma-4-26b-a4b.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="11.34" data-released="2026-06"
+              onclick="window.location='models/ornith-1.0-9b@q4_k_m.html'">
+            <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="ornith-1.0-9b" title="ornith-1.0-9b@q4_k_m">ornith-1.0-9b</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 4bit</td>
+            <td class="px-3 py-2 num text-right font-bold text-emerald-700" data-sort="0.7491566951566953">
+              75%
+            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="5368.3">
+5.2 GB            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="629.8825865427498">
+              630 s
+            </td>
+                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.6723333333333333">
+                    67%
+                  </td>
+                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.915">
+                    92%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="1.0">
+                    100%
+                  </td>
+                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.75">
+                    75%
+                  </td>
+          </tr>
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="27.46" data-released="2026-03-12"
+              onclick="window.location='models/google_gemma-4-26b-a4b.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-4-26b-a4b" title="google/gemma-4-26b-a4b">gemma-4-26b-a4b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-emerald-700" data-sort="0.743955693657472">
@@ -1107,7 +1422,8 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     100%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/zai-org_glm-4.7-flash@q4_k_m.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="27.64" data-released="2026-01-19"
+              onclick="window.location='models/zai-org_glm-4.7-flash@q4_k_m.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="glm-4.7-flash" title="zai-org/glm-4.7-flash@q4_k_m">glm-4.7-flash</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-emerald-700" data-sort="0.7409141810570381">
@@ -1131,7 +1447,8 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     71%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/nvidia_nemotron-3-super.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="116.2" data-released="2026-03-10"
+              onclick="window.location='models/nvidia_nemotron-3-super.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="nemotron-3-super" title="nvidia/nemotron-3-super">nemotron-3-super</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-emerald-700" data-sort="0.7289556369556369">
@@ -1157,7 +1474,8 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     75%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/qwen_qwen3-vl-30b.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="27.82" data-released="2025-10-04"
+              onclick="window.location='models/qwen_qwen3-vl-30b.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3-vl-30b" title="qwen/qwen3-vl-30b">qwen3-vl-30b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-emerald-700" data-sort="0.7216866928745431">
@@ -1187,7 +1505,8 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     67%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/qwen_qwen3.5-9b.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="12.54" data-released="2026-02-27"
+              onclick="window.location='models/qwen_qwen3.5-9b.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3.5-9b" title="qwen/qwen3.5-9b">qwen3.5-9b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.6938468605101912">
@@ -1217,7 +1536,8 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     62%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/google_gemma-4-e4b.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="12.25" data-released="2026-03-02"
+              onclick="window.location='models/google_gemma-4-e4b.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-4-e4b" title="google/gemma-4-e4b">gemma-4-e4b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.6934085772997926">
@@ -1247,7 +1567,8 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     71%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/google_gemma-4-e4b@q8_0.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="15.76" data-released="2026-03-02"
+              onclick="window.location='models/google_gemma-4-e4b@q8_0.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-4-e4b" title="google/gemma-4-e4b@q8_0">gemma-4-e4b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 8bit</td>
             <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.6902500399903417">
@@ -1275,7 +1596,8 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     88%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/qwen3.5-9b-mlx.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="11.79" data-released="2026-02-27"
+              onclick="window.location='models/qwen3.5-9b-mlx.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3.5-9b-mlx" title="qwen3.5-9b-mlx">qwen3.5-9b-mlx</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.6827166565707076">
@@ -1305,7 +1627,8 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     71%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/openai_gpt-oss-20b.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="19.78" data-released="2025-08-04"
+              onclick="window.location='models/openai_gpt-oss-20b.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gpt-oss-20b" title="openai/gpt-oss-20b">gpt-oss-20b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.6817651607651609">
@@ -1331,7 +1654,8 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     75%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/zai-org_glm-4.7-flash.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="45.52" data-released="2026-01-19"
+              onclick="window.location='models/zai-org_glm-4.7-flash.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="glm-4.7-flash" title="zai-org/glm-4.7-flash">glm-4.7-flash</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 8bit</td>
             <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.6800213675213674">
@@ -1356,7 +1680,8 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     67%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/google_gemma-4-e2b@q8_0.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="11.76" data-released="2026-03-02"
+              onclick="window.location='models/google_gemma-4-e2b@q8_0.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-4-e2b" title="google/gemma-4-e2b@q8_0">gemma-4-e2b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 8bit</td>
             <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.6782838594659696">
@@ -1384,16 +1709,17 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     62%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/google_gemma-3-12b.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="14.52" data-released="2025-03-01"
+              onclick="window.location='models/google_gemma-3-12b.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-3-12b" title="google/gemma-3-12b">gemma-3-12b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
-            <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.6449537667926752">
-              64%
+            <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.6775341053854055">
+              68%
             </td>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="7694.3">
 7.5 GB            </td>
-            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="456.34177624993026">
-              456 s
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="559.1597994610202">
+              559 s
             </td>
                   <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.5066666666666667">
                     51%
@@ -1404,7 +1730,9 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                   <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.8580000000000001">
                     86%
                   </td>
-                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.9761904761904762">
+                    98%
+                  </td>
                   <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.6073749999999999">
                     61%
                   </td>
@@ -1412,7 +1740,70 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     67%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/google_gemma-4-e2b.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="24.39" data-released="2026-03-12"
+              onclick="window.location='models/google_gemma-4-26b-a4b-qat.html'">
+            <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-4-26b-a4b-qat" title="google/gemma-4-26b-a4b-qat">gemma-4-26b-a4b-qat</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
+            <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.6751296788271547">
+              68%
+            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="14916.7">
+14.6 GB            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="1105.274442875525">
+              1105 s
+            </td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.7870833333333334">
+                    79%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.4527179123765059">
+                    45%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.676">
+                    68%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="1.0">
+                    100%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.26879166666666665">
+                    27%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.9166666666666666">
+                    92%
+                  </td>
+          </tr>
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="26.0" data-released="2025-03-01"
+              onclick="window.location='models/google_gemma-3-27b.html'">
+            <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-3-27b" title="google/gemma-3-27b">gemma-3-27b</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
+            <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.6645648351934383">
+              66%
+            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="16091.8">
+15.7 GB            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="1153.1396395417396">
+              1153 s
+            </td>
+                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.42041666666666677">
+                    42%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.861074206535127">
+                    86%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.8780000000000001">
+                    88%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="1.0">
+                    100%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.5730972222222223">
+                    57%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.6666666666666666">
+                    67%
+                  </td>
+          </tr>
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="10.11" data-released="2026-03-02"
+              onclick="window.location='models/google_gemma-4-e2b.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-4-e2b" title="google/gemma-4-e2b">gemma-4-e2b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.6420506465596298">
@@ -1442,7 +1833,8 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     58%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/meta_llama-3.3-70b.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="59.44" data-released="2024-12-06"
+              onclick="window.location='models/meta_llama-3.3-70b.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="llama-3.3-70b" title="meta/llama-3.3-70b">llama-3.3-70b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.6395507213874562">
@@ -1466,7 +1858,8 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     83%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/qwen_qwen3-coder-30b.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="26.41" data-released="2025-07-31"
+              onclick="window.location='models/qwen_qwen3-coder-30b.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3-coder-30b" title="qwen/qwen3-coder-30b">qwen3-coder-30b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.6329481946624804">
@@ -1490,35 +1883,8 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     33%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/google_gemma-3-27b.html'">
-            <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-3-27b" title="google/gemma-3-27b">gemma-3-27b</td>
-            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
-            <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.6289195971005839">
-              63%
-            </td>
-            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="16091.8">
-15.7 GB            </td>
-            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="934.4600567937596">
-              934 s
-            </td>
-                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.42041666666666677">
-                    42%
-                  </td>
-                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.861074206535127">
-                    86%
-                  </td>
-                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.8780000000000001">
-                    88%
-                  </td>
-                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
-                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.5730972222222223">
-                    57%
-                  </td>
-                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.6666666666666666">
-                    67%
-                  </td>
-          </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/zai-org_glm-4.6v-flash.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="13.25" data-released="2025-12-07"
+              onclick="window.location='models/zai-org_glm-4.6v-flash.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="glm-4.6v-flash" title="zai-org/glm-4.6v-flash">glm-4.6v-flash</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.623532152373498">
@@ -1547,7 +1913,8 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     54%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/qwen_qwen3-30b-a3b-2507.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="26.41" data-released="2025-07-21"
+              onclick="window.location='models/qwen_qwen3-30b-a3b-2507.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3-30b-a3b-2507" title="qwen/qwen3-30b-a3b-2507">qwen3-30b-a3b-2507</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.6171801267515554">
@@ -1573,7 +1940,64 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     75%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/qwen3.5-4b.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="28.05" data-released="2024-11-08"
+              onclick="window.location='models/qwen_qwen2.5-coder-32b.html'">
+            <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen2.5-coder-32b" title="qwen/qwen2.5-coder-32b">qwen2.5-coder-32b</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
+            <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.6036760858189429">
+              60%
+            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="17593.1">
+17.2 GB            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="370.18199754098896">
+              370 s
+            </td>
+                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.6">
+                    60%
+                  </td>
+                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
+                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.9821428571428571">
+                    98%
+                  </td>
+                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
+                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.5833333333333334">
+                    58%
+                  </td>
+          </tr>
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="13.32" data-released="2026-03-12"
+              onclick="window.location='models/google_gemma-4-12b-qat.html'">
+            <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-4-12b-qat" title="google/gemma-4-12b-qat">gemma-4-12b-qat</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 4bit</td>
+            <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.6023193535084157">
+              60%
+            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="6819.8">
+6.7 GB            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="1858.9394734590314">
+              1859 s
+            </td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.7125000000000001">
+                    71%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.2443138930427971">
+                    24%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.787">
+                    79%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.9761904761904762">
+                    98%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.26233333333333336">
+                    26%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.7083333333333334">
+                    71%
+                  </td>
+          </tr>
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="9.15" data-released="2026-03-02"
+              onclick="window.location='models/qwen3.5-4b.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3.5-4b" title="qwen3.5-4b">qwen3.5-4b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.5945154880076298">
@@ -1603,7 +2027,8 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     62%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/qwen_qwen3-8b.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="10.31" data-released="2025-04-27"
+              onclick="window.location='models/qwen_qwen3-8b.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3-8b" title="qwen/qwen3-8b">qwen3-8b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.5677492877492878">
@@ -1629,16 +2054,17 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     67%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/allenai_olmo-3-32b-think.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="27.66" data-released="2025-11-19"
+              onclick="window.location='models/allenai_olmo-3-32b-think.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="olmo-3-32b-think" title="allenai/olmo-3-32b-think">olmo-3-32b-think</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
-            <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.5608967948717949">
+            <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.5628402930402931">
               56%
             </td>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="17302.4">
 16.9 GB            </td>
-            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="1657.660859500058">
-              1658 s
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="3525.6360766252037">
+              3526 s
             </td>
                   <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.4954166666666667">
                     50%
@@ -1647,13 +2073,16 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                   <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.9066000000000001">
                     91%
                   </td>
-                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
+                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.5476190476190477">
+                    55%
+                  </td>
                   <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
                   <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.5">
                     50%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/mistralai_ministral-3-14b-reasoning.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="15.89" data-released="2025-10-31"
+              onclick="window.location='models/mistralai_ministral-3-14b-reasoning.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="ministral-3-14b-reasoning" title="mistralai/ministral-3-14b-reasoning">ministral-3-14b-reasoning</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.5592586902349683">
@@ -1683,7 +2112,8 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     58%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/qwen_qwen3-4b-2507.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="8.12" data-released="2025-08-06"
+              onclick="window.location='models/qwen_qwen3-4b-2507.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3-4b-2507" title="qwen/qwen3-4b-2507">qwen3-4b-2507</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.5586963776963778">
@@ -1709,29 +2139,8 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     58%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/qwen_qwen2.5-coder-32b.html'">
-            <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen2.5-coder-32b" title="qwen/qwen2.5-coder-32b">qwen2.5-coder-32b</td>
-            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
-            <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.5405982905982907">
-              54%
-            </td>
-            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="17593.1">
-17.2 GB            </td>
-            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="199.19540595798753">
-              199 s
-            </td>
-                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.6">
-                    60%
-                  </td>
-                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
-                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
-                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
-                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
-                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.5833333333333334">
-                    58%
-                  </td>
-          </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/qwen3.5-2b.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="7.81" data-released="2026-03-02"
+              onclick="window.location='models/qwen3.5-2b.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3.5-2b" title="qwen3.5-2b">qwen3.5-2b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.5331212729386391">
@@ -1761,7 +2170,8 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     33%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/nvidia_nemotron-3-nano.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="27.2" data-released="2025-12-15"
+              onclick="window.location='models/nvidia_nemotron-3-nano.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="nemotron-3-nano" title="nvidia/nemotron-3-nano">nemotron-3-nano</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.5313736263736264">
@@ -1787,7 +2197,8 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     67%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/nvidia_nemotron-3-nano-omni.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="38.04" data-released="2026-04-20"
+              onclick="window.location='models/nvidia_nemotron-3-nano-omni.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="nemotron-3-nano-omni" title="nvidia/nemotron-3-nano-omni">nemotron-3-nano-omni</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.5123491271567309">
@@ -1817,7 +2228,8 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     75%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/nvidia_nemotron-3-nano-omni@q8_0.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="49.86" data-released="2026-04-20"
+              onclick="window.location='models/nvidia_nemotron-3-nano-omni@q8_0.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="nemotron-3-nano-omni" title="nvidia/nemotron-3-nano-omni@q8_0">nemotron-3-nano-omni</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 8bit</td>
             <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.4962771020499768">
@@ -1845,7 +2257,39 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     67%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/ibm_granite-4-h-tiny.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="8.83" data-released="2025-02-20"
+              onclick="window.location='models/google_gemma-3-4b.html'">
+            <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-3-4b" title="google/gemma-3-4b">gemma-3-4b</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
+            <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.47219376922841083">
+              47%
+            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="2894.2">
+2.8 GB            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="185.7311589187011">
+              186 s
+            </td>
+                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.49833333333333335">
+                    50%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.6513038121539831">
+                    65%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.537">
+                    54%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.6071428571428571">
+                    61%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.4140509259259259">
+                    41%
+                  </td>
+                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.16666666666666666">
+                    17%
+                  </td>
+          </tr>
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="9.94" data-released="2025-10-02"
+              onclick="window.location='models/ibm_granite-4-h-tiny.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="granite-4-h-tiny" title="ibm/granite-4-h-tiny">granite-4-h-tiny</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.46870922728065584">
@@ -1871,7 +2315,8 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     54%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/qwen_qwen3-4b-thinking-2507.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="8.12" data-released="2025-08-05"
+              onclick="window.location='models/qwen_qwen3-4b-thinking-2507.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3-4b-thinking-2507" title="qwen/qwen3-4b-thinking-2507">qwen3-4b-thinking-2507</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.4606828885400314">
@@ -1895,55 +2340,35 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     67%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/google_gemma-3-4b.html'">
-            <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-3-4b" title="google/gemma-3-4b">gemma-3-4b</td>
-            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
-            <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.4532557042098993">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="14.52" data-released="2026-06-02"
+              onclick="window.location='models/mellum2-12b-a2.5b-thinking.html'">
+            <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="mellum2-12b-a2.5b-thinking" title="mellum2-12b-a2.5b-thinking">mellum2-12b-a2.5b-thinking</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 4bit</td>
+            <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.44736304436304436">
               45%
             </td>
-            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="2894.2">
-2.8 GB            </td>
-            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="158.4847887508804">
-              158 s
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="7697.4">
+7.5 GB            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="440.40302245598286">
+              440 s
             </td>
-                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.49833333333333335">
-                    50%
-                  </td>
-                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.6513038121539831">
-                    65%
-                  </td>
-                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.537">
-                    54%
-                  </td>
-                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
-                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.4140509259259259">
+                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.40541666666666665">
                     41%
                   </td>
-                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.16666666666666666">
-                    17%
+                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
+                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.436">
+                    44%
                   </td>
-          </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/microsoft_phi-4-reasoning-plus.html'">
-            <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="phi-4-reasoning-plus" title="microsoft/phi-4-reasoning-plus">phi-4-reasoning-plus</td>
-            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
-            <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.4486858974358975">
-              45%
-            </td>
-            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="7873.9">
-7.7 GB            </td>
-            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="368.3710118330782">
-              368 s
-            </td>
-                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.5179166666666667">
-                    52%
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.8928571428571429">
+                    89%
                   </td>
                   <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
-                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
-                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
-                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
-                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
+                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.4583333333333333">
+                    46%
+                  </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/ouro-2.6b.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="" data-released="2025-11-09"
+              onclick="window.location='models/ouro-2.6b.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="ouro-2.6b" title="ouro-2.6b">ouro-2.6b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.4153846153846154">
@@ -1966,7 +2391,8 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     50%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/nvidia_nemotron-3-nano-4b.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="8.64" data-released="2026-03-07"
+              onclick="window.location='models/nvidia_nemotron-3-nano-4b.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="nemotron-3-nano-4b" title="nvidia/nemotron-3-nano-4b">nemotron-3-nano-4b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.3950297110297111">
@@ -1992,16 +2418,65 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     50%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/google_gemma-3n-e4b.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="14.86" data-released="2024-11-08"
+              onclick="window.location='models/qwen_qwen2.5-coder-14b.html'">
+            <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen2.5-coder-14b" title="qwen/qwen2.5-coder-14b">qwen2.5-coder-14b</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
+            <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.35836996336996335">
+              36%
+            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="7940.0">
+7.8 GB            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="135.8737019179389">
+              136 s
+            </td>
+                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.36416666666666664">
+                    36%
+                  </td>
+                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
+                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
+                  <td class="px-3 py-2 text-right num font-bold text-emerald-700" data-sort="0.9583333333333333">
+                    96%
+                  </td>
+                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
+                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.20833333333333334">
+                    21%
+                  </td>
+          </tr>
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="14.77" data-released="2025-04-17"
+              onclick="window.location='models/microsoft_phi-4-reasoning-plus.html'">
+            <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="phi-4-reasoning-plus" title="microsoft/phi-4-reasoning-plus">phi-4-reasoning-plus</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
+            <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.35279487179487184">
+              35%
+            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="7873.9">
+7.7 GB            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="1304.648312831996">
+              1305 s
+            </td>
+                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.5179166666666667">
+                    52%
+                  </td>
+                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
+                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
+                  <td class="px-3 py-2 text-right num font-bold text-red-600" data-sort="0.0">
+                    0%
+                  </td>
+                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
+                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
+          </tr>
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="11.64" data-released="2025-06-03"
+              onclick="window.location='models/google_gemma-3n-e4b.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-3n-e4b" title="google/gemma-3n-e4b">gemma-3n-e4b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
-            <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.3042136831341785">
-              30%
+            <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.3286890958895462">
+              33%
             </td>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="5587.5">
 5.5 GB            </td>
-            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="145.35424095904455">
-              145 s
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="265.8773240840528">
+              266 s
             </td>
                   <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.10583333333333333">
                     11%
@@ -2010,7 +2485,9 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     72%
                   </td>
                   <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
-                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
+                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.511904761904762">
+                    51%
+                  </td>
                   <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.20800462962962962">
                     21%
                   </td>
@@ -2018,29 +2495,8 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     50%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/qwen_qwen2.5-coder-14b.html'">
-            <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen2.5-coder-14b" title="qwen/qwen2.5-coder-14b">qwen2.5-coder-14b</td>
-            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
-            <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.25837606837606836">
-              26%
-            </td>
-            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="7940.0">
-7.8 GB            </td>
-            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="73.8139273772249">
-              74 s
-            </td>
-                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.36416666666666664">
-                    36%
-                  </td>
-                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
-                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
-                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
-                  <td class="px-3 py-2 text-right text-stone-400" data-sort="-1">—</td>
-                  <td class="px-3 py-2 text-right num font-bold text-amber-700" data-sort="0.20833333333333334">
-                    21%
-                  </td>
-          </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/liquid_lfm2-24b-a2b.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="21.5" data-released="2026-02-24"
+              onclick="window.location='models/liquid_lfm2-24b-a2b.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="lfm2-24b-a2b" title="liquid/lfm2-24b-a2b">lfm2-24b-a2b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
             <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.22825193325193324">
@@ -2066,7 +2522,8 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     25%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/google_gemma-4-31b@q8_0.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="" data-released="2026-03-12"
+              onclick="window.location='models/google_gemma-4-31b@q8_0.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-4-31b" title="google/gemma-4-31b@q8_0">gemma-4-31b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 8bit</td>
             <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.18076923076923074">
@@ -2091,7 +2548,8 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     50%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/qwen_qwen3.6-27b@q8_0.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="" data-released="2026-04-21"
+              onclick="window.location='models/qwen_qwen3.6-27b@q8_0.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3.6-27b" title="qwen/qwen3.6-27b@q8_0">qwen3.6-27b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 8bit</td>
             <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.18076923076923074">
@@ -2116,7 +2574,8 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
                     50%
                   </td>
           </tr>
-          <tr class="cursor-pointer row-link" onclick="window.location='models/liquid_lfm2.5-1.2b.html'">
+          <tr class="cursor-pointer row-link os-tr" data-total-ram="7.16" data-released="2026-01-06"
+              onclick="window.location='models/liquid_lfm2.5-1.2b.html'">
             <td class="px-3 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="lfm2.5-1.2b" title="liquid/lfm2.5-1.2b">lfm2.5-1.2b</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 8bit</td>
             <td class="px-3 py-2 num text-right font-bold text-amber-700" data-sort="0.06058608058608059">
@@ -2145,7 +2604,27 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
       </tbody>
     </table>
   </div>
-  <p class="mt-2 text-xs text-stone-500">Click a row to open the model detail page. Columns are sortable.</p>
+  <p class="mt-2 text-xs text-stone-500">Click a row to open the model detail page. Columns are sortable. The filter above hides table rows and dims the corresponding dots in the chart.</p>
+
+  <script>
+  (() => {
+    owbFilter({
+      ramSelect: 'os-ram-filter',
+      yearSelect: 'os-year-filter',
+      groups: [
+        // Table first: it holds every model, so its count is the honest one.
+        { els: document.querySelectorAll('#overall-table .os-tr'), cls: 'owb-hidden' },
+        { els: document.querySelectorAll('#overall-scatter .os-dot'), cls: 'os-filtered' },
+      ],
+      onApply: ([tableVisible, dotsVisible]) => {
+        const t = document.getElementById('os-table-count');
+        if (t) t.textContent = tableVisible;
+        const d = document.getElementById('os-count');
+        if (d) d.textContent = dotsVisible;
+      },
+    });
+  })();
+  </script>
 </section>
 
   </main>

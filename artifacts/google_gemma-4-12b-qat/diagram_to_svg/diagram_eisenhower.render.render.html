@@ -1,0 +1,117 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html,body{margin:0;background:#fff;font-family:system-ui,-apple-system,sans-serif}
+  .wrap{padding:24px;display:inline-block;background:#fff}
+  /* Force a concrete render box: many model-emitted SVGs only set viewBox.
+     Without a width here, an inline-block parent collapses the SVG to its
+     intrinsic ~300x150 (or smaller) and the screenshot becomes a tiny
+     blank tile. Fixed width + auto height uses viewBox aspect-ratio. */
+  .wrap svg{display:block;width:1200px;height:auto;max-width:none}
+</style></head><body><div class="wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800">
+  <!-- Background -->
+  <rect width="1200" height="800" fill="white"/>
+  
+  <!-- Whiteboard Frame -->
+  <rect x="50" y="50" width="1100" height="700" fill="none" stroke="#cccccc" stroke-width="4"/>
+  
+  <!-- Markers for Arrows -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="black" />
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="600" y="110" font-family="Arial, sans-serif" font-size="36" font-weight="bold" text-anchor="middle" fill="black">Eisenhower - Matrix - Marketing</text>
+
+  <!-- Axes -->
+  <g id="axes" stroke="black" stroke-width="2">
+    <!-- Y-Axis -->
+    <line x1="200" y1="150" x2="200" y2="750" marker-end="url(#arrowhead)" />
+    <text x="180" y="450" font-family="Arial, sans-serif" font-size="24" transform="rotate(-90, 180, 450)" text-anchor="middle">Wichtigkeit</text>
+    <text x="170" y="140" font-family="Arial, sans-serif" font-size="20" fill="blue">hoch</text>
+    <text x="170" y="770" font-family="Arial, sans-serif" font-size="20" fill="blue">niedrig</text>
+    
+    <!-- X-Axis -->
+    <line x1="200" y1="750" x2="1000" y2="750" marker-end="url(#arrowhead)" />
+    <text x="600" y="780" font-family="Arial, sans-serif" font-size="24" text-anchor="middle">Dringlichkeit</text>
+    <text x="170" y="760" font-family="Arial, sans-serif" font-size="20" fill="blue">niedrig</text>
+    <text x="1010" y="760" font-family="Arial, sans-serif" font-size="20" fill="blue">hoch</text>
+  </g>
+
+  <!-- Quadrant 1: Wichtig + Nicht dringend -->
+  <g id="quadrant_top_left">
+    <rect x="220" y="170" width="360" height="260" fill="none" stroke="black" stroke-width="1.5"/>
+    <text x="240" y="200" font-family="Arial, sans-serif" font-size="20" font-weight="bold">Wichtig + Nicht dringend</text>
+    <text x="240" y="230" font-family="Arial, sans-serif" font-size="16">• Content-Strategie</text>
+    <text x="240" y="260" font-family="Arial, sans-serif" font-size="16">• Brand schärfen</text>
+    <text x="240" y="290" font-family="Arial, sans-serif" font-size="16">• SEO aufräumen</text>
+    <text x="240" y="320" font-family="Arial, sans-serif" font-size="16">• Zielgruppen verstehen</text>
+    <!-- Target Icon -->
+    <circle cx="530" cy="350" r="25" fill="none" stroke="black" stroke-width="2"/>
+    <line x1="530" y1="325" x2="530" y2="375" stroke="black" stroke-width="1"/>
+    <line x1="505" y1="350" x2="555" y2="350" stroke="black" stroke-width="1"/>
+  </g>
+
+  <!-- Quadrant 2: Wichtig + Dringend -->
+  <g id="quadrant_top_right">
+    <rect x="620" y="170" width="360" height="260" fill="none" stroke="black" stroke-width="1.5"/>
+    <text x="640" y="200" font-family="Arial, sans-serif" font-size="20" font-weight="bold">Wichtig + Dringend</text>
+    <text x="640" y="230" font-family="Arial, sans-serif" font-size="16">• Kampagne retten</text>
+    <text x="640" y="260" font-family="Arial, sans-serif" font-size="16">• Shitstorm beantworten</text>
+    <text x="640" y="290" font-family="Arial, sans-serif" font-size="16">• falschen Link fixen</text>
+    <text x="640" y="320" font-family="Arial, sans-serif" font-size="16">• Chef will bis 14 Uhr "viral gehen"</text>
+    <!-- Lightning Icon -->
+    <path d="M940 220 L960 250 L930 270 L950 300 L920 330" fill="none" stroke="black" stroke-width="3"/>
+    <!-- Megaphone Icon -->
+    <path d="M940 340 L980 340 L980 370 L940 370 Z" fill="none" stroke="black" stroke-width="2"/>
+    <path d="M940 355 L910 355" stroke="black" stroke-width="2"/>
+  </g>
+
+  <!-- Quadrant 3: Nicht wichtig + Nicht dringend -->
+  <g id="quadrant_bottom_left">
+    <rect x="220" y="450" width="360" height="260" fill="none" stroke="black" stroke-width="1.5"/>
+    <text x="240" y="480" font-family="Arial, sans-serif" font-size="20" font-weight="bold">Nicht wichtig + Nicht dringend</text>
+    <text x="240" y="510" font-family="Arial, sans-serif" font-size="16">• Mere-Ideen mit Glitzer</text>
+    <text x="240" y="540" font-family="Arial, sans-serif" font-size="16">• Buzzword-Bingo</text>
+    <text x="240" y="570" font-family="Arial, sans-serif" font-size="16">• TikTok-Tanz mit dem Maskottchen</text>
+    <text x="240" y="600" font-family="Arial, sans-serif" font-size="16">• Hashtag brainstormen</text>
+    <text x="240" y="620" font-family="Arial, sans-serif" font-size="14" fill="gray">#innovation #synergy #wow</text>
+    <!-- Sparkles/Dancing figure -->
+    <path d="M450 620 L460 610 L470 620 L480 610 L490 620" fill="none" stroke="black" stroke-width="2"/>
+    <path d="M450 650 L450 680 M440 660 L460 660 M450 680 L470 680" stroke="black" stroke-width="2"/>
+  </g>
+
+  <!-- Quadrant 4: Nicht wichtig + Dringend -->
+  <g id="quadrant_bottom_right">
+    <rect x="620" y="450" width="360" height="260" fill="none" stroke="black" stroke-width="1.5"/>
+    <text x="640" y="480" font-family="Arial, sans-serif" font-size="20" font-weight="bold">Nicht wichtig + Dringend</text>
+    <text x="640" y="510" font-family="Arial, sans-serif" font-size="16">• Nach ein Last-Minute-Meeting</text>
+    <text x="640" y="540" font-family="Arial, sans-serif" font-size="16">• Kann das Logo größer?</text>
+    <text x="640" y="570" font-family="Arial, sans-serif" font-size="16">• LinkedIn-Post für "Welttag der Büroklammer"</text>
+    <text x="640" y="600" font-family="Arial, sans-serif" font-size="16">• Folie 27 später machen</text>
+    <!-- Three lines icon -->
+    <line x1="950" y1="650" x2="950" y2="700" stroke="black" stroke-width="3"/>
+    <line x1="970" y1="650" x2="970" y2="700" stroke="black" stroke-width="3"/>
+    <line x1="990" y1="650" x2="990" y2="700" stroke="black" stroke-width="3"/>
+  </g>
+
+  <!-- Extras -->
+  <g id="extras">
+    <!-- Coffee -->
+    <path d="M1080 150 Q1080 130 1110 130 L1130 130 Q1160 130 1160 160 L1160 190 Q1160 210 1130 210 L1080 210 Q1050 210 1050 190 L1050 160 Q1050 130 1080 130" fill="none" stroke="black" stroke-width="2"/>
+    <path d="M1080 190 L1080 230 M1130 190 L1130 230 M1160 190 L1160 230" stroke="black" stroke-width="2"/>
+    <text x="1180" y="180" font-family="Arial, sans-serif" font-size="16" text-anchor="start">Kaffee</text>
+    <text x="1180" y="200" font-family="Arial, sans-serif" font-size="16" text-anchor="start">schläft nicht.</text>
+    <text x="1180" y="220" font-family="Arial, sans-serif" font-size="16" text-anchor="start">Aber hilft. :)</text>
+    
+    <!-- Heart -->
+    <path d="M100 650 Q100 630 120 630 Q140 630 140 650 Q140 680 120 700 Q100 680 100 650" fill="none" stroke="black" stroke-width="2"/>
+    <text x="80" y="680" font-family="Arial, sans-serif" font-size="16" text-anchor="start">Einfach,</text>
+    <text x="80" y="700" font-family="Arial, sans-serif" font-size="16" text-anchor="start">wenn das</text>
+    <text x="80" y="720" font-family="Arial, sans-serif" font-size="16" text-anchor="start">Internet</text>
+    <text x="80" y="740" font-family="Arial, sans-serif" font-size="16" text-anchor="start">wieder da</text>
+    <text x="80" y="760" font-family="Arial, sans-serif" font-size="16" text-anchor="start">ist. :)</text>
+  </g>
+</svg></div></body></html>

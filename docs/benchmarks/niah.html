@@ -32,10 +32,116 @@
     }
   }
 </script>
+<script>
+  // Shared model filter (RAM cap + release window), used by the landing page
+  // and every bench page. Participating elements carry `data-total-ram` (GB,
+  // 64k-context estimate) and `data-released` (YYYY-MM[-DD]).
+  //
+  // Release-window option values: "m<N>" = the last N months, "y<YYYY>" = that
+  // calendar year and nothing else, "" = no restriction. Both are compared at
+  // whole-calendar-month granularity, so a YYYY-MM date without a day resolves
+  // without guessing. "Last N months" counts back from the viewer's own clock,
+  // not the build date — the report stays online and a window pinned to the
+  // build would quietly drift into meaning something else.
+  //
+  // Missing values never hide a model, for either criterion: the RAM figure
+  // comes from a runtime measurement and the date from curated metadata, so a
+  // gap means "not known", not "doesn't qualify". A freshly benchmarked model
+  // that nobody has annotated yet must not silently drop out of the report —
+  // the RAM and Released columns show "—" so the gap is visible in place.
+  //
+  // Each group names the class to toggle, so callers choose the presentation:
+  // charts dim their dots (comparison stays visible), tables hide their rows
+  // (that's the point of filtering a 60-row table). The first return value of
+  // apply() is the per-group count of models still shown.
+  window.owbFilter = function (cfg) {
+    const ram = document.getElementById(cfg.ramSelect);
+    const year = document.getElementById(cfg.yearSelect);
+    const groups = (cfg.groups || []).map(g => ({ els: Array.from(g.els), cls: g.cls }));
+    if (!ram && !year) return null;
+
+    // Month index (year * 12 + month) so windows are plain integer ranges.
+    function releaseMonth(el) {
+      const rel = el.dataset.released || '';
+      if (rel.length < 7) return null;
+      return parseInt(rel.slice(0, 4), 10) * 12 + parseInt(rel.slice(5, 7), 10);
+    }
+
+    function windowFor(value) {
+      if (!value) return null;
+      if (value[0] === 'm') {
+        const now = new Date();
+        const nowMonth = now.getFullYear() * 12 + now.getMonth() + 1;
+        return { from: nowMonth - parseInt(value.slice(1), 10) + 1, to: Infinity };
+      }
+      const y = parseInt(value.slice(1), 10);
+      return { from: y * 12 + 1, to: y * 12 + 12 };
+    }
+
+    function inWindow(el, value) {
+      const win = windowFor(value);
+      if (!win) return true;
+      const m = releaseMonth(el);
+      if (m === null) return true;
+      return m >= win.from && m <= win.to;
+    }
+
+    function excluded(el) {
+      const cap = ram ? parseFloat(ram.value) : NaN;
+      if (cap) {
+        const gb = parseFloat(el.dataset.totalRam || '');
+        if (gb && gb > cap) return true;
+      }
+      if (year && !inWindow(el, year.value)) return true;
+      return false;
+    }
+
+    // Mark options that would empty the page rather than letting the user
+    // pick them and wonder where everything went.
+    const population = groups.flatMap(g => g.els);
+    function disableEmpty(sel, matches) {
+      if (!sel) return;
+      Array.from(sel.options).forEach(opt => {
+        // "all" (value "" or the RAM select's "0") always stays selectable.
+        if (!opt.value || opt.value === '0') return;
+        if (population.some(el => matches(el, opt.value))) return;
+        opt.disabled = true;
+        opt.textContent += ' — no models';
+      });
+    }
+    disableEmpty(ram, (el, v) => {
+      const gb = parseFloat(el.dataset.totalRam || '');
+      return !gb || gb <= parseFloat(v);
+    });
+    disableEmpty(year, inWindow);
+
+    function apply() {
+      const counts = groups.map(g => {
+        let visible = 0;
+        g.els.forEach(el => {
+          const off = excluded(el);
+          el.classList.toggle(g.cls, off);
+          if (!off) visible++;
+        });
+        return visible;
+      });
+      if (cfg.onApply) cfg.onApply(counts);
+      return counts;
+    }
+
+    if (ram) ram.addEventListener('change', apply);
+    if (year) year.addEventListener('change', apply);
+    apply();
+    return { apply, excluded };
+  };
+</script>
 <style>
   body { font-feature-settings: "ss01","cv11"; }
   .num { font-variant-numeric: tabular-nums; }
   .row-link:hover { background: rgb(245 245 244 / 1); }
+  /* Model filter: table rows drop out entirely, chart dots only dim (see
+     window.owbFilter). */
+  .owb-hidden { display: none !important; }
   .preview-pop {
     position: fixed; pointer-events: none; z-index: 50;
     transform: translate(16px, 16px);
@@ -208,23 +314,46 @@ Answer as a numbered list 1., 2., 3. with one short sentence each.</pre>
          class="hidden sm:block shrink-0 w-48 md:w-64 aspect-square self-start object-cover rounded-lg border border-stone-200 bg-stone-50"
          loading="lazy" onerror="this.style.display='none'">
   </div>
+
+    <div class="mt-5">
+<div class="flex flex-wrap items-center gap-x-6 gap-y-2 bg-stone-50 border border-stone-200 rounded-lg px-4 py-2.5 text-sm">
+  <span class="text-xs font-medium uppercase tracking-wider text-stone-500">Filter</span>
+
+  <div class="flex items-center gap-2">
+    <label for="sp-ram-filter" class="text-stone-600">Max RAM</label>
+    <select id="sp-ram-filter" class="bg-white border border-stone-300 rounded px-2 py-1 num">
+      <option value="0">all</option>
+      <option value="16">16 GB</option>
+      <option value="32">32 GB</option>
+      <option value="48">48 GB</option>
+      <option value="64">64 GB</option>
+      <option value="128" selected>128 GB</option>
+    </select>
+  </div>
+
+    <div class="flex items-center gap-2">
+      <label for="sp-year-filter" class="text-stone-600">Released</label>
+      <select id="sp-year-filter" class="bg-white border border-stone-300 rounded px-2 py-1 num">
+        <option value="m6">last 6 months</option>
+        <option value="m12">last 12 months</option>
+        <option value="m24">last 24 months</option>
+          <option value="y2026" selected>2026 only</option>
+          <option value="y2025">2025 only</option>
+          <option value="y2024">2024 only</option>
+        <option value="">all</option>
+      </select>
+    </div>
+
+  <span class="text-xs text-stone-500 ml-auto num">
+    <span id="sp-table-count">–</span> of 59 models shown
+  </span>
+</div>    </div>
 </section>
 
 
   <section class="mb-8">
     <div class="flex items-baseline justify-between flex-wrap gap-2 mb-2">
       <h2 class="text-sm font-semibold tracking-tight text-stone-800 uppercase">Wall-time vs. quality</h2>
-      <div class="flex items-center gap-2 text-sm">
-        <label for="sp-ram-filter" class="text-stone-600">Max RAM</label>
-        <select id="sp-ram-filter" class="bg-white border border-stone-300 rounded px-2 py-1 num">
-          <option value="0">all</option>
-          <option value="16">16 GB</option>
-          <option value="32">32 GB</option>
-          <option value="48">48 GB</option>
-          <option value="64">64 GB</option>
-          <option value="128" selected>128 GB</option>
-        </select>
-      </div>
     </div>
     <p class="text-xs text-stone-500 mb-3">
       X = wall-time for <em>this</em> bench · Y = score (0–100&nbsp;%) in this bench. Optimum is top-left — fast and good. RAM estimate for 64k context: 4&nbsp;GB system + model weights + max(2&nbsp;GB, 40% of weights) for KV cache.
@@ -268,7 +397,7 @@ Answer as a numbered list 1., 2., 3. with one short sentence each.</pre>
         <text x="477.0" y="428" font-size="10" fill="#57534e" text-anchor="middle">Wall-time (s) →</text>
         <text x="14" y="206.0" font-size="10" fill="#57534e" text-anchor="middle" transform="rotate(-90 14 206.0)">Score</text>
 
-          <g class="sp-dot" data-model-id="google/gemma-4-31b" data-total-ram="29.93" data-moe="0" style="cursor:pointer">
+          <g class="sp-dot" data-model-id="google/gemma-4-31b" data-total-ram="29.93" data-released="2026-03-12" data-moe="0" style="cursor:pointer">
             <circle cx="564.5591506907535" cy="16.911999999999978" r="9" fill="#dc2626" fill-opacity="0.78"
                     stroke="#dc2626" stroke-width="1.75"
                     class="sp-circle"/>
@@ -276,7 +405,7 @@ Answer as a numbered list 1., 2., 3. with one short sentence each.</pre>
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">31</text>
           </g>
-          <g class="sp-dot" data-model-id="mistralai/devstral-small-2-2512" data-total-ram="22.41" data-moe="0" style="cursor:pointer">
+          <g class="sp-dot" data-model-id="mistralai/devstral-small-2-2512" data-total-ram="22.41" data-released="2025-12-09" data-moe="0" style="cursor:pointer">
             <circle cx="284.06484409125557" cy="18.659999999999968" r="9" fill="#475569" fill-opacity="0.78"
                     stroke="#475569" stroke-width="1.75"
                     class="sp-circle"/>
@@ -284,7 +413,7 @@ Answer as a numbered list 1., 2., 3. with one short sentence each.</pre>
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">24</text>
           </g>
-          <g class="sp-dot" data-model-id="bytedance/seed-oss-36b" data-total-ram="30.53" data-moe="0" style="cursor:pointer">
+          <g class="sp-dot" data-model-id="bytedance/seed-oss-36b" data-total-ram="30.53" data-released="2025-08-20" data-moe="0" style="cursor:pointer">
             <circle cx="892.8118430356193" cy="18.659999999999968" r="9" fill="#475569" fill-opacity="0.78"
                     stroke="#475569" stroke-width="1.75"
                     class="sp-circle"/>
@@ -292,7 +421,15 @@ Answer as a numbered list 1., 2., 3. with one short sentence each.</pre>
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">36</text>
           </g>
-          <g class="sp-dot" data-model-id="qwen/qwen3.6-27b" data-total-ram="26.79" data-moe="0" style="cursor:pointer">
+          <g class="sp-dot" data-model-id="ornith-1.0-35b@q4_k_m" data-total-ram="31.6" data-released="2026-06" data-moe="1" style="cursor:pointer">
+            <circle cx="178.53590477587466" cy="24.55000000000001" r="9" fill="#475569" fill-opacity="0.78"
+                    stroke="#475569" stroke-width="1.75"
+stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
+              <text x="178.53590477587466" y="24.55000000000001" text-anchor="middle" dominant-baseline="central"
+                    font-size="8" font-weight="700" fill="#fff"
+                    pointer-events="none" class="sp-label">35</text>
+          </g>
+          <g class="sp-dot" data-model-id="qwen/qwen3.6-27b" data-total-ram="26.79" data-released="2026-04-21" data-moe="0" style="cursor:pointer">
             <circle cx="581.1362269468045" cy="27.400000000000034" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
                     class="sp-circle"/>
@@ -300,7 +437,7 @@ Answer as a numbered list 1., 2., 3. with one short sentence each.</pre>
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">27</text>
           </g>
-          <g class="sp-dot" data-model-id="nvidia/nemotron-3-super" data-total-ram="116.2" data-moe="1" style="cursor:pointer">
+          <g class="sp-dot" data-model-id="nvidia/nemotron-3-super" data-total-ram="116.2" data-released="2026-03-10" data-moe="1" style="cursor:pointer">
             <circle cx="250.82582990513012" cy="27.779999999999973" r="9" fill="#a3e635" fill-opacity="0.78"
                     stroke="#a3e635" stroke-width="1.75"
 stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
@@ -308,7 +445,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                     font-size="6" font-weight="700" fill="#1c1917"
                     pointer-events="none" class="sp-label">120</text>
           </g>
-          <g class="sp-dot" data-model-id="qwen/qwen3-coder-next" data-total-ram="67.39" data-moe="1" style="cursor:pointer">
+          <g class="sp-dot" data-model-id="qwen/qwen3-coder-next" data-total-ram="67.39" data-released="2026-01-30" data-moe="1" style="cursor:pointer">
             <circle cx="124.86705567080838" cy="28.920000000000016" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
 stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
@@ -316,7 +453,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">80</text>
           </g>
-          <g class="sp-dot" data-model-id="qwen/qwen3-vl-30b" data-total-ram="27.82" data-moe="1" style="cursor:pointer">
+          <g class="sp-dot" data-model-id="qwen/qwen3-vl-30b" data-total-ram="27.82" data-released="2025-10-04" data-moe="1" style="cursor:pointer">
             <circle cx="523.8204404444442" cy="28.920000000000016" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
 stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
@@ -324,7 +461,15 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">30</text>
           </g>
-          <g class="sp-dot" data-model-id="qwen/qwen3.6-35b-a3b" data-total-ram="32.78" data-moe="1" style="cursor:pointer">
+          <g class="sp-dot" data-model-id="poolside/laguna-s-2.1" data-total-ram="96.79" data-released="2026-07-21" data-moe="1" style="cursor:pointer">
+            <circle cx="622.0249960434865" cy="28.920000000000016" r="9" fill="#475569" fill-opacity="0.78"
+                    stroke="#475569" stroke-width="1.75"
+stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
+              <text x="622.0249960434865" y="28.920000000000016" text-anchor="middle" dominant-baseline="central"
+                    font-size="6" font-weight="700" fill="#fff"
+                    pointer-events="none" class="sp-label">118</text>
+          </g>
+          <g class="sp-dot" data-model-id="qwen/qwen3.6-35b-a3b" data-total-ram="32.78" data-released="2026-04-15" data-moe="1" style="cursor:pointer">
             <circle cx="192.8198449712695" cy="29.300000000000068" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
 stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
@@ -332,7 +477,15 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">35</text>
           </g>
-          <g class="sp-dot" data-model-id="google/gemma-4-e4b" data-total-ram="12.25" data-moe="0" style="cursor:pointer">
+          <g class="sp-dot" data-model-id="meta/muse-glimmer" data-total-ram="27.67" data-released="2026-08-10" data-moe="0" style="cursor:pointer">
+            <circle cx="705.4913828000426" cy="29.680000000000007" r="9" fill="#a21caf" fill-opacity="0.78"
+                    stroke="#a21caf" stroke-width="1.75"
+                    class="sp-circle"/>
+              <text x="705.4913828000426" y="29.680000000000007" text-anchor="middle" dominant-baseline="central"
+                    font-size="8" font-weight="700" fill="#fff"
+                    pointer-events="none" class="sp-label">30</text>
+          </g>
+          <g class="sp-dot" data-model-id="google/gemma-4-e4b" data-total-ram="12.25" data-released="2026-03-02" data-moe="0" style="cursor:pointer">
             <circle cx="142.74989496990003" cy="32.72000000000003" r="9" fill="#dc2626" fill-opacity="0.78"
                     stroke="#dc2626" stroke-width="1.75"
                     class="sp-circle"/>
@@ -340,7 +493,15 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">8</text>
           </g>
-          <g class="sp-dot" data-model-id="qwen/qwen3-30b-a3b-2507" data-total-ram="26.41" data-moe="1" style="cursor:pointer">
+          <g class="sp-dot" data-model-id="google/gemma-4-31b-qat" data-total-ram="28.58" data-released="2026-03-12" data-moe="0" style="cursor:pointer">
+            <circle cx="602.6669737496233" cy="33.099999999999966" r="9" fill="#dc2626" fill-opacity="0.78"
+                    stroke="#dc2626" stroke-width="1.75"
+                    class="sp-circle"/>
+              <text x="602.6669737496233" y="33.099999999999966" text-anchor="middle" dominant-baseline="central"
+                    font-size="8" font-weight="700" fill="#fff"
+                    pointer-events="none" class="sp-label">31</text>
+          </g>
+          <g class="sp-dot" data-model-id="qwen/qwen3-30b-a3b-2507" data-total-ram="26.41" data-released="2025-07-21" data-moe="1" style="cursor:pointer">
             <circle cx="226.81994907872718" cy="37.65999999999997" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
 stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
@@ -348,7 +509,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">30</text>
           </g>
-          <g class="sp-dot" data-model-id="openai/gpt-oss-20b" data-total-ram="19.78" data-moe="1" style="cursor:pointer">
+          <g class="sp-dot" data-model-id="openai/gpt-oss-20b" data-total-ram="19.78" data-released="2025-08-04" data-moe="1" style="cursor:pointer">
             <circle cx="245.1502134564462" cy="47.539999999999964" r="9" fill="#15803d" fill-opacity="0.78"
                     stroke="#15803d" stroke-width="1.75"
 stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
@@ -356,7 +517,15 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">20</text>
           </g>
-          <g class="sp-dot" data-model-id="allenai/olmo-3-32b-think" data-total-ram="27.66" data-moe="0" style="cursor:pointer">
+          <g class="sp-dot" data-model-id="ornith-1.0-9b@q4_k_m" data-total-ram="11.34" data-released="2026-06" data-moe="0" style="cursor:pointer">
+            <circle cx="186.74133365189363" cy="48.30000000000001" r="9" fill="#475569" fill-opacity="0.78"
+                    stroke="#475569" stroke-width="1.75"
+                    class="sp-circle"/>
+              <text x="186.74133365189363" y="48.30000000000001" text-anchor="middle" dominant-baseline="central"
+                    font-size="8" font-weight="700" fill="#fff"
+                    pointer-events="none" class="sp-label">9</text>
+          </g>
+          <g class="sp-dot" data-model-id="allenai/olmo-3-32b-think" data-total-ram="27.66" data-released="2025-11-19" data-moe="0" style="cursor:pointer">
             <circle cx="309.8148695833584" cy="51.49199999999996" r="9" fill="#475569" fill-opacity="0.78"
                     stroke="#475569" stroke-width="1.75"
                     class="sp-circle"/>
@@ -364,7 +533,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">32</text>
           </g>
-          <g class="sp-dot" data-model-id="google/gemma-4-26b-a4b" data-total-ram="27.46" data-moe="1" style="cursor:pointer">
+          <g class="sp-dot" data-model-id="google/gemma-4-26b-a4b" data-total-ram="27.46" data-released="2026-03-12" data-moe="1" style="cursor:pointer">
             <circle cx="176.01278926432047" cy="55.51999999999998" r="9" fill="#dc2626" fill-opacity="0.78"
                     stroke="#dc2626" stroke-width="1.75"
 stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
@@ -372,7 +541,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">26</text>
           </g>
-          <g class="sp-dot" data-model-id="google/gemma-3-27b" data-total-ram="26.0" data-moe="0" style="cursor:pointer">
+          <g class="sp-dot" data-model-id="google/gemma-3-27b" data-total-ram="26.0" data-released="2025-03-01" data-moe="0" style="cursor:pointer">
             <circle cx="259.3596015416258" cy="62.35999999999996" r="9" fill="#dc2626" fill-opacity="0.78"
                     stroke="#dc2626" stroke-width="1.75"
                     class="sp-circle"/>
@@ -380,7 +549,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">27</text>
           </g>
-          <g class="sp-dot" data-model-id="qwen/qwen3.5-35b-a3b" data-total-ram="32.78" data-moe="1" style="cursor:pointer">
+          <g class="sp-dot" data-model-id="qwen/qwen3.5-35b-a3b" data-total-ram="32.78" data-released="2026-02-24" data-moe="1" style="cursor:pointer">
             <circle cx="188.04277484587533" cy="63.5" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
 stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
@@ -388,7 +557,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">35</text>
           </g>
-          <g class="sp-dot" data-model-id="qwen3.5-4b" data-total-ram="9.15" data-moe="0" style="cursor:pointer">
+          <g class="sp-dot" data-model-id="qwen3.5-4b" data-total-ram="9.15" data-released="2026-03-02" data-moe="0" style="cursor:pointer">
             <circle cx="228.54825746620816" cy="63.65199999999999" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
                     class="sp-circle"/>
@@ -396,7 +565,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">4</text>
           </g>
-          <g class="sp-dot" data-model-id="qwen/qwen3.5-9b" data-total-ram="12.54" data-moe="0" style="cursor:pointer">
+          <g class="sp-dot" data-model-id="qwen/qwen3.5-9b" data-total-ram="12.54" data-released="2026-02-27" data-moe="0" style="cursor:pointer">
             <circle cx="305.7868775379413" cy="68.82" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
                     class="sp-circle"/>
@@ -404,7 +573,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">9</text>
           </g>
-          <g class="sp-dot" data-model-id="google/gemma-3-12b" data-total-ram="14.52" data-moe="0" style="cursor:pointer">
+          <g class="sp-dot" data-model-id="google/gemma-3-12b" data-total-ram="14.52" data-released="2025-03-01" data-moe="0" style="cursor:pointer">
             <circle cx="152.6287739351159" cy="69.95999999999998" r="9" fill="#dc2626" fill-opacity="0.78"
                     stroke="#dc2626" stroke-width="1.75"
                     class="sp-circle"/>
@@ -412,7 +581,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">12</text>
           </g>
-          <g class="sp-dot" data-model-id="qwen/qwen3-vl-8b" data-total-ram="11.53" data-moe="0" style="cursor:pointer">
+          <g class="sp-dot" data-model-id="qwen/qwen3-vl-8b" data-total-ram="11.53" data-released="2025-10-11" data-moe="0" style="cursor:pointer">
             <circle cx="526.904359438447" cy="74.13999999999999" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
                     class="sp-circle"/>
@@ -420,7 +589,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">8</text>
           </g>
-          <g class="sp-dot" data-model-id="qwen/qwen3-4b-2507" data-total-ram="8.12" data-moe="0" style="cursor:pointer">
+          <g class="sp-dot" data-model-id="qwen/qwen3-4b-2507" data-total-ram="8.12" data-released="2025-08-06" data-moe="0" style="cursor:pointer">
             <circle cx="177.8544646453035" cy="76.04000000000002" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
                     class="sp-circle"/>
@@ -428,7 +597,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">4</text>
           </g>
-          <g class="sp-dot" data-model-id="openai/gpt-oss-120b" data-total-ram="86.65" data-moe="1" style="cursor:pointer">
+          <g class="sp-dot" data-model-id="openai/gpt-oss-120b" data-total-ram="86.65" data-released="2025-08-04" data-moe="1" style="cursor:pointer">
             <circle cx="179.63613246199415" cy="81.51199999999994" r="9" fill="#15803d" fill-opacity="0.78"
                     stroke="#15803d" stroke-width="1.75"
 stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
@@ -436,7 +605,15 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                     font-size="6" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">120</text>
           </g>
-          <g class="sp-dot" data-model-id="mistralai/ministral-3-14b-reasoning" data-total-ram="15.89" data-moe="0" style="cursor:pointer">
+          <g class="sp-dot" data-model-id="google/gemma-4-12b-qat" data-total-ram="13.32" data-released="2026-03-12" data-moe="0" style="cursor:pointer">
+            <circle cx="372.723645641603" cy="96.94" r="9" fill="#dc2626" fill-opacity="0.78"
+                    stroke="#dc2626" stroke-width="1.75"
+                    class="sp-circle"/>
+              <text x="372.723645641603" y="96.94" text-anchor="middle" dominant-baseline="central"
+                    font-size="8" font-weight="700" fill="#fff"
+                    pointer-events="none" class="sp-label">12</text>
+          </g>
+          <g class="sp-dot" data-model-id="mistralai/ministral-3-14b-reasoning" data-total-ram="15.89" data-released="2025-10-31" data-moe="0" style="cursor:pointer">
             <circle cx="532.7950862865731" cy="101.50000000000006" r="9" fill="#475569" fill-opacity="0.78"
                     stroke="#475569" stroke-width="1.75"
                     class="sp-circle"/>
@@ -444,7 +621,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">14</text>
           </g>
-          <g class="sp-dot" data-model-id="google/gemma-4-e2b" data-total-ram="10.11" data-moe="0" style="cursor:pointer">
+          <g class="sp-dot" data-model-id="google/gemma-4-e2b" data-total-ram="10.11" data-released="2026-03-02" data-moe="0" style="cursor:pointer">
             <circle cx="119.31310696020654" cy="106.21199999999999" r="9" fill="#dc2626" fill-opacity="0.78"
                     stroke="#dc2626" stroke-width="1.75"
                     class="sp-circle"/>
@@ -452,7 +629,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">5</text>
           </g>
-          <g class="sp-dot" data-model-id="qwen/qwen3-8b" data-total-ram="10.31" data-moe="0" style="cursor:pointer">
+          <g class="sp-dot" data-model-id="qwen/qwen3-8b" data-total-ram="10.31" data-released="2025-04-27" data-moe="0" style="cursor:pointer">
             <circle cx="89.78552345596599" cy="112.89999999999998" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
                     class="sp-circle"/>
@@ -460,7 +637,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">8</text>
           </g>
-          <g class="sp-dot" data-model-id="nvidia/nemotron-3-nano" data-total-ram="27.2" data-moe="1" style="cursor:pointer">
+          <g class="sp-dot" data-model-id="nvidia/nemotron-3-nano" data-total-ram="27.2" data-released="2025-12-15" data-moe="1" style="cursor:pointer">
             <circle cx="221.23115568143504" cy="133.79999999999995" r="9" fill="#a3e635" fill-opacity="0.78"
                     stroke="#a3e635" stroke-width="1.75"
 stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
@@ -468,7 +645,15 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                     font-size="8" font-weight="700" fill="#1c1917"
                     pointer-events="none" class="sp-label">30</text>
           </g>
-          <g class="sp-dot" data-model-id="qwen3.5-2b" data-total-ram="7.81" data-moe="0" style="cursor:pointer">
+          <g class="sp-dot" data-model-id="google/gemma-4-26b-a4b-qat" data-total-ram="24.39" data-released="2026-03-12" data-moe="1" style="cursor:pointer">
+            <circle cx="193.55161727538885" cy="139.12" r="9" fill="#dc2626" fill-opacity="0.78"
+                    stroke="#dc2626" stroke-width="1.75"
+stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
+              <text x="193.55161727538885" y="139.12" text-anchor="middle" dominant-baseline="central"
+                    font-size="8" font-weight="700" fill="#fff"
+                    pointer-events="none" class="sp-label">26</text>
+          </g>
+          <g class="sp-dot" data-model-id="qwen3.5-2b" data-total-ram="7.81" data-released="2026-03-02" data-moe="0" style="cursor:pointer">
             <circle cx="77.43674869164566" cy="147.85999999999999" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
                     class="sp-circle"/>
@@ -476,7 +661,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">2</text>
           </g>
-          <g class="sp-dot" data-model-id="qwen3.5-9b-mlx" data-total-ram="11.79" data-moe="0" style="cursor:pointer">
+          <g class="sp-dot" data-model-id="qwen3.5-9b-mlx" data-total-ram="11.79" data-released="2026-02-27" data-moe="0" style="cursor:pointer">
             <circle cx="262.8342897166317" cy="156.98" r="9" fill="#7c3aed" fill-opacity="0.78"
                     stroke="#7c3aed" stroke-width="1.75"
                     class="sp-circle"/>
@@ -484,7 +669,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">9</text>
           </g>
-          <g class="sp-dot" data-model-id="ibm/granite-4-h-tiny" data-total-ram="9.94" data-moe="0" style="cursor:pointer">
+          <g class="sp-dot" data-model-id="ibm/granite-4-h-tiny" data-total-ram="9.94" data-released="2025-10-02" data-moe="0" style="cursor:pointer">
             <circle cx="79.58576605835654" cy="162.3" r="9" fill="#475569" fill-opacity="0.78"
                     stroke="#475569" stroke-width="1.75"
                     class="sp-circle"/>
@@ -492,7 +677,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">7</text>
           </g>
-          <g class="sp-dot" data-model-id="nvidia/nemotron-3-nano-omni" data-total-ram="38.04" data-moe="1" style="cursor:pointer">
+          <g class="sp-dot" data-model-id="nvidia/nemotron-3-nano-omni" data-total-ram="38.04" data-released="2026-04-20" data-moe="1" style="cursor:pointer">
             <circle cx="168.8114478944068" cy="175.21999999999997" r="9" fill="#a3e635" fill-opacity="0.78"
                     stroke="#a3e635" stroke-width="1.75"
 stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
@@ -500,7 +685,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                     font-size="8" font-weight="700" fill="#1c1917"
                     pointer-events="none" class="sp-label">30</text>
           </g>
-          <g class="sp-dot" data-model-id="google/gemma-3-4b" data-total-ram="8.83" data-moe="0" style="cursor:pointer">
+          <g class="sp-dot" data-model-id="google/gemma-3-4b" data-total-ram="8.83" data-released="2025-02-20" data-moe="0" style="cursor:pointer">
             <circle cx="81.46485211802474" cy="191.94" r="9" fill="#dc2626" fill-opacity="0.78"
                     stroke="#dc2626" stroke-width="1.75"
                     class="sp-circle"/>
@@ -508,7 +693,15 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                     font-size="8" font-weight="700" fill="#fff"
                     pointer-events="none" class="sp-label">4</text>
           </g>
-          <g class="sp-dot" data-model-id="nvidia/nemotron-3-nano-4b" data-total-ram="8.64" data-moe="0" style="cursor:pointer">
+          <g class="sp-dot" data-model-id="mellum2-12b-a2.5b-thinking" data-total-ram="14.52" data-released="2026-06-02" data-moe="1" style="cursor:pointer">
+            <circle cx="156.5691246828556" cy="230.32" r="9" fill="#475569" fill-opacity="0.78"
+                    stroke="#475569" stroke-width="1.75"
+stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
+              <text x="156.5691246828556" y="230.32" text-anchor="middle" dominant-baseline="central"
+                    font-size="8" font-weight="700" fill="#fff"
+                    pointer-events="none" class="sp-label">12</text>
+          </g>
+          <g class="sp-dot" data-model-id="nvidia/nemotron-3-nano-4b" data-total-ram="8.64" data-released="2026-03-07" data-moe="0" style="cursor:pointer">
             <circle cx="112.56378270834944" cy="252.35999999999999" r="9" fill="#a3e635" fill-opacity="0.78"
                     stroke="#a3e635" stroke-width="1.75"
                     class="sp-circle"/>
@@ -516,7 +709,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                     font-size="8" font-weight="700" fill="#1c1917"
                     pointer-events="none" class="sp-label">4</text>
           </g>
-          <g class="sp-dot" data-model-id="liquid/lfm2.5-1.2b" data-total-ram="7.16" data-moe="0" style="cursor:pointer">
+          <g class="sp-dot" data-model-id="liquid/lfm2.5-1.2b" data-total-ram="7.16" data-released="2026-01-06" data-moe="0" style="cursor:pointer">
             <circle cx="64.2806811004627" cy="358.0" r="9" fill="#22d3ee" fill-opacity="0.78"
                     stroke="#22d3ee" stroke-width="1.75"
                     class="sp-circle"/>
@@ -524,7 +717,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                     font-size="8" font-weight="700" fill="#1c1917"
                     pointer-events="none" class="sp-label">1</text>
           </g>
-          <g class="sp-dot" data-model-id="liquid/lfm2-24b-a2b" data-total-ram="21.5" data-moe="1" style="cursor:pointer">
+          <g class="sp-dot" data-model-id="liquid/lfm2-24b-a2b" data-total-ram="21.5" data-released="2026-02-24" data-moe="1" style="cursor:pointer">
             <circle cx="172.35268449076642" cy="358.0" r="9" fill="#22d3ee" fill-opacity="0.78"
                     stroke="#22d3ee" stroke-width="1.75"
 stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
@@ -539,11 +732,11 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
     <div class="mt-3 bg-white border border-stone-200 rounded-lg p-3">
       <div class="flex items-baseline justify-between flex-wrap gap-2 mb-2">
         <div class="text-xs uppercase tracking-wider text-stone-500">Models in this bench</div>
-        <div class="text-xs text-stone-500"><span id="sp-count">33</span> visible</div>
+        <div class="text-xs text-stone-500"><span id="sp-count">41</span> visible</div>
       </div>
       <ol id="sp-list" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1.5 text-sm">
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="google/gemma-4-31b" data-total-ram="29.93">
+              data-model-id="google/gemma-4-31b" data-total-ram="29.93" data-released="2026-03-12">
             <span class="text-xs text-stone-400 w-5 text-right num">1.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#dc2626"></span>
             <a href="../models/google_gemma-4-31b.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="google/gemma-4-31b">gemma-4-31b</a>
@@ -552,7 +745,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
  · 12 t/s · 30 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="mistralai/devstral-small-2-2512" data-total-ram="22.41">
+              data-model-id="mistralai/devstral-small-2-2512" data-total-ram="22.41" data-released="2025-12-09">
             <span class="text-xs text-stone-400 w-5 text-right num">2.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#475569"></span>
             <a href="../models/mistralai_devstral-small-2-2512.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="mistralai/devstral-small-2-2512">devstral-small-2-2512</a>
@@ -561,7 +754,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
  · 18 t/s · 22 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="bytedance/seed-oss-36b" data-total-ram="30.53">
+              data-model-id="bytedance/seed-oss-36b" data-total-ram="30.53" data-released="2025-08-20">
             <span class="text-xs text-stone-400 w-5 text-right num">3.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#475569"></span>
             <a href="../models/bytedance_seed-oss-36b.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="bytedance/seed-oss-36b">seed-oss-36b</a>
@@ -570,8 +763,17 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
  · 6 t/s · 31 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="qwen/qwen3.6-27b" data-total-ram="26.79">
+              data-model-id="ornith-1.0-35b@q4_k_m" data-total-ram="31.6" data-released="2026-06">
             <span class="text-xs text-stone-400 w-5 text-right num">4.</span>
+            <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#475569"></span>
+            <a href="../models/ornith-1.0-35b@q4_k_m.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="ornith-1.0-35b@q4_k_m">ornith-1.0-35b</a>
+<span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
+              98% · 284s
+ · 52 t/s · 32 GB            </span>
+          </li>
+          <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
+              data-model-id="qwen/qwen3.6-27b" data-total-ram="26.79" data-released="2026-04-21">
+            <span class="text-xs text-stone-400 w-5 text-right num">5.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#7c3aed"></span>
             <a href="../models/qwen_qwen3.6-27b.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="qwen/qwen3.6-27b">qwen3.6-27b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -579,8 +781,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
  · 13 t/s · 27 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="nvidia/nemotron-3-super" data-total-ram="116.2">
-            <span class="text-xs text-stone-400 w-5 text-right num">5.</span>
+              data-model-id="nvidia/nemotron-3-super" data-total-ram="116.2" data-released="2026-03-10">
+            <span class="text-xs text-stone-400 w-5 text-right num">6.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#a3e635"></span>
             <a href="../models/nvidia_nemotron-3-super.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="nvidia/nemotron-3-super">nemotron-3-super</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -588,8 +790,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
  · 29 t/s · 116 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="qwen/qwen3-coder-next" data-total-ram="67.39">
-            <span class="text-xs text-stone-400 w-5 text-right num">6.</span>
+              data-model-id="qwen/qwen3-coder-next" data-total-ram="67.39" data-released="2026-01-30">
+            <span class="text-xs text-stone-400 w-5 text-right num">7.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#7c3aed"></span>
             <a href="../models/qwen_qwen3-coder-next.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="qwen/qwen3-coder-next">qwen3-coder-next</a>
 <span class="text-[11px] text-stone-400 num shrink-0">mlx 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -597,8 +799,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
  · 45 t/s · 67 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="qwen/qwen3-vl-30b" data-total-ram="27.82">
-            <span class="text-xs text-stone-400 w-5 text-right num">7.</span>
+              data-model-id="qwen/qwen3-vl-30b" data-total-ram="27.82" data-released="2025-10-04">
+            <span class="text-xs text-stone-400 w-5 text-right num">8.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#7c3aed"></span>
             <a href="../models/qwen_qwen3-vl-30b.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="qwen/qwen3-vl-30b">qwen3-vl-30b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">mlx 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -606,8 +808,17 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
  · 25 t/s · 28 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="qwen/qwen3.6-35b-a3b" data-total-ram="32.78">
-            <span class="text-xs text-stone-400 w-5 text-right num">8.</span>
+              data-model-id="poolside/laguna-s-2.1" data-total-ram="96.79" data-released="2026-07-21">
+            <span class="text-xs text-stone-400 w-5 text-right num">9.</span>
+            <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#475569"></span>
+            <a href="../models/poolside_laguna-s-2.1.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="poolside/laguna-s-2.1">laguna-s-2.1</a>
+<span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
+              97% · 1266s
+ · 15 t/s · 97 GB            </span>
+          </li>
+          <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
+              data-model-id="qwen/qwen3.6-35b-a3b" data-total-ram="32.78" data-released="2026-04-15">
+            <span class="text-xs text-stone-400 w-5 text-right num">10.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#7c3aed"></span>
             <a href="../models/qwen_qwen3.6-35b-a3b.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="qwen/qwen3.6-35b-a3b">qwen3.6-35b-a3b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -615,8 +826,17 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
  · 49 t/s · 33 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="google/gemma-4-e4b" data-total-ram="12.25">
-            <span class="text-xs text-stone-400 w-5 text-right num">9.</span>
+              data-model-id="meta/muse-glimmer" data-total-ram="27.67" data-released="2026-08-10">
+            <span class="text-xs text-stone-400 w-5 text-right num">11.</span>
+            <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#a21caf"></span>
+            <a href="../models/meta_muse-glimmer.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="meta/muse-glimmer">muse-glimmer</a>
+<span class="text-[11px] text-stone-400 num shrink-0">gguf</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
+              96% · 1451s
+ · 6 t/s · 28 GB            </span>
+          </li>
+          <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
+              data-model-id="google/gemma-4-e4b" data-total-ram="12.25" data-released="2026-03-02">
+            <span class="text-xs text-stone-400 w-5 text-right num">12.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#dc2626"></span>
             <a href="../models/google_gemma-4-e4b.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="google/gemma-4-e4b">gemma-4-e4b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -624,8 +844,17 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
  · 55 t/s · 12 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="qwen/qwen3-30b-a3b-2507" data-total-ram="26.41">
-            <span class="text-xs text-stone-400 w-5 text-right num">10.</span>
+              data-model-id="google/gemma-4-31b-qat" data-total-ram="28.58" data-released="2026-03-12">
+            <span class="text-xs text-stone-400 w-5 text-right num">13.</span>
+            <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#dc2626"></span>
+            <a href="../models/google_gemma-4-31b-qat.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="google/gemma-4-31b-qat">gemma-4-31b-qat</a>
+<span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
+              96% · 1223s
+ · 13 t/s · 29 GB            </span>
+          </li>
+          <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
+              data-model-id="qwen/qwen3-30b-a3b-2507" data-total-ram="26.41" data-released="2025-07-21">
+            <span class="text-xs text-stone-400 w-5 text-right num">14.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#7c3aed"></span>
             <a href="../models/qwen_qwen3-30b-a3b-2507.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="qwen/qwen3-30b-a3b-2507">qwen3-30b-a3b-2507</a>
 <span class="text-[11px] text-stone-400 num shrink-0">mlx 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -633,8 +862,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
  · 22 t/s · 26 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="openai/gpt-oss-20b" data-total-ram="19.78">
-            <span class="text-xs text-stone-400 w-5 text-right num">11.</span>
+              data-model-id="openai/gpt-oss-20b" data-total-ram="19.78" data-released="2025-08-04">
+            <span class="text-xs text-stone-400 w-5 text-right num">15.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#15803d"></span>
             <a href="../models/openai_gpt-oss-20b.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="openai/gpt-oss-20b">gpt-oss-20b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">mlx 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -642,8 +871,17 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
  · 46 t/s · 20 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="allenai/olmo-3-32b-think" data-total-ram="27.66">
-            <span class="text-xs text-stone-400 w-5 text-right num">12.</span>
+              data-model-id="ornith-1.0-9b@q4_k_m" data-total-ram="11.34" data-released="2026-06">
+            <span class="text-xs text-stone-400 w-5 text-right num">16.</span>
+            <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#475569"></span>
+            <a href="../models/ornith-1.0-9b@q4_k_m.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="ornith-1.0-9b@q4_k_m">ornith-1.0-9b</a>
+<span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
+              92% · 303s
+ · 36 t/s · 11 GB            </span>
+          </li>
+          <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
+              data-model-id="allenai/olmo-3-32b-think" data-total-ram="27.66" data-released="2025-11-19">
+            <span class="text-xs text-stone-400 w-5 text-right num">17.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#475569"></span>
             <a href="../models/allenai_olmo-3-32b-think.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="allenai/olmo-3-32b-think">olmo-3-32b-think</a>
 <span class="text-[11px] text-stone-400 num shrink-0">mlx 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -651,8 +889,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
  · 20 t/s · 28 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="google/gemma-4-26b-a4b" data-total-ram="27.46">
-            <span class="text-xs text-stone-400 w-5 text-right num">13.</span>
+              data-model-id="google/gemma-4-26b-a4b" data-total-ram="27.46" data-released="2026-03-12">
+            <span class="text-xs text-stone-400 w-5 text-right num">18.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#dc2626"></span>
             <a href="../models/google_gemma-4-26b-a4b.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="google/gemma-4-26b-a4b">gemma-4-26b-a4b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -660,8 +898,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
  · 55 t/s · 27 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="google/gemma-3-27b" data-total-ram="26.0">
-            <span class="text-xs text-stone-400 w-5 text-right num">14.</span>
+              data-model-id="google/gemma-3-27b" data-total-ram="26.0" data-released="2025-03-01">
+            <span class="text-xs text-stone-400 w-5 text-right num">19.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#dc2626"></span>
             <a href="../models/google_gemma-3-27b.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="google/gemma-3-27b">gemma-3-27b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">mlx 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -669,8 +907,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
  · 19 t/s · 26 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="qwen/qwen3.5-35b-a3b" data-total-ram="32.78">
-            <span class="text-xs text-stone-400 w-5 text-right num">15.</span>
+              data-model-id="qwen/qwen3.5-35b-a3b" data-total-ram="32.78" data-released="2026-02-24">
+            <span class="text-xs text-stone-400 w-5 text-right num">20.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#7c3aed"></span>
             <a href="../models/qwen_qwen3.5-35b-a3b.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="qwen/qwen3.5-35b-a3b">qwen3.5-35b-a3b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -678,8 +916,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
  · 48 t/s · 33 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="qwen3.5-4b" data-total-ram="9.15">
-            <span class="text-xs text-stone-400 w-5 text-right num">16.</span>
+              data-model-id="qwen3.5-4b" data-total-ram="9.15" data-released="2026-03-02">
+            <span class="text-xs text-stone-400 w-5 text-right num">21.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#7c3aed"></span>
             <a href="../models/qwen3.5-4b.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="qwen3.5-4b">qwen3.5-4b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -687,8 +925,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
  · 43 t/s · 9 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="qwen/qwen3.5-9b" data-total-ram="12.54">
-            <span class="text-xs text-stone-400 w-5 text-right num">17.</span>
+              data-model-id="qwen/qwen3.5-9b" data-total-ram="12.54" data-released="2026-02-27">
+            <span class="text-xs text-stone-400 w-5 text-right num">22.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#7c3aed"></span>
             <a href="../models/qwen_qwen3.5-9b.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="qwen/qwen3.5-9b">qwen3.5-9b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -696,8 +934,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
  · 35 t/s · 13 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="google/gemma-3-12b" data-total-ram="14.52">
-            <span class="text-xs text-stone-400 w-5 text-right num">18.</span>
+              data-model-id="google/gemma-3-12b" data-total-ram="14.52" data-released="2025-03-01">
+            <span class="text-xs text-stone-400 w-5 text-right num">23.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#dc2626"></span>
             <a href="../models/google_gemma-3-12b.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="google/gemma-3-12b">gemma-3-12b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">mlx 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -705,8 +943,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
  · 34 t/s · 15 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="qwen/qwen3-vl-8b" data-total-ram="11.53">
-            <span class="text-xs text-stone-400 w-5 text-right num">19.</span>
+              data-model-id="qwen/qwen3-vl-8b" data-total-ram="11.53" data-released="2025-10-11">
+            <span class="text-xs text-stone-400 w-5 text-right num">24.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#7c3aed"></span>
             <a href="../models/qwen_qwen3-vl-8b.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="qwen/qwen3-vl-8b">qwen3-vl-8b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">mlx 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -714,8 +952,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
  · 23 t/s · 12 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="qwen/qwen3-4b-2507" data-total-ram="8.12">
-            <span class="text-xs text-stone-400 w-5 text-right num">20.</span>
+              data-model-id="qwen/qwen3-4b-2507" data-total-ram="8.12" data-released="2025-08-06">
+            <span class="text-xs text-stone-400 w-5 text-right num">25.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#7c3aed"></span>
             <a href="../models/qwen_qwen3-4b-2507.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="qwen/qwen3-4b-2507">qwen3-4b-2507</a>
 <span class="text-[11px] text-stone-400 num shrink-0">mlx 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -723,8 +961,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
  · 26 t/s · 8 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="openai/gpt-oss-120b" data-total-ram="86.65">
-            <span class="text-xs text-stone-400 w-5 text-right num">21.</span>
+              data-model-id="openai/gpt-oss-120b" data-total-ram="86.65" data-released="2025-08-04">
+            <span class="text-xs text-stone-400 w-5 text-right num">26.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#15803d"></span>
             <a href="../models/openai_gpt-oss-120b.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="openai/gpt-oss-120b">gpt-oss-120b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -732,8 +970,17 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
  · 41 t/s · 87 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="mistralai/ministral-3-14b-reasoning" data-total-ram="15.89">
-            <span class="text-xs text-stone-400 w-5 text-right num">22.</span>
+              data-model-id="google/gemma-4-12b-qat" data-total-ram="13.32" data-released="2026-03-12">
+            <span class="text-xs text-stone-400 w-5 text-right num">27.</span>
+            <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#dc2626"></span>
+            <a href="../models/google_gemma-4-12b-qat.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="google/gemma-4-12b-qat">gemma-4-12b-qat</a>
+<span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
+              79% · 714s
+ · 33 t/s · 13 GB            </span>
+          </li>
+          <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
+              data-model-id="mistralai/ministral-3-14b-reasoning" data-total-ram="15.89" data-released="2025-10-31">
+            <span class="text-xs text-stone-400 w-5 text-right num">28.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#475569"></span>
             <a href="../models/mistralai_ministral-3-14b-reasoning.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="mistralai/ministral-3-14b-reasoning">ministral-3-14b-reasoning</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -741,8 +988,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
  · 20 t/s · 16 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="google/gemma-4-e2b" data-total-ram="10.11">
-            <span class="text-xs text-stone-400 w-5 text-right num">23.</span>
+              data-model-id="google/gemma-4-e2b" data-total-ram="10.11" data-released="2026-03-02">
+            <span class="text-xs text-stone-400 w-5 text-right num">29.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#dc2626"></span>
             <a href="../models/google_gemma-4-e2b.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="google/gemma-4-e2b">gemma-4-e2b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -750,8 +997,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
  · 67 t/s · 10 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="qwen/qwen3-8b" data-total-ram="10.31">
-            <span class="text-xs text-stone-400 w-5 text-right num">24.</span>
+              data-model-id="qwen/qwen3-8b" data-total-ram="10.31" data-released="2025-04-27">
+            <span class="text-xs text-stone-400 w-5 text-right num">30.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#7c3aed"></span>
             <a href="../models/qwen_qwen3-8b.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="qwen/qwen3-8b">qwen3-8b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">mlx 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -759,8 +1006,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
  · 48 t/s · 10 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="nvidia/nemotron-3-nano" data-total-ram="27.2">
-            <span class="text-xs text-stone-400 w-5 text-right num">25.</span>
+              data-model-id="nvidia/nemotron-3-nano" data-total-ram="27.2" data-released="2025-12-15">
+            <span class="text-xs text-stone-400 w-5 text-right num">31.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#a3e635"></span>
             <a href="../models/nvidia_nemotron-3-nano.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="nvidia/nemotron-3-nano">nemotron-3-nano</a>
 <span class="text-[11px] text-stone-400 num shrink-0">mlx 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -768,8 +1015,17 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
  · 86 t/s · 27 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="qwen3.5-2b" data-total-ram="7.81">
-            <span class="text-xs text-stone-400 w-5 text-right num">26.</span>
+              data-model-id="google/gemma-4-26b-a4b-qat" data-total-ram="24.39" data-released="2026-03-12">
+            <span class="text-xs text-stone-400 w-5 text-right num">32.</span>
+            <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#dc2626"></span>
+            <a href="../models/google_gemma-4-26b-a4b-qat.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="google/gemma-4-26b-a4b-qat">gemma-4-26b-a4b-qat</a>
+<span class="text-[11px] text-stone-400 num shrink-0">mlx 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
+              68% · 318s
+ · 53 t/s · 24 GB            </span>
+          </li>
+          <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
+              data-model-id="qwen3.5-2b" data-total-ram="7.81" data-released="2026-03-02">
+            <span class="text-xs text-stone-400 w-5 text-right num">33.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#7c3aed"></span>
             <a href="../models/qwen3.5-2b.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="qwen3.5-2b">qwen3.5-2b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -777,8 +1033,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
  · 111 t/s · 8 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="qwen3.5-9b-mlx" data-total-ram="11.79">
-            <span class="text-xs text-stone-400 w-5 text-right num">27.</span>
+              data-model-id="qwen3.5-9b-mlx" data-total-ram="11.79" data-released="2026-02-27">
+            <span class="text-xs text-stone-400 w-5 text-right num">34.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#7c3aed"></span>
             <a href="../models/qwen3.5-9b-mlx.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="qwen3.5-9b-mlx">qwen3.5-9b-mlx</a>
 <span class="text-[11px] text-stone-400 num shrink-0">mlx 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -786,8 +1042,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
  · 54 t/s · 12 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="ibm/granite-4-h-tiny" data-total-ram="9.94">
-            <span class="text-xs text-stone-400 w-5 text-right num">28.</span>
+              data-model-id="ibm/granite-4-h-tiny" data-total-ram="9.94" data-released="2025-10-02">
+            <span class="text-xs text-stone-400 w-5 text-right num">35.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#475569"></span>
             <a href="../models/ibm_granite-4-h-tiny.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="ibm/granite-4-h-tiny">granite-4-h-tiny</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -795,8 +1051,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
  · 94 t/s · 10 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="nvidia/nemotron-3-nano-omni" data-total-ram="38.04">
-            <span class="text-xs text-stone-400 w-5 text-right num">29.</span>
+              data-model-id="nvidia/nemotron-3-nano-omni" data-total-ram="38.04" data-released="2026-04-20">
+            <span class="text-xs text-stone-400 w-5 text-right num">36.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#a3e635"></span>
             <a href="../models/nvidia_nemotron-3-nano-omni.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="nvidia/nemotron-3-nano-omni">nemotron-3-nano-omni</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -804,8 +1060,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
  · 67 t/s · 38 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="google/gemma-3-4b" data-total-ram="8.83">
-            <span class="text-xs text-stone-400 w-5 text-right num">30.</span>
+              data-model-id="google/gemma-3-4b" data-total-ram="8.83" data-released="2025-02-20">
+            <span class="text-xs text-stone-400 w-5 text-right num">37.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#dc2626"></span>
             <a href="../models/google_gemma-3-4b.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="google/gemma-3-4b">gemma-3-4b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">mlx 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -813,8 +1069,17 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
  · 93 t/s · 9 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="nvidia/nemotron-3-nano-4b" data-total-ram="8.64">
-            <span class="text-xs text-stone-400 w-5 text-right num">31.</span>
+              data-model-id="mellum2-12b-a2.5b-thinking" data-total-ram="14.52" data-released="2026-06-02">
+            <span class="text-xs text-stone-400 w-5 text-right num">38.</span>
+            <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#475569"></span>
+            <a href="../models/mellum2-12b-a2.5b-thinking.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="mellum2-12b-a2.5b-thinking">mellum2-12b-a2.5b-thinking</a>
+<span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
+              44% · 236s
+ · 81 t/s · 15 GB            </span>
+          </li>
+          <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
+              data-model-id="nvidia/nemotron-3-nano-4b" data-total-ram="8.64" data-released="2026-03-07">
+            <span class="text-xs text-stone-400 w-5 text-right num">39.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#a3e635"></span>
             <a href="../models/nvidia_nemotron-3-nano-4b.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="nvidia/nemotron-3-nano-4b">nemotron-3-nano-4b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">gguf 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -822,8 +1087,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
  · 65 t/s · 9 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="liquid/lfm2.5-1.2b" data-total-ram="7.16">
-            <span class="text-xs text-stone-400 w-5 text-right num">32.</span>
+              data-model-id="liquid/lfm2.5-1.2b" data-total-ram="7.16" data-released="2026-01-06">
+            <span class="text-xs text-stone-400 w-5 text-right num">40.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#22d3ee"></span>
             <a href="../models/liquid_lfm2.5-1.2b.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="liquid/lfm2.5-1.2b">lfm2.5-1.2b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">mlx 8bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -831,8 +1096,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
  · 125 t/s · 7 GB            </span>
           </li>
           <li class="sp-row flex items-center gap-3 px-2 py-1 rounded hover:bg-stone-50 transition cursor-pointer"
-              data-model-id="liquid/lfm2-24b-a2b" data-total-ram="21.5">
-            <span class="text-xs text-stone-400 w-5 text-right num">33.</span>
+              data-model-id="liquid/lfm2-24b-a2b" data-total-ram="21.5" data-released="2026-02-24">
+            <span class="text-xs text-stone-400 w-5 text-right num">41.</span>
             <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background:#22d3ee"></span>
             <a href="../models/liquid_lfm2-24b-a2b.html#niah" class="num font-medium text-stone-900 hover:underline truncate min-w-0" title="liquid/lfm2-24b-a2b">lfm2-24b-a2b</a>
 <span class="text-[11px] text-stone-400 num shrink-0">mlx 4bit</span>            <span class="text-xs text-stone-500 num shrink-0 ml-auto">
@@ -843,12 +1108,11 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
     </div>
   </section>
 
-  <script id="sp-data" type="application/json">[{"model_id": "google/gemma-4-31b", "short_id": "gemma-4-31b", "vendor": "google", "quant": "gguf 4bit", "score": 0.9976, "wall_s": 1138.7784482500283, "tps": 12.100686841054596, "tokens": 2963, "weights_gb": 18.52, "kv_estimate_gb": 7.41, "total_ram_gb": 29.93, "color": "#dc2626", "color_key": "google", "label_color": "#fff", "params_b": 31, "is_moe": false}, {"model_id": "mistralai/devstral-small-2-2512", "short_id": "devstral-small-2-2512", "vendor": "mistralai", "quant": "mlx 4bit", "score": 0.9930000000000001, "wall_s": 518.0123598740902, "tps": 17.65633120606573, "tokens": 903, "weights_gb": 13.15, "kv_estimate_gb": 5.26, "total_ram_gb": 22.41, "color": "#475569", "color_key": "mistralai", "label_color": "#fff", "params_b": 24, "is_moe": false}, {"model_id": "bytedance/seed-oss-36b", "short_id": "seed-oss-36b", "vendor": "bytedance", "quant": "mlx 4bit", "score": 0.9930000000000001, "wall_s": 1865.2393247509608, "tps": 6.078689217385704, "tokens": 2797, "weights_gb": 18.95, "kv_estimate_gb": 7.58, "total_ram_gb": 30.53, "color": "#475569", "color_key": "bytedance", "label_color": "#fff", "params_b": 36, "is_moe": false}, {"model_id": "qwen/qwen3.6-27b", "short_id": "qwen3.6-27b", "vendor": "qwen", "quant": "gguf 4bit", "score": 0.97, "wall_s": 1175.4654202921083, "tps": 13.094637875236314, "tokens": 7244, "weights_gb": 16.28, "kv_estimate_gb": 6.51, "total_ram_gb": 26.79, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 27, "is_moe": false}, {"model_id": "nvidia/nemotron-3-super", "short_id": "nemotron-3-super", "vendor": "nvidia", "quant": "gguf 4bit", "score": 0.9690000000000001, "wall_s": 444.4506071670912, "tps": 28.610157232943568, "tokens": 3592, "weights_gb": 80.14, "kv_estimate_gb": 32.06, "total_ram_gb": 116.2, "color": "#a3e635", "color_key": "nvidia", "label_color": "#1c1917", "params_b": 120, "is_moe": true}, {"model_id": "qwen/qwen3-coder-next", "short_id": "qwen3-coder-next", "vendor": "qwen", "quant": "mlx 4bit", "score": 0.966, "wall_s": 165.68938550096937, "tps": 45.437721052619565, "tokens": 1029, "weights_gb": 45.28, "kv_estimate_gb": 18.11, "total_ram_gb": 67.39, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 80, "is_moe": true}, {"model_id": "qwen/qwen3-vl-30b", "short_id": "qwen3-vl-30b", "vendor": "qwen", "quant": "mlx 4bit", "score": 0.966, "wall_s": 1048.6190075409831, "tps": 25.03809709402441, "tokens": 930, "weights_gb": 17.01, "kv_estimate_gb": 6.81, "total_ram_gb": 27.82, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 30, "is_moe": true}, {"model_id": "qwen/qwen3.6-35b-a3b", "short_id": "qwen3.6-35b-a3b", "vendor": "qwen", "quant": "gguf 4bit", "score": 0.9649999999999999, "wall_s": 316.0767060839571, "tps": 48.59534311527661, "tokens": 7550, "weights_gb": 20.55, "kv_estimate_gb": 8.22, "total_ram_gb": 32.78, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 35, "is_moe": true}, {"model_id": "google/gemma-4-e4b", "short_id": "gemma-4-e4b", "vendor": "google", "quant": "gguf 4bit", "score": 0.956, "wall_s": 205.2661609989591, "tps": 54.981810438120924, "tokens": 3207, "weights_gb": 5.89, "kv_estimate_gb": 2.36, "total_ram_gb": 12.25, "color": "#dc2626", "color_key": "google", "label_color": "#fff", "params_b": 7.5, "is_moe": false}, {"model_id": "qwen/qwen3-30b-a3b-2507", "short_id": "qwen3-30b-a3b-2507", "vendor": "qwen", "quant": "mlx 4bit", "score": 0.9430000000000001, "wall_s": 391.32283812505193, "tps": 21.813849573460015, "tokens": 999, "weights_gb": 16.01, "kv_estimate_gb": 6.4, "total_ram_gb": 26.41, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 30, "is_moe": true}, {"model_id": "openai/gpt-oss-20b", "short_id": "gpt-oss-20b", "vendor": "openai", "quant": "mlx 4bit", "score": 0.917, "wall_s": 431.8898166659055, "tps": 46.14530076280795, "tokens": 5633, "weights_gb": 11.27, "kv_estimate_gb": 4.51, "total_ram_gb": 19.78, "color": "#15803d", "color_key": "openai", "label_color": "#fff", "params_b": 20, "is_moe": true}, {"model_id": "allenai/olmo-3-32b-think", "short_id": "olmo-3-32b-think", "vendor": "allenai", "quant": "mlx 4bit", "score": 0.9066000000000001, "wall_s": 575.000121209072, "tps": 20.067122879951537, "tokens": 2682, "weights_gb": 16.9, "kv_estimate_gb": 6.76, "total_ram_gb": 27.66, "color": "#475569", "color_key": "allenai", "label_color": "#fff", "params_b": 32, "is_moe": false}, {"model_id": "google/gemma-4-26b-a4b", "short_id": "gemma-4-26b-a4b", "vendor": "google", "quant": "gguf 4bit", "score": 0.896, "wall_s": 278.8807631259551, "tps": 54.65308411386871, "tokens": 5921, "weights_gb": 16.76, "kv_estimate_gb": 6.7, "total_ram_gb": 27.46, "color": "#dc2626", "color_key": "google", "label_color": "#fff", "params_b": 26, "is_moe": true}, {"model_id": "google/gemma-3-27b", "short_id": "gemma-3-27b", "vendor": "google", "quant": "mlx 4bit", "score": 0.8780000000000001, "wall_s": 463.336823083926, "tps": 19.04307682000706, "tokens": 681, "weights_gb": 15.71, "kv_estimate_gb": 6.29, "total_ram_gb": 26.0, "color": "#dc2626", "color_key": "google", "label_color": "#fff", "params_b": 27, "is_moe": false}, {"model_id": "qwen/qwen3.5-35b-a3b", "short_id": "qwen3.5-35b-a3b", "vendor": "qwen", "quant": "gguf 4bit", "score": 0.875, "wall_s": 305.5045017080847, "tps": 47.67788534080753, "tokens": 6804, "weights_gb": 20.56, "kv_estimate_gb": 8.22, "total_ram_gb": 32.78, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 35, "is_moe": true}, {"model_id": "qwen3.5-4b", "short_id": "qwen3.5-4b", "vendor": "lmstudio-community", "quant": "gguf 4bit", "score": 0.8746, "wall_s": 395.14778291701805, "tps": 43.1472814210608, "tokens": 10211, "weights_gb": 3.15, "kv_estimate_gb": 2.0, "total_ram_gb": 9.15, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 4, "is_moe": false}, {"model_id": "qwen/qwen3.5-9b", "short_id": "qwen3.5-9b", "vendor": "qwen", "quant": "gguf 4bit", "score": 0.861, "wall_s": 566.0857125839684, "tps": 35.01818714740302, "tokens": 12476, "weights_gb": 6.1, "kv_estimate_gb": 2.44, "total_ram_gb": 12.54, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 9, "is_moe": false}, {"model_id": "google/gemma-3-12b", "short_id": "gemma-3-12b", "vendor": "google", "quant": "mlx 4bit", "score": 0.8580000000000001, "wall_s": 227.12925379083026, "tps": 34.16608219553036, "tokens": 740, "weights_gb": 7.51, "kv_estimate_gb": 3.01, "total_ram_gb": 14.52, "color": "#dc2626", "color_key": "google", "label_color": "#fff", "params_b": 12, "is_moe": false}, {"model_id": "qwen/qwen3-vl-8b", "short_id": "qwen3-vl-8b", "vendor": "qwen", "quant": "mlx 4bit", "score": 0.847, "wall_s": 1055.444074167055, "tps": 23.45364813659286, "tokens": 710, "weights_gb": 5.38, "kv_estimate_gb": 2.15, "total_ram_gb": 11.53, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 8, "is_moe": false}, {"model_id": "qwen/qwen3-4b-2507", "short_id": "qwen3-4b-2507", "vendor": "qwen", "quant": "mlx 4bit", "score": 0.842, "wall_s": 282.95660208386835, "tps": 26.190311960438283, "tokens": 711, "weights_gb": 2.12, "kv_estimate_gb": 2.0, "total_ram_gb": 8.12, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 4, "is_moe": false}, {"model_id": "openai/gpt-oss-120b", "short_id": "gpt-oss-120b", "vendor": "openai", "quant": "gguf 4bit", "score": 0.8276000000000001, "wall_s": 286.8996374158887, "tps": 41.23212661408609, "tokens": 2204, "weights_gb": 59.03, "kv_estimate_gb": 23.61, "total_ram_gb": 86.65, "color": "#15803d", "color_key": "openai", "label_color": "#fff", "params_b": 120, "is_moe": true}, {"model_id": "mistralai/ministral-3-14b-reasoning", "short_id": "ministral-3-14b-reasoning", "vendor": "mistralai", "quant": "gguf 4bit", "score": 0.7749999999999999, "wall_s": 1068.480928667006, "tps": 20.095832997025823, "tokens": 11312, "weights_gb": 8.49, "kv_estimate_gb": 3.4, "total_ram_gb": 15.89, "color": "#475569", "color_key": "mistralai", "label_color": "#fff", "params_b": 14, "is_moe": false}, {"model_id": "google/gemma-4-e2b", "short_id": "gemma-4-e2b", "vendor": "google", "quant": "gguf 4bit", "score": 0.7626000000000001, "wall_s": 153.39785966603085, "tps": 66.64687528185294, "tokens": 2910, "weights_gb": 4.11, "kv_estimate_gb": 2.0, "total_ram_gb": 10.11, "color": "#dc2626", "color_key": "google", "label_color": "#fff", "params_b": 4.6, "is_moe": false}, {"model_id": "qwen/qwen3-8b", "short_id": "qwen3-8b", "vendor": "qwen", "quant": "mlx 4bit", "score": 0.745, "wall_s": 88.04992895992473, "tps": 48.20239195117076, "tokens": 2007, "weights_gb": 4.31, "kv_estimate_gb": 2.0, "total_ram_gb": 10.31, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 8, "is_moe": false}, {"model_id": "nvidia/nemotron-3-nano", "short_id": "nemotron-3-nano", "vendor": "nvidia", "quant": "mlx 4bit", "score": 0.6900000000000001, "wall_s": 378.95419699989725, "tps": 86.08263043693377, "tokens": 11228, "weights_gb": 16.57, "kv_estimate_gb": 6.63, "total_ram_gb": 27.2, "color": "#a3e635", "color_key": "nvidia", "label_color": "#1c1917", "params_b": 30, "is_moe": true}, {"model_id": "qwen3.5-2b", "short_id": "qwen3.5-2b", "vendor": "lmstudio-community", "quant": "gguf 4bit", "score": 0.653, "wall_s": 60.7206733339699, "tps": 111.46103582152496, "tokens": 825, "weights_gb": 1.81, "kv_estimate_gb": 2.0, "total_ram_gb": 7.81, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 2, "is_moe": false}, {"model_id": "qwen3.5-9b-mlx", "short_id": "qwen3.5-9b-mlx", "vendor": "mlx-community", "quant": "mlx 4bit", "score": 0.629, "wall_s": 471.0267067499226, "tps": 53.54824692716298, "tokens": 17912, "weights_gb": 5.57, "kv_estimate_gb": 2.23, "total_ram_gb": 11.79, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 9, "is_moe": false}, {"model_id": "ibm/granite-4-h-tiny", "short_id": "granite-4-h-tiny", "vendor": "ibm", "quant": "gguf 4bit", "score": 0.615, "wall_s": 65.47669537505135, "tps": 94.28484895143443, "tokens": 861, "weights_gb": 3.94, "kv_estimate_gb": 2.0, "total_ram_gb": 9.94, "color": "#475569", "color_key": "ibm", "label_color": "#fff", "params_b": 7, "is_moe": false}, {"model_id": "nvidia/nemotron-3-nano-omni", "short_id": "nemotron-3-nano-omni", "vendor": "nvidia", "quant": "gguf 4bit", "score": 0.5810000000000001, "wall_s": 262.94336829090025, "tps": 67.40489717839928, "tokens": 10160, "weights_gb": 24.31, "kv_estimate_gb": 9.72, "total_ram_gb": 38.04, "color": "#a3e635", "color_key": "nvidia", "label_color": "#1c1917", "params_b": 30, "is_moe": true}, {"model_id": "google/gemma-3-4b", "short_id": "gemma-3-4b", "vendor": "google", "quant": "mlx 4bit", "score": 0.537, "wall_s": 69.6353284579236, "tps": 93.23750006658729, "tokens": 658, "weights_gb": 2.83, "kv_estimate_gb": 2.0, "total_ram_gb": 8.83, "color": "#dc2626", "color_key": "google", "label_color": "#fff", "params_b": 4, "is_moe": false}, {"model_id": "nvidia/nemotron-3-nano-4b", "short_id": "nemotron-3-nano-4b", "vendor": "nvidia", "quant": "gguf 4bit", "score": 0.378, "wall_s": 138.46083058405202, "tps": 65.27358739104237, "tokens": 2214, "weights_gb": 2.64, "kv_estimate_gb": 2.0, "total_ram_gb": 8.64, "color": "#a3e635", "color_key": "nvidia", "label_color": "#1c1917", "params_b": 4, "is_moe": false}, {"model_id": "liquid/lfm2.5-1.2b", "short_id": "lfm2.5-1.2b", "vendor": "liquid", "quant": "mlx 8bit", "score": 0.09999999999999999, "wall_s": 31.604786042007618, "tps": 125.15670911492639, "tokens": 96, "weights_gb": 1.16, "kv_estimate_gb": 2.0, "total_ram_gb": 7.16, "color": "#22d3ee", "color_key": "liquid", "label_color": "#1c1917", "params_b": 1.2, "is_moe": false}, {"model_id": "liquid/lfm2-24b-a2b", "short_id": "lfm2-24b-a2b", "vendor": "liquid", "quant": "mlx 4bit", "score": 0.09999999999999999, "wall_s": 270.7805312500568, "tps": 68.99967273498694, "tokens": 13997, "weights_gb": 12.5, "kv_estimate_gb": 5.0, "total_ram_gb": 21.5, "color": "#22d3ee", "color_key": "liquid", "label_color": "#1c1917", "params_b": 24, "is_moe": true}]</script>
+  <script id="sp-data" type="application/json">[{"model_id": "google/gemma-4-31b", "short_id": "gemma-4-31b", "vendor": "google", "quant": "gguf 4bit", "score": 0.9976, "wall_s": 1138.7784482500283, "tps": 12.100686841054596, "tokens": 2963, "weights_gb": 18.52, "kv_estimate_gb": 7.41, "total_ram_gb": 29.93, "color": "#dc2626", "color_key": "google", "label_color": "#fff", "params_b": 31, "is_moe": false, "released": "2026-03-12"}, {"model_id": "mistralai/devstral-small-2-2512", "short_id": "devstral-small-2-2512", "vendor": "mistralai", "quant": "mlx 4bit", "score": 0.9930000000000001, "wall_s": 518.0123598740902, "tps": 17.65633120606573, "tokens": 903, "weights_gb": 13.15, "kv_estimate_gb": 5.26, "total_ram_gb": 22.41, "color": "#475569", "color_key": "mistralai", "label_color": "#fff", "params_b": 24, "is_moe": false, "released": "2025-12-09"}, {"model_id": "bytedance/seed-oss-36b", "short_id": "seed-oss-36b", "vendor": "bytedance", "quant": "mlx 4bit", "score": 0.9930000000000001, "wall_s": 1865.2393247509608, "tps": 6.078689217385704, "tokens": 2797, "weights_gb": 18.95, "kv_estimate_gb": 7.58, "total_ram_gb": 30.53, "color": "#475569", "color_key": "bytedance", "label_color": "#fff", "params_b": 36, "is_moe": false, "released": "2025-08-20"}, {"model_id": "ornith-1.0-35b@q4_k_m", "short_id": "ornith-1.0-35b", "vendor": "deepreinforce-ai", "quant": "gguf 4bit", "score": 0.9774999999999999, "wall_s": 284.46470729087014, "tps": 52.41872118805852, "tokens": 6189, "weights_gb": 19.71, "kv_estimate_gb": 7.89, "total_ram_gb": 31.6, "color": "#475569", "color_key": "deepreinforce-ai", "label_color": "#fff", "params_b": 35, "is_moe": true, "released": "2026-06"}, {"model_id": "qwen/qwen3.6-27b", "short_id": "qwen3.6-27b", "vendor": "qwen", "quant": "gguf 4bit", "score": 0.97, "wall_s": 1175.4654202921083, "tps": 13.094637875236314, "tokens": 7244, "weights_gb": 16.28, "kv_estimate_gb": 6.51, "total_ram_gb": 26.79, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 27, "is_moe": false, "released": "2026-04-21"}, {"model_id": "nvidia/nemotron-3-super", "short_id": "nemotron-3-super", "vendor": "nvidia", "quant": "gguf 4bit", "score": 0.9690000000000001, "wall_s": 444.4506071670912, "tps": 28.610157232943568, "tokens": 3592, "weights_gb": 80.14, "kv_estimate_gb": 32.06, "total_ram_gb": 116.2, "color": "#a3e635", "color_key": "nvidia", "label_color": "#1c1917", "params_b": 120, "is_moe": true, "released": "2026-03-10"}, {"model_id": "qwen/qwen3-coder-next", "short_id": "qwen3-coder-next", "vendor": "qwen", "quant": "mlx 4bit", "score": 0.966, "wall_s": 165.68938550096937, "tps": 45.437721052619565, "tokens": 1029, "weights_gb": 45.28, "kv_estimate_gb": 18.11, "total_ram_gb": 67.39, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 80, "is_moe": true, "released": "2026-01-30"}, {"model_id": "qwen/qwen3-vl-30b", "short_id": "qwen3-vl-30b", "vendor": "qwen", "quant": "mlx 4bit", "score": 0.966, "wall_s": 1048.6190075409831, "tps": 25.03809709402441, "tokens": 930, "weights_gb": 17.01, "kv_estimate_gb": 6.81, "total_ram_gb": 27.82, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 30, "is_moe": true, "released": "2025-10-04"}, {"model_id": "poolside/laguna-s-2.1", "short_id": "laguna-s-2.1", "vendor": "poolside", "quant": "gguf 4bit", "score": 0.966, "wall_s": 1265.9569584568962, "tps": 14.5116220609074, "tokens": 963, "weights_gb": 66.28, "kv_estimate_gb": 26.51, "total_ram_gb": 96.79, "color": "#475569", "color_key": "poolside", "label_color": "#fff", "params_b": 118, "is_moe": true, "released": "2026-07-21"}, {"model_id": "qwen/qwen3.6-35b-a3b", "short_id": "qwen3.6-35b-a3b", "vendor": "qwen", "quant": "gguf 4bit", "score": 0.9649999999999999, "wall_s": 316.0767060839571, "tps": 48.59534311527661, "tokens": 7550, "weights_gb": 20.55, "kv_estimate_gb": 8.22, "total_ram_gb": 32.78, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 35, "is_moe": true, "released": "2026-04-15"}, {"model_id": "meta/muse-glimmer", "short_id": "muse-glimmer", "vendor": "meta", "quant": "gguf", "score": 0.964, "wall_s": 1450.6776504591107, "tps": 6.148772932473811, "tokens": 3592, "weights_gb": 16.91, "kv_estimate_gb": 6.76, "total_ram_gb": 27.67, "color": "#a21caf", "color_key": "meta", "label_color": "#fff", "params_b": 30, "is_moe": false, "released": "2026-08-10"}, {"model_id": "google/gemma-4-e4b", "short_id": "gemma-4-e4b", "vendor": "google", "quant": "gguf 4bit", "score": 0.956, "wall_s": 205.2661609989591, "tps": 54.981810438120924, "tokens": 3207, "weights_gb": 5.89, "kv_estimate_gb": 2.36, "total_ram_gb": 12.25, "color": "#dc2626", "color_key": "google", "label_color": "#fff", "params_b": 7.5, "is_moe": false, "released": "2026-03-02"}, {"model_id": "google/gemma-4-31b-qat", "short_id": "gemma-4-31b-qat", "vendor": "google", "quant": "gguf 4bit", "score": 0.9550000000000001, "wall_s": 1223.1154337081825, "tps": 12.731056097930145, "tokens": 3515, "weights_gb": 17.56, "kv_estimate_gb": 7.02, "total_ram_gb": 28.58, "color": "#dc2626", "color_key": "google", "label_color": "#fff", "params_b": 31, "is_moe": false, "released": "2026-03-12"}, {"model_id": "qwen/qwen3-30b-a3b-2507", "short_id": "qwen3-30b-a3b-2507", "vendor": "qwen", "quant": "mlx 4bit", "score": 0.9430000000000001, "wall_s": 391.32283812505193, "tps": 21.813849573460015, "tokens": 999, "weights_gb": 16.01, "kv_estimate_gb": 6.4, "total_ram_gb": 26.41, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 30, "is_moe": true, "released": "2025-07-21"}, {"model_id": "openai/gpt-oss-20b", "short_id": "gpt-oss-20b", "vendor": "openai", "quant": "mlx 4bit", "score": 0.917, "wall_s": 431.8898166659055, "tps": 46.14530076280795, "tokens": 5633, "weights_gb": 11.27, "kv_estimate_gb": 4.51, "total_ram_gb": 19.78, "color": "#15803d", "color_key": "openai", "label_color": "#fff", "params_b": 20, "is_moe": true, "released": "2025-08-04"}, {"model_id": "ornith-1.0-9b@q4_k_m", "short_id": "ornith-1.0-9b", "vendor": "deepreinforce-ai", "quant": "gguf 4bit", "score": 0.915, "wall_s": 302.62426300009247, "tps": 36.24807971052753, "tokens": 3598, "weights_gb": 5.24, "kv_estimate_gb": 2.1, "total_ram_gb": 11.34, "color": "#475569", "color_key": "deepreinforce-ai", "label_color": "#fff", "params_b": 9, "is_moe": false, "released": "2026-06"}, {"model_id": "allenai/olmo-3-32b-think", "short_id": "olmo-3-32b-think", "vendor": "allenai", "quant": "mlx 4bit", "score": 0.9066000000000001, "wall_s": 575.000121209072, "tps": 20.067122879951537, "tokens": 2682, "weights_gb": 16.9, "kv_estimate_gb": 6.76, "total_ram_gb": 27.66, "color": "#475569", "color_key": "allenai", "label_color": "#fff", "params_b": 32, "is_moe": false, "released": "2025-11-19"}, {"model_id": "google/gemma-4-26b-a4b", "short_id": "gemma-4-26b-a4b", "vendor": "google", "quant": "gguf 4bit", "score": 0.896, "wall_s": 278.8807631259551, "tps": 54.65308411386871, "tokens": 5921, "weights_gb": 16.76, "kv_estimate_gb": 6.7, "total_ram_gb": 27.46, "color": "#dc2626", "color_key": "google", "label_color": "#fff", "params_b": 26, "is_moe": true, "released": "2026-03-12"}, {"model_id": "google/gemma-3-27b", "short_id": "gemma-3-27b", "vendor": "google", "quant": "mlx 4bit", "score": 0.8780000000000001, "wall_s": 463.336823083926, "tps": 19.04307682000706, "tokens": 681, "weights_gb": 15.71, "kv_estimate_gb": 6.29, "total_ram_gb": 26.0, "color": "#dc2626", "color_key": "google", "label_color": "#fff", "params_b": 27, "is_moe": false, "released": "2025-03-01"}, {"model_id": "qwen/qwen3.5-35b-a3b", "short_id": "qwen3.5-35b-a3b", "vendor": "qwen", "quant": "gguf 4bit", "score": 0.875, "wall_s": 305.5045017080847, "tps": 47.67788534080753, "tokens": 6804, "weights_gb": 20.56, "kv_estimate_gb": 8.22, "total_ram_gb": 32.78, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 35, "is_moe": true, "released": "2026-02-24"}, {"model_id": "qwen3.5-4b", "short_id": "qwen3.5-4b", "vendor": "lmstudio-community", "quant": "gguf 4bit", "score": 0.8746, "wall_s": 395.14778291701805, "tps": 43.1472814210608, "tokens": 10211, "weights_gb": 3.15, "kv_estimate_gb": 2.0, "total_ram_gb": 9.15, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 4, "is_moe": false, "released": "2026-03-02"}, {"model_id": "qwen/qwen3.5-9b", "short_id": "qwen3.5-9b", "vendor": "qwen", "quant": "gguf 4bit", "score": 0.861, "wall_s": 566.0857125839684, "tps": 35.01818714740302, "tokens": 12476, "weights_gb": 6.1, "kv_estimate_gb": 2.44, "total_ram_gb": 12.54, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 9, "is_moe": false, "released": "2026-02-27"}, {"model_id": "google/gemma-3-12b", "short_id": "gemma-3-12b", "vendor": "google", "quant": "mlx 4bit", "score": 0.8580000000000001, "wall_s": 227.12925379083026, "tps": 34.16608219553036, "tokens": 740, "weights_gb": 7.51, "kv_estimate_gb": 3.01, "total_ram_gb": 14.52, "color": "#dc2626", "color_key": "google", "label_color": "#fff", "params_b": 12, "is_moe": false, "released": "2025-03-01"}, {"model_id": "qwen/qwen3-vl-8b", "short_id": "qwen3-vl-8b", "vendor": "qwen", "quant": "mlx 4bit", "score": 0.847, "wall_s": 1055.444074167055, "tps": 23.45364813659286, "tokens": 710, "weights_gb": 5.38, "kv_estimate_gb": 2.15, "total_ram_gb": 11.53, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 8, "is_moe": false, "released": "2025-10-11"}, {"model_id": "qwen/qwen3-4b-2507", "short_id": "qwen3-4b-2507", "vendor": "qwen", "quant": "mlx 4bit", "score": 0.842, "wall_s": 282.95660208386835, "tps": 26.190311960438283, "tokens": 711, "weights_gb": 2.12, "kv_estimate_gb": 2.0, "total_ram_gb": 8.12, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 4, "is_moe": false, "released": "2025-08-06"}, {"model_id": "openai/gpt-oss-120b", "short_id": "gpt-oss-120b", "vendor": "openai", "quant": "gguf 4bit", "score": 0.8276000000000001, "wall_s": 286.8996374158887, "tps": 41.23212661408609, "tokens": 2204, "weights_gb": 59.03, "kv_estimate_gb": 23.61, "total_ram_gb": 86.65, "color": "#15803d", "color_key": "openai", "label_color": "#fff", "params_b": 120, "is_moe": true, "released": "2025-08-04"}, {"model_id": "google/gemma-4-12b-qat", "short_id": "gemma-4-12b-qat", "vendor": "google", "quant": "gguf 4bit", "score": 0.787, "wall_s": 714.2244616658427, "tps": 33.015516309313135, "tokens": 11768, "weights_gb": 6.66, "kv_estimate_gb": 2.66, "total_ram_gb": 13.32, "color": "#dc2626", "color_key": "google", "label_color": "#fff", "params_b": 12, "is_moe": false, "released": "2026-03-12"}, {"model_id": "mistralai/ministral-3-14b-reasoning", "short_id": "ministral-3-14b-reasoning", "vendor": "mistralai", "quant": "gguf 4bit", "score": 0.7749999999999999, "wall_s": 1068.480928667006, "tps": 20.095832997025823, "tokens": 11312, "weights_gb": 8.49, "kv_estimate_gb": 3.4, "total_ram_gb": 15.89, "color": "#475569", "color_key": "mistralai", "label_color": "#fff", "params_b": 14, "is_moe": false, "released": "2025-10-31"}, {"model_id": "google/gemma-4-e2b", "short_id": "gemma-4-e2b", "vendor": "google", "quant": "gguf 4bit", "score": 0.7626000000000001, "wall_s": 153.39785966603085, "tps": 66.64687528185294, "tokens": 2910, "weights_gb": 4.11, "kv_estimate_gb": 2.0, "total_ram_gb": 10.11, "color": "#dc2626", "color_key": "google", "label_color": "#fff", "params_b": 4.6, "is_moe": false, "released": "2026-03-02"}, {"model_id": "qwen/qwen3-8b", "short_id": "qwen3-8b", "vendor": "qwen", "quant": "mlx 4bit", "score": 0.745, "wall_s": 88.04992895992473, "tps": 48.20239195117076, "tokens": 2007, "weights_gb": 4.31, "kv_estimate_gb": 2.0, "total_ram_gb": 10.31, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 8, "is_moe": false, "released": "2025-04-27"}, {"model_id": "nvidia/nemotron-3-nano", "short_id": "nemotron-3-nano", "vendor": "nvidia", "quant": "mlx 4bit", "score": 0.6900000000000001, "wall_s": 378.95419699989725, "tps": 86.08263043693377, "tokens": 11228, "weights_gb": 16.57, "kv_estimate_gb": 6.63, "total_ram_gb": 27.2, "color": "#a3e635", "color_key": "nvidia", "label_color": "#1c1917", "params_b": 30, "is_moe": true, "released": "2025-12-15"}, {"model_id": "google/gemma-4-26b-a4b-qat", "short_id": "gemma-4-26b-a4b-qat", "vendor": "google", "quant": "mlx 4bit", "score": 0.676, "wall_s": 317.69620216684416, "tps": 53.28105926805981, "tokens": 11439, "weights_gb": 14.57, "kv_estimate_gb": 5.83, "total_ram_gb": 24.39, "color": "#dc2626", "color_key": "google", "label_color": "#fff", "params_b": 26, "is_moe": true, "released": "2026-03-12"}, {"model_id": "qwen3.5-2b", "short_id": "qwen3.5-2b", "vendor": "lmstudio-community", "quant": "gguf 4bit", "score": 0.653, "wall_s": 60.7206733339699, "tps": 111.46103582152496, "tokens": 825, "weights_gb": 1.81, "kv_estimate_gb": 2.0, "total_ram_gb": 7.81, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 2, "is_moe": false, "released": "2026-03-02"}, {"model_id": "qwen3.5-9b-mlx", "short_id": "qwen3.5-9b-mlx", "vendor": "mlx-community", "quant": "mlx 4bit", "score": 0.629, "wall_s": 471.0267067499226, "tps": 53.54824692716298, "tokens": 17912, "weights_gb": 5.57, "kv_estimate_gb": 2.23, "total_ram_gb": 11.79, "color": "#7c3aed", "color_key": "qwen", "label_color": "#fff", "params_b": 9, "is_moe": false, "released": "2026-02-27"}, {"model_id": "ibm/granite-4-h-tiny", "short_id": "granite-4-h-tiny", "vendor": "ibm", "quant": "gguf 4bit", "score": 0.615, "wall_s": 65.47669537505135, "tps": 94.28484895143443, "tokens": 861, "weights_gb": 3.94, "kv_estimate_gb": 2.0, "total_ram_gb": 9.94, "color": "#475569", "color_key": "ibm", "label_color": "#fff", "params_b": 7, "is_moe": false, "released": "2025-10-02"}, {"model_id": "nvidia/nemotron-3-nano-omni", "short_id": "nemotron-3-nano-omni", "vendor": "nvidia", "quant": "gguf 4bit", "score": 0.5810000000000001, "wall_s": 262.94336829090025, "tps": 67.40489717839928, "tokens": 10160, "weights_gb": 24.31, "kv_estimate_gb": 9.72, "total_ram_gb": 38.04, "color": "#a3e635", "color_key": "nvidia", "label_color": "#1c1917", "params_b": 30, "is_moe": true, "released": "2026-04-20"}, {"model_id": "google/gemma-3-4b", "short_id": "gemma-3-4b", "vendor": "google", "quant": "mlx 4bit", "score": 0.537, "wall_s": 69.6353284579236, "tps": 93.23750006658729, "tokens": 658, "weights_gb": 2.83, "kv_estimate_gb": 2.0, "total_ram_gb": 8.83, "color": "#dc2626", "color_key": "google", "label_color": "#fff", "params_b": 4, "is_moe": false, "released": "2025-02-20"}, {"model_id": "mellum2-12b-a2.5b-thinking", "short_id": "mellum2-12b-a2.5b-thinking", "vendor": "JetBrains", "quant": "gguf 4bit", "score": 0.436, "wall_s": 235.84970216697548, "tps": 80.56553210725643, "tokens": 6963, "weights_gb": 7.52, "kv_estimate_gb": 3.01, "total_ram_gb": 14.52, "color": "#475569", "color_key": "JetBrains", "label_color": "#fff", "params_b": 12, "is_moe": true, "released": "2026-06-02"}, {"model_id": "nvidia/nemotron-3-nano-4b", "short_id": "nemotron-3-nano-4b", "vendor": "nvidia", "quant": "gguf 4bit", "score": 0.378, "wall_s": 138.46083058405202, "tps": 65.27358739104237, "tokens": 2214, "weights_gb": 2.64, "kv_estimate_gb": 2.0, "total_ram_gb": 8.64, "color": "#a3e635", "color_key": "nvidia", "label_color": "#1c1917", "params_b": 4, "is_moe": false, "released": "2026-03-07"}, {"model_id": "liquid/lfm2.5-1.2b", "short_id": "lfm2.5-1.2b", "vendor": "liquid", "quant": "mlx 8bit", "score": 0.09999999999999999, "wall_s": 31.604786042007618, "tps": 125.15670911492639, "tokens": 96, "weights_gb": 1.16, "kv_estimate_gb": 2.0, "total_ram_gb": 7.16, "color": "#22d3ee", "color_key": "liquid", "label_color": "#1c1917", "params_b": 1.2, "is_moe": false, "released": "2026-01-06"}, {"model_id": "liquid/lfm2-24b-a2b", "short_id": "lfm2-24b-a2b", "vendor": "liquid", "quant": "mlx 4bit", "score": 0.09999999999999999, "wall_s": 270.7805312500568, "tps": 68.99967273498694, "tokens": 13997, "weights_gb": 12.5, "kv_estimate_gb": 5.0, "total_ram_gb": 21.5, "color": "#22d3ee", "color_key": "liquid", "label_color": "#1c1917", "params_b": 24, "is_moe": true, "released": "2026-02-24"}]</script>
   <script>
   (() => {
-    const sel = document.getElementById('sp-ram-filter');
-    if (!sel) return;
     const card = document.getElementById('sp-card');
+    if (!card) return;
     const dots = card.querySelectorAll('.sp-dot');
     const rows = document.querySelectorAll('#sp-list .sp-row');
     const tip = document.getElementById('sp-tooltip');
@@ -857,44 +1121,10 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
       JSON.parse(document.getElementById('sp-data').textContent).map(m => [m.model_id, m])
     );
 
-    // Grey out (rather than remove) options for which no model qualifies.
-    Array.from(sel.options).forEach(opt => {
-      const cap = parseFloat(opt.value);
-      if (!cap) return;
-      const matches = Array.from(dots).some(g => {
-        const ram = parseFloat(g.dataset.totalRam || '');
-        return ram && ram <= cap;
-      });
-      if (!matches) {
-        opt.disabled = true;
-        opt.textContent = opt.textContent + ' — no models';
-      }
-    });
-
-    // Decides whether a model falls below the current RAM cap
-    // (true = greyed out, false = within the filter).
-    function isFiltered(g) {
-      const cap = parseFloat(sel.value);
-      if (!cap) return false;
-      const ram = parseFloat(g.dataset.totalRam || '');
-      return !ram || ram > cap;
-    }
-
-    function applyFilter() {
-      let visible = 0;
-      dots.forEach(g => {
-        const filtered = isFiltered(g);
-        g.classList.toggle('sp-filtered', filtered);
-        if (!filtered) visible++;
-      });
-      rows.forEach(li => {
-        li.classList.toggle('sp-filtered', isFiltered(li));
-      });
-      countEl.textContent = visible;
-      emphasize(null);
-    }
-    sel.addEventListener('change', applyFilter);
-    applyFilter();
+    // The chart's own filter groups are wired up further down, together with
+    // the result table, so a single filter bar governs both. Redrawing the
+    // dots after a filter change needs emphasize(), hence the handle.
+    window.spEmphasize = emphasize;
 
     function emphasize(modelId) {
       dots.forEach(g => {
@@ -969,7 +1199,7 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
 
 <section>
   <div class="bg-white border border-stone-200 rounded-lg overflow-hidden">
-    <table class="sortable w-full text-sm">
+    <table id="sp-table" class="sortable w-full text-sm">
       <thead class="bg-stone-50 border-b border-stone-200 text-left text-stone-600">
         <tr>
           <th data-sort class="px-4 py-2 font-medium">Model</th>
@@ -985,7 +1215,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
         </tr>
       </thead>
       <tbody class="divide-y divide-stone-100">
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="29.93" data-released="2026-03-12"
               onclick="window.location='../models/google_gemma-4-31b.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-4-31b" title="google/gemma-4-31b">
               gemma-4-31b
@@ -1006,7 +1237,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                 </span>
             </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="22.41" data-released="2025-12-09"
               onclick="window.location='../models/mistralai_devstral-small-2-2512.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="devstral-small-2-2512" title="mistralai/devstral-small-2-2512">
               devstral-small-2-2512
@@ -1027,7 +1259,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                 </span>
             </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="30.53" data-released="2025-08-20"
               onclick="window.location='../models/bytedance_seed-oss-36b.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="seed-oss-36b" title="bytedance/seed-oss-36b">
               seed-oss-36b
@@ -1048,7 +1281,30 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                 </span>
             </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="31.6" data-released="2026-06"
+              onclick="window.location='../models/ornith-1.0-35b@q4_k_m.html#niah'">
+            <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="ornith-1.0-35b" title="ornith-1.0-35b@q4_k_m">
+              ornith-1.0-35b
+            </td>
+            <td class="px-3 py-2 text-stone-600 whitespace-nowrap">deepreinforce-ai</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 4bit</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="256">256k</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap" data-sort="2026-06">2026-06</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="20186.2">
+19.7 GB            </td>
+            <td class="px-3 py-2 num text-right" data-sort="52.41872118805852">52</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="6189">
+6189            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="284.46470729087014">284.5 s</td>
+            <td class="px-3 py-2 num text-right" data-sort="0.9774999999999999">
+                <span class="font-bold text-lg text-emerald-700">
+                  98%
+                </span>
+            </td>
+          </tr>
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="26.79" data-released="2026-04-21"
               onclick="window.location='../models/qwen_qwen3.6-27b.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3.6-27b" title="qwen/qwen3.6-27b">
               qwen3.6-27b
@@ -1069,7 +1325,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                 </span>
             </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="116.2" data-released="2026-03-10"
               onclick="window.location='../models/nvidia_nemotron-3-super.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="nemotron-3-super" title="nvidia/nemotron-3-super">
               nemotron-3-super
@@ -1090,7 +1347,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                 </span>
             </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="67.39" data-released="2026-01-30"
               onclick="window.location='../models/qwen_qwen3-coder-next.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3-coder-next" title="qwen/qwen3-coder-next">
               qwen3-coder-next
@@ -1111,7 +1369,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                 </span>
             </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="27.82" data-released="2025-10-04"
               onclick="window.location='../models/qwen_qwen3-vl-30b.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3-vl-30b" title="qwen/qwen3-vl-30b">
               qwen3-vl-30b
@@ -1132,7 +1391,30 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                 </span>
             </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="96.79" data-released="2026-07-21"
+              onclick="window.location='../models/poolside_laguna-s-2.1.html#niah'">
+            <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="laguna-s-2.1" title="poolside/laguna-s-2.1">
+              laguna-s-2.1
+            </td>
+            <td class="px-3 py-2 text-stone-600 whitespace-nowrap">poolside</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 4bit</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="256">256k</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap" data-sort="2026-07-21">2026-07-21</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="67866.4">
+66.3 GB            </td>
+            <td class="px-3 py-2 num text-right" data-sort="14.5116220609074">15</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="963">
+963            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="1265.9569584568962">1266.0 s</td>
+            <td class="px-3 py-2 num text-right" data-sort="0.966">
+                <span class="font-bold text-lg text-emerald-700">
+                  97%
+                </span>
+            </td>
+          </tr>
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="32.78" data-released="2026-04-15"
               onclick="window.location='../models/qwen_qwen3.6-35b-a3b.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3.6-35b-a3b" title="qwen/qwen3.6-35b-a3b">
               qwen3.6-35b-a3b
@@ -1153,7 +1435,30 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                 </span>
             </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="27.67" data-released="2026-08-10"
+              onclick="window.location='../models/meta_muse-glimmer.html#niah'">
+            <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="muse-glimmer" title="meta/muse-glimmer">
+              muse-glimmer
+            </td>
+            <td class="px-3 py-2 text-stone-600 whitespace-nowrap">meta</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="128">128k</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap" data-sort="2026-08-10">2026-08-10</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="17316.0">
+16.9 GB            </td>
+            <td class="px-3 py-2 num text-right" data-sort="6.148772932473811">6</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="3592">
+3592            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="1450.6776504591107">1450.7 s</td>
+            <td class="px-3 py-2 num text-right" data-sort="0.964">
+                <span class="font-bold text-lg text-emerald-700">
+                  96%
+                </span>
+            </td>
+          </tr>
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="12.25" data-released="2026-03-02"
               onclick="window.location='../models/google_gemma-4-e4b.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-4-e4b" title="google/gemma-4-e4b">
               gemma-4-e4b
@@ -1174,7 +1479,30 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                 </span>
             </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="28.58" data-released="2026-03-12"
+              onclick="window.location='../models/google_gemma-4-31b-qat.html#niah'">
+            <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-4-31b-qat" title="google/gemma-4-31b-qat">
+              gemma-4-31b-qat
+            </td>
+            <td class="px-3 py-2 text-stone-600 whitespace-nowrap">google</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 4bit</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="256">256k</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap" data-sort="2026-03-12">2026-03-12</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="17978.5">
+17.6 GB            </td>
+            <td class="px-3 py-2 num text-right" data-sort="12.731056097930145">13</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="3515">
+3515            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="1223.1154337081825">1223.1 s</td>
+            <td class="px-3 py-2 num text-right" data-sort="0.9550000000000001">
+                <span class="font-bold text-lg text-emerald-700">
+                  96%
+                </span>
+            </td>
+          </tr>
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="26.41" data-released="2025-07-21"
               onclick="window.location='../models/qwen_qwen3-30b-a3b-2507.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3-30b-a3b-2507" title="qwen/qwen3-30b-a3b-2507">
               qwen3-30b-a3b-2507
@@ -1195,7 +1523,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                 </span>
             </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="19.78" data-released="2025-08-04"
               onclick="window.location='../models/openai_gpt-oss-20b.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gpt-oss-20b" title="openai/gpt-oss-20b">
               gpt-oss-20b
@@ -1216,7 +1545,30 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                 </span>
             </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="11.34" data-released="2026-06"
+              onclick="window.location='../models/ornith-1.0-9b@q4_k_m.html#niah'">
+            <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="ornith-1.0-9b" title="ornith-1.0-9b@q4_k_m">
+              ornith-1.0-9b
+            </td>
+            <td class="px-3 py-2 text-stone-600 whitespace-nowrap">deepreinforce-ai</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 4bit</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="256">256k</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap" data-sort="2026-06">2026-06</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="5368.3">
+5.2 GB            </td>
+            <td class="px-3 py-2 num text-right" data-sort="36.24807971052753">36</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="3598">
+3598            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="302.62426300009247">302.6 s</td>
+            <td class="px-3 py-2 num text-right" data-sort="0.915">
+                <span class="font-bold text-lg text-emerald-700">
+                  92%
+                </span>
+            </td>
+          </tr>
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="27.66" data-released="2025-11-19"
               onclick="window.location='../models/allenai_olmo-3-32b-think.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="olmo-3-32b-think" title="allenai/olmo-3-32b-think">
               olmo-3-32b-think
@@ -1237,7 +1589,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                 </span>
             </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="27.46" data-released="2026-03-12"
               onclick="window.location='../models/google_gemma-4-26b-a4b.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-4-26b-a4b" title="google/gemma-4-26b-a4b">
               gemma-4-26b-a4b
@@ -1258,7 +1611,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                 </span>
             </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="26.0" data-released="2025-03-01"
               onclick="window.location='../models/google_gemma-3-27b.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-3-27b" title="google/gemma-3-27b">
               gemma-3-27b
@@ -1279,7 +1633,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                 </span>
             </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="32.78" data-released="2026-02-24"
               onclick="window.location='../models/qwen_qwen3.5-35b-a3b.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3.5-35b-a3b" title="qwen/qwen3.5-35b-a3b">
               qwen3.5-35b-a3b
@@ -1300,7 +1655,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                 </span>
             </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="9.15" data-released="2026-03-02"
               onclick="window.location='../models/qwen3.5-4b.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3.5-4b" title="qwen3.5-4b">
               qwen3.5-4b
@@ -1321,7 +1677,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                 </span>
             </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="12.54" data-released="2026-02-27"
               onclick="window.location='../models/qwen_qwen3.5-9b.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3.5-9b" title="qwen/qwen3.5-9b">
               qwen3.5-9b
@@ -1342,7 +1699,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                 </span>
             </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="14.52" data-released="2025-03-01"
               onclick="window.location='../models/google_gemma-3-12b.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-3-12b" title="google/gemma-3-12b">
               gemma-3-12b
@@ -1363,7 +1721,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                 </span>
             </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="11.53" data-released="2025-10-11"
               onclick="window.location='../models/qwen_qwen3-vl-8b.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3-vl-8b" title="qwen/qwen3-vl-8b">
               qwen3-vl-8b
@@ -1384,7 +1743,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                 </span>
             </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="8.12" data-released="2025-08-06"
               onclick="window.location='../models/qwen_qwen3-4b-2507.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3-4b-2507" title="qwen/qwen3-4b-2507">
               qwen3-4b-2507
@@ -1405,7 +1765,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                 </span>
             </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="86.65" data-released="2025-08-04"
               onclick="window.location='../models/openai_gpt-oss-120b.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gpt-oss-120b" title="openai/gpt-oss-120b">
               gpt-oss-120b
@@ -1426,7 +1787,30 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                 </span>
             </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="13.32" data-released="2026-03-12"
+              onclick="window.location='../models/google_gemma-4-12b-qat.html#niah'">
+            <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-4-12b-qat" title="google/gemma-4-12b-qat">
+              gemma-4-12b-qat
+            </td>
+            <td class="px-3 py-2 text-stone-600 whitespace-nowrap">google</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 4bit</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="256">256k</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap" data-sort="2026-03-12">2026-03-12</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="6819.8">
+6.7 GB            </td>
+            <td class="px-3 py-2 num text-right" data-sort="33.015516309313135">33</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="11768">
+11768            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="714.2244616658427">714.2 s</td>
+            <td class="px-3 py-2 num text-right" data-sort="0.787">
+                <span class="font-bold text-lg text-emerald-700">
+                  79%
+                </span>
+            </td>
+          </tr>
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="15.89" data-released="2025-10-31"
               onclick="window.location='../models/mistralai_ministral-3-14b-reasoning.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="ministral-3-14b-reasoning" title="mistralai/ministral-3-14b-reasoning">
               ministral-3-14b-reasoning
@@ -1448,7 +1832,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                 <span class="block text-[10px] text-stone-400 uppercase tracking-wider">preliminary</span>
             </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="10.11" data-released="2026-03-02"
               onclick="window.location='../models/google_gemma-4-e2b.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-4-e2b" title="google/gemma-4-e2b">
               gemma-4-e2b
@@ -1469,7 +1854,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                 </span>
             </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="10.31" data-released="2025-04-27"
               onclick="window.location='../models/qwen_qwen3-8b.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3-8b" title="qwen/qwen3-8b">
               qwen3-8b
@@ -1490,7 +1876,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                 </span>
             </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="27.2" data-released="2025-12-15"
               onclick="window.location='../models/nvidia_nemotron-3-nano.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="nemotron-3-nano" title="nvidia/nemotron-3-nano">
               nemotron-3-nano
@@ -1511,7 +1898,30 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                 </span>
             </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="24.39" data-released="2026-03-12"
+              onclick="window.location='../models/google_gemma-4-26b-a4b-qat.html#niah'">
+            <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-4-26b-a4b-qat" title="google/gemma-4-26b-a4b-qat">
+              gemma-4-26b-a4b-qat
+            </td>
+            <td class="px-3 py-2 text-stone-600 whitespace-nowrap">google</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="256">256k</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap" data-sort="2026-03-12">2026-03-12</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="14916.7">
+14.6 GB            </td>
+            <td class="px-3 py-2 num text-right" data-sort="53.28105926805981">53</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="11439">
+11439            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="317.69620216684416">317.7 s</td>
+            <td class="px-3 py-2 num text-right" data-sort="0.676">
+                <span class="font-bold text-lg text-amber-700">
+                  68%
+                </span>
+            </td>
+          </tr>
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="7.81" data-released="2026-03-02"
               onclick="window.location='../models/qwen3.5-2b.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3.5-2b" title="qwen3.5-2b">
               qwen3.5-2b
@@ -1532,7 +1942,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                 </span>
             </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="11.79" data-released="2026-02-27"
               onclick="window.location='../models/qwen3.5-9b-mlx.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3.5-9b-mlx" title="qwen3.5-9b-mlx">
               qwen3.5-9b-mlx
@@ -1553,7 +1964,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                 </span>
             </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="9.94" data-released="2025-10-02"
               onclick="window.location='../models/ibm_granite-4-h-tiny.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="granite-4-h-tiny" title="ibm/granite-4-h-tiny">
               granite-4-h-tiny
@@ -1574,7 +1986,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                 </span>
             </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="38.04" data-released="2026-04-20"
               onclick="window.location='../models/nvidia_nemotron-3-nano-omni.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="nemotron-3-nano-omni" title="nvidia/nemotron-3-nano-omni">
               nemotron-3-nano-omni
@@ -1595,7 +2008,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                 </span>
             </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="8.83" data-released="2025-02-20"
               onclick="window.location='../models/google_gemma-3-4b.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-3-4b" title="google/gemma-3-4b">
               gemma-3-4b
@@ -1616,7 +2030,30 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                 </span>
             </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="14.52" data-released="2026-06-02"
+              onclick="window.location='../models/mellum2-12b-a2.5b-thinking.html#niah'">
+            <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="mellum2-12b-a2.5b-thinking" title="mellum2-12b-a2.5b-thinking">
+              mellum2-12b-a2.5b-thinking
+            </td>
+            <td class="px-3 py-2 text-stone-600 whitespace-nowrap">JetBrains</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 4bit</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="128">128k</td>
+            <td class="px-3 py-2 text-stone-600 num whitespace-nowrap" data-sort="2026-06-02">2026-06-02</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="7697.4">
+7.5 GB            </td>
+            <td class="px-3 py-2 num text-right" data-sort="80.56553210725643">81</td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="6963">
+6963            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="235.84970216697548">235.8 s</td>
+            <td class="px-3 py-2 num text-right" data-sort="0.436">
+                <span class="font-bold text-lg text-amber-700">
+                  44%
+                </span>
+            </td>
+          </tr>
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="8.64" data-released="2026-03-07"
               onclick="window.location='../models/nvidia_nemotron-3-nano-4b.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="nemotron-3-nano-4b" title="nvidia/nemotron-3-nano-4b">
               nemotron-3-nano-4b
@@ -1637,7 +2074,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                 </span>
             </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="7.16" data-released="2026-01-06"
               onclick="window.location='../models/liquid_lfm2.5-1.2b.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="lfm2.5-1.2b" title="liquid/lfm2.5-1.2b">
               lfm2.5-1.2b
@@ -1658,7 +2096,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                 </span>
             </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="21.5" data-released="2026-02-24"
               onclick="window.location='../models/liquid_lfm2-24b-a2b.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="lfm2-24b-a2b" title="liquid/lfm2-24b-a2b">
               lfm2-24b-a2b
@@ -1679,7 +2118,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
                 </span>
             </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="" data-released="2025-12-07"
               onclick="window.location='../models/zai-org_glm-4.6v-flash.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="glm-4.6v-flash" title="zai-org/glm-4.6v-flash">
               glm-4.6v-flash
@@ -1697,7 +2137,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 num text-right" data-sort="-1">
 —            </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="26.41" data-released="2025-07-31"
               onclick="window.location='../models/qwen_qwen3-coder-30b.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3-coder-30b" title="qwen/qwen3-coder-30b">
               qwen3-coder-30b
@@ -1715,7 +2156,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 num text-right" data-sort="-1">
 —            </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="23.76" data-released="2026-03-04"
               onclick="window.location='../models/qwen3.5-27b-claude-4.6-opus-distilled-mlx.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3.5-27b-claude-4.6-opus-distilled-mlx" title="qwen3.5-27b-claude-4.6-opus-distilled-mlx">
               qwen3.5-27b-claude-4.6-opus-distilled-mlx
@@ -1733,7 +2175,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 num text-right" data-sort="-1">
 —            </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="82.44" data-released="2025-07-28"
               onclick="window.location='../models/glm-4.5-air-mlx.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="glm-4.5-air-mlx" title="glm-4.5-air-mlx">
               glm-4.5-air-mlx
@@ -1751,7 +2194,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 num text-right" data-sort="-1">
 —            </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="" data-released="2026-03-12"
               onclick="window.location='../models/google_gemma-4-26b-a4b@q8_0.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-4-26b-a4b" title="google/gemma-4-26b-a4b@q8_0">
               gemma-4-26b-a4b
@@ -1769,7 +2213,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 num text-right" data-sort="-1">
 —            </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="" data-released="2026-03-12"
               onclick="window.location='../models/google_gemma-4-31b@q8_0.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-4-31b" title="google/gemma-4-31b@q8_0">
               gemma-4-31b
@@ -1787,7 +2232,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 num text-right" data-sort="-1">
 —            </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="" data-released="2026-03-02"
               onclick="window.location='../models/google_gemma-4-e2b@q8_0.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-4-e2b" title="google/gemma-4-e2b@q8_0">
               gemma-4-e2b
@@ -1805,7 +2251,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 num text-right" data-sort="-1">
 —            </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="" data-released="2026-03-02"
               onclick="window.location='../models/google_gemma-4-e4b@q8_0.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="gemma-4-e4b" title="google/gemma-4-e4b@q8_0">
               gemma-4-e4b
@@ -1823,7 +2270,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 num text-right" data-sort="-1">
 —            </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="59.44" data-released="2024-12-06"
               onclick="window.location='../models/meta_llama-3.3-70b.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="llama-3.3-70b" title="meta/llama-3.3-70b">
               llama-3.3-70b
@@ -1841,7 +2289,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 num text-right" data-sort="-1">
 —            </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="" data-released="2026-04-20"
               onclick="window.location='../models/nvidia_nemotron-3-nano-omni@q8_0.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="nemotron-3-nano-omni" title="nvidia/nemotron-3-nano-omni@q8_0">
               nemotron-3-nano-omni
@@ -1859,7 +2308,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 num text-right" data-sort="-1">
 —            </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="" data-released="2025-11-09"
               onclick="window.location='../models/ouro-2.6b.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="ouro-2.6b" title="ouro-2.6b">
               ouro-2.6b
@@ -1877,7 +2327,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 num text-right" data-sort="-1">
 —            </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="101.95" data-released="2026-02-24"
               onclick="window.location='../models/qwen3.5-122b-a10b.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3.5-122b-a10b" title="qwen3.5-122b-a10b">
               qwen3.5-122b-a10b
@@ -1895,7 +2346,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 num text-right" data-sort="-1">
 —            </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="8.12" data-released="2025-08-05"
               onclick="window.location='../models/qwen_qwen3-4b-thinking-2507.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3-4b-thinking-2507" title="qwen/qwen3-4b-thinking-2507">
               qwen3-4b-thinking-2507
@@ -1913,7 +2365,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 num text-right" data-sort="-1">
 —            </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="" data-released="2026-02-27"
               onclick="window.location='../models/qwen_qwen3.5-9b@q8_0.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3.5-9b" title="qwen/qwen3.5-9b@q8_0">
               qwen3.5-9b
@@ -1922,8 +2375,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">gguf 8bit</td>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="256">256k</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap" data-sort="2026-02-27">2026-02-27</td>
-            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="9965.3">
-9.7 GB            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="0">
+—            </td>
             <td class="px-3 py-2 num text-right" data-sort="0">0</td>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="0">
 —            </td>
@@ -1931,7 +2384,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 num text-right" data-sort="-1">
 —            </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="" data-released="2026-04-21"
               onclick="window.location='../models/qwen_qwen3.6-27b@q8_0.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3.6-27b" title="qwen/qwen3.6-27b@q8_0">
               qwen3.6-27b
@@ -1949,7 +2403,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 num text-right" data-sort="-1">
 —            </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="" data-released="2026-04-15"
               onclick="window.location='../models/qwen_qwen3.6-35b-a3b@q8_0.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="qwen3.6-35b-a3b" title="qwen/qwen3.6-35b-a3b@q8_0">
               qwen3.6-35b-a3b
@@ -1967,7 +2422,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 num text-right" data-sort="-1">
 —            </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="45.52" data-released="2026-01-19"
               onclick="window.location='../models/zai-org_glm-4.7-flash.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="glm-4.7-flash" title="zai-org/glm-4.7-flash">
               glm-4.7-flash
@@ -1985,7 +2441,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 num text-right" data-sort="-1">
 —            </td>
           </tr>
-          <tr class="row-link cursor-pointer"
+          <tr class="row-link cursor-pointer sp-tr"
+              data-total-ram="" data-released="2026-01-19"
               onclick="window.location='../models/zai-org_glm-4.7-flash@q4_k_m.html#niah'">
             <td class="px-4 py-2 num font-medium text-stone-900 whitespace-nowrap" data-sort="glm-4.7-flash" title="zai-org/glm-4.7-flash@q4_k_m">
               glm-4.7-flash
@@ -1994,8 +2451,8 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap">mlx 4bit</td>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="198">198k</td>
             <td class="px-3 py-2 text-stone-600 num whitespace-nowrap" data-sort="2026-01-19">2026-01-19</td>
-            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="17292.7">
-16.9 GB            </td>
+            <td class="px-3 py-2 text-stone-600 num text-right" data-sort="0">
+—            </td>
             <td class="px-3 py-2 num text-right" data-sort="0">0</td>
             <td class="px-3 py-2 text-stone-600 num text-right" data-sort="0">
 —            </td>
@@ -2008,7 +2465,33 @@ stroke-dasharray="2.5,1.5"                    class="sp-circle"/>
   </div>
   <p class="mt-3 text-xs text-stone-500">
     Click a row to open the model detail page. Hover shows available render previews. Column headers are sortable.
+    The filter at the top of the page hides table rows and dims the matching dots in the chart.
   </p>
+
+    <script>
+    (() => {
+      // One filter bar for the whole page. Wired up here, after the table, so
+      // it works on benches that have no scatter chart too.
+      owbFilter({
+        ramSelect: 'sp-ram-filter',
+        yearSelect: 'sp-year-filter',
+        groups: [
+          // Table first: it lists every model of this bench, including the
+          // errored ones the scatter drops, so its count is the honest one.
+          { els: document.querySelectorAll('#sp-table .sp-tr'), cls: 'owb-hidden' },
+          { els: document.querySelectorAll('#sp-card .sp-dot'), cls: 'sp-filtered' },
+          { els: document.querySelectorAll('#sp-list .sp-row'), cls: 'sp-filtered' },
+        ],
+        onApply: ([tableVisible, dotsVisible]) => {
+          const t = document.getElementById('sp-table-count');
+          if (t) t.textContent = tableVisible;
+          const c = document.getElementById('sp-count');
+          if (c) c.textContent = dotsVisible;
+          if (window.spEmphasize) window.spEmphasize(null);
+        },
+      });
+    })();
+    </script>
 </section>
 
   </main>

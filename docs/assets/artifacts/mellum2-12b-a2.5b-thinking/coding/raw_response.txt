@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kanban Board</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes confetti {
+            0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+            100% { transform: translate(100px, 200px) rotate(720deg); opacity: 0; }
+        }
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: red;
+            border-radius: 50%;
+            opacity: 0.7;
+            animation: confetti 2s linear forwards;
+        }
+        .card {
+            transition: all 0.3s ease;
+            cursor: grab;
+        }
+        .card:active {
+            cursor: grabbing;
+            transform: scale(1.05);
+        }
+        .drag-over {
+            border: 2px dashed #3b82f6;
+            background: #eff6ff;
+        }
+        .edit-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+        }
+        .modal {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            max-width: 90%;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 p-4">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-4xl font-bold text-center mb-8 bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600">Kanban Board</h1>
+        
+        <div class="grid grid-cols-4 gap-6">
+            <!-- Backlog Column -->
+            <div class="col-span-1 bg-white rounded-2xl shadow-xl overflow-hidden" data-testid="column-backlog">
+                <div class="p-4 border-b-2 border-gray-200">
+                    <h2 class="text-2xl font-semibold text-gray-800">Backlog</h2>
+                </div>
+                <div class="card-container min-h-[300px] p-2" data-testid="column-backlog">
+                    <!-- Cards will be inserted here -->
+                </div>
+                <div class="add-card-container">
+                    <button data-testid="add-card" class="w-full bg-gradient-to-r from-blue-400 to-purple-600 hover:from-blue-500 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition all duration-300 transform hover:scale-105 shadow-md">
+                        + Add Card
+                    </button>
+                </div>
+            </div>
+            
+            <!-- In Progress Column -->
+            <div class="col-span-1 bg-white rounded-2xl shadow-xl overflow-hidden" data-testid="column-in-progress">
+                <div class="p-4 border-b-2 border-gray-200">
+                    <h2 class="text-2xl font-semibold text-gray-800">In Progress</h2>
+                </div>
+                <div class="card-container min-h-[300px] p-2" data-testid="column-in-progress">
+                    <!-- Cards will be inserted here -->
+                </div>
+                <div class="add-card-container">
+                    <button data-testid="add-card" class="w-full bg-gradient-to-r from-blue-400 to-purple-600 hover:from-blue-500 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition all duration-300 transform hover:scale-105 shadow-md">
+                        + Add Card
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Review Column -->
+            <div class="col-span-1 bg-white rounded-2xl shadow-xl overflow-hidden" data-testid="column-review">
+                <div class="p-4 border-b-2 border-gray-200">
+                    <h2 class="text-2xl font-semibold text-gray-800">Review</h2>
+                </div>
+                <div class="card-container min-h-[300px] p-2" data-testid="column-review">
+                    <!-- Cards will be inserted here -->
+                </div>
+                <div class="add-card-container">
+                    <button data-testid="add-card" class="w-full bg-gradient-to-r from-blue-400 to-purple-600 hover:from-blue-500 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition all duration-300 transform hover:scale-105 shadow-md">
+                        + Add Card
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Done Column -->
+            <div class="col-span-1 bg-white rounde-2xl shadow-xl overflow-hidden" data-testid="column-done">
+                <div class="p-4 border-b-2 border-gray-200">
+                    <h2 class="text-2xl font-semibold text-gray-800">Done</h2>
+                </div>
+                <div class="card-container min-h-[300px] p-2" data-testid="column-done">
+                    <!-- Cards will be inserted here -->
+                </div>
+                <div class="add-card-container">
+                    <button data-testid="add-card" class="w-full bg-gradient-to-r from-blue-400 to-purple-600 hover:from-blue-500 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition all duration-300 transform hover:scale-105 shadow-md">
+                        + Add Card
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Delete Confirmation Modal -->
+        <div id="delete-modal" class="modal-backdrop hidden">
+            <div class="modal">
+                <h3 class="text-lg font-semibold text-gray-800" id="modal-title">Confirm Deletion</h3>
+                <p class="text-gray-600 mt-2" id="modal-message">Are you sure you want to delete this card? This action cannot be undone.</p>
+                <div class="flex justify-end space-x-4 mt-6">
+                    <button id="cancel-delete" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-5 rounded-lg transition duration-200">Cancel</button>
+                    <button id="confirm-delete" data-testid="confirm-delete" class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-5 rounded-lg transition duration-200">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Configuration
+            const STORAGE_NAMESPACE = 'kanban-board';
+            const COLUMNS = {
+                'backlog': data-testid="column-backlog",
+                'in-progress': data-testid="column-in-progress",
+                'review': data-testid="column-review",
+                'done': data-testid="column-done"
+            };
+            
+            // Initialize state
+            let boardState = {
+                backlog: [],
+                'in-progress': [],
+                review: [],
+                done: []
+            };
+            
+            // Load from localStorage or initialize with dummy cards
+            const loadState = () => {
+                const saved = localStorage.getItem(STORAGE_NAMESPACE);
+                if (saved) {
+                    try {
+                        boardState = JSON.parse(saved);
+                        return true;
+                    } catch (e) {
+                        console.error("Failed to parse saved state", e);
+                    }
+                }
+                return false;
+            };
+            
+            // Save to localStorage
+            const saveState = () => {
+                localStorage.setItem(STORAGE_NAMESPACE, JSON.stringify(boardState));
+            };
+            
+            // Initialize with dummy cards if needed
+            const initializeDummyCards = () => {
+                const allColumns = Object.keys(COLUMNS);
+                allColumns.forEach(column => {
+                    if (boardState[column].length === 0) {
+                        for (let i = 1; i <= 3; i++) {
+                            boardState[column].push({
+                                id: `${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+                                title: `Dummy Card ${i} in ${column.replace('-', ' ')}`
+                            });
+                        }
+                    }
+                });
+            };
+            
+            // Render the board
+            const renderBoard = () => {
+                Object.keys(COLUMNS).forEach(column => {
+                    const container = document.querySelector(COLUMNS[column]);
+                    container.innerHTML = '';
+                    
+                    boardState[column].forEach(card => {
+                        const cardElement = document.createElement('div');
+                        cardElement.className = 'card bg-white rounded-xl shadow-md mb-4 transition-all duration-200 hover:shadow-xl cursor-grab';
+                        cardElement.dataset.id = card.id;
+                        cardElement.innerHTML = `
+                            <div class="p-4">
+                                <div class="flex justify-between items-start">
+                                    <span class="text-gray-800 font-medium line-clamp-2">${card.title}</span>
+                                    <button class="delete-btn text-red-500 hover:text-red-700 ml-2" data-testid="delete-card">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        container.appendChild(cardElement);
+                    });
+                });
+            };
+            
+            // Add new card
+            const addCard = (column) => {
+                const input = document.createElement('input');
+                input.type = "text";
+                input.className = "w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mt-2";
+                input.placeholder = "Enter card title...";
+                input.dataset.testid = "card-input";
+                
+                const addButton = document.querySelector(`[data-testid="add-card"]`);
+                const container = document.querySelector(COLUMNS[column]);
+                const addCardContainer = container.querySelector('.add-card-container');
+                
+                // Clear existing content and show input
+                container.innerHTML = '';
+                container.appendChild(input);
+                input.focus();
+                
+                const handleAdd = (title) => {
+                    if (title.trim() === '') return;
+                    
+                    const newCard = {
+                        id: `${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+                        title: title.trim()
+                    };
+                    
+                    boardState[column].push(newCard);
+                    saveState();
+                    renderBoard();
+                    
+                    // Hide input and show add button again
+                    container.innerHTML = '';
+                    container.appendChild(addButton);
+                };
+                
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        handleAdd(input.value);
+                    }
+                });
+                
+                // Cancel on Escape
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        container.innerHTML = '';
+                        container.appendChild(addButton);
+                    }
+                });
+            };
+            
+            // Edit card
+            const editCard = (cardElement, titleSpan) => {
+                const input = document.createElement('input');
+                input.type = "text";
+                input.className = "edit-input";
+                input.value = titleSpan.textContent;
+                input.focus();
+                
+                titleSpan.parentNode.replaceChild(input, titleSpan);
+                
+                const handleSave = () => {
+                    if (input.value.trim() !== '') {
+                        boardState[cardElement.dataset.id] = {
+                            ...boardState[cardElement.dataset.id],
+                            title: input.value.trim()
+                        };
+                        saveState();
+                    }
+                    titleSpan.textContent = input.value;
+                    titleSpan.parentNode.replaceChild(titleSpan, input);
+                };
+                
+                const handleCancel = () => {
+                    titleSpan.textContent = input.value;
+                    titleSpan. parentNode. replaceChild(titleSpan, input);
+                };
+                
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') handleSave();
+                    if (e.key === 'Escape') handleCancel();
+                });
+                
+                window.addEventListener('click', (e) => {
+                    if (!e.target.closest('.edit-input')) {
+                        handleCancel();
+                    }
+                });
+            };
+            
+            // Delete card with confirmation
+            let cardToDelete = null;
+            
+            const showDeleteConfirmation = (cardElement, title) => {
+                document.getElementById('modal-title').textContent = `Delete "${title}"?`;
+                document.getElementById('modal-message').textContent = "Are you sure you want to delete this card? This action cannot be undone.";
+                cardToDelete = cardElement.dataset.id;
+                document.getElementById('delete-modal').classList.remove('hidden');
+            };
+            
+            const confirmDelete = () => {
+                if (cardToDelete) {
+                    boardState[Object.keys(COLUMNS).find(col => 
+                        boardState[col].some(card => card.id === cardToDelete)
+                    )] = boardState[Object.keys(COLUMNS).find(col => 
+                        boardState[col].some(card => card.id === cardToDelete)
+                    )].filter(card => card.id !== cardToDelete);
+                    
+                    saveState();
+                    renderBoard();
+                    document.getElementById('delete-modal').classList.add('hidden');
+                    cardToDelete = null;
+                }
+            };
+            
+            // Trigger confetti animation
+            const triggerConfetti = () => {
+                const doneColumn = document.querySelector(COLUMNS.done);
+                if (!doneColumn) return;
+                
+                const particles = [];
+                const particleCount = 15;
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'confetti-piece';
+                    particle.style.left = `${Math.random() * 100}%`;
+                    particle.style.backgroundColor = `hsl(${Math.random() * 360}, 70%, 60%)`;
+                    particle.style.width = `${Math.random() * 10 + 5}px`;
+                    particle.style.height = `${Math.random() * 10 + 5}px`;
+                    doneColumn.appendChild(particle);
+                    particles.push(particle);
+                }
+                
+                setTimeout(() => {
+                    particles.forEach(particle => particle.remove());
+                }, 2000);
+            };
+            
+            // Drag and Drop Setup
+            let draggedCard = null;
+            
+            document.addEventListener('dragstart', (e) => {
+                if (e.target.classList.contains('card')) {
+                    draggedCard = e.target;
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/html', e.target.outerHTML);
+                    setTimeout(() => e.target.remove(), 0);
+                }
+            });
+            
+            document.addEventListener('dragover', (e) => {
+                if (e.target.classList.contains('card-container')) {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    e.target.classList.add('drag-over');
+                }
+            });
+            
+            document.addEventListener('dragleave', (e) => {
+                if (e.target.classList.contains('card-container')) {
+                    e.target.classList.remove('drag-over');
+                }
+            });
+            
+            document.addEventListener('drop', (e) => {
+                if (e.target.classList. contains ('card-container')) {
+                    e.preventDefault();
+                    e.target.classList.remove('drag-over');
+                    
+                    const targetColumn = Object.keys(COLUMNS).find(col => 
+                        document.querySelector(COLUMNS[col]) === e.target
+                    );
+                    
+                    if (targetColumn && draggedCard) {
+                        const newCard = {
+                            id: `${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+                            title: draggedCard.querySelector('.line-clamp-2').textContent
+                        };
+                        
+                        boardState[targetColumn].push(newCard);
+                        saveState();
+                        renderBoard();
+                        
+                        if (targetColumn === 'done') {
+                            triggerConfetti();
+                        }
+                    }
+                }
+            });
+            
+            // Initialize and Render
+            if (!loadState()) {
+                initializeDummyCards();
+                saveState();
+            }
+            
+            renderBoard();
+            
+            // Event Listeners
+            Object.keys(COLUMNS).forEach(column => {
+                const container = document.querySelector(COLUMNS[column]);
+                const addButton = container.querySelector('[data-testid="add-card"]');
+                
+                addButton.addEventListener('click', () => addCard(column));
+                
+                // Delete confirmation modal
+                document.getElementById('cancel-delete').addEventListener('click', () => {
+                    document.getElementById('delete-modal').classList.add('hidden');
+                    cardToDelete = null;
+                });
+                
+                document.getElementById('confirm-delete').addEventListener('click', confirmDelete);
+            });
+            
+            // Global event delegation for card interactions
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('[data-testid="delete-card"]')) {
+                    const cardElement = e.target.closest('.card');
+                    const titleSpan = cardElement.querySelector('.line-clamp-2');
+                    showDeleteConfirmation(cardElement, titleSpan.textContent);
+                }
+            });
+            
+            document.addEventListener('dblclick', (e) => {
+                if (e.target.closest('.p-4')) {
+                    const titleSpan = e.target.closest('.line-clamp-2');
+                    editCard(e.target.closest('.card'), titleSpan);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

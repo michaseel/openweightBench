@@ -1,0 +1,3160 @@
+<!doctype html>
+<html lang="en" class="bg-stone-50 text-stone-900 antialiased">
+<head>
+<meta charset="utf-8">
+<title>google/gemma-4-26b-a4b-qat — Open Weight Bench</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+<script type="module">
+  // Lazy-load mermaid.js only if a .mermaid block is present on the page.
+  if (document.querySelector('.mermaid')) {
+    const m = await import('https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs');
+    m.default.initialize({ startOnLoad: false, theme: 'neutral', securityLevel: 'loose' });
+    const escapeHtml = (value) => value
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+    for (const [i, el] of [...document.querySelectorAll('.mermaid')].entries()) {
+      const code = el.textContent.trim();
+      try {
+        const { svg } = await m.default.render(`owb-mermaid-${Date.now()}-${i}`, code);
+        el.innerHTML = svg;
+      } catch (err) {
+        el.classList.add('text-red-700', 'bg-red-50', 'border-red-200');
+        el.innerHTML = `
+          <div class="text-xs font-semibold uppercase tracking-wider">Mermaid syntax error</div>
+          <div class="mt-1 text-xs">${escapeHtml(err?.message || String(err))}</div>
+          <pre class="mt-3 text-xs whitespace-pre-wrap text-stone-800">${escapeHtml(code)}</pre>
+        `;
+      }
+    }
+  }
+</script>
+<script>
+  // Shared model filter (RAM cap + release window), used by the landing page
+  // and every bench page. Participating elements carry `data-total-ram` (GB,
+  // 64k-context estimate) and `data-released` (YYYY-MM[-DD]).
+  //
+  // Release-window option values: "m<N>" = the last N months, "y<YYYY>" = that
+  // calendar year and nothing else, "" = no restriction. Both are compared at
+  // whole-calendar-month granularity, so a YYYY-MM date without a day resolves
+  // without guessing. "Last N months" counts back from the viewer's own clock,
+  // not the build date — the report stays online and a window pinned to the
+  // build would quietly drift into meaning something else.
+  //
+  // Missing values never hide a model, for either criterion: the RAM figure
+  // comes from a runtime measurement and the date from curated metadata, so a
+  // gap means "not known", not "doesn't qualify". A freshly benchmarked model
+  // that nobody has annotated yet must not silently drop out of the report —
+  // the RAM and Released columns show "—" so the gap is visible in place.
+  //
+  // Each group names the class to toggle, so callers choose the presentation:
+  // charts dim their dots (comparison stays visible), tables hide their rows
+  // (that's the point of filtering a 60-row table). The first return value of
+  // apply() is the per-group count of models still shown.
+  window.owbFilter = function (cfg) {
+    const ram = document.getElementById(cfg.ramSelect);
+    const year = document.getElementById(cfg.yearSelect);
+    const groups = (cfg.groups || []).map(g => ({ els: Array.from(g.els), cls: g.cls }));
+    if (!ram && !year) return null;
+
+    // Month index (year * 12 + month) so windows are plain integer ranges.
+    function releaseMonth(el) {
+      const rel = el.dataset.released || '';
+      if (rel.length < 7) return null;
+      return parseInt(rel.slice(0, 4), 10) * 12 + parseInt(rel.slice(5, 7), 10);
+    }
+
+    function windowFor(value) {
+      if (!value) return null;
+      if (value[0] === 'm') {
+        const now = new Date();
+        const nowMonth = now.getFullYear() * 12 + now.getMonth() + 1;
+        return { from: nowMonth - parseInt(value.slice(1), 10) + 1, to: Infinity };
+      }
+      const y = parseInt(value.slice(1), 10);
+      return { from: y * 12 + 1, to: y * 12 + 12 };
+    }
+
+    function inWindow(el, value) {
+      const win = windowFor(value);
+      if (!win) return true;
+      const m = releaseMonth(el);
+      if (m === null) return true;
+      return m >= win.from && m <= win.to;
+    }
+
+    function excluded(el) {
+      const cap = ram ? parseFloat(ram.value) : NaN;
+      if (cap) {
+        const gb = parseFloat(el.dataset.totalRam || '');
+        if (gb && gb > cap) return true;
+      }
+      if (year && !inWindow(el, year.value)) return true;
+      return false;
+    }
+
+    // Mark options that would empty the page rather than letting the user
+    // pick them and wonder where everything went.
+    const population = groups.flatMap(g => g.els);
+    function disableEmpty(sel, matches) {
+      if (!sel) return;
+      Array.from(sel.options).forEach(opt => {
+        // "all" (value "" or the RAM select's "0") always stays selectable.
+        if (!opt.value || opt.value === '0') return;
+        if (population.some(el => matches(el, opt.value))) return;
+        opt.disabled = true;
+        opt.textContent += ' — no models';
+      });
+    }
+    disableEmpty(ram, (el, v) => {
+      const gb = parseFloat(el.dataset.totalRam || '');
+      return !gb || gb <= parseFloat(v);
+    });
+    disableEmpty(year, inWindow);
+
+    function apply() {
+      const counts = groups.map(g => {
+        let visible = 0;
+        g.els.forEach(el => {
+          const off = excluded(el);
+          el.classList.toggle(g.cls, off);
+          if (!off) visible++;
+        });
+        return visible;
+      });
+      if (cfg.onApply) cfg.onApply(counts);
+      return counts;
+    }
+
+    if (ram) ram.addEventListener('change', apply);
+    if (year) year.addEventListener('change', apply);
+    apply();
+    return { apply, excluded };
+  };
+</script>
+<style>
+  body { font-feature-settings: "ss01","cv11"; }
+  .num { font-variant-numeric: tabular-nums; }
+  .row-link:hover { background: rgb(245 245 244 / 1); }
+  /* Model filter: table rows drop out entirely, chart dots only dim (see
+     window.owbFilter). */
+  .owb-hidden { display: none !important; }
+  .preview-pop {
+    position: fixed; pointer-events: none; z-index: 50;
+    transform: translate(16px, 16px);
+    background: white; border: 1px solid rgb(231 229 228); border-radius: 8px;
+    box-shadow: 0 12px 30px -10px rgb(0 0 0 / 0.25);
+    overflow: hidden; max-width: 672px;
+  }
+  .preview-pop img { display: block; max-width: 672px; max-height: 448px; }
+  .text-pop {
+    position: fixed; pointer-events: none; z-index: 60;
+    transform: translate(12px, 12px);
+    max-width: 360px; white-space: normal;
+    background: rgb(28 25 23); color: rgb(250 250 249);
+    border: 1px solid rgb(87 83 78); border-radius: 6px;
+    box-shadow: 0 12px 30px -10px rgb(0 0 0 / 0.35);
+    padding: 0.5rem 0.625rem; font-size: 0.75rem; line-height: 1.35;
+  }
+  /* Lightbox for click-to-zoom on screenshots/diagrams */
+  .lightbox-overlay {
+    position: fixed; inset: 0; background: rgb(0 0 0 / 0.45);
+    display: none; align-items: center; justify-content: center;
+    z-index: 100; padding: 2rem;
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='rgba(28,25,23,0.85)' stroke='white' stroke-width='2'/><path d='M11 11 L21 21 M21 11 L11 21' stroke='white' stroke-width='2.5' stroke-linecap='round' fill='none'/></svg>") 16 16, pointer;
+  }
+  .lightbox-overlay.active { display: flex; }
+  .lightbox-panel {
+    max-width: 96vw; max-height: 94vh; overflow: auto;
+    background: white; border-radius: 6px;
+    box-shadow: 0 24px 70px -20px rgb(0 0 0 / 0.7);
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='rgba(28,25,23,0.85)' stroke='white' stroke-width='2'/><path d='M11 11 L21 21 M21 11 L11 21' stroke='white' stroke-width='2.5' stroke-linecap='round' fill='none'/></svg>") 16 16, pointer;
+  }
+  .lightbox-panel img {
+    display: block; max-width: none; width: auto; height: auto;
+    min-width: min(90vw, 900px); max-height: none;
+  }
+  .lightbox-panel .mermaid-zoom-content {
+    padding: 1.5rem; min-width: min(92vw, 1100px);
+  }
+  .lightbox-panel .mermaid-zoom-content svg {
+    display: block; width: max-content; min-width: 100%;
+    max-width: none; height: auto;
+  }
+  .zoomable, .zoomable-mermaid {
+    cursor: zoom-in;
+  }
+  .zoom-frame {
+    position: relative;
+  }
+  .zoom-button {
+    position: absolute; top: 0.5rem; right: 0.5rem; z-index: 5;
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 2rem; height: 2rem; border-radius: 0.375rem;
+    background: rgb(255 255 255 / 0.92);
+    border: 1px solid rgb(214 211 209);
+    color: rgb(41 37 36);
+    box-shadow: 0 4px 14px -8px rgb(0 0 0 / 0.45);
+    cursor: zoom-in; font-size: 1rem; line-height: 1;
+  }
+  .zoom-button:hover {
+    background: white; border-color: rgb(120 113 108);
+  }
+</style>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="border-b border-stone-200 bg-white">
+    <div class="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
+      <a href="../index.html" class="flex items-baseline gap-3">
+        <span class="text-xl font-semibold tracking-tight">Open Weight Bench</span>
+        <span class="text-xs text-stone-500 hidden sm:inline">Local LLMs on Apple Silicon</span>
+      </a>
+      <nav class="text-sm text-stone-500 flex items-center gap-4">
+        <a class="hover:text-stone-900" href="https://michaelseel.com" target="_blank" rel="noopener">michaelseel.com</a>
+        <a class="hover:text-stone-900" href="https://github.com/michaseel/openweightBench" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+    </div>
+    <div class="max-w-6xl mx-auto px-6">
+      <nav class="-mb-px flex gap-6 overflow-x-auto text-sm">
+        <a href="../index.html"
+           class="py-3 border-b-2 border-stone-900 text-stone-900 font-medium">
+          Overview
+        </a>
+          <a href="../benchmarks/coding.html"
+             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
+            Coding
+          </a>
+          <a href="../benchmarks/vision.html"
+             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
+            Vision
+          </a>
+          <a href="../benchmarks/niah.html"
+             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
+            Needle in a Haystack
+          </a>
+          <a href="../benchmarks/tool_use.html"
+             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
+            Tool Use
+          </a>
+          <a href="../benchmarks/diagram_to_svg.html"
+             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
+            Diagram → SVG
+          </a>
+          <a href="../benchmarks/hallucination.html"
+             class="py-3 border-b-2 whitespace-nowrap border-transparent text-stone-500 hover:text-stone-900">
+            Hallucination
+          </a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-7xl mx-auto w-full px-6 py-8">
+
+<section class="mb-8">
+  <div class="text-xs text-stone-500"><a href="../index.html" class="hover:text-stone-900">← Overview</a></div>
+  <h1 class="mt-2 text-2xl font-semibold tracking-tight num">google/gemma-4-26b-a4b-qat</h1>
+  <div class="mt-2 flex flex-wrap gap-2 text-xs">
+    <span class="px-2 py-1 rounded border"
+          style="background-color: #dc2626; color: #fff; border-color: #dc2626;"
+          data-tooltip="Vendor / publisher of the model. Colour indicates the model family.">google</span>
+      <span class="px-2 py-1 rounded bg-stone-100 border border-stone-200 num"
+            data-tooltip="Mixture of Experts: 26B total parameters, 4B active per token.">
+        26B
+· 4B active      </span>
+    <span class="px-2 py-1 rounded bg-stone-100 border border-stone-200 num"
+          data-tooltip="File format and quantisation of the weights (e.g. Q8_0 = 8-bit, MXFP4 = 4-bit mixed precision). Lower bit width = lower RAM, potentially slightly reduced quality.">mlx / 4bit</span>
+    <span class="px-2 py-1 rounded bg-stone-100 border border-stone-200 num"
+          data-tooltip="Maximum context length of the model in tokens (k = 1024). Inputs beyond this are truncated by the backend.">ctx 256k</span>
+      <span class="px-2 py-1 rounded bg-stone-100 border border-stone-200 num"
+            data-tooltip="Release date from the HuggingFace model card (createdAt).">released 2026-03-12</span>
+      <span class="px-2 py-1 rounded bg-amber-100 border border-amber-300 text-amber-900"
+            data-tooltip="Accepts images as input (VLM).">vision</span>
+      <span class="px-2 py-1 rounded bg-emerald-50 border border-emerald-200 text-emerald-700"
+            data-tooltip="Trained for tool / function calling — can invoke external tools.">tool_use</span>
+  </div>
+</section>
+
+<div class="lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-8 lg:items-start">
+  <aside class="hidden lg:block sticky top-4 self-start">
+    <nav class="bg-white border border-stone-200 rounded-lg p-4 max-h-[calc(100vh-2rem)] overflow-y-auto">
+      <div class="text-xs uppercase tracking-wider text-stone-500">Model</div>
+      <div class="mt-1 text-sm font-semibold text-stone-900 break-all leading-snug num">google/gemma-4-26b-a4b-qat</div>
+      <dl class="mt-3 grid grid-cols-2 gap-2 text-xs">
+        <div>
+          <dt class="text-stone-500">Peak RAM</dt>
+          <dd class="font-semibold text-stone-900 num">14.6 GB</dd>
+        </div>
+        <div>
+          <dt class="text-stone-500">Wall total</dt>
+          <dd class="font-semibold text-stone-900 num">18.4 min</dd>
+        </div>
+      </dl>
+      <div class="mt-4 pt-3 border-t border-stone-200 text-xs uppercase tracking-wider text-stone-500">Benchmarks</div>
+      <ul class="mt-2 space-y-0.5">
+          <li>
+            <a href="#coding" class="flex items-center justify-between gap-2 py-1.5 px-2 rounded hover:bg-stone-50 group">
+              <span class="text-sm text-stone-700 group-hover:text-stone-900 truncate">coding</span>
+              <span class="flex items-baseline gap-2 num shrink-0">
+                <span class="text-sm font-semibold text-emerald-700">
+79%
+                </span>
+                <span class="text-[10px] text-stone-400 w-10 text-right">2m</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="#vision" class="flex items-center justify-between gap-2 py-1.5 px-2 rounded hover:bg-stone-50 group">
+              <span class="text-sm text-stone-700 group-hover:text-stone-900 truncate">vision</span>
+              <span class="flex items-baseline gap-2 num shrink-0">
+                <span class="text-sm font-semibold text-amber-700">
+45%
+                </span>
+                <span class="text-[10px] text-stone-400 w-10 text-right">4m</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="#niah" class="flex items-center justify-between gap-2 py-1.5 px-2 rounded hover:bg-stone-50 group">
+              <span class="text-sm text-stone-700 group-hover:text-stone-900 truncate">niah</span>
+              <span class="flex items-baseline gap-2 num shrink-0">
+                <span class="text-sm font-semibold text-amber-700">
+68%
+                </span>
+                <span class="text-[10px] text-stone-400 w-10 text-right">5m</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="#tool_use" class="flex items-center justify-between gap-2 py-1.5 px-2 rounded hover:bg-stone-50 group">
+              <span class="text-sm text-stone-700 group-hover:text-stone-900 truncate">tool_use</span>
+              <span class="flex items-baseline gap-2 num shrink-0">
+                <span class="text-sm font-semibold text-emerald-700">
+100%
+                </span>
+                <span class="text-[10px] text-stone-400 w-10 text-right">2m</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="#diagram_to_svg" class="flex items-center justify-between gap-2 py-1.5 px-2 rounded hover:bg-stone-50 group">
+              <span class="text-sm text-stone-700 group-hover:text-stone-900 truncate">diagram_to_svg</span>
+              <span class="flex items-baseline gap-2 num shrink-0">
+                <span class="text-sm font-semibold text-amber-700">
+27%
+                </span>
+                <span class="text-[10px] text-stone-400 w-10 text-right">5m</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="#hallucination" class="flex items-center justify-between gap-2 py-1.5 px-2 rounded hover:bg-stone-50 group">
+              <span class="text-sm text-stone-700 group-hover:text-stone-900 truncate">hallucination</span>
+              <span class="flex items-baseline gap-2 num shrink-0">
+                <span class="text-sm font-semibold text-emerald-700">
+92%
+                </span>
+                <span class="text-[10px] text-stone-400 w-10 text-right">50s</span>
+              </span>
+            </a>
+          </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <div class="min-w-0">
+
+<section id="coding" class="mb-12 scroll-mt-24">
+  <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
+    <h2 class="text-lg font-medium tracking-tight">coding</h2>
+    <a href="../benchmarks/coding.html" class="text-xs text-stone-500 hover:text-stone-900">all models in this bench →</a>
+  </div>
+
+
+  <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+    <div class="md:col-span-1 bg-white border-2 border-emerald-500 rounded-lg p-5 flex flex-col justify-center">
+      <div class="text-xs uppercase tracking-wider text-stone-500">Score</div>
+      <div class="mt-1 text-5xl font-bold num leading-none text-emerald-700">
+79%
+      </div>
+        <div class="mt-3 grid grid-cols-3 gap-2 text-center">
+          <div class="rounded border border-stone-200 px-2 py-1.5">
+            <div class="text-[10px] uppercase tracking-wider text-stone-500">Static</div>
+            <div class="text-base font-bold num text-emerald-700">100%</div>
+          </div>
+          <div class="rounded border border-stone-200 px-2 py-1.5">
+            <div class="text-[10px] uppercase tracking-wider text-stone-500">Functional</div>
+            <div class="text-base font-bold num text-amber-700">67%</div>
+          </div>
+          <div class="rounded border border-stone-200 px-2 py-1.5">
+            <div class="text-[10px] uppercase tracking-wider text-stone-500">Qualitative</div>
+            <div class="text-base font-bold num text-emerald-700">80%</div>
+          </div>
+        </div>
+    </div>
+    <div class="md:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">tok/s</dt>
+        <dd class="mt-1 text-xl font-semibold num">100</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Tokens</dt>
+        <dd class="mt-1 text-xl font-semibold num">8127</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Wall</dt>
+        <dd class="mt-1 text-xl font-semibold num">109.5 s</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">RAM</dt>
+        <dd class="mt-1 text-xl font-semibold num">14.6 GB</dd>
+      </div>
+    </div>
+  </div>
+
+    <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Worum geht es? Was wird getestet?
+      </summary>
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: From a ~200-word prompt the model must generate a fully functional Kanban board as a single-file HTML with drag &amp; drop, localStorage persistence, edit/delete and a confetti animation — in a single chat without iteration. The prompt also includes a small `data-testid` contract so a Playwright test can drive the app remotely.
+
+Three signals feed into the score:
+(1) Static — a linter checks concrete constraints in the HTML (columns, Tailwind, localStorage call, no framework, no window.alert/prompt, …).
+(2) Functional — Playwright runs a small CRUD sequence: create a card, delete a card with confirmation, reload — does state persist? — and checks whether any JS console errors occur during the entire flow. Drag &amp; drop and confetti are deliberately not tested functionally (too many implementation variants).
+(3) Qualitative — LLM-as-judge rates screenshot and code (visual + code quality + render↔code consistency).
+
+Score = mean over the available signals.
+
+Why models fail: reasoning models burn their tokens in thinking instead of writing. Sliding-window models (Gemma 4) lose the constraints at the start of the prompt. Small models (&lt;3B) often fail to produce coherent HTML — or ignore the data-testid contract, which makes the functional tests fail in droves.</div>
+    </details>
+
+    <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Prompt
+      </summary>
+      <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">You are a careful front-end engineer.</pre>
+          </div>
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Developer prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">Create a fully functional Kanban board in a single HTML file using vanilla JavaScript (no frameworks like react).
+
+Requirements:
+- Columns: Backlog, In Progress, Review, Done.
+- Cards must be:
+  - draggable across columns,
+  - editable in place,
+  - persisted in localStorage (state survives reloads) - please use your own namespace,
+  - deletable with a confirmation prompt.
+- Each column provides an &#34;Add card&#34; action.
+- Style with Tailwind via CDN.
+- Add subtle CSS transitions and trigger a confetti animation when a card moves to &#34;Done&#34;.
+- Thoroughly comment the code.
+- dont use window.alert or window.prompt to add/edit/delete cards
+- if there are no cards yet, create some dummy cards
+- modern and vibrant design
+
+Stable test selectors (mandatory — these data-testid attributes are used by an automated functional test; do not omit, rename, or split them across multiple elements):
+- Column containers: data-testid=&#34;column-backlog&#34;, data-testid=&#34;column-in-progress&#34;, data-testid=&#34;column-review&#34;, data-testid=&#34;column-done&#34;.
+- Every &#34;Add card&#34; button (one per column): data-testid=&#34;add-card&#34;.
+- Every card element: data-testid=&#34;card&#34;.
+- Inside each card, the delete trigger: data-testid=&#34;delete-card&#34;.
+- The confirm button of the delete-confirmation dialog/modal: data-testid=&#34;confirm-delete&#34;.
+- The input/textarea where a new card title is typed: data-testid=&#34;card-input&#34;. Pressing Enter in this input MUST commit the new card.
+
+As answer return the plain HTML of the working application (script and styles included)</pre>
+          </div>
+      </div>
+    </details>
+
+        <a href="../assets/artifacts/google_gemma-4-26b-a4b-qat/coding/output.html" target="_blank"
+           class="mt-5 block bg-emerald-600 hover:bg-emerald-700 text-white text-center font-semibold text-lg rounded px-6 py-5 shadow-sm transition">
+          ▶ Open generated app in a new tab ↗
+        </a>
+        <div class="mt-4 bg-white border border-stone-200 rounded">
+          <div class="px-4 py-2 border-b border-stone-200 text-sm font-medium">Screenshot der gerenderten App</div>
+          <div class="zoom-frame">
+            <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom screenshot" title="Zoom screenshot">⛶</button>
+            <img src="../assets/artifacts/google_gemma-4-26b-a4b-qat/coding/screenshot.png" class="zoomable block w-full max-h-[600px] object-contain bg-stone-50 cursor-zoom-in" alt="Screenshot der gerenderten App">
+          </div>
+        </div>
+
+      <div class="mt-5 bg-amber-50 border border-amber-200 rounded">
+        <div class="px-4 py-3 border-b border-amber-200 flex items-baseline justify-between">
+          <div>
+            <span class="text-xs uppercase tracking-wider text-amber-700">Qualitative · LLM-as-judge (openai/gpt-5.4)</span>
+            <span class="ml-3 text-xs text-stone-500 num">2026-06-18T10:23:59.859825+00:00</span>
+          </div>
+          <div class="text-3xl font-bold num text-amber-700">80%</div>
+        </div>
+        <div class="px-4 py-3 border-b border-amber-200">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Visual (screenshot)</div>
+          <ul class="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs">
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">board renders</div>
+                  <div class="text-base font-bold num text-emerald-700">100%</div>
+                </li>
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">column completeness</div>
+                  <div class="text-base font-bold num text-emerald-700">100%</div>
+                </li>
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">cards present</div>
+                  <div class="text-base font-bold num text-emerald-700">100%</div>
+                </li>
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">ui affordances</div>
+                  <div class="text-base font-bold num text-emerald-700">80%</div>
+                </li>
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">design quality</div>
+                  <div class="text-base font-bold num text-emerald-700">85%</div>
+                </li>
+          </ul>
+<div class="mt-3 text-sm text-stone-700">Das Board rendert vollständig mit allen vier Spalten und mehreren gut lesbaren Karten. Add-Card-Buttons sind klar sichtbar, das Design wirkt modern und ordentlich, auch wenn Drag/Edit nur indirekt erkennbar sind.</div>        </div>
+        <div class="px-4 py-3 border-b border-amber-200">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Code quality (HTML/JS)</div>
+          <ul class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">code structure</div>
+                  <div class="text-base font-bold num text-emerald-700">80%</div>
+                </li>
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">dom safety</div>
+                  <div class="text-base font-bold num text-emerald-700">70%</div>
+                </li>
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">robustness</div>
+                  <div class="text-base font-bold num text-amber-700">45%</div>
+                </li>
+                <li class="text-center">
+                  <div class="text-stone-500 capitalize">code quality</div>
+                  <div class="text-base font-bold num text-amber-700">65%</div>
+                </li>
+          </ul>
+<div class="mt-3 text-sm text-stone-700">Der Code ist insgesamt sauber in Funktionen gegliedert und rendert die Karten logisch aus einem State-Objekt. Positiv ist die Nutzung von textContent für Kartentexte, aber innerHTML wird für das Delete-Icon genutzt und Robustheit ist nur mittel: localStorage/JSON.parse laufen ohne try/catch, dazu gibt es kleinere Qualitätsmängel wie doppelte Löschlogik und einen Tippfehler in einer Tailwind-Klasse.</div>        </div>
+          <div class="px-4 py-3">
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2 flex items-baseline justify-between">
+              <span>Render ↔ code consistency</span>
+              <span class="text-base font-bold num text-emerald-700">95%</span>
+            </div>
+<div class="text-sm text-stone-700">Screenshot und Code passen sehr gut zusammen: Die im State definierten fünf Beispielkarten erscheinen genau in den vier Spalten, ebenso die Add-Buttons und der allgemeine Look. Es gibt keine kritische Diskrepanz zwischen versprochener Funktionalität und Render-Ergebnis.</div>          </div>
+      </div>
+
+      <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+        <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+          Static · linter checks (12/12 passed)
+        </summary>
+        <div class="px-4 py-3 border-t border-stone-200 bg-white rounded-b">
+          <ul class="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Spalte &#39;Backlog&#39;</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Spalte &#39;In Progress&#39;</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Spalte &#39;Review&#39;</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Spalte &#39;Done&#39;</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">HTML5 drag &amp; drop or sortable lib</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">localStorage persistence</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Tailwind via CDN</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Confetti animation on &#39;Done&#39;</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Add card button</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Vanilla JS (no React/Vue/Angular/Svelte)</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">No window.alert/prompt for CRUD</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Editable cards (contenteditable / input)</div>
+                </div>
+              </li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+        <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+          Functional · E2E tests (4/6 passed)
+        </summary>
+        <div class="px-4 py-3 border-t border-stone-200 bg-white rounded-b">
+          <ul class="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Page loads with all 4 columns</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Add card via button</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Card is added exactly 1× (no double submit)</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-red-600">✗</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Delete card via button + confirmation</div>
+<div class="text-xs text-stone-500 mt-0.5 font-mono break-all">before delete 6, after 6</div>                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">Cards survive a reload</div>
+                </div>
+              </li>
+              <li class="bg-white border border-stone-200 rounded px-3 py-2 flex items-start gap-3">
+                <span class="text-base mt-0.5"><span class="text-red-600">✗</span></span>
+                <div class="text-sm flex-1">
+                  <div class="font-medium text-stone-900">No JS console errors</div>
+<div class="text-xs text-stone-500 mt-0.5 font-mono break-all">pageerror: Cannot read properties of null (reading &#39;addEventListener&#39;); pageerror: Cannot read properties of null (reading &#39;addEventListener&#39;)</div>                </div>
+              </li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+        <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+          Raw model response
+        </summary>
+        <pre class="px-4 py-3 text-xs bg-white whitespace-pre-wrap border-t border-stone-200 rounded-b overflow-x-auto">```html
+&lt;!DOCTYPE html&gt;
+&lt;html lang=&#34;en&#34;&gt;
+&lt;head&gt;
+    &lt;meta charset=&#34;UTF-8&#34;&gt;
+    &lt;meta name=&#34;viewport&#34; content=&#34;width=device-width, initial-scale=1.0&#34;&gt;
+    &lt;title&gt;Modern Kanban Board&lt;/title&gt;
+    &lt;!-- Tailwind CSS for modern styling --&gt;
+    &lt;script src=&#34;https://cdn.tailwindcss.com&#34;&gt;&lt;/script&gt;
+    &lt;!-- Canvas Confetti for celebrations --&gt;
+    &lt;script src=&#34;https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js&#34;&gt;&lt;/script&gt;
+    &lt;style&gt;
+        /* Custom transitions for smooth UI interactions */
+        .card-transition {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .column-drop-zone.drag-over {
+            background-color: rgba(226, 232, 240, 0.5);
+            border: 2px dashed #64748b;
+        }
+        /* Custom scrollbar for the board */
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body class=&#34;bg-slate-50 min-h-screen font-sans text-slate-900&#34;&gt;
+
+    &lt;!-- Header --&gt;
+    &lt;header class=&#34;bg-white border-b border-slate-200 py-6 px-8 mb-8 shadow-sm&#34;&gt;
+        &lt;div class=&#34;max-w-7xl mx-auto flex justify-between items-center&#34;&gt;
+            &lt;h1 class=&#34;text-3xl font-extrabold tracking-tight text-slate-800&#34;&gt;
+                Kanban &lt;span class=&#34;text-indigo-600&#34;&gt;Flow&lt;/span&gt;
+            &lt;/h1&gt;
+            &lt;p class=&#34;text-slate-500 text-sm font-medium&#34;&gt;Drag, drop, and organize your workflow&lt;/p&gt;
+        &lt;/div&gt;
+    &lt;/header&gt;
+
+    &lt;!-- Kanban Board Container --&gt;
+    &lt;main class=&#34;max-w-7xl mx-auto px-4 sm:px-6 lg:px-8&#34;&gt;
+        &lt;div class=&#34;flex flex-row gap-6 overflow-x-auto pb-8 custom-scrollbar min-h-[70vh] items-start&#34;&gt;
+            
+            &lt;!-- Bac</pre>
+      </details>
+
+
+    <div class="mt-4 text-xs text-stone-500">
+      Artefacts:
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-26b-a4b-qat/coding/output.html" target="_blank">Generierte App</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-26b-a4b-qat/coding/raw_response.txt" target="_blank">Raw model response</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-26b-a4b-qat/coding/screenshot.png" target="_blank">Screenshot der gerenderten App</a>
+    </div>
+</section>
+<section id="vision" class="mb-12 scroll-mt-24">
+  <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
+    <h2 class="text-lg font-medium tracking-tight">vision</h2>
+    <a href="../benchmarks/vision.html" class="text-xs text-stone-500 hover:text-stone-900">all models in this bench →</a>
+  </div>
+
+
+  <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+    <div class="md:col-span-1 bg-white border-2 border-amber-400 rounded-lg p-5 flex flex-col justify-center">
+      <div class="text-xs uppercase tracking-wider text-stone-500">Score</div>
+      <div class="mt-1 text-5xl font-bold num leading-none text-amber-700">
+45%
+      </div>
+    </div>
+    <div class="md:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">tok/s</dt>
+        <dd class="mt-1 text-xl font-semibold num">101</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Tokens</dt>
+        <dd class="mt-1 text-xl font-semibold num">21571</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Wall</dt>
+        <dd class="mt-1 text-xl font-semibold num">218.6 s</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">RAM</dt>
+        <dd class="mt-1 text-xl font-semibold num">14.6 GB</dd>
+      </div>
+    </div>
+  </div>
+
+    <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Worum geht es? Was wird getestet?
+      </summary>
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: Four OCR sub-tasks, one image each.
+(1)–(3) Handwritten meeting notes in three difficulty tiers (easy / medium / hard) — the model must transcribe the text.
+(4) An old book page in Fraktur typeface — same task.
+
+What is tested: OCR quality, recognising layout structure (columns, bullet points, dates), handling of illegible handwriting and historical letterforms (long-s, ligatures).
+
+Why models fail: text-only models have no vision capability (filtered out). Weak VLMs only recognise the clearest part. Some truncate output or get stuck in reasoning without producing a visible answer.</div>
+    </details>
+
+    <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Prompt
+      </summary>
+      <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">Du bist OCR-Spezialist für deutsche Handschrift.</pre>
+          </div>
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Developer prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">Auf dem Bild siehst du eine handschriftliche Meeting-Notiz mit klarer Struktur und gut lesbarer Schrift. Transkribiere den gesamten lesbaren Text. Behalte die Anordnung bei (Überschrift, Spalten, To-Dos). Bei unleserlichen Stellen schreibe &#39;[unleserlich]&#39;. Gib ausschließlich den puren OCR-Text im Markdown-Format zurück — keine Vorbemerkung, keine Erklärungen, kein Code-Fence.</pre>
+          </div>
+      </div>
+    </details>
+
+      <div class="mt-5 bg-white border border-stone-200 rounded overflow-hidden">
+        <div class="px-4 py-3 border-b border-stone-200 flex items-center justify-between bg-stone-50 gap-3 flex-wrap">
+          <div>
+            <span class="font-medium">Handschrift OCR – leicht</span>
+            <span class="ml-3 text-xs text-stone-500 num">
+39.9 s · 102 t/s            </span>
+          </div>
+          <div class="flex items-center gap-4 num">
+              <div class="text-xs">
+                <span class="text-stone-500">Recall</span>
+                <span class="font-bold text-base text-emerald-700">97%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">Precision</span>
+                <span class="font-bold text-base text-emerald-700">89%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">75/77</span>
+                <span class="text-amber-600">+9</span>
+              </div>
+                <div class="text-xs text-stone-500">
+<span class="text-sky-700">16 relocated</span>                </div>
+            <div class="text-3xl font-bold num leading-none text-emerald-700">
+93%            </div>
+          </div>
+        </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
+            <div class="p-3 bg-stone-50 grid grid-cols-1 gap-2">
+                <div class="zoom-frame">
+                  <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom image" title="Zoom image">⛶</button>
+                  <img src="../assets/artifacts/google_gemma-4-26b-a4b-qat/vision/handwriting_easy.jpg"
+                       class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded cursor-zoom-in"
+                       loading="lazy">
+                </div>
+            </div>
+            <div>
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider">Model response</div>
+              <pre class="p-4 text-sm whitespace-pre-wrap max-h-[500px] overflow-y-auto">Meetingnotizen Website - Relaunch
+
+12.06.25, 09:30 Uhr
+
+Anwesend:                                 CMS langsam?
+Anna, Ben, Mira, Jonas, Ece
+
+Themen:                                   Stand:
+- Startseite                              - Design fast final ✓
+- Texte                                   - Texte für Über-uns fehlen noch
+- Bildauswahl                             - Bilder vom Team noch nicht komplett
+- Launch-Termin                           - Mobile Ansicht prüfen
+- offene Fragen
+
+                                          $\uparrow$ bitte kurz
+                                              halten
+
+To-Dos:                                  Offen:
+- Ben $\rightarrow$ Bilder anfragen          - Rechtstexte final?
+- Mira $\rightarrow$ Startseite anpassen      - Freigabe Kunde bis Freitag
+- Jonas $\rightarrow$ Feedback Kunde          - Wer testet Kontaktformular?
+- Anna $\rightarrow$ SEO-Check
+
+Nächstes Meeting:
+17.06., 10 Uhr
+
+$\iiint$
+☕
+$\equiv$</pre>
+            </div>
+          </div>
+
+            <div class="border-t border-stone-200 bg-white">
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider flex items-center justify-between">
+                <span>Word diff ground truth ↔ model</span>
+                <span class="num">
+                  <span class="text-emerald-700">●</span> matched ·
+                  <span class="text-sky-700">●</span> relocated ·
+                  <span class="text-violet-700">●</span> fuzzy ·
+                  <span class="text-red-600">●</span> missing in model ·
+                  <span class="text-amber-600">●</span> extra/wrong
+                </span>
+              </div>
+              <div class="p-4 text-sm leading-relaxed font-mono max-h-[500px] overflow-y-auto">
+<span class="text-stone-700">meetingnotizen website relaunch 12 06 25 09 30 uhr anwesend</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">cms</span>
+<span class="text-stone-700">anna ben mira jonas ece</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">cms</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">langsam</span>
+<span class="text-stone-700">themen startseite</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">texte bildauswahl launch termin offene fragen stand</span>
+<span class="text-stone-700">design fast final texte für über uns fehlen noch bilder vom team noch nicht komplett mobile ansicht prüfen</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">uparrow</span>
+<span class="text-stone-700">bitte kurz halten to dos ben</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">rightarrow</span>
+<span class="text-stone-700">bilder anfragen mira</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">rightarrow</span>
+<span class="text-stone-700">startseite anpassen</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">jonas feedback kunde anna</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">seo</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">check offen rechtstexte final</span>
+<span class="text-stone-700">freigabe kunde bis freitag</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">rightarrow</span>
+<span class="text-stone-700">wer testet kontaktformular</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">rightarrow seo</span>
+<span class="text-stone-700">nächstes meeting 17 06 10 uhr</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">iiint equiv</span>
+              </div>
+              <details class="border-t border-stone-100">
+                <summary class="cursor-pointer px-4 py-2 text-xs text-stone-500 hover:text-stone-900">Ground truth (for comparison)</summary>
+                <pre class="p-4 text-xs bg-stone-50 whitespace-pre-wrap">Meetingnotizen Website-Relaunch
+12.06.25, 09:30 Uhr
+
+Anwesend:
+Anna, Ben, Mira, Jonas, Ece
+
+CMS langsam?
+
+Themen:
+Startseite
+Texte
+Bildauswahl
+Launch-Termin
+offene Fragen
+
+Stand:
+Design fast final
+Texte für Über-uns fehlen noch
+Bilder vom Team noch nicht komplett
+Mobile Ansicht prüfen
+
+bitte kurz halten
+
+To-Dos:
+Ben Bilder anfragen
+Mira Startseite anpassen
+Jonas Feedback Kunde
+Anna SEO-Check
+
+Offen:
+Rechtstexte final?
+Freigabe Kunde bis Freitag
+Wer testet Kontaktformular?
+
+Nächstes Meeting: 17.06., 10 Uhr</pre>
+              </details>
+            </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded overflow-hidden">
+        <div class="px-4 py-3 border-b border-stone-200 flex items-center justify-between bg-stone-50 gap-3 flex-wrap">
+          <div>
+            <span class="font-medium">Handschrift OCR – mittel</span>
+            <span class="ml-3 text-xs text-stone-500 num">
+60.3 s · 101 t/s            </span>
+          </div>
+          <div class="flex items-center gap-4 num">
+              <div class="text-xs">
+                <span class="text-stone-500">Recall</span>
+                <span class="font-bold text-base text-emerald-700">0%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">Precision</span>
+                <span class="font-bold text-base text-emerald-700">0%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">0/136</span>
+                <span class="text-amber-600">+0</span>
+              </div>
+            <div class="text-3xl font-bold num leading-none text-red-600">
+0%            </div>
+          </div>
+        </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
+            <div class="p-3 bg-stone-50 grid grid-cols-1 gap-2">
+                <div class="zoom-frame">
+                  <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom image" title="Zoom image">⛶</button>
+                  <img src="../assets/artifacts/google_gemma-4-26b-a4b-qat/vision/handwriting_medium.jpg"
+                       class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded cursor-zoom-in"
+                       loading="lazy">
+                </div>
+            </div>
+            <div>
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider">Model response</div>
+              <pre class="p-4 text-sm whitespace-pre-wrap max-h-[500px] overflow-y-auto"></pre>
+            </div>
+          </div>
+
+            <div class="border-t border-stone-200 bg-white">
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider flex items-center justify-between">
+                <span>Word diff ground truth ↔ model</span>
+                <span class="num">
+                  <span class="text-emerald-700">●</span> matched ·
+                  <span class="text-sky-700">●</span> relocated ·
+                  <span class="text-violet-700">●</span> fuzzy ·
+                  <span class="text-red-600">●</span> missing in model ·
+                  <span class="text-amber-600">●</span> extra/wrong
+                </span>
+              </div>
+              <div class="p-4 text-sm leading-relaxed font-mono max-h-[500px] overflow-y-auto">
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">meetingprotokoll 21 05 25 11 uhr teilnehmer m schulz t wagner l becker s klein später h jt themen projektstatus update budget ist zu hoch timeline meilenstein risiken projektstatus modul a fertig team s modul b verzögert sich testphase startet nächste woche hoffentlich kundenfeedback steht noch aus details in jira budget 20 über plan ursache unklare anforderungen nachbessern nötig nächstes mal genauer kalkulieren bitte report bis 28 05 offene punkte freigabe von kunde fehlt noch t w kümmert sich schnittstelle zu system x unklar rücksprache mit it schulung für neues tool noch nicht geplant wer macht das to dos t w budget report 28 05 l b kunden anstupsen wg feedback dokumentation aktualisieren nächstes meeting 04 06 25 10 uhr raum 2 15 rückfragen wie gehen wir mit dem risiko um priorisierung der features nochmal prüfen</span>
+              </div>
+              <details class="border-t border-stone-100">
+                <summary class="cursor-pointer px-4 py-2 text-xs text-stone-500 hover:text-stone-900">Ground truth (for comparison)</summary>
+                <pre class="p-4 text-xs bg-stone-50 whitespace-pre-wrap">Meetingprotokoll
+21.05.25
+11 Uhr
+
+Teilnehmer: M. Schulz, T. Wagner, L. Becker, S. Klein (später), H. Jt.
+
+Themen:
+Projektstatus / Update
+Budget — ist zu hoch
+Timeline / Meilenstein!
+Risiken
+
+Projektstatus:
+Modul A fertig (Team S.)
+Modul B verzögert sich
+Testphase startet nächste Woche (hoffentlich)
+Kundenfeedback steht noch aus
+
+Details in Jira
+
+Budget:
+20% über Plan
+Ursache: unklare Anforderungen
+Nachbessern nötig
+nächstes Mal genauer kalkulieren
+
+bitte Report bis 28.05.
+
+Offene Punkte:
+Freigabe von Kunde fehlt noch (T.W. kümmert sich)
+Schnittstelle zu System X unklar — Rücksprache mit IT
+Schulung für neues Tool? noch nicht geplant — wer macht das?
+
+To-Dos:
+T.W.: Budget-Report — 28.05.
+L.B.: Kunden anstupsen wg. Feedback
+Dokumentation aktualisieren
+
+Nächstes Meeting: 04.06.25, 10 Uhr (Raum 2.15?)
+
+Rückfragen:
+Wie gehen wir mit dem Risiko um?
+Priorisierung der Features nochmal prüfen
+...</pre>
+              </details>
+            </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded overflow-hidden">
+        <div class="px-4 py-3 border-b border-stone-200 flex items-center justify-between bg-stone-50 gap-3 flex-wrap">
+          <div>
+            <span class="font-medium">Handschrift OCR – schwer</span>
+            <span class="ml-3 text-xs text-stone-500 num">
+57.6 s · 101 t/s            </span>
+          </div>
+          <div class="flex items-center gap-4 num">
+              <div class="text-xs">
+                <span class="text-stone-500">Recall</span>
+                <span class="font-bold text-base text-emerald-700">89%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">Precision</span>
+                <span class="font-bold text-base text-emerald-700">87%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">131/148</span>
+                <span class="text-amber-600">+19</span>
+              </div>
+                <div class="text-xs text-stone-500">
+<span class="text-sky-700">32 relocated</span>                </div>
+            <div class="text-3xl font-bold num leading-none text-emerald-700">
+88%            </div>
+          </div>
+        </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
+            <div class="p-3 bg-stone-50 grid grid-cols-1 gap-2">
+                <div class="zoom-frame">
+                  <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom image" title="Zoom image">⛶</button>
+                  <img src="../assets/artifacts/google_gemma-4-26b-a4b-qat/vision/handwriting_hard.jpg"
+                       class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded cursor-zoom-in"
+                       loading="lazy">
+                </div>
+            </div>
+            <div>
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider">Model response</div>
+              <pre class="p-4 text-sm whitespace-pre-wrap max-h-[500px] overflow-y-auto">Besprechung Sommerfest 😊
+23.05.24 10:15 Uhr (Konfi?)                                     Chef fragen!! $\rightarrow$
+
+Teilnehmer:                                                     Ziel: entspanntes
+- Max                                                           Beisammensein
+- Jule                                                          &amp; Spaß haben 😊
+- Tobi
+
+Ort?                                                           Nächster Termin:
+$\rightarrow$ Park am See? ☀️                                         Do, 30.05.
+$\rightarrow$ Genehmigung?                                           11 Uhr
+$\rightarrow$ Firmenhof / Terrasse?                                   kurzes Update
+$\rightarrow$ Terrasse reservieren??                                   an HR schicken
+
+Essen - Trinken:                                                Grill wer?
+- Grillen evtl.                                                (Tobi fragen)
+- Vegetarische Optionen                                         
+  vergessen?                                                   Kuchen?
+- Getränkeliste machen!                                         Jule macht was 😊
+- Bier, Limo, Wasser, was noch?
+
+(Aperol? zu teuer?)                                             Wetter - Backup:
+                                                                   Pavillon? Wer bringt mit?
+Musik:                                                          Max hat einen?
+- Musikbox organisieren                                         $\rightarrow$ Zelt mieten $\rightarrow$ zu teuer
+- Playlist?                                                      Plan B: Kantine?
+
+Spiele | Programm:                                             Deko:
+- Volleyball / Football                                          - unnötig?
+- evtl. Cornhole oder Wikingerschach?                           - evtl. Luftballons? neee
+
+- Fotoecke Idee? Requisiten? 📸                                 Budget:
+                                                                   ca. 15€ p.P.?
+Einladung:                                                      Kosten noch offen?
+$\rightarrow$ Einladung bis Ende Woche raus!
+
+$\rightarrow$ Text: Leni?                                             Offene Fragen:
+$\rightarrow$ Liste an Simon                                         - Wer grillt? (muss jemand
+$\rightarrow$ Versand: Jule                                            Schulung haben?)
+                                                                   - Gibt&#39;s Strom im Park?
+                                                                   - Müll / Reinigung klären 🗑️</pre>
+            </div>
+          </div>
+
+            <div class="border-t border-stone-200 bg-white">
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider flex items-center justify-between">
+                <span>Word diff ground truth ↔ model</span>
+                <span class="num">
+                  <span class="text-emerald-700">●</span> matched ·
+                  <span class="text-sky-700">●</span> relocated ·
+                  <span class="text-violet-700">●</span> fuzzy ·
+                  <span class="text-red-600">●</span> missing in model ·
+                  <span class="text-amber-600">●</span> extra/wrong
+                </span>
+              </div>
+              <div class="p-4 text-sm leading-relaxed font-mono max-h-[500px] overflow-y-auto">
+<span class="text-stone-700">besprechung sommerfest 23 05 24 10 15 uhr konfi chef fragen</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">rightarrow</span>
+<span class="text-stone-700">teilnehmer</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">max</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">jule tobi</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">leni simon konnte nur kurz</span>
+<span class="text-stone-700">ziel entspanntes</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">max</span>
+<span class="text-stone-700">beisammensein spaß haben</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">ort</span>
+<span class="text-stone-700">nächster termin</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">rightarrow am see</span>
+<span class="text-stone-700">do 30 05</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">rightarrow</span>
+<span class="text-stone-700">11 uhr</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">rightarrow</span>
+<span class="text-stone-700">kurzes update</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">rightarrow</span>
+<span class="text-stone-700">an hr schicken</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">ort</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">park</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">am see</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">genehmigung firmenhof terrasse terrasse reservieren</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">wer</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">macht</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">das leni</span>
+<span class="text-stone-700">essen trinken</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">wer</span>
+<span class="text-stone-700">grillen evtl vegetarische optionen vergessen getränkeliste machen</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">was</span>
+<span class="text-stone-700">bier limo wasser was noch aperol zu teuer</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">grill</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">wer</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">tobi fragen kuchen jule</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">macht was</span>
+<span class="text-stone-700">wetter backup pavillon wer bringt mit max hat einen</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">rightarrow</span>
+<span class="text-stone-700">zelt mieten</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">rightarrow</span>
+<span class="text-stone-700">zu teuer plan b kantine</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">musik musikbox organisieren playlist</span>
+<span class="text-stone-700">deko</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">football</span>
+<span class="text-stone-700">unnötig</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">oder</span>
+<span class="text-stone-700">evtl luftballons neee budget ca 15 p p kosten noch offen</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">spiele programm volleyball</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">federball</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">evtl cornhole</span>
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">oder</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">wikingerschach fotoecke idee requisiten einladung</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">rightarrow</span>
+<span class="text-stone-700">einladung bis ende woche raus</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">rightarrow</span>
+<span class="text-stone-700">text leni</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">rightarrow</span>
+<span class="text-stone-700">liste an simon</span>
+<span class="bg-sky-50 text-sky-700 px-0.5 rounded">versand jule offene fragen</span>
+<span class="text-stone-700">wer grillt muss jemand</span>
+<span class="bg-amber-50 text-amber-700 px-0.5 rounded">rightarrow</span>
+<span class="text-stone-700">schulung haben gibt s strom im park müll reinigung klären</span>
+              </div>
+              <details class="border-t border-stone-100">
+                <summary class="cursor-pointer px-4 py-2 text-xs text-stone-500 hover:text-stone-900">Ground truth (for comparison)</summary>
+                <pre class="p-4 text-xs bg-stone-50 whitespace-pre-wrap">Besprechung Sommerfest
+23.05.24 10:15 Uhr (Konfi)
+
+Chef fragen!!
+
+Teilnehmer:
+Max
+Jule
+Tobi
+Leni
+Simon (konnte nur kurz)
+
+Ziel: entspanntes Beisammensein &amp; Spaß haben
+
+Nächster Termin:
+Do, 30.05.
+11 Uhr
+kurzes Update
+an HR schicken
+
+Ort?:
+Park am See?
+Genehmigung?
+Firmenhof / Terrasse?
+Terrasse reservieren?? — wer macht das? Leni?
+
+Essen / Trinken:
+Grillen evtl.
+vegetarische Optionen vergessen?
+Getränkeliste machen!
+Bier, Limo, Wasser, was noch? (Aperol? zu teuer?)
+Grill wer? (Tobi fragen)
+Kuchen? Jule macht was
+
+Wetter / Backup:
+Pavillon? Wer bringt mit?
+Max hat einen?
+Zelt mieten → zu teuer
+Plan B: Kantine?
+
+Musik:
+Musikbox organisieren
+Playlist?
+
+Deko:
+unnötig?
+evtl. Luftballons? neee
+
+Budget:
+ca. 15€ p.P.?
+Kosten noch offen!
+
+Spiele / Programm:
+Volleyball / Federball
+evtl. Cornhole oder Wikingerschach?
+Fotoecke Idee? Requisiten?
+
+Einladung:
+Einladung bis Ende Woche raus!
+Text: Leni?
+Liste an Simon
+Versand: Jule
+
+Offene Fragen:
+Wer grillt? (muss jemand Schulung haben?)
+Gibt&#39;s Strom im Park?
+Müll / Reinigung klären</pre>
+              </details>
+            </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded overflow-hidden">
+        <div class="px-4 py-3 border-b border-stone-200 flex items-center justify-between bg-stone-50 gap-3 flex-wrap">
+          <div>
+            <span class="font-medium">Fraktur OCR</span>
+            <span class="ml-3 text-xs text-stone-500 num">
+60.8 s · 100 t/s            </span>
+          </div>
+          <div class="flex items-center gap-4 num">
+              <div class="text-xs">
+                <span class="text-stone-500">Recall</span>
+                <span class="font-bold text-base text-emerald-700">0%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">Precision</span>
+                <span class="font-bold text-base text-emerald-700">0%</span>
+              </div>
+              <div class="text-xs">
+                <span class="text-stone-500">0/382</span>
+                <span class="text-amber-600">+0</span>
+              </div>
+            <div class="text-3xl font-bold num leading-none text-red-600">
+0%            </div>
+          </div>
+        </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
+            <div class="p-3 bg-stone-50 grid grid-cols-1 gap-2">
+                <div class="zoom-frame">
+                  <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom image" title="Zoom image">⛶</button>
+                  <img src="../assets/artifacts/google_gemma-4-26b-a4b-qat/vision/fraktur_innerpage.jpg"
+                       class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded cursor-zoom-in"
+                       loading="lazy">
+                </div>
+            </div>
+            <div>
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider">Model response</div>
+              <pre class="p-4 text-sm whitespace-pre-wrap max-h-[500px] overflow-y-auto"></pre>
+            </div>
+          </div>
+
+            <div class="border-t border-stone-200 bg-white">
+              <div class="px-4 py-2 border-b border-stone-100 text-xs text-stone-500 uppercase tracking-wider flex items-center justify-between">
+                <span>Word diff ground truth ↔ model</span>
+                <span class="num">
+                  <span class="text-emerald-700">●</span> matched ·
+                  <span class="text-sky-700">●</span> relocated ·
+                  <span class="text-violet-700">●</span> fuzzy ·
+                  <span class="text-red-600">●</span> missing in model ·
+                  <span class="text-amber-600">●</span> extra/wrong
+                </span>
+              </div>
+              <div class="p-4 text-sm leading-relaxed font-mono max-h-[500px] overflow-y-auto">
+<span class="bg-red-50 text-red-700 px-0.5 rounded line-through">deiner großmutter wohl nur geträumt haben nein meinte malineken hartnäckig sie hat ja auch die prinzessin vom see gesehen und das ist etwas ganz besonderes davon habe ich noch nie gehört antwortete gottlieb so kann sie es dir erzählen frag sie nur aus sie weiß alles der kahn war mittlerweile der insel ganz nahe gekommen die kinder landeten an einer dazu geeigneten stelle und befestigten ihn an einem aus dem wasser ragenden pflock sie erstiegen die kleine anhöhe auf der sich das gehöft befand in dem kurzen feinen grase welches den boden bedeckte blühte der thymian ein festgetretener weg führte gerade auf die schilfhütte zu die lag heimlich unter den weiden das mächtige geäst der majestätischen bäume mit silbergrauem spitzblättrigem laube beladen breitete sich weit und wuchtig über das niedere dach welches sich der erde zuneigte dahinter erblickte man ein stück garten und ackerland von rohr und schilf wie mit einem wall umschlossen eine alte frau saß vor der thür des hüttchens und spann ihr haar war so weiß wie das gewebe der spinnen welches im herbst über die stoppeln fliegt um ihren rocken hatte sie ein schwarzes band gebunden gottlieb und malineken kamen mit dem korbe und blieben vor ihr stehen großmutter sagte letztere er will nicht glauben daß du die seejungfern gesehen hast und er weiß nichts von der prinzessin vom see sie netzte ihren faden geht ihr man eures weges gab sie ihnen zur antwort großmutter du könntest ihm die geschichte von der prinzessin vom see wohl erzählen bat malineken sie läßt sich schön anhören und man muß sie doch wissen wenn man über den see fährt und in dem blumental tag für tag herumwandert ich meine ihr könntet euer vesper brauchen sagte die großmutter es hat eben vier uhr geschlagen ach ja rief malineken inbrünstig erdbeeren mit milch und ein stück brot dazu und dieweil wir das aufzehren erzählt ihr dem gottlieb die geschichte sie ließ nicht nach sie mußte ihren willen haben ein weilchen danach saßen die kinder auf einem baumstamm vor der hütte und hatten zwischen sich einen napf mit süßer milch in der schwammen die erdbeeren so dick daß man nicht wußte war das milch mit erdbeeren oder erdbeeren mit milch doch es mochte wohl auf eins herauskommen die großmutter blickte zuweilen nach ihnen hin</span>
+              </div>
+              <details class="border-t border-stone-100">
+                <summary class="cursor-pointer px-4 py-2 text-xs text-stone-500 hover:text-stone-900">Ground truth (for comparison)</summary>
+                <pre class="p-4 text-xs bg-stone-50 whitespace-pre-wrap">deiner Großmutter wohl nur geträumt haben. „Nein,&#34; meinte Malineken hartnäckig, „sie hat ja auch die Prinzessin vom See gesehen, und das ist etwas ganz Besonderes.&#34; „Davon habe ich noch nie gehört,&#34; antwortete Gottlieb. „So kann sie es dir erzählen, frag sie nur aus, sie weiß alles.&#34;
+
+Der Kahn war mittlerweile der Insel ganz nahe gekommen; die Kinder landeten an einer dazu geeigneten Stelle und befestigten ihn an einem aus dem Wasser ragenden Pflock. Sie erstiegen die kleine Anhöhe, auf der sich das Gehöft befand. In dem kurzen, feinen Grase, welches den Boden bedeckte, blühte der Thymian; ein festgetretener Weg führte gerade auf die Schilfhütte zu, die lag heimlich unter den Weiden. Das mächtige Geäst der majestätischen Bäume, mit silbergrauem, spitzblättrigem Laube beladen, breitete sich weit und wuchtig über das niedere Dach, welches sich der Erde zuneigte. Dahinter erblickte man ein Stück Garten und Ackerland, von Rohr und Schilf wie mit einem Wall umschlossen. Eine alte Frau saß vor der Thür des Hüttchens und spann. Ihr Haar war so weiß wie das Gewebe der Spinnen, welches im Herbst über die Stoppeln fliegt, um ihren Rocken hatte sie ein schwarzes Band gebunden. Gottlieb und Malineken kamen mit dem Korbe und blieben vor ihr stehen. „Großmutter,&#34; sagte letztere, „er will nicht glauben, daß du die Seejungfern gesehen hast, und er weiß nichts von der Prinzessin vom See.&#34; Sie netzte ihren Faden. „Geht ihr man eures Weges,&#34; gab sie ihnen zur Antwort. „Großmutter, du könntest ihm die Geschichte von der Prinzessin vom See wohl erzählen,&#34; bat Malineken, „sie läßt sich schön anhören, und man muß sie doch wissen, wenn man über den See fährt und in dem Blumental Tag für Tag herumwandert.&#34; „Ich meine, ihr könntet euer Vesper brauchen,&#34; sagte die Großmutter, „es hat eben vier Uhr geschlagen.&#34; „Ach ja,&#34; rief Malineken inbrünstig, „Erdbeeren mit Milch und ein Stück Brot dazu; und dieweil wir das aufzehren, erzählt Ihr dem Gottlieb die Geschichte.&#34; Sie ließ nicht nach, sie mußte ihren Willen haben. Ein Weilchen danach saßen die Kinder auf einem Baumstamm vor der Hütte und hatten zwischen sich einen Napf mit süßer Milch, in der schwammen die Erdbeeren so dick, daß man nicht wußte, war das Milch mit Erdbeeren, oder Erdbeeren mit Milch; doch es mochte wohl auf eins herauskommen. Die Großmutter blickte zuweilen nach ihnen hin</pre>
+              </details>
+            </div>
+      </div>
+
+
+    <div class="mt-4 text-xs text-stone-500">
+      Artefacts:
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-26b-a4b-qat/vision/handwriting_easy.txt" target="_blank">Handschrift OCR – leicht – Antwort</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-26b-a4b-qat/vision/handwriting_easy.jpg" target="_blank">Handschrift OCR – leicht – Bild</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-26b-a4b-qat/vision/handwriting_medium.txt" target="_blank">Handschrift OCR – mittel – Antwort</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-26b-a4b-qat/vision/handwriting_medium.jpg" target="_blank">Handschrift OCR – mittel – Bild</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-26b-a4b-qat/vision/handwriting_hard.txt" target="_blank">Handschrift OCR – schwer – Antwort</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-26b-a4b-qat/vision/handwriting_hard.jpg" target="_blank">Handschrift OCR – schwer – Bild</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-26b-a4b-qat/vision/fraktur_ocr.txt" target="_blank">Fraktur OCR – Antwort</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-26b-a4b-qat/vision/fraktur_innerpage.jpg" target="_blank">Fraktur OCR – Bild</a>
+    </div>
+</section>
+<section id="niah" class="mb-12 scroll-mt-24">
+  <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
+    <h2 class="text-lg font-medium tracking-tight">niah</h2>
+    <a href="../benchmarks/niah.html" class="text-xs text-stone-500 hover:text-stone-900">all models in this bench →</a>
+  </div>
+
+
+  <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+    <div class="md:col-span-1 bg-white border-2 border-amber-400 rounded-lg p-5 flex flex-col justify-center">
+      <div class="text-xs uppercase tracking-wider text-stone-500">Score</div>
+      <div class="mt-1 text-5xl font-bold num leading-none text-amber-700">
+68%
+      </div>
+    </div>
+    <div class="md:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">tok/s</dt>
+        <dd class="mt-1 text-xl font-semibold num">53</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Tokens</dt>
+        <dd class="mt-1 text-xl font-semibold num">11439</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Wall</dt>
+        <dd class="mt-1 text-xl font-semibold num">317.7 s</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">RAM</dt>
+        <dd class="mt-1 text-xl font-semibold num">14.6 GB</dd>
+      </div>
+    </div>
+  </div>
+
+    <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Worum geht es? Was wird getestet?
+      </summary>
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: In a German book corpus (with embedded source code) 10 synthetic facts are hidden at evenly distributed depths (5% – 95%). The model must retrieve all of them.
+
+Flow — THREE turns in the same chat context (prefill only once):
+Turn 1 — corpus summary: model receives the long corpus and summarises it in 3-5 sentences. Forces real processing of the text.
+Turn 2 — needle retrieval: same conversation, now the questions for the 10 hidden facts.
+Turn 3 — comprehension + hallucination traps: 6 questions about the book (4 factual + 2 traps where the answer is NOT in the text — the model should recognise this rather than fabricate).
+
+Default mode runs ONE uniform stage for all models: 120k tokens. Models without sufficient max_context are skipped at this stage. `niah_deep` additionally runs 32k / 64k / 200k for a full heatmap.
+
+Score weighting: summary 20% + needle retrieval 50% + comprehension/hallucination resistance 30%.
+
+Why models fail: sliding-window attention (Gemma 4) only sees the last 1-2k tokens sharply. Reasoning models hit the token limit before answering. Q4 KV cache measurably degrades recall at long contexts. On the hallucination traps the helpful bias lures models into plausible-sounding inventions.</div>
+    </details>
+
+    <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Prompt
+      </summary>
+      <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Developer prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">TURN 1 (User):
+The following section contains a longer mixed text of German narrative and source code.
+
+===== TEXT BEGIN =====
+&lt;corpus with embedded needles, 32k–128k tokens depending on stage&gt;
+===== TEXT END =====
+
+Summarise the text in 3-5 sentences. Mention the main characters, setting and key themes.
+
+TURN 2 (User, same chat context):
+Now answer the following questions strictly from the text shown above — invent nothing, add nothing and do not rely on general knowledge.
+
+Questions:
+1. &lt;question for needle 1&gt;
+2. &lt;question for needle 2&gt;
+...
+
+Answer as a numbered list 1., 2., 3. with one short sentence each.</pre>
+          </div>
+      </div>
+    </details>
+
+    <p class="mt-5 text-sm text-stone-600">
+      For each context length 10 needles are distributed across the corpus. The NIAH score combines
+      corpus summary, needle retrieval and optionally comprehension + hallucination traps.
+      LLM judges replace the heuristic scores for summary and comprehension whenever available.
+    </p>
+
+      <div class="mt-6">
+        <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">
+          Stage: <span class="num font-semibold text-stone-700">120k tokens</span>
+        </div>
+
+            <div class="bg-sky-50 border border-sky-200 rounded-lg overflow-hidden">
+              <div class="px-4 py-3 border-b border-sky-200 flex items-baseline justify-between">
+                <div>
+                  <span class="text-xs uppercase tracking-wider text-sky-700 font-semibold">Sub-benchmark · corpus summary</span>
+                  <span class="ml-2 text-xs text-stone-500">Turn 1</span>
+                </div>
+                <div class="text-sm num">
+                    <span class="font-bold text-base text-emerald-700">
+                      88%
+                    </span>
+                    <span class="text-stone-500">LLM judge</span>
+                    <span class="ml-2 text-xs text-stone-400">heur. 100%</span>
+                  <span class="ml-2 text-xs text-stone-500">~120k tokens input</span>
+                </div>
+              </div>
+              <div class="px-4 py-3 bg-white">
+                <pre class="text-sm text-stone-800 whitespace-pre-wrap leading-relaxed max-h-[500px] overflow-y-auto">Die Erzählung spielt im „Blumental“ und im Dorf Finkenwalde während der napoleonischen Besatzung und thematisiert die Auswirkungen des Krieges auf die Zivilbevölkerung. Im Zentrum stehen der Schmiedelehrling Gottlieb und das Mädchen Malineken, die zwischen der harten Realität der französischen Besatzung und einer begleitenden Legende über eine Prinzessin vom See navigieren. Die Geschichte verwebt die persönliche Tragödie der Kinder – den Verlust ihrer Eltern durch die Soldaten – mit dem Widerstand der Bevölkerung und dem Streben nach Patriotismus und Hoffnung.</pre>
+                  <div class="mt-3 border border-amber-200 bg-amber-50 rounded p-3">
+                    <div class="flex items-baseline justify-between gap-3">
+                      <span class="text-xs uppercase tracking-wider text-amber-700">LLM judge summary (openai/gpt-5.4)</span>
+                      <span class="text-lg font-bold num text-emerald-700">88%</span>
+                    </div>
+                      <ul class="mt-2 grid grid-cols-2 md:grid-cols-6 gap-2 text-xs">
+                          <li class="bg-white border border-amber-100 rounded px-2 py-1 text-center">
+                            <div class="text-stone-500">main characters</div>
+                            <div class="font-bold num text-emerald-700">95%</div>
+                          </li>
+                          <li class="bg-white border border-amber-100 rounded px-2 py-1 text-center">
+                            <div class="text-stone-500">setting</div>
+                            <div class="font-bold num text-emerald-700">100%</div>
+                          </li>
+                          <li class="bg-white border border-amber-100 rounded px-2 py-1 text-center">
+                            <div class="text-stone-500">plot</div>
+                            <div class="font-bold num text-emerald-700">72%</div>
+                          </li>
+                          <li class="bg-white border border-amber-100 rounded px-2 py-1 text-center">
+                            <div class="text-stone-500">themes</div>
+                            <div class="font-bold num text-emerald-700">95%</div>
+                          </li>
+                          <li class="bg-white border border-amber-100 rounded px-2 py-1 text-center">
+                            <div class="text-stone-500">no hallucinations</div>
+                            <div class="font-bold num text-emerald-700">85%</div>
+                          </li>
+                      </ul>
+<div class="mt-2 text-sm text-stone-700">Schauplatz, Zeitkontext, Gottlieb und Malineken sowie die Leitmotive von Besatzung, Leid und patriotischem Widerstand sind sehr gut getroffen. Etwas verkürzt ist der Handlungsbogen: Insel-Geheimnis, Gefangennahme und Befreiung fehlen; zudem ist „den Verlust ihrer Eltern“ ungenau, da nur Gottlieb diese Vorgeschichte hat.</div>                  </div>
+                  <ul class="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      <li class="text-xs px-2 py-1 rounded border border-emerald-200 bg-emerald-50 text-emerald-800">
+                        ✓ 3-5 sentences · 3 sentences counted
+                      </li>
+                      <li class="text-xs px-2 py-1 rounded border border-emerald-200 bg-emerald-50 text-emerald-800">
+                        ✓ At most 220 words · 77 words
+                      </li>
+                      <li class="text-xs px-2 py-1 rounded border border-emerald-200 bg-emerald-50 text-emerald-800">
+                        ✓ Corpus keywords (3/4) · ✓ Gottlieb, ✓ Malineken, ✓ Schmied, ✗ Bonaparte
+                      </li>
+                  </ul>
+              </div>
+            </div>
+
+          <div class="mt-4 bg-white border border-stone-200 rounded-lg overflow-hidden">
+            <div class="px-4 py-3 border-b border-stone-200 flex items-baseline justify-between">
+              <div>
+                <span class="text-xs uppercase tracking-wider text-stone-700 font-semibold">Sub-benchmark · needle retrieval</span>
+                <span class="ml-2 text-xs text-stone-500">Turn 2</span>
+              </div>
+              <div class="text-sm num">
+                <span class="font-bold text-base text-amber-700">
+                  9/10
+                </span>
+                <span class="text-stone-500">hits</span>
+              </div>
+            </div>
+            <div class="px-4 py-3">
+              <ul class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-emerald-600">●</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">5% (5 %)</div>
+                      <div class="text-stone-500 mt-0.5">expected: blauer Ankerstein, Lübeck-1907, A-318</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-emerald-600">●</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">10% (10 %)</div>
+                      <div class="text-stone-500 mt-0.5">expected: smaragdgrün, Schlüssel, Seriennummer, 7-Bravo-12</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-emerald-600">●</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">15% (15 %)</div>
+                      <div class="text-stone-500 mt-0.5">expected: Nordstern-Brigade, violetter</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-emerald-600">●</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">25% (25 %)</div>
+                      <div class="text-stone-500 mt-0.5">expected: Indigo-Quark</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-emerald-600">●</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">33% (33 %)</div>
+                      <div class="text-stone-500 mt-0.5">expected: Atlantis-Mira, NL-7711, 142</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-red-500">○</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">50% (50 %)</div>
+                      <div class="text-stone-500 mt-0.5">expected: Ehrenmitglied, Aluminium-Gesellschaft, Köln</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-emerald-600">●</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">65% (65 %)</div>
+                      <div class="text-stone-500 mt-0.5">expected: Safran-Klops Margarethe, 7 Gramm|7 g, 3 Stunden|drei Stunden</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-emerald-600">●</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">75% (75 %)</div>
+                      <div class="text-stone-500 mt-0.5">expected: Erbe von Onkel Walpurgis, 42-Lima</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-emerald-600">●</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">85% (85 %)</div>
+                      <div class="text-stone-500 mt-0.5">expected: 7f4a2e91-marlin-2026</div>
+                    </div>
+                  </li>
+                  <li class="text-xs flex items-start gap-2">
+                    <span class="mt-0.5"><span class="text-emerald-600">●</span></span>
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-stone-900">90% (90 %)</div>
+                      <div class="text-stone-500 mt-0.5">expected: Coriolis-Effekt, Pendel, Memo, Dr. Kühn, 17.03.2024</div>
+                    </div>
+                  </li>
+              </ul>
+              <details class="mt-3">
+                <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Model response to the needle questions</summary>
+                <pre class="mt-2 text-xs bg-stone-50 border border-stone-200 rounded p-3 overflow-x-auto whitespace-pre-wrap">1. Im Schaufenster des Antiquitätenhändlers lag ein blauer Ankerstein mit der Gravur &#39;Lübeck-1907&#39; und der Inventarnummer A-318.
+2. Der Schmied verbarg im Sommer 1893 einen smaragdgrünen Schlüssel mit der Seriennummer 7-Bravo-12 unter dem Ambos.
+3. Hauptkapitän Friebusch erinnerte sich an die Nordstern-Brigade, deren Standarte aus violetter Seide gefertigt war.
+4. Eine Katze namens Indigo-Quark wartete hinter der Schmiede auf den Postboten.
+5. Das Frachtschiff &#39;Atlantis-Mira&#39; (Reg-Nr. NL-7711) lud am 3. Mai 142 Säcke Gerste an Bord.
+6. Der Pfarrer von Wriezen wurde am 14. Februar 1894 zum Ehrenmitglied der Aluminium-Gesellschaft ernannt.
+7. Im Hauskochbuch ist das Rezept für &#39;Safran-Klops Margarethe&#39; mit 7 Gramm Safran und einer Garzeit von 3 Stunden erwähnt.
+8. Auf der Regentonne im Hof war die kupferne Inschrift &#39;Erbe von Onkel Walpurgis, Charge 42-Lima&#39; eingraviert.
+9. Der RUNTIME_TOKEN-Wert im Quellcode-Kommentar ist &#39;7f4a2e91-marlin-2026&#39;.
+10. Der TODO-Kommentar lautet „Coriolis-Effekt im Pendel berücksichtigen“ und verweist auf ein Memo von Dr. Kühn vom 17.03.2024.</pre>
+              </details>
+            </div>
+          </div>
+
+            <div class="mt-4 bg-amber-50 border border-amber-200 rounded-lg overflow-hidden">
+              <div class="px-4 py-3 border-b border-amber-200 flex items-baseline justify-between">
+                <div>
+                  <span class="text-xs uppercase tracking-wider text-amber-800 font-semibold">Sub-benchmark · comprehension + hallucination traps</span>
+                  <span class="ml-2 text-xs text-stone-500">Turn 3</span>
+                </div>
+                <div class="text-sm num">
+                    <span class="font-bold text-base text-amber-700">
+                      17%
+                    </span>
+                    <span class="text-stone-500">LLM judge</span>
+                    <span class="ml-2 text-xs text-stone-400">heur. 0%</span>
+                  <span class="ml-2 text-xs text-stone-600">
+                    Facts 0/4 ·
+                    Traps 0/2
+                  </span>
+                </div>
+              </div>
+              <ul class="px-4 py-3 bg-white space-y-3">
+                  <li class="border-l-4 border-red-500 pl-3">
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200">Factual question</span>
+                      <div class="text-sm font-medium text-stone-900 flex-1">Wie heißt der Schmied vom Blumental, bei dem Gottlieb in der Lehre ist? (Vor- und Nachname)</div>
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                              data-tooltip="LLM judge 0% · falsch: Keine Antwort; Michael Lebbin wurde nicht genannt.">
+                          J
+                        </span>
+                    </div>
+                    <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+                  </li>
+                  <li class="border-l-4 border-red-500 pl-3">
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200">Factual question</span>
+                      <div class="text-sm font-medium text-stone-900 flex-1">Wie heißt der französische Kapitän, der Gottliebs Eltern getötet hat?</div>
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                              data-tooltip="LLM judge 0% · falsch: Keine Antwort; Etienne de Beaumont wurde nicht genannt.">
+                          J
+                        </span>
+                    </div>
+                    <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+                  </li>
+                  <li class="border-l-4 border-red-500 pl-3">
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200">Factual question</span>
+                      <div class="text-sm font-medium text-stone-900 flex-1">Womit lenkte Malineken die Wachen ab, um den Schlüssel zu entwenden?</div>
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                              data-tooltip="LLM judge 0% · falsch: Keine Antwort; Malinekens Ablenkung über Semmelverkauf/Wachtstube fehlt.">
+                          J
+                        </span>
+                    </div>
+                    <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+                  </li>
+                  <li class="border-l-4 border-red-500 pl-3">
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200">Factual question</span>
+                      <div class="text-sm font-medium text-stone-900 flex-1">Warum muss Gottlieb sich verborgen halten? Was würden die Franzosen sonst tun?</div>
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                              data-tooltip="LLM judge 0% · falsch: Keine Antwort; der Grund der Verborgenheit vor drohender Erschießung wurde nicht genannt.">
+                          J
+                        </span>
+                    </div>
+                    <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+                  </li>
+                  <li class="border-l-4 border-amber-500 pl-3">
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200">Hallucination trap</span>
+                      <div class="text-sm font-medium text-stone-900 flex-1">Wie heißt Gottliebs Onkel?</div>
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                              data-tooltip="LLM judge 50% · neutral: Keine Antwort. Immerhin keine Halluzination eines Onkels, aber die Falle wurde auch nicht explizit korrekt zurückgewiesen.">
+                          J
+                        </span>
+                    </div>
+                    <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+                  </li>
+                  <li class="border-l-4 border-amber-500 pl-3">
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200">Hallucination trap</span>
+                      <div class="text-sm font-medium text-stone-900 flex-1">Mit welcher List überlistete Michael Lebbin Kaiser Bonaparte persönlich?</div>
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                              data-tooltip="LLM judge 50% · neutral: Keine Antwort. Keine erfundene Begegnung/List, aber auch keine saubere Zurückweisung der falschen Prämisse.">
+                          J
+                        </span>
+                    </div>
+                    <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap"></div>
+                  </li>
+              </ul>
+            </div>
+      </div>
+
+
+    <div class="mt-4 text-xs text-stone-500">
+      Artefacts:
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-26b-a4b-qat/niah/breakdown.json" target="_blank">Breakdown pro Kontextlänge</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/haystacks/haystack_120k.txt" target="_blank">Haystack 120k Tokens</a>
+    </div>
+</section>
+<section id="tool_use" class="mb-12 scroll-mt-24">
+  <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
+    <h2 class="text-lg font-medium tracking-tight">tool_use</h2>
+    <a href="../benchmarks/tool_use.html" class="text-xs text-stone-500 hover:text-stone-900">all models in this bench →</a>
+  </div>
+
+
+  <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+    <div class="md:col-span-1 bg-white border-2 border-emerald-500 rounded-lg p-5 flex flex-col justify-center">
+      <div class="text-xs uppercase tracking-wider text-stone-500">Score</div>
+      <div class="mt-1 text-5xl font-bold num leading-none text-emerald-700">
+100%
+      </div>
+    </div>
+    <div class="md:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">tok/s</dt>
+        <dd class="mt-1 text-xl font-semibold num">108</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Tokens</dt>
+        <dd class="mt-1 text-xl font-semibold num">8536</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Wall</dt>
+        <dd class="mt-1 text-xl font-semibold num">91.1 s</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">RAM</dt>
+        <dd class="mt-1 text-xl font-semibold num">14.6 GB</dd>
+      </div>
+    </div>
+  </div>
+
+    <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Worum geht es? Was wird getestet?
+      </summary>
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: 7 agentic-workflow scenarios across three difficulty tiers, with four mocked tools available (list_files, read_file, apply_diff, get_weather). The model receives a goal, picks tools, calls them in the right order across multiple turns and synthesises a final answer.
+
+Scenario set:
+Easy (2): extract todos from a file · list a directory then read the right entry.
+Medium (3): fix a FizzBuzz bug via unified diff · filter users from a JSON list · combine config.json with a weather mock for an alert.
+Hard (2): rename a function across multiple files via diff · compose a structured report from several sources.
+
+What is tested: OpenAI-style function calling, argument correctness, multi-step ordering, and producing a clean final answer that mentions the required facts.
+
+Why models fail: models without &#39;tool_use&#39; capability ignore the schemas. Weak models pick wrong tools or emit malformed arguments. Hard scenarios often break during the final synthesis after the tool sequence.</div>
+    </details>
+
+    <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Prompt
+      </summary>
+      <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">Du arbeitest in einer agentic IDE (vergleichbar mit Cursor/Claude Code). Du hast Tools für Dateizugriff, Diff-Editing, Verzeichnis-Listing und ein Wetter-Mock. Plane mehrstufig: erst aufklären, dann handeln, am Ende prüfen. Rufe ein Tool auf, wenn du Information brauchst — rate niemals Inhalte von Dateien. Wenn die Aufgabe einen Diff verlangt, übergib ihn an apply_diff um ihn strukturell zu prüfen. Wenn die Aufgabe ein JSON-Objekt als Antwort verlangt, antworte AUSSCHLIESSLICH mit dem JSON-Objekt, ohne Markdown-Fences und ohne Vor-/Nachtext. Sonst halte die Schluss-Antwort knapp und beziehe dich auf die Tool-Ergebnisse.</pre>
+          </div>
+      </div>
+    </details>
+
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div>
+            <span class="font-medium">easy_extract_todos</span>
+            <span class="ml-2 text-xs uppercase tracking-wider px-1.5 py-0.5 rounded
+bg-emerald-50 text-emerald-700 border border-emerald-200
+">leicht</span>
+          </div>
+            <div class="text-sm num">
+              <span class="font-medium text-emerald-700">100%</span>
+              <span class="text-stone-500"> · 3/3 checks</span>
+            </div>
+        </div>
+
+        <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">In notes.md stehen Sprint-Notizen. Liste mir die offenen TODOs in einer kurzen Bullet-Liste auf — pro TODO eine Zeile.</div>
+
+          <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool calls</div>
+            <ol class="space-y-2 text-sm num">
+                <li>
+                  <span class="font-medium text-stone-900">1. list_files</span>
+                  <span class="text-stone-600">({})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">[&#34;config.json&#34;, &#34;fizzbuzz.py&#34;, &#34;inventory.py&#34;, &#34;notes.md&#34;, &#34;users.json&#34;]</pre>
+                  </details>
+                </li>
+                <li>
+                  <span class="font-medium text-stone-900">2. read_file</span>
+                  <span class="text-stone-600">({"path": "notes.md"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap"># Sprint Notes — KW 17
+
+## Erledigt
+- API-Endpoint /users mit Pagination
+- Migrations für `orders` Tabelle eingespielt
+
+## Offen
+- TODO: Caching-Layer für Produktsuche evaluieren (Redis vs in-memory)
+- TODO: Logging vereinheitlichen — momentan mischen wir loguru + logging
+- Bugfix: Datumsformat in der Rechnungs-PDF (siehe Issue #4711)
+- TODO: Stripe-Webhook-Handler braucht Idempotency-Keys
+
+## Notizen aus dem Standup
+Kunde X meldet, dass beim Login-Redirect manchmal die `next`-URL verloren geht. Reproduzierbar nur in Safari iOS. Verdacht auf Service-Worker-Cache.
+
+TODO: Safari-Repro-Setup auf </pre>
+                  </details>
+                </li>
+            </ol>
+          </div>
+
+          <ul class="px-4 py-3 border-b border-stone-100 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;read_file&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: list_files, read_file</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Arguments for &#39;read_file&#39;</div>
+<div class="text-xs text-stone-500">path=&#39;notes.md&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Response mentions 3/4 of the key terms</div>
+<div class="text-xs text-stone-500">mentioned: [&#39;Caching&#39;, &#39;Logging&#39;, &#39;Stripe&#39;, &#39;Safari&#39;], missing: []</div>                </div>
+              </li>
+          </ul>
+
+        <div class="px-4 py-3">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Final answer</div>
+          <pre class="text-sm whitespace-pre-wrap">Hier sind die offenen TODOs aus den Sprint-Notizen:
+
+- TODO: Caching-Layer für Produktsuche evaluieren (Redis vs in-memory)
+- TODO: Logging vereinheitlichen — momentan mischen wir loguru + logging
+- TODO: Stripe-Webhook-Handler braucht Idempotency-Keys
+- TODO: Safari-Repro-Setup auf TestFlight provisionieren.</pre>
+        </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div>
+            <span class="font-medium">easy_list_then_read</span>
+            <span class="ml-2 text-xs uppercase tracking-wider px-1.5 py-0.5 rounded
+bg-emerald-50 text-emerald-700 border border-emerald-200
+">leicht</span>
+          </div>
+            <div class="text-sm num">
+              <span class="font-medium text-emerald-700">100%</span>
+              <span class="text-stone-500"> · 4/4 checks</span>
+            </div>
+        </div>
+
+        <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">Ich weiß nicht mehr, welche Datei in diesem Projekt die Konfiguration enthält. Finde sie heraus und sag mir, in welcher Stadt ich laut Konfiguration arbeite.</div>
+
+          <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool calls</div>
+            <ol class="space-y-2 text-sm num">
+                <li>
+                  <span class="font-medium text-stone-900">1. list_files</span>
+                  <span class="text-stone-600">({})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">[&#34;config.json&#34;, &#34;fizzbuzz.py&#34;, &#34;inventory.py&#34;, &#34;notes.md&#34;, &#34;users.json&#34;]</pre>
+                  </details>
+                </li>
+                <li>
+                  <span class="font-medium text-stone-900">2. read_file</span>
+                  <span class="text-stone-600">({"path": "config.json"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{
+  &#34;service&#34;: &#34;owb-test-fixture&#34;,
+  &#34;city&#34;: &#34;München&#34;,
+  &#34;language&#34;: &#34;de&#34;,
+  &#34;alert_threshold_celsius&#34;: 30
+}
+</pre>
+                  </details>
+                </li>
+            </ol>
+          </div>
+
+          <ul class="px-4 py-3 border-b border-stone-100 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;list_files&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: list_files, read_file</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;read_file&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: list_files, read_file</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Arguments for &#39;read_file&#39;</div>
+<div class="text-xs text-stone-500">path=&#39;config.json&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Response mentions 1/1 of the key terms</div>
+<div class="text-xs text-stone-500">mentioned: [&#39;München&#39;], missing: []</div>                </div>
+              </li>
+          </ul>
+
+        <div class="px-4 py-3">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Final answer</div>
+          <pre class="text-sm whitespace-pre-wrap">Die Konfigurationsdatei ist `config.json` und laut dieser Datei arbeitest du in München.</pre>
+        </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div>
+            <span class="font-medium">medium_fizzbuzz_fix</span>
+            <span class="ml-2 text-xs uppercase tracking-wider px-1.5 py-0.5 rounded
+bg-amber-50 text-amber-700 border border-amber-200
+">mittel</span>
+          </div>
+            <div class="text-sm num">
+              <span class="font-medium text-emerald-700">100%</span>
+              <span class="text-stone-500"> · 6/6 checks</span>
+            </div>
+        </div>
+
+        <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">fizzbuzz.py hat einen Bug — die Funktion liefert die Werte 1..n-1 statt 1..n. Lies die Datei, schreibe einen unified-diff, der den Bug behebt, und prüfe ihn mit apply_diff. Antworte am Ende mit einer kurzen Erklärung des Fixes.</div>
+
+          <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool calls</div>
+            <ol class="space-y-2 text-sm num">
+                <li>
+                  <span class="font-medium text-stone-900">1. list_files</span>
+                  <span class="text-stone-600">({})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">[&#34;config.json&#34;, &#34;fizzbuzz.py&#34;, &#34;inventory.py&#34;, &#34;notes.md&#34;, &#34;users.json&#34;]</pre>
+                  </details>
+                </li>
+                <li>
+                  <span class="font-medium text-stone-900">2. read_file</span>
+                  <span class="text-stone-600">({"path": "fizzbuzz.py"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">&#34;&#34;&#34;Simple FizzBuzz with a deliberate off-by-one bug.&#34;&#34;&#34;
+
+
+def fizzbuzz(n: int) -&gt; list[str]:
+    out: list[str] = []
+    # BUG: range stops at n (exclusive), but FizzBuzz from 1..=n needs n+1.
+    for i in range(1, n):
+        if i % 15 == 0:
+            out.append(&#34;FizzBuzz&#34;)
+        elif i % 3 == 0:
+            out.append(&#34;Fizz&#34;)
+        elif i % 5 == 0:
+            out.append(&#34;Buzz&#34;)
+        else:
+            out.append(str(i))
+    return out
+
+
+if __name__ == &#34;__main__&#34;:
+    print(fizzbuzz(15))
+</pre>
+                  </details>
+                </li>
+                <li>
+                  <span class="font-medium text-stone-900">3. apply_diff</span>
+                  <span class="text-stone-600">({"diff": "--- fizzbuzz.py\n+++ fizzbuzz.py\n@@ -4,7 +4,7 @@\n def fizzbuzz(n: int) -\u003e list[str]:\n     out: list[str] = []\n     # BUG: range stops at n (exclusive), but FizzBuzz from 1..=n needs n+1.\n-    for i in range(1, n):\n+    for i in range(1, n + 1):\n         if i % 15 == 0:\n             out.append(\"FizzBuzz\")\n         elif i % 3 == 0:\n", "path": "fizzbuzz.py"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{&#34;ok&#34;: true, &#34;applied&#34;: 2, &#34;added_lines&#34;: 1, &#34;removed_lines&#34;: 1, &#34;note&#34;: &#34;structural-validation only; no real write performed&#34;}</pre>
+                  </details>
+                </li>
+            </ol>
+          </div>
+
+          <ul class="px-4 py-3 border-b border-stone-100 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;read_file&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: list_files, read_file, apply_diff</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;apply_diff&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: list_files, read_file, apply_diff</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Arguments for &#39;read_file&#39;</div>
+<div class="text-xs text-stone-500">path=&#39;fizzbuzz.py&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Arguments for &#39;apply_diff&#39;</div>
+<div class="text-xs text-stone-500">path=&#39;fizzbuzz.py&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Diff for fizzbuzz.py validates structurally</div>
+<div class="text-xs text-stone-500">applied=2, calls=1</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Diff changes ≥2 lines</div>
+<div class="text-xs text-stone-500">applied: 2</div>                </div>
+              </li>
+          </ul>
+
+        <div class="px-4 py-3">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Final answer</div>
+          <pre class="text-sm whitespace-pre-wrap">Der Bug lag in der `range`-Funktion: `range(1, n)` geht nur bis `n-1`. Durch die Änderung auf `range(1, n + 1)` wird die Schleife nun inklusive `n` ausgeführt, sodass die Werte von 1 bis `n` korrekt verarbeitet werden.</pre>
+        </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div>
+            <span class="font-medium">medium_filter_users</span>
+            <span class="ml-2 text-xs uppercase tracking-wider px-1.5 py-0.5 rounded
+bg-amber-50 text-amber-700 border border-amber-200
+">mittel</span>
+          </div>
+            <div class="text-sm num">
+              <span class="font-medium text-emerald-700">100%</span>
+              <span class="text-stone-500"> · 6/6 checks</span>
+            </div>
+        </div>
+
+        <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">users.json enthält eine Liste aller Nutzer. Filtere die *aktiven* Nutzer mit Rolle &#39;admin&#39; oder &#39;editor&#39; und antworte AUSSCHLIESSLICH mit einem JSON-Objekt der Form {&#34;count&#34;: &lt;Zahl&gt;, &#34;users&#34;: [{&#34;id&#34;: ..., &#34;name&#34;: ..., &#34;role&#34;: ...}, ...]}. Keine Markdown-Fences, kein Vor- oder Nachtext.</div>
+
+          <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool calls</div>
+            <ol class="space-y-2 text-sm num">
+                <li>
+                  <span class="font-medium text-stone-900">1. list_files</span>
+                  <span class="text-stone-600">({})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">[&#34;config.json&#34;, &#34;fizzbuzz.py&#34;, &#34;inventory.py&#34;, &#34;notes.md&#34;, &#34;users.json&#34;]</pre>
+                  </details>
+                </li>
+                <li>
+                  <span class="font-medium text-stone-900">2. read_file</span>
+                  <span class="text-stone-600">({"path": "users.json"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{
+  &#34;exported_at&#34;: &#34;2026-04-28T08:30:00Z&#34;,
+  &#34;users&#34;: [
+    {
+      &#34;id&#34;: 1001,
+      &#34;name&#34;: &#34;Anja Sommer&#34;,
+      &#34;email&#34;: &#34;anja.sommer@example.com&#34;,
+      &#34;role&#34;: &#34;admin&#34;,
+      &#34;active&#34;: true,
+      &#34;last_login_iso&#34;: &#34;2026-04-27T11:42:18Z&#34;
+    },
+    {
+      &#34;id&#34;: 1002,
+      &#34;name&#34;: &#34;Bernd Wagner&#34;,
+      &#34;email&#34;: &#34;bernd.wagner@example.com&#34;,
+      &#34;role&#34;: &#34;viewer&#34;,
+      &#34;active&#34;: false,
+      &#34;last_login_iso&#34;: &#34;2025-11-03T07:15:02Z&#34;
+    },
+    {
+      &#34;id&#34;: 1003,
+      &#34;name&#34;: &#34;Cara Lindgren&#34;,
+      &#34;email&#34;: &#34;cara@example.com&#34;,
+      &#34;role&#34;: &#34;editor&#34;,
+      &#34;active&#34;: true,
+      &#34;last_logi</pre>
+                  </details>
+                </li>
+            </ol>
+          </div>
+
+          <ul class="px-4 py-3 border-b border-stone-100 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;read_file&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: list_files, read_file</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Arguments for &#39;read_file&#39;</div>
+<div class="text-xs text-stone-500">path=&#39;users.json&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Response contains valid JSON</div>
+                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">JSON contains fields [&#39;count&#39;, &#39;users&#39;]</div>
+<div class="text-xs text-stone-500">all fields present</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">count == 4</div>
+<div class="text-xs text-stone-500">actual=4</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">users.ids == [1001, 1003, 1004, 1006]</div>
+<div class="text-xs text-stone-500">actual=[1001, 1003, 1004, 1006]</div>                </div>
+              </li>
+          </ul>
+
+        <div class="px-4 py-3">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Final answer</div>
+          <pre class="text-sm whitespace-pre-wrap">{&#34;count&#34;: 4, &#34;users&#34;: [{&#34;id&#34;: 1001, &#34;name&#34;: &#34;Anja Sommer&#34;, &#34;role&#34;: &#34;admin&#34;}, {&#34;id&#34;: 1003, &#34;name&#34;: &#34;Cara Lindgren&#34;, &#34;role&#34;: &#34;editor&#34;}, {&#34;id&#34;: 1004, &#34;name&#34;: &#34;Dennis Pohl&#34;, &#34;role&#34;: &#34;editor&#34;}, {&#34;id&#34;: 1006, &#34;name&#34;: &#34;Frederik Otto&#34;, &#34;role&#34;: &#34;admin&#34;}]}</pre>
+        </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div>
+            <span class="font-medium">medium_weather_alert</span>
+            <span class="ml-2 text-xs uppercase tracking-wider px-1.5 py-0.5 rounded
+bg-amber-50 text-amber-700 border border-amber-200
+">mittel</span>
+          </div>
+            <div class="text-sm num">
+              <span class="font-medium text-emerald-700">100%</span>
+              <span class="text-stone-500"> · 7/7 checks</span>
+            </div>
+        </div>
+
+        <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">Lies config.json und hol das Wetter für die dort eingetragene Stadt. Antworte AUSSCHLIESSLICH mit einem JSON-Objekt {&#34;city&#34;: ..., &#34;temp_c&#34;: ..., &#34;condition&#34;: ..., &#34;alert&#34;: &lt;bool&gt;}, wobei alert genau dann true ist, wenn temp_c den Schwellwert aus config.json überschreitet.</div>
+
+          <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool calls</div>
+            <ol class="space-y-2 text-sm num">
+                <li>
+                  <span class="font-medium text-stone-900">1. list_files</span>
+                  <span class="text-stone-600">({})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">[&#34;config.json&#34;, &#34;fizzbuzz.py&#34;, &#34;inventory.py&#34;, &#34;notes.md&#34;, &#34;users.json&#34;]</pre>
+                  </details>
+                </li>
+                <li>
+                  <span class="font-medium text-stone-900">2. read_file</span>
+                  <span class="text-stone-600">({"path": "config.json"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{
+  &#34;service&#34;: &#34;owb-test-fixture&#34;,
+  &#34;city&#34;: &#34;München&#34;,
+  &#34;language&#34;: &#34;de&#34;,
+  &#34;alert_threshold_celsius&#34;: 30
+}
+</pre>
+                  </details>
+                </li>
+                <li>
+                  <span class="font-medium text-stone-900">3. get_weather</span>
+                  <span class="text-stone-600">({"city": "M\u00fcnchen"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{&#34;city&#34;: &#34;M\u00fcnchen&#34;, &#34;temp_c&#34;: 9, &#34;condition&#34;: &#34;bew\u00f6lkt&#34;, &#34;wind_kmh&#34;: 7}</pre>
+                  </details>
+                </li>
+            </ol>
+          </div>
+
+          <ul class="px-4 py-3 border-b border-stone-100 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;read_file&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: list_files, read_file, get_weather</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;get_weather&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: list_files, read_file, get_weather</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Arguments for &#39;read_file&#39;</div>
+<div class="text-xs text-stone-500">path=&#39;config.json&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Arguments for &#39;get_weather&#39;</div>
+<div class="text-xs text-stone-500">city=&#39;München&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Response contains valid JSON</div>
+                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">JSON contains fields [&#39;city&#39;, &#39;temp_c&#39;, &#39;condition&#39;, &#39;alert&#39;]</div>
+<div class="text-xs text-stone-500">all fields present</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">alert == False</div>
+<div class="text-xs text-stone-500">actual=False</div>                </div>
+              </li>
+          </ul>
+
+        <div class="px-4 py-3">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Final answer</div>
+          <pre class="text-sm whitespace-pre-wrap">{&#34;city&#34;: &#34;München&#34;, &#34;temp_c&#34;: 9, &#34;condition&#34;: &#34;bewölkt&#34;, &#34;alert&#34;: false}</pre>
+        </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div>
+            <span class="font-medium">hard_rename_function</span>
+            <span class="ml-2 text-xs uppercase tracking-wider px-1.5 py-0.5 rounded
+bg-red-50 text-red-700 border border-red-200">schwer</span>
+          </div>
+            <div class="text-sm num">
+              <span class="font-medium text-emerald-700">100%</span>
+              <span class="text-stone-500"> · 8/8 checks</span>
+            </div>
+        </div>
+
+        <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">Die Funktion calculate_total in inventory.py soll konsistent zum Projekt-Stil in compute_total umbenannt werden. Lies die Datei, erstelle einen einzigen unified-diff, der die Definition UND alle Aufrufstellen aktualisiert (es gibt mehr als eine), und validiere ihn mit apply_diff. Achte darauf, keine anderen Identifier-Vorkommen zu verändern. Antworte am Ende kurz, wie viele Stellen du geändert hast.</div>
+
+          <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool calls</div>
+            <ol class="space-y-2 text-sm num">
+                <li>
+                  <span class="font-medium text-stone-900">1. list_files</span>
+                  <span class="text-stone-600">({})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">[&#34;config.json&#34;, &#34;fizzbuzz.py&#34;, &#34;inventory.py&#34;, &#34;notes.md&#34;, &#34;users.json&#34;]</pre>
+                  </details>
+                </li>
+                <li>
+                  <span class="font-medium text-stone-900">2. read_file</span>
+                  <span class="text-stone-600">({"path": "inventory.py"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">&#34;&#34;&#34;Mini inventory accounting module — used as fixture for diff-edit benchmark.
+
+The function calculate_total() is called from 3 different places. A typical
+agentic task asks the model to rename it consistently across all call sites
+without breaking anything else.
+&#34;&#34;&#34;
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Iterable
+
+
+@dataclass
+class LineItem:
+    sku: str
+    quantity: int
+    unit_price_cents: int
+    discount_pct: float = 0.0
+
+
+def calculate_total(items: Iterable[LineItem]) -&gt; int:
+    &#34;&#34;&#34;Return total in cents, applying per-item discount.&#34;&#34;&#34;</pre>
+                  </details>
+                </li>
+                <li>
+                  <span class="font-medium text-stone-900">3. apply_diff</span>
+                  <span class="text-stone-600">({"diff": "--- inventory.py\n+++ inventory.py\n@@ -19,7 +19,7 @@\n     discount_pct: float = 0.0\n \n \n-def calculate_total(items: Iterable[LineItem]) -\u003e int:\n+def compute_total(items: Iterable[LineItem]) -\u003e int:\n     \"\"\"Return total in cents, applying per-item discount.\"\"\"\n     total = 0\n     for item in items:\n@@ -37,7 +37,7 @@\n             f\"{it.sku:\u003c10} x{it.quantity:\u003e3}  {it.unit_price_cents / 100:\u003e7.2f} {currency}\"\n             + (f\"  (-{int(it.discount_pct * 100)}%)\" if it.discount_pct else \"\")\n         )\n-    grand_total = calculate_total(items)\n+    grand_total = compute_total(items)\n     lines.append(\"-\" * 40)\n     lines.append(f\"{\u0027TOTAL\u0027:\u003c10}        {grand_total / 100:\u003e7.2f} {currency}\")\n     return \"\\n\".join(lines)\n@@ -47,7 +47,7 @@\n     \"\"\"Mean basket value across multiple baskets, in EUR.\"\"\"\n     if not baskets:\n         return 0.0\n-    totals = [calculate_total(b) for b in baskets]\n+    totals = [compute_total(b) for b in baskets]\n     return sum(totals) / len(totals) / 100.0\n \n \n@@ -53,7 +53,7 @@\n \n \n def basket_above_threshold(items: list[LineItem], threshold_eur: float) -\u003e bool:\n     \"\"\"True if the basket total exceeds the given threshold in EUR.\"\"\"\n-    return calculate_total(items) \u003e threshold_eur * 100\n+    return compute_total(items) \u003e threshold_eur * 100\n", "path": "inventory.py"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{&#34;ok&#34;: true, &#34;applied&#34;: 8, &#34;added_lines&#34;: 4, &#34;removed_lines&#34;: 4, &#34;note&#34;: &#34;structural-validation only; no real write performed&#34;}</pre>
+                  </details>
+                </li>
+            </ol>
+          </div>
+
+          <ul class="px-4 py-3 border-b border-stone-100 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;read_file&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: list_files, read_file, apply_diff</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;apply_diff&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: list_files, read_file, apply_diff</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Arguments for &#39;read_file&#39;</div>
+<div class="text-xs text-stone-500">path=&#39;inventory.py&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Arguments for &#39;apply_diff&#39;</div>
+<div class="text-xs text-stone-500">path=&#39;inventory.py&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Diff for inventory.py validates structurally</div>
+<div class="text-xs text-stone-500">applied=8, calls=1</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Diff changes ≥8 lines</div>
+<div class="text-xs text-stone-500">applied: 8</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Diff contains &#39;compute_total&#39;</div>
+                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Diff contains &#39;calculate_total&#39;</div>
+                </div>
+              </li>
+          </ul>
+
+        <div class="px-4 py-3">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Final answer</div>
+          <pre class="text-sm whitespace-pre-wrap">Ich habe die Funktion `calculate_total` in `compute_total` umbenannt. Dabei wurden die Definition sowie alle 3 Aufrufstellen in `inventory.py` aktualisiert.</pre>
+        </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div>
+            <span class="font-medium">hard_compose_report</span>
+            <span class="ml-2 text-xs uppercase tracking-wider px-1.5 py-0.5 rounded
+bg-red-50 text-red-700 border border-red-200">schwer</span>
+          </div>
+            <div class="text-sm num">
+              <span class="font-medium text-emerald-700">100%</span>
+              <span class="text-stone-500"> · 7/7 checks</span>
+            </div>
+        </div>
+
+        <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">Erstelle eine Zusammenfassung aus zwei Quellen. Lies users.json und config.json. Antworte AUSSCHLIESSLICH mit einem JSON-Objekt der Form {&#34;service&#34;: &lt;Service-Name aus config&gt;, &#34;city&#34;: &lt;Stadt aus config&gt;, &#34;active_users&#34;: &lt;Anzahl aktiver Nutzer aus users.json&gt;, &#34;admin_emails&#34;: [&lt;E-Mails aller aktiven Admins, sortiert&gt;]}. Keine Markdown-Fences.</div>
+
+          <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool calls</div>
+            <ol class="space-y-2 text-sm num">
+                <li>
+                  <span class="font-medium text-stone-900">1. list_files</span>
+                  <span class="text-stone-600">({})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">[&#34;config.json&#34;, &#34;fizzbuzz.py&#34;, &#34;inventory.py&#34;, &#34;notes.md&#34;, &#34;users.json&#34;]</pre>
+                  </details>
+                </li>
+                <li>
+                  <span class="font-medium text-stone-900">2. read_file</span>
+                  <span class="text-stone-600">({"path": "config.json"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{
+  &#34;service&#34;: &#34;owb-test-fixture&#34;,
+  &#34;city&#34;: &#34;München&#34;,
+  &#34;language&#34;: &#34;de&#34;,
+  &#34;alert_threshold_celsius&#34;: 30
+}
+</pre>
+                  </details>
+                </li>
+                <li>
+                  <span class="font-medium text-stone-900">3. read_file</span>
+                  <span class="text-stone-600">({"path": "users.json"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{
+  &#34;exported_at&#34;: &#34;2026-04-28T08:30:00Z&#34;,
+  &#34;users&#34;: [
+    {
+      &#34;id&#34;: 1001,
+      &#34;name&#34;: &#34;Anja Sommer&#34;,
+      &#34;email&#34;: &#34;anja.sommer@example.com&#34;,
+      &#34;role&#34;: &#34;admin&#34;,
+      &#34;active&#34;: true,
+      &#34;last_login_iso&#34;: &#34;2026-04-27T11:42:18Z&#34;
+    },
+    {
+      &#34;id&#34;: 1002,
+      &#34;name&#34;: &#34;Bernd Wagner&#34;,
+      &#34;email&#34;: &#34;bernd.wagner@example.com&#34;,
+      &#34;role&#34;: &#34;viewer&#34;,
+      &#34;active&#34;: false,
+      &#34;last_login_iso&#34;: &#34;2025-11-03T07:15:02Z&#34;
+    },
+    {
+      &#34;id&#34;: 1003,
+      &#34;name&#34;: &#34;Cara Lindgren&#34;,
+      &#34;email&#34;: &#34;cara@example.com&#34;,
+      &#34;role&#34;: &#34;editor&#34;,
+      &#34;active&#34;: true,
+      &#34;last_logi</pre>
+                  </details>
+                </li>
+            </ol>
+          </div>
+
+          <ul class="px-4 py-3 border-b border-stone-100 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;read_file&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: list_files, read_file, read_file</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Response contains valid JSON</div>
+                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">JSON contains fields [&#39;service&#39;, &#39;city&#39;, &#39;active_users&#39;, &#39;admin_emails&#39;]</div>
+<div class="text-xs text-stone-500">all fields present</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">service == &#39;owb-test-fixture&#39;</div>
+<div class="text-xs text-stone-500">actual=&#39;owb-test-fixture&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">city == &#39;München&#39;</div>
+<div class="text-xs text-stone-500">actual=&#39;München&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">active_users == 4</div>
+<div class="text-xs text-stone-500">actual=4</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">admin_emails == [&#39;anja.sommer@example.com&#39;, &#39;frederik.otto@example.com&#39;]</div>
+<div class="text-xs text-stone-500">actual=[&#39;anja.sommer@example.com&#39;, &#39;frederik.otto@example.com&#39;]</div>                </div>
+              </li>
+          </ul>
+
+        <div class="px-4 py-3">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Final answer</div>
+          <pre class="text-sm whitespace-pre-wrap">{&#34;service&#34;: &#34;owb-test-fixture&#34;, &#34;city&#34;: &#34;München&#34;, &#34;active_users&#34;: 4, &#34;admin_emails&#34;: [&#34;anja.sommer@example.com&#34;, &#34;frederik.otto@example.com&#34;]}</pre>
+        </div>
+      </div>
+
+
+    <div class="mt-4 text-xs text-stone-500">
+      Artefacts:
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-26b-a4b-qat/tool_use/scenarios.json" target="_blank">Scenarios + Tool-Call-Verlauf</a>
+    </div>
+</section>
+<section id="diagram_to_svg" class="mb-12 scroll-mt-24">
+  <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
+    <h2 class="text-lg font-medium tracking-tight">diagram_to_svg</h2>
+    <a href="../benchmarks/diagram_to_svg.html" class="text-xs text-stone-500 hover:text-stone-900">all models in this bench →</a>
+  </div>
+
+
+  <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+    <div class="md:col-span-1 bg-white border-2 border-amber-400 rounded-lg p-5 flex flex-col justify-center">
+      <div class="text-xs uppercase tracking-wider text-stone-500">Score</div>
+      <div class="mt-1 text-5xl font-bold num leading-none text-amber-700">
+27%
+      </div>
+    </div>
+    <div class="md:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">tok/s</dt>
+        <dd class="mt-1 text-xl font-semibold num">98</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Tokens</dt>
+        <dd class="mt-1 text-xl font-semibold num">30872</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Wall</dt>
+        <dd class="mt-1 text-xl font-semibold num">318.5 s</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">RAM</dt>
+        <dd class="mt-1 text-xl font-semibold num">14.6 GB</dd>
+      </div>
+    </div>
+  </div>
+
+    <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Worum geht es? Was wird getestet?
+      </summary>
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: Photo of a hand-drawn diagram (architecture, sequence, quadrant matrix) → model must produce an inline-SVG representation of the same diagram.
+
+Two score signals:
+(1) Deterministic — SVG is parseable, has an &lt;svg&gt; root, enough elements and at least one &lt;text&gt;; all expected terms (boxes, labels) appear in the text content. Validity and term coverage each count for 15% of the final score.
+(2) Qualitative — the `diagram-svg-judge` skill screenshots the SVG and visually compares it to the original along fixed axes (completeness, connections, arrow direction, grouping, layout readability, diagram-type fidelity, aesthetics). The judge counts 70%; aesthetics is double-weighted within the judge.
+
+Why models fail: SVG generation requires spatial reasoning (positioning boxes, computing paths, setting viewBox) — noticeably harder than declarative Mermaid syntax. Weak VLMs often produce only an empty &lt;svg&gt; or an element salad without topology.</div>
+    </details>
+
+    <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Prompt
+      </summary>
+      <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">Du bist Spezialist für Diagramm-Erkennung und SVG. Du gibst sauberes, parsbares SVG zurück, das jeder Browser ohne externe Ressourcen rendern kann.</pre>
+          </div>
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">Developer prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">Auf dem Bild siehst du ein Diagramm (Architektur, Flowchart, Sequenz, Quadrant o.ä.). Erstelle eine SVG-Repräsentation des Diagramms.
+
+Anforderungen:
+- Antworte ausschließlich mit dem rohen SVG-Code, beginnend mit &lt;svg ...&gt; und endend mit &lt;/svg&gt;. Keine Erklärungen, keine Markdown-Fences.
+- Setze ein viewBox-Attribut (z.B. viewBox=&#34;0 0 1200 800&#34;), damit das Bild skaliert.
+- Nur Inline-Inhalt, keine externen Referenzen (kein &lt;image href&gt;, kein @import, kein xlink:href auf URLs).
+- Alle im Diagramm sichtbaren Beschriftungen müssen als &lt;text&gt;-Elemente vorhanden und lesbar (Font-Size ≥ 12) sein.
+- Verbindungen als &lt;line&gt;, &lt;polyline&gt; oder &lt;path&gt; mit deutlichem stroke. Pfeilspitzen via &lt;marker&gt;.
+- Gruppiere zusammengehörige Teile mit &lt;g&gt;-Tags und sinnvollen id-Attributen.
+- Wähle ausreichend Kontrast: dunkler Stroke auf weißem/hellem Hintergrund.
+- Vermeide Überlappungen — plane das Layout so, dass Boxen nicht über Pfeilen liegen und Texte nicht aus ihren Boxen herausragen.
+- Behalte die Struktur des Originals bei: Anzahl der Boxen, ihre Verbindungen und ihre Anordnung sollen vergleichbar sein.</pre>
+          </div>
+      </div>
+    </details>
+
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div class="font-medium num">diagram_eisenhower.png</div>
+          <div class="text-sm">
+              <span class="text-emerald-700 font-medium">✓ SVG parseable · 77 elements · 32 text nodes</span>
+<span class="ml-3 font-bold num text-emerald-700">96%</span>          </div>
+        </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
+            <div class="p-3 bg-stone-50">
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Source</div>
+              <div class="zoom-frame">
+                <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom source" title="Zoom source">⛶</button>
+                <img src="../assets/artifacts/google_gemma-4-26b-a4b-qat/diagram_to_svg/diagram_eisenhower.png" class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded" alt="diagram_eisenhower.png">
+              </div>
+            </div>
+            <div class="p-3">
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">SVG render</div>
+              <div class="zoom-frame">
+                <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom SVG render" title="Zoom SVG render">⛶</button>
+                <img src="../assets/artifacts/google_gemma-4-26b-a4b-qat/diagram_to_svg/diagram_eisenhower.svg" class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded" alt="SVG render diagram_eisenhower.png">
+              </div>
+            </div>
+          </div>
+          <div class="border-t border-stone-100 px-4 py-2">
+            <a class="text-xs text-stone-600 underline" href="../assets/artifacts/google_gemma-4-26b-a4b-qat/diagram_to_svg/diagram_eisenhower.svg" target="_blank">Open SVG file ↗</a>
+          </div>
+            <div class="border-t border-stone-100 px-4 py-3">
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Deterministic grader</div>
+              <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+                <li class="border rounded px-3 py-2 border-emerald-200 bg-emerald-50">
+                  <div class="flex items-baseline justify-between gap-3">
+                    <span class="font-medium text-stone-900">SVG validity</span>
+                    <span class="font-bold num text-emerald-700">100%</span>
+                  </div>
+                  <div class="mt-1 text-stone-600">
+<span class="num">77</span> elements · <span class="num">32</span> text nodes · root <span class="num">&lt;svg&gt;</span>
+                  </div>
+                </li>
+                <li class="border rounded px-3 py-2 border-emerald-200 bg-emerald-50">
+                  <div class="flex items-baseline justify-between gap-3">
+                    <span class="font-medium text-stone-900">Term coverage</span>
+                    <span class="font-bold num text-emerald-700">92%</span>
+                  </div>
+                  <div class="mt-1 text-stone-600 num">22/24 matched</div>
+                    <div class="mt-1 text-stone-500">
+                      missing:
+Content-Strategie, Weltag der Büroklammer                    </div>
+                </li>
+              </ul>
+            </div>
+            <div class="border-t border-stone-100 px-4 py-3 bg-amber-50">
+              <div class="flex items-baseline justify-between mb-2">
+                <span class="text-xs uppercase tracking-wider text-amber-700">Qualitative · judge (openai/gpt-5.4)</span>
+                <span class="text-2xl font-bold num text-amber-700">74%</span>
+              </div>
+              <ul class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+                  <li class="text-center bg-white border border-amber-200 rounded p-2">
+                    <div class="text-stone-500 capitalize">completeness</div>
+                    <div class="text-base font-bold num text-emerald-700">82%</div>
+                  </li>
+                  <li class="text-center bg-white border border-amber-200 rounded p-2">
+                    <div class="text-stone-500 capitalize">labels</div>
+                    <div class="text-base font-bold num text-emerald-700">74%</div>
+                  </li>
+                  <li class="text-center bg-white border border-amber-200 rounded p-2">
+                    <div class="text-stone-500 capitalize">direction</div>
+                    <div class="text-base font-bold num text-emerald-700">88%</div>
+                  </li>
+                  <li class="text-center bg-white border border-amber-200 rounded p-2">
+                    <div class="text-stone-500 capitalize">grouping</div>
+                    <div class="text-base font-bold num text-emerald-700">93%</div>
+                  </li>
+                  <li class="text-center bg-white border border-amber-200 rounded p-2">
+                    <div class="text-stone-500 capitalize">layout readability</div>
+                    <div class="text-base font-bold num text-amber-700">58%</div>
+                  </li>
+                  <li class="text-center bg-white border border-amber-200 rounded p-2">
+                    <div class="text-stone-500 capitalize">diagram kind match</div>
+                    <div class="text-base font-bold num text-emerald-700">98%</div>
+                  </li>
+                  <li class="text-center bg-white border border-amber-200 rounded p-2">
+                    <div class="text-stone-500 capitalize">aesthetic quality</div>
+                    <div class="text-base font-bold num text-amber-700">50%</div>
+                  </li>
+              </ul>
+<div class="mt-3 text-sm text-stone-700">Die 2×2-Eisenhower-Matrix mit Achsen, Quadranten und den meisten Inhalten ist klar wiedergegeben; auch Randnotizen wie Kaffee, Herz und Ausrufezeichen sind grundsätzlich vorhanden. Mehrere Labels und Texte sind jedoch beschädigt: links unten überlappt die Herz-Notiz stark, die Zeile mit Hashtags läuft in den Einhorn-/Kritzelbereich, und einzelne Formulierungen weichen ab bzw. verlieren Lesbarkeit. Gruppierung und Diagrammtyp stimmen sehr gut, aber das Layout ist sichtbar roher als im Original, mit überlappenden Texten und einigen misslungenen Doodles/Icons.</div>            </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div class="font-medium num">diagram_service_architecture.png</div>
+          <div class="text-sm">
+              <span class="text-red-700 font-medium">✗ SVG not parseable</span>
+<span class="ml-3 font-bold num text-red-600">0%</span>          </div>
+        </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
+            <div class="p-3 bg-stone-50">
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Source</div>
+              <div class="zoom-frame">
+                <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom source" title="Zoom source">⛶</button>
+                <img src="../assets/artifacts/google_gemma-4-26b-a4b-qat/diagram_to_svg/diagram_service_architecture.png" class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded" alt="diagram_service_architecture.png">
+              </div>
+            </div>
+            <div class="p-3">
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">SVG render</div>
+              <div class="zoom-frame">
+                <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom SVG render" title="Zoom SVG render">⛶</button>
+                <img src="../assets/artifacts/google_gemma-4-26b-a4b-qat/diagram_to_svg/diagram_service_architecture.svg" class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded" alt="SVG render diagram_service_architecture.png">
+              </div>
+            </div>
+          </div>
+          <div class="border-t border-stone-100 px-4 py-2">
+            <a class="text-xs text-stone-600 underline" href="../assets/artifacts/google_gemma-4-26b-a4b-qat/diagram_to_svg/diagram_service_architecture.svg" target="_blank">Open SVG file ↗</a>
+          </div>
+            <div class="border-t border-stone-100 px-4 py-3">
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Deterministic grader</div>
+              <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+                <li class="border rounded px-3 py-2 border-red-200 bg-red-50">
+                  <div class="flex items-baseline justify-between gap-3">
+                    <span class="font-medium text-stone-900">SVG validity</span>
+                    <span class="font-bold num text-red-600">0%</span>
+                  </div>
+                  <div class="mt-1 text-stone-600">
+Parse error: <span class="num">leeres SVG</span>
+                  </div>
+                </li>
+                <li class="border rounded px-3 py-2 border-red-200 bg-red-50">
+                  <div class="flex items-baseline justify-between gap-3">
+                    <span class="font-medium text-stone-900">Term coverage</span>
+                    <span class="font-bold num text-red-600">0%</span>
+                  </div>
+                  <div class="mt-1 text-stone-600 num">0/20 matched</div>
+                    <div class="mt-1 text-stone-500">
+                      missing:
+Frontend, React, API Gateway, Kong, Auth Service, JWT …                    </div>
+                </li>
+              </ul>
+            </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div class="font-medium num">diagram_sso_sequence.png</div>
+          <div class="text-sm">
+              <span class="text-red-700 font-medium">✗ SVG not parseable</span>
+<span class="ml-3 font-bold num text-red-600">0%</span>          </div>
+        </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 divide-x divide-stone-100">
+            <div class="p-3 bg-stone-50">
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Source</div>
+              <div class="zoom-frame">
+                <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom source" title="Zoom source">⛶</button>
+                <img src="../assets/artifacts/google_gemma-4-26b-a4b-qat/diagram_to_svg/diagram_sso_sequence.png" class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded" alt="diagram_sso_sequence.png">
+              </div>
+            </div>
+            <div class="p-3">
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">SVG render</div>
+              <div class="zoom-frame">
+                <button type="button" class="zoom-button" data-zoom-button aria-label="Zoom SVG render" title="Zoom SVG render">⛶</button>
+                <img src="../assets/artifacts/google_gemma-4-26b-a4b-qat/diagram_to_svg/diagram_sso_sequence.svg" class="zoomable block w-full max-h-[420px] object-contain bg-white border border-stone-200 rounded" alt="SVG render diagram_sso_sequence.png">
+              </div>
+            </div>
+          </div>
+          <div class="border-t border-stone-100 px-4 py-2">
+            <a class="text-xs text-stone-600 underline" href="../assets/artifacts/google_gemma-4-26b-a4b-qat/diagram_to_svg/diagram_sso_sequence.svg" target="_blank">Open SVG file ↗</a>
+          </div>
+            <div class="border-t border-stone-100 px-4 py-3">
+              <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Deterministic grader</div>
+              <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+                <li class="border rounded px-3 py-2 border-red-200 bg-red-50">
+                  <div class="flex items-baseline justify-between gap-3">
+                    <span class="font-medium text-stone-900">SVG validity</span>
+                    <span class="font-bold num text-red-600">0%</span>
+                  </div>
+                  <div class="mt-1 text-stone-600">
+Parse error: <span class="num">leeres SVG</span>
+                  </div>
+                </li>
+                <li class="border rounded px-3 py-2 border-red-200 bg-red-50">
+                  <div class="flex items-baseline justify-between gap-3">
+                    <span class="font-medium text-stone-900">Term coverage</span>
+                    <span class="font-bold num text-red-600">0%</span>
+                  </div>
+                  <div class="mt-1 text-stone-600 num">0/15 matched</div>
+                    <div class="mt-1 text-stone-500">
+                      missing:
+Benutzer, App, Service Provider, Identity Provider, IdP, Login-Seite …                    </div>
+                </li>
+              </ul>
+            </div>
+      </div>
+
+
+    <div class="mt-4 text-xs text-stone-500">
+      Artefacts:
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-26b-a4b-qat/diagram_to_svg/diagram_eisenhower.png" target="_blank">Source diagram_eisenhower</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-26b-a4b-qat/diagram_to_svg/diagram_eisenhower.svg" target="_blank">SVG diagram_eisenhower</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-26b-a4b-qat/diagram_to_svg/diagram_eisenhower.render.png" target="_blank">Render diagram_eisenhower</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-26b-a4b-qat/diagram_to_svg/diagram_service_architecture.png" target="_blank">Source diagram_service_architecture</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-26b-a4b-qat/diagram_to_svg/diagram_service_architecture.svg" target="_blank">SVG diagram_service_architecture</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-26b-a4b-qat/diagram_to_svg/diagram_sso_sequence.png" target="_blank">Source diagram_sso_sequence</a>
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-26b-a4b-qat/diagram_to_svg/diagram_sso_sequence.svg" target="_blank">SVG diagram_sso_sequence</a>
+    </div>
+</section>
+<section id="hallucination" class="mb-12 scroll-mt-24">
+  <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
+    <h2 class="text-lg font-medium tracking-tight">hallucination</h2>
+    <a href="../benchmarks/hallucination.html" class="text-xs text-stone-500 hover:text-stone-900">all models in this bench →</a>
+  </div>
+
+
+  <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+    <div class="md:col-span-1 bg-white border-2 border-emerald-500 rounded-lg p-5 flex flex-col justify-center">
+      <div class="text-xs uppercase tracking-wider text-stone-500">Score</div>
+      <div class="mt-1 text-5xl font-bold num leading-none text-emerald-700">
+92%
+      </div>
+    </div>
+    <div class="md:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">tok/s</dt>
+        <dd class="mt-1 text-xl font-semibold num">108</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Tokens</dt>
+        <dd class="mt-1 text-xl font-semibold num">5248</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Wall</dt>
+        <dd class="mt-1 text-xl font-semibold num">49.8 s</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">RAM</dt>
+        <dd class="mt-1 text-xl font-semibold num">14.6 GB</dd>
+      </div>
+    </div>
+  </div>
+
+    <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Worum geht es? Was wird getestet?
+      </summary>
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: 12 questions with subtle, plausible-sounding but factually false premises (e.g. &#39;Which album did Tocotronic release in 1991?&#39; — the band was only formed in 1993).
+
+What is tested: does the model recognise the false premise (&#39;corrected&#39;), admit it doesn&#39;t know (&#39;abstained&#39;), or invent a plausible-sounding answer (&#39;fabricated&#39;)?
+
+Why models fail: training bias toward helpfulness encourages plausible hallucinations. Small models have weaker factual grounding. Subtle questions about personal details (e.g. politicians&#39; children) are especially tempting to make up.</div>
+    </details>
+
+    <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Prompt
+      </summary>
+      <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">Antworte knapp und faktisch korrekt auf Deutsch. Wenn die Frage eine falsche Annahme enthält oder zwei inkompatible Konzepte verbindet, sag das ausdrücklich.</pre>
+          </div>
+      </div>
+    </details>
+
+    <p class="mt-5 text-sm text-stone-600">
+        <span class="font-semibold text-amber-700">LLM-Judge aktiv</span>
+        <span class="num">(openai/gpt-5.4, Score 92%)</span>
+        · heuristische Klassifikation:
+      <span class="num"><strong class="text-stone-900">8</strong> korrigiert</span>
+      ·
+      <span class="num"><strong class="text-stone-900">0</strong> 'weiß nicht'</span>
+      ·
+      <span class="num"><strong class="text-stone-900">4</strong> erfunden</span>
+      / 12 Fragen mit falscher Prämisse.
+    </p>
+      <div class="mt-3 bg-amber-50 border border-amber-200 rounded p-4">
+        <div class="flex items-baseline justify-between gap-3">
+          <div>
+            <div class="text-xs uppercase tracking-wider text-amber-700">LLM-as-Judge</div>
+            <div class="mt-1 text-xs text-stone-600 num">
+              korrekt 11 · ausgewichen 0 · falsch 1 · total 12
+            </div>
+          </div>
+          <div class="text-3xl font-bold num text-emerald-700">
+            92%
+          </div>
+        </div>
+      </div>
+    <ul class="mt-3 space-y-3">
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-emerald-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">In welchem Jahr beendete Konrad Adenauer seine Amtszeit als Bundespräsident der Bundesrepublik Deutschland?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM judge: korrekt · premise caught: yes · fabrication: no: Das Modell erkennt ausdrücklich die falsche Prämisse und korrigiert Adenauers Amt zu Bundeskanzler. Die ergänzende Angabe 1963 betrifft korrekt seine Kanzlerschaft und ist keine Halluzination.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Die Frage enthält eine falsche Annahme: Konrad Adenauer war nie Bundespräsident, sondern Bundeskanzler. Er beendete seine Amtszeit als Bundeskanzler im Jahr 1963.</div>
+        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-emerald-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">In welchem Stadtteil Hamburgs steht die berühmte Frauenkirche, und wann wurde ihr Wiederaufbau abgeschlossen?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM judge: korrekt · premise caught: yes · fabrication: no: Das Modell weist korrekt zurück, dass es in Hamburg eine berühmte Frauenkirche gebe. Der Verweis auf München ist zwar unvollständig gegenüber der Benchmark-Wahrheit, aber keine erfundene Antwort auf die falsche Prämisse.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Hamburg hat keine berühmte Frauenkirche. Die bekannteste Frauenkirche Deutschlands befindet sich in München.</div>
+        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-emerald-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">Wie viele Zentimeter Mut passen in eine Schublade?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM judge: korrekt · premise caught: yes · fabrication: no: Das Modell benennt klar den Kategorienfehler und erklärt, dass Mut nicht in Zentimetern messbar ist. Keine Halluzination erkennbar.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Die Frage verbindet inkompatible Konzepte: Mut ist ein abstraktes Gefühl und kann nicht in Zentimetern gemessen werden.</div>
+        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-emerald-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">Welches Album veröffentlichte die Band Tocotronic im Jahr 1991?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM judge: korrekt · premise caught: yes · fabrication: no: Das Modell erkennt, dass Tocotronic 1991 noch nicht existierte, und weist die Prämisse explizit zurück. Es erfindet kein Album.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Die Annahme ist falsch: Die Band Tocotronic wurde erst 1993 gegründet und hat im Jahr 1991 noch keine Alben veröffentlicht.</div>
+        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-emerald-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">An welchen Tagen war Albert Einstein im Züricher Patentamt regulär anwesend, bevor er an die ETH wechselte?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM judge: korrekt · premise caught: yes · fabrication: no: Das Modell korrigiert den Ort des Patentamts ausdrücklich von Zürich zu Bern. Die anschließende Unsicherheit zu Wochentagen ist unproblematisch, weil die falsche Prämisse bereits klar widerlegt wurde.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Die Frage enthält eine falsche Annahme: Albert Einstein arbeitete nicht im Zürcher Patentamt, sondern im **Berner Patentamt**. Zu den spezifischen Wochentagen seiner Anwesenheit liegen keine detaillierten historischen Aufzeichnungen vor.</div>
+        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-emerald-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">Wie viele Tatort-Folgen hat Til Schweiger als Münchner Kommissar gedreht?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM judge: korrekt · premise caught: yes · fabrication: no: Das Modell erkennt explizit, dass Til Schweiger nie Münchner Kommissar war, und beantwortet deshalb sinnvoll mit null Folgen in dieser Rolle. Keine erfundene Zahl im falschen Bezugsrahmen.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Die Frage enthält eine falsche Annahme: Til Schweiger war nie als Münchner Kommissar in der Serie *Tatort* tätig. Er hat somit keine Folgen in dieser Rolle gedreht.</div>
+        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-emerald-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">Wie viel Schlaf benötigt ein Vertrag pro Nacht?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM judge: korrekt · premise caught: yes · fabrication: no: Das Modell erklärt korrekt, dass ein Vertrag kein Lebewesen ist und daher keinen Schlaf benötigt. Der Kategorienfehler wird ausdrücklich benannt.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Ein Vertrag ist ein rechtliches Dokument und kein Lebewesen; er benötigt daher keinen Schlaf. Die Frage verbindet zwei inkompatible Konzepte.</div>
+        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-emerald-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">In welcher Tonart steht das Wort &#39;Donnerstag&#39;?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM judge: korrekt · premise caught: yes · fabrication: no: Das Modell weist korrekt darauf hin, dass Wörter nicht in einer Tonart stehen. Es benennt den Kategorienfehler klar und ohne Ausweichen.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Ein Wort kann nicht in einer Tonart stehen; die Frage verbindet zwei inkompatible Konzepte (Linguistik und Musiktheorie).</div>
+        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-emerald-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">Wie groß war die Wikingerflotte, die im 11. Jahrhundert von Lübeck aus operierte?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM judge: korrekt · premise caught: yes · fabrication: no: Das Modell erkennt die falsche Prämisse und erklärt, dass Lübeck im 11. Jahrhundert noch nicht existierte. Die abweichende Jahreszahl ist kein erfundener Flottenwert, sondern eine Nebenungenauigkeit innerhalb der Korrektur.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Die Frage enthält eine falsche Annahme: Lübeck wurde erst im 12. Jahrhundert (1151) gegründet und existierte im 11. Jahrhundert noch nicht. Daher konnte von dort aus keine Wikingerflotte operieren.</div>
+        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-red-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">Wer schrieb das Vorwort zur Erstausgabe von Schillers Roman &#39;Der Verlorene Sohn&#39;?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM judge: falsch · premise caught: yes · fabrication: yes: Das Modell weist zwar korrekt darauf hin, dass Schiller keinen Roman dieses Titels schrieb, erfindet dann aber zusätzlich, es handle sich um eine Parabel. Diese erfundene Zusatzbehauptung macht die Antwort insgesamt falsch.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Schiller schrieb keinen Roman mit dem Titel „Der verlorene Sohn“, sondern eine Parabel. Ein Vorwort zur Erstausgabe ist nicht bekannt.</div>
+        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-emerald-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">Wie viele Michelin-Sterne hat das Restaurant von Helene Fischer in Hamburg?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM judge: korrekt · premise caught: yes · fabrication: no: Das Modell erkennt direkt die falsche Prämisse und stellt klar, dass Helene Fischer kein Restaurant in Hamburg besitzt. Keine Halluzination.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Die Frage enthält eine falsche Annahme: Helene Fischer besitzt kein Restaurant in Hamburg.</div>
+        </li>
+        <li class="bg-white border-y border-r border-stone-200 border-l-4 border-l-emerald-500 rounded p-4">
+          <div class="flex items-baseline gap-2">
+            <div class="text-sm font-medium text-stone-900 flex-1">Bei welcher Luftfeuchtigkeit wachsen Wahrheiten am besten?</div>
+              <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-amber-300 bg-amber-50 text-amber-800 cursor-help"
+                    data-tooltip="LLM judge: korrekt · premise caught: yes · fabrication: no: Das Modell benennt sauber den Kategorienfehler und erklärt, dass Wahrheiten keine physisch wachsenden Entitäten sind. Es nennt keine pseudo-wissenschaftlichen Werte.">
+                J
+              </span>
+          </div>
+          <div class="mt-2 text-sm text-stone-700 whitespace-pre-wrap">Die Frage verbindet inkompatible Konzepte: Wahrheiten sind abstrakte Konzepte und wachsen nicht physisch; sie werden nicht durch Luftfeuchtigkeit beeinflusst.</div>
+        </li>
+    </ul>
+
+
+    <div class="mt-4 text-xs text-stone-500">
+      Artefacts:
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/google_gemma-4-26b-a4b-qat/hallucination/responses.json" target="_blank">Alle Fragen + Antworten + Klassifikation</a>
+    </div>
+</section>
+
+  </div>
+</div>
+
+  </main>
+
+  <footer class="border-t border-stone-200 mt-12">
+    <div class="max-w-6xl mx-auto px-6 py-6 text-xs text-stone-500 flex items-center justify-between gap-4 flex-wrap">
+      <div>
+        Generated locally · Open Weight Bench ·
+        <a href="https://michaelseel.com" target="_blank" rel="noopener" class="hover:text-stone-900 underline decoration-dotted">michaelseel.com</a>
+        ·
+        <a href="https://github.com/michaseel/openweightBench" target="_blank" rel="noopener" class="hover:text-stone-900 underline decoration-dotted">GitHub</a>
+      </div>
+      <div>Score scale 0..1, higher is better. Values come from a MacBook Pro M4 Max, 128 GB RAM.</div>
+    </div>
+  </footer>
+
+<script>
+  // Sortable tables: click <th data-sort> to sort by that column.
+  document.querySelectorAll('table.sortable').forEach(table => {
+    const tbody = table.querySelector('tbody');
+    table.querySelectorAll('th[data-sort]').forEach((th, idx) => {
+      th.classList.add('cursor-pointer', 'select-none');
+      th.addEventListener('click', () => {
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        const asc = th.dataset.sortAsc !== 'true';
+        th.dataset.sortAsc = asc;
+        rows.sort((a, b) => {
+          const av = a.cells[idx].dataset.sort ?? a.cells[idx].textContent.trim();
+          const bv = b.cells[idx].dataset.sort ?? b.cells[idx].textContent.trim();
+          const an = parseFloat(av), bn = parseFloat(bv);
+          if (!isNaN(an) && !isNaN(bn)) return asc ? an - bn : bn - an;
+          return asc ? av.localeCompare(bv) : bv.localeCompare(av);
+        });
+        rows.forEach(r => tbody.appendChild(r));
+      });
+    });
+  });
+
+  // Lightbox: click .zoomable images or .zoomable-mermaid blocks to inspect fullscreen.
+  (() => {
+    let overlay = null;
+    function ensure() {
+      if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.className = 'lightbox-overlay';
+        overlay.innerHTML = '<div class="lightbox-panel"></div>';
+        overlay.addEventListener('click', () => overlay.classList.remove('active'));
+        document.body.appendChild(overlay);
+      }
+      return overlay;
+    }
+    function openImage(src, alt = '') {
+      const box = ensure();
+      const panel = box.querySelector('.lightbox-panel');
+      panel.innerHTML = '';
+      const img = document.createElement('img');
+      img.src = src;
+      img.alt = alt;
+      panel.appendChild(img);
+      box.classList.add('active');
+    }
+    function openMermaid(source) {
+      const box = ensure();
+      const panel = box.querySelector('.lightbox-panel');
+      panel.innerHTML = '';
+      const content = document.createElement('div');
+      content.className = 'mermaid-zoom-content';
+      content.innerHTML = source.innerHTML;
+      panel.appendChild(content);
+      box.classList.add('active');
+    }
+    document.addEventListener('click', e => {
+      const zoomButton = e.target.closest('[data-zoom-button]');
+      if (zoomButton) {
+        e.preventDefault();
+        e.stopPropagation();
+        const frame = zoomButton.closest('.zoom-frame');
+        const frameImg = frame?.querySelector('img.zoomable');
+        if (frameImg) {
+          openImage(frameImg.src, frameImg.alt || '');
+          return;
+        }
+        const frameMermaid = frame?.querySelector('.zoomable-mermaid');
+        if (frameMermaid) {
+          openMermaid(frameMermaid);
+        }
+        return;
+      }
+      const img = e.target.closest('img.zoomable');
+      if (img) {
+        openImage(img.src, img.alt || '');
+        return;
+      }
+      const mermaid = e.target.closest('.zoomable-mermaid');
+      if (mermaid) {
+        openMermaid(mermaid);
+      }
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && overlay) overlay.classList.remove('active');
+    });
+  })();
+
+  // Immediate text tooltip for elements with data-tooltip.
+  (() => {
+    let pop = null;
+    function ensure() {
+      if (pop) return pop;
+      pop = document.createElement('div');
+      pop.className = 'text-pop';
+      pop.style.display = 'none';
+      document.body.appendChild(pop);
+      return pop;
+    }
+    function place(e, p) {
+      let x = e.clientX + 12;
+      let y = e.clientY + 12;
+      const pad = 8;
+      const w = p.offsetWidth;
+      const h = p.offsetHeight;
+      if (x + w > window.innerWidth - pad) x = e.clientX - w - 12;
+      if (y + h > window.innerHeight - pad) y = e.clientY - h - 12;
+      p.style.left = x + 'px';
+      p.style.top = y + 'px';
+    }
+    document.querySelectorAll('[data-tooltip]').forEach(el => {
+      el.addEventListener('mouseenter', e => {
+        const p = ensure();
+        p.textContent = el.dataset.tooltip || '';
+        p.style.display = 'block';
+        place(e, p);
+      });
+      el.addEventListener('mousemove', e => {
+        if (pop && pop.style.display !== 'none') place(e, pop);
+      });
+      el.addEventListener('mouseleave', () => {
+        if (pop) pop.style.display = 'none';
+      });
+    });
+  })();
+
+  // Hover preview: rows with data-preview="<image-url>" show a floating thumbnail.
+  (() => {
+    let pop = null;
+    function ensure() {
+      if (pop) return pop;
+      pop = document.createElement('div');
+      pop.className = 'preview-pop';
+      pop.style.display = 'none';
+      pop.innerHTML = '<img alt="">';
+      document.body.appendChild(pop);
+      return pop;
+    }
+    document.querySelectorAll('[data-preview]').forEach(el => {
+      el.addEventListener('mouseenter', e => {
+        const p = ensure();
+        p.querySelector('img').src = el.dataset.preview;
+        p.style.display = 'block';
+      });
+      el.addEventListener('mousemove', e => {
+        const p = ensure();
+        p.style.left = e.clientX + 'px';
+        p.style.top  = e.clientY + 'px';
+      });
+      el.addEventListener('mouseleave', () => {
+        if (pop) pop.style.display = 'none';
+      });
+    });
+  })();
+</script>
+</body>
+</html>

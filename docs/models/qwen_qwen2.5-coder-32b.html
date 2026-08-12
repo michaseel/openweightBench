@@ -32,10 +32,116 @@
     }
   }
 </script>
+<script>
+  // Shared model filter (RAM cap + release window), used by the landing page
+  // and every bench page. Participating elements carry `data-total-ram` (GB,
+  // 64k-context estimate) and `data-released` (YYYY-MM[-DD]).
+  //
+  // Release-window option values: "m<N>" = the last N months, "y<YYYY>" = that
+  // calendar year and nothing else, "" = no restriction. Both are compared at
+  // whole-calendar-month granularity, so a YYYY-MM date without a day resolves
+  // without guessing. "Last N months" counts back from the viewer's own clock,
+  // not the build date — the report stays online and a window pinned to the
+  // build would quietly drift into meaning something else.
+  //
+  // Missing values never hide a model, for either criterion: the RAM figure
+  // comes from a runtime measurement and the date from curated metadata, so a
+  // gap means "not known", not "doesn't qualify". A freshly benchmarked model
+  // that nobody has annotated yet must not silently drop out of the report —
+  // the RAM and Released columns show "—" so the gap is visible in place.
+  //
+  // Each group names the class to toggle, so callers choose the presentation:
+  // charts dim their dots (comparison stays visible), tables hide their rows
+  // (that's the point of filtering a 60-row table). The first return value of
+  // apply() is the per-group count of models still shown.
+  window.owbFilter = function (cfg) {
+    const ram = document.getElementById(cfg.ramSelect);
+    const year = document.getElementById(cfg.yearSelect);
+    const groups = (cfg.groups || []).map(g => ({ els: Array.from(g.els), cls: g.cls }));
+    if (!ram && !year) return null;
+
+    // Month index (year * 12 + month) so windows are plain integer ranges.
+    function releaseMonth(el) {
+      const rel = el.dataset.released || '';
+      if (rel.length < 7) return null;
+      return parseInt(rel.slice(0, 4), 10) * 12 + parseInt(rel.slice(5, 7), 10);
+    }
+
+    function windowFor(value) {
+      if (!value) return null;
+      if (value[0] === 'm') {
+        const now = new Date();
+        const nowMonth = now.getFullYear() * 12 + now.getMonth() + 1;
+        return { from: nowMonth - parseInt(value.slice(1), 10) + 1, to: Infinity };
+      }
+      const y = parseInt(value.slice(1), 10);
+      return { from: y * 12 + 1, to: y * 12 + 12 };
+    }
+
+    function inWindow(el, value) {
+      const win = windowFor(value);
+      if (!win) return true;
+      const m = releaseMonth(el);
+      if (m === null) return true;
+      return m >= win.from && m <= win.to;
+    }
+
+    function excluded(el) {
+      const cap = ram ? parseFloat(ram.value) : NaN;
+      if (cap) {
+        const gb = parseFloat(el.dataset.totalRam || '');
+        if (gb && gb > cap) return true;
+      }
+      if (year && !inWindow(el, year.value)) return true;
+      return false;
+    }
+
+    // Mark options that would empty the page rather than letting the user
+    // pick them and wonder where everything went.
+    const population = groups.flatMap(g => g.els);
+    function disableEmpty(sel, matches) {
+      if (!sel) return;
+      Array.from(sel.options).forEach(opt => {
+        // "all" (value "" or the RAM select's "0") always stays selectable.
+        if (!opt.value || opt.value === '0') return;
+        if (population.some(el => matches(el, opt.value))) return;
+        opt.disabled = true;
+        opt.textContent += ' — no models';
+      });
+    }
+    disableEmpty(ram, (el, v) => {
+      const gb = parseFloat(el.dataset.totalRam || '');
+      return !gb || gb <= parseFloat(v);
+    });
+    disableEmpty(year, inWindow);
+
+    function apply() {
+      const counts = groups.map(g => {
+        let visible = 0;
+        g.els.forEach(el => {
+          const off = excluded(el);
+          el.classList.toggle(g.cls, off);
+          if (!off) visible++;
+        });
+        return visible;
+      });
+      if (cfg.onApply) cfg.onApply(counts);
+      return counts;
+    }
+
+    if (ram) ram.addEventListener('change', apply);
+    if (year) year.addEventListener('change', apply);
+    apply();
+    return { apply, excluded };
+  };
+</script>
 <style>
   body { font-feature-settings: "ss01","cv11"; }
   .num { font-variant-numeric: tabular-nums; }
   .row-link:hover { background: rgb(245 245 244 / 1); }
+  /* Model filter: table rows drop out entirely, chart dots only dim (see
+     window.owbFilter). */
+  .owb-hidden { display: none !important; }
   .preview-pop {
     position: fixed; pointer-events: none; z-index: 50;
     transform: translate(16px, 16px);
@@ -179,7 +285,7 @@
         </div>
         <div>
           <dt class="text-stone-500">Wall total</dt>
-          <dd class="font-semibold text-stone-900 num">3.3 min</dd>
+          <dd class="font-semibold text-stone-900 num">6.2 min</dd>
         </div>
       </dl>
       <div class="mt-4 pt-3 border-t border-stone-200 text-xs uppercase tracking-wider text-stone-500">Benchmarks</div>
@@ -192,6 +298,17 @@
 60%
                 </span>
                 <span class="text-[10px] text-stone-400 w-10 text-right">2m</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="#tool_use" class="flex items-center justify-between gap-2 py-1.5 px-2 rounded hover:bg-stone-50 group">
+              <span class="text-sm text-stone-700 group-hover:text-stone-900 truncate">tool_use</span>
+              <span class="flex items-baseline gap-2 num shrink-0">
+                <span class="text-sm font-semibold text-emerald-700">
+98%
+                </span>
+                <span class="text-[10px] text-stone-400 w-10 text-right">3m</span>
               </span>
             </a>
           </li>
@@ -575,6 +692,798 @@ As answer return the plain HTML of the working application (script and styles in
         <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/qwen_qwen2.5-coder-32b/coding/output.html" target="_blank">Generierte App</a>
         <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/qwen_qwen2.5-coder-32b/coding/raw_response.txt" target="_blank">Raw model response</a>
         <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/qwen_qwen2.5-coder-32b/coding/screenshot.png" target="_blank">Screenshot der gerenderten App</a>
+    </div>
+</section>
+<section id="tool_use" class="mb-12 scroll-mt-24">
+  <div class="flex items-baseline justify-between border-b border-stone-200 pb-2">
+    <h2 class="text-lg font-medium tracking-tight">tool_use</h2>
+    <a href="../benchmarks/tool_use.html" class="text-xs text-stone-500 hover:text-stone-900">all models in this bench →</a>
+  </div>
+
+
+  <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+    <div class="md:col-span-1 bg-white border-2 border-emerald-500 rounded-lg p-5 flex flex-col justify-center">
+      <div class="text-xs uppercase tracking-wider text-stone-500">Score</div>
+      <div class="mt-1 text-5xl font-bold num leading-none text-emerald-700">
+98%
+      </div>
+    </div>
+    <div class="md:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">tok/s</dt>
+        <dd class="mt-1 text-xl font-semibold num">24</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Tokens</dt>
+        <dd class="mt-1 text-xl font-semibold num">2554</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">Wall</dt>
+        <dd class="mt-1 text-xl font-semibold num">171.0 s</dd>
+      </div>
+      <div class="bg-white border border-stone-200 rounded p-3">
+        <dt class="text-xs uppercase tracking-wider text-stone-500">RAM</dt>
+        <dd class="mt-1 text-xl font-semibold num">17.2 GB</dd>
+      </div>
+    </div>
+  </div>
+
+    <details class="mt-4 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Worum geht es? Was wird getestet?
+      </summary>
+      <div class="px-4 py-3 text-sm text-stone-700 whitespace-pre-line border-t border-stone-200 bg-white rounded-b">Task: 7 agentic-workflow scenarios across three difficulty tiers, with four mocked tools available (list_files, read_file, apply_diff, get_weather). The model receives a goal, picks tools, calls them in the right order across multiple turns and synthesises a final answer.
+
+Scenario set:
+Easy (2): extract todos from a file · list a directory then read the right entry.
+Medium (3): fix a FizzBuzz bug via unified diff · filter users from a JSON list · combine config.json with a weather mock for an alert.
+Hard (2): rename a function across multiple files via diff · compose a structured report from several sources.
+
+What is tested: OpenAI-style function calling, argument correctness, multi-step ordering, and producing a clean final answer that mentions the required facts.
+
+Why models fail: models without &#39;tool_use&#39; capability ignore the schemas. Weak models pick wrong tools or emit malformed arguments. Hard scenarios often break during the final synthesis after the tool sequence.</div>
+    </details>
+
+    <details class="mt-2 bg-stone-50 border border-stone-200 rounded">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-stone-700 hover:text-stone-900">
+        Prompt
+      </summary>
+      <div class="px-4 py-3 bg-white border-t border-stone-200 rounded-b space-y-3">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-1">System prompt</div>
+            <pre class="text-xs whitespace-pre-wrap text-stone-800">Du arbeitest in einer agentic IDE (vergleichbar mit Cursor/Claude Code). Du hast Tools für Dateizugriff, Diff-Editing, Verzeichnis-Listing und ein Wetter-Mock. Plane mehrstufig: erst aufklären, dann handeln, am Ende prüfen. Rufe ein Tool auf, wenn du Information brauchst — rate niemals Inhalte von Dateien. Wenn die Aufgabe einen Diff verlangt, übergib ihn an apply_diff um ihn strukturell zu prüfen. Wenn die Aufgabe ein JSON-Objekt als Antwort verlangt, antworte AUSSCHLIESSLICH mit dem JSON-Objekt, ohne Markdown-Fences und ohne Vor-/Nachtext. Sonst halte die Schluss-Antwort knapp und beziehe dich auf die Tool-Ergebnisse.</pre>
+          </div>
+      </div>
+    </details>
+
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div>
+            <span class="font-medium">easy_extract_todos</span>
+            <span class="ml-2 text-xs uppercase tracking-wider px-1.5 py-0.5 rounded
+bg-emerald-50 text-emerald-700 border border-emerald-200
+">leicht</span>
+          </div>
+            <div class="text-sm num">
+              <span class="font-medium text-emerald-700">100%</span>
+              <span class="text-stone-500"> · 3/3 checks</span>
+            </div>
+        </div>
+
+        <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">In notes.md stehen Sprint-Notizen. Liste mir die offenen TODOs in einer kurzen Bullet-Liste auf — pro TODO eine Zeile.</div>
+
+          <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool calls</div>
+            <ol class="space-y-2 text-sm num">
+                <li>
+                  <span class="font-medium text-stone-900">1. read_file</span>
+                  <span class="text-stone-600">({"path": "notes.md"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap"># Sprint Notes — KW 17
+
+## Erledigt
+- API-Endpoint /users mit Pagination
+- Migrations für `orders` Tabelle eingespielt
+
+## Offen
+- TODO: Caching-Layer für Produktsuche evaluieren (Redis vs in-memory)
+- TODO: Logging vereinheitlichen — momentan mischen wir loguru + logging
+- Bugfix: Datumsformat in der Rechnungs-PDF (siehe Issue #4711)
+- TODO: Stripe-Webhook-Handler braucht Idempotency-Keys
+
+## Notizen aus dem Standup
+Kunde X meldet, dass beim Login-Redirect manchmal die `next`-URL verloren geht. Reproduzierbar nur in Safari iOS. Verdacht auf Service-Worker-Cache.
+
+TODO: Safari-Repro-Setup auf </pre>
+                  </details>
+                </li>
+            </ol>
+          </div>
+
+          <ul class="px-4 py-3 border-b border-stone-100 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;read_file&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: read_file</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Arguments for &#39;read_file&#39;</div>
+<div class="text-xs text-stone-500">path=&#39;notes.md&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Response mentions 3/4 of the key terms</div>
+<div class="text-xs text-stone-500">mentioned: [&#39;Caching&#39;, &#39;Logging&#39;, &#39;Stripe&#39;, &#39;Safari&#39;], missing: []</div>                </div>
+              </li>
+          </ul>
+
+        <div class="px-4 py-3">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Final answer</div>
+          <pre class="text-sm whitespace-pre-wrap">- Caching-Layer für Produktsuche evaluieren (Redis vs in-memory)
+- Logging vereinheitlichen — momentan mischen wir loguru + logging
+- Stripe-Webhook-Handler braucht Idempotency-Keys
+- Safari-Repro-Setup auf TestFlight provisionieren.</pre>
+        </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div>
+            <span class="font-medium">easy_list_then_read</span>
+            <span class="ml-2 text-xs uppercase tracking-wider px-1.5 py-0.5 rounded
+bg-emerald-50 text-emerald-700 border border-emerald-200
+">leicht</span>
+          </div>
+            <div class="text-sm num">
+              <span class="font-medium text-emerald-700">100%</span>
+              <span class="text-stone-500"> · 4/4 checks</span>
+            </div>
+        </div>
+
+        <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">Ich weiß nicht mehr, welche Datei in diesem Projekt die Konfiguration enthält. Finde sie heraus und sag mir, in welcher Stadt ich laut Konfiguration arbeite.</div>
+
+          <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool calls</div>
+            <ol class="space-y-2 text-sm num">
+                <li>
+                  <span class="font-medium text-stone-900">1. list_files</span>
+                  <span class="text-stone-600">({})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">[&#34;config.json&#34;, &#34;fizzbuzz.py&#34;, &#34;inventory.py&#34;, &#34;notes.md&#34;, &#34;users.json&#34;]</pre>
+                  </details>
+                </li>
+                <li>
+                  <span class="font-medium text-stone-900">2. read_file</span>
+                  <span class="text-stone-600">({"path": "config.json"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{
+  &#34;service&#34;: &#34;owb-test-fixture&#34;,
+  &#34;city&#34;: &#34;München&#34;,
+  &#34;language&#34;: &#34;de&#34;,
+  &#34;alert_threshold_celsius&#34;: 30
+}
+</pre>
+                  </details>
+                </li>
+            </ol>
+          </div>
+
+          <ul class="px-4 py-3 border-b border-stone-100 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;list_files&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: list_files, read_file</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;read_file&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: list_files, read_file</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Arguments for &#39;read_file&#39;</div>
+<div class="text-xs text-stone-500">path=&#39;config.json&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Response mentions 1/1 of the key terms</div>
+<div class="text-xs text-stone-500">mentioned: [&#39;München&#39;], missing: []</div>                </div>
+              </li>
+          </ul>
+
+        <div class="px-4 py-3">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Final answer</div>
+          <pre class="text-sm whitespace-pre-wrap">Laut Konfiguration arbeitest du in München.</pre>
+        </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div>
+            <span class="font-medium">medium_fizzbuzz_fix</span>
+            <span class="ml-2 text-xs uppercase tracking-wider px-1.5 py-0.5 rounded
+bg-amber-50 text-amber-700 border border-amber-200
+">mittel</span>
+          </div>
+            <div class="text-sm num">
+              <span class="font-medium text-emerald-700">100%</span>
+              <span class="text-stone-500"> · 6/6 checks</span>
+            </div>
+        </div>
+
+        <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">fizzbuzz.py hat einen Bug — die Funktion liefert die Werte 1..n-1 statt 1..n. Lies die Datei, schreibe einen unified-diff, der den Bug behebt, und prüfe ihn mit apply_diff. Antworte am Ende mit einer kurzen Erklärung des Fixes.</div>
+
+          <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool calls</div>
+            <ol class="space-y-2 text-sm num">
+                <li>
+                  <span class="font-medium text-stone-900">1. read_file</span>
+                  <span class="text-stone-600">({"path": "fizzbuzz.py"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">&#34;&#34;&#34;Simple FizzBuzz with a deliberate off-by-one bug.&#34;&#34;&#34;
+
+
+def fizzbuzz(n: int) -&gt; list[str]:
+    out: list[str] = []
+    # BUG: range stops at n (exclusive), but FizzBuzz from 1..=n needs n+1.
+    for i in range(1, n):
+        if i % 15 == 0:
+            out.append(&#34;FizzBuzz&#34;)
+        elif i % 3 == 0:
+            out.append(&#34;Fizz&#34;)
+        elif i % 5 == 0:
+            out.append(&#34;Buzz&#34;)
+        else:
+            out.append(str(i))
+    return out
+
+
+if __name__ == &#34;__main__&#34;:
+    print(fizzbuzz(15))
+</pre>
+                  </details>
+                </li>
+                <li>
+                  <span class="font-medium text-stone-900">2. apply_diff</span>
+                  <span class="text-stone-600">({"diff": "--- fizzbuzz.py\n+++ fizzbuzz.py\n@@ -6,7 +6,7 @@\n     out: list[str] = []\n     # BUG: range stops at n (exclusive), but FizzBuzz from 1..=n needs n+1.\n-    for i in range(1, n):\n+    for i in range(1, n + 1):\n         if i % 15 == 0:\n             out.append(\"FizzBuzz\")\n         elif i % 3 == 0:\n", "path": "fizzbuzz.py"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{&#34;ok&#34;: true, &#34;applied&#34;: 2, &#34;added_lines&#34;: 1, &#34;removed_lines&#34;: 1, &#34;note&#34;: &#34;structural-validation only; no real write performed&#34;}</pre>
+                  </details>
+                </li>
+            </ol>
+          </div>
+
+          <ul class="px-4 py-3 border-b border-stone-100 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;read_file&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: read_file, apply_diff</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;apply_diff&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: read_file, apply_diff</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Arguments for &#39;read_file&#39;</div>
+<div class="text-xs text-stone-500">path=&#39;fizzbuzz.py&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Arguments for &#39;apply_diff&#39;</div>
+<div class="text-xs text-stone-500">path=&#39;fizzbuzz.py&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Diff for fizzbuzz.py validates structurally</div>
+<div class="text-xs text-stone-500">applied=2, calls=1</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Diff changes ≥2 lines</div>
+<div class="text-xs text-stone-500">applied: 2</div>                </div>
+              </li>
+          </ul>
+
+        <div class="px-4 py-3">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Final answer</div>
+          <pre class="text-sm whitespace-pre-wrap">Der Bug wurde erfolgreich behoben, indem der Bereich der Schleife von `range(1, n)` auf `range(1, n + 1)` geändert wurde. Dies stellt sicher, dass die Schleife bis zum inklusiven Wert `n` läuft und somit alle Zahlen von 1 bis `n` berücksichtigt werden.</pre>
+        </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div>
+            <span class="font-medium">medium_filter_users</span>
+            <span class="ml-2 text-xs uppercase tracking-wider px-1.5 py-0.5 rounded
+bg-amber-50 text-amber-700 border border-amber-200
+">mittel</span>
+          </div>
+            <div class="text-sm num">
+              <span class="font-medium text-emerald-700">100%</span>
+              <span class="text-stone-500"> · 6/6 checks</span>
+            </div>
+        </div>
+
+        <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">users.json enthält eine Liste aller Nutzer. Filtere die *aktiven* Nutzer mit Rolle &#39;admin&#39; oder &#39;editor&#39; und antworte AUSSCHLIESSLICH mit einem JSON-Objekt der Form {&#34;count&#34;: &lt;Zahl&gt;, &#34;users&#34;: [{&#34;id&#34;: ..., &#34;name&#34;: ..., &#34;role&#34;: ...}, ...]}. Keine Markdown-Fences, kein Vor- oder Nachtext.</div>
+
+          <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool calls</div>
+            <ol class="space-y-2 text-sm num">
+                <li>
+                  <span class="font-medium text-stone-900">1. read_file</span>
+                  <span class="text-stone-600">({"path": "users.json"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{
+  &#34;exported_at&#34;: &#34;2026-04-28T08:30:00Z&#34;,
+  &#34;users&#34;: [
+    {
+      &#34;id&#34;: 1001,
+      &#34;name&#34;: &#34;Anja Sommer&#34;,
+      &#34;email&#34;: &#34;anja.sommer@example.com&#34;,
+      &#34;role&#34;: &#34;admin&#34;,
+      &#34;active&#34;: true,
+      &#34;last_login_iso&#34;: &#34;2026-04-27T11:42:18Z&#34;
+    },
+    {
+      &#34;id&#34;: 1002,
+      &#34;name&#34;: &#34;Bernd Wagner&#34;,
+      &#34;email&#34;: &#34;bernd.wagner@example.com&#34;,
+      &#34;role&#34;: &#34;viewer&#34;,
+      &#34;active&#34;: false,
+      &#34;last_login_iso&#34;: &#34;2025-11-03T07:15:02Z&#34;
+    },
+    {
+      &#34;id&#34;: 1003,
+      &#34;name&#34;: &#34;Cara Lindgren&#34;,
+      &#34;email&#34;: &#34;cara@example.com&#34;,
+      &#34;role&#34;: &#34;editor&#34;,
+      &#34;active&#34;: true,
+      &#34;last_logi</pre>
+                  </details>
+                </li>
+            </ol>
+          </div>
+
+          <ul class="px-4 py-3 border-b border-stone-100 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;read_file&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: read_file</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Arguments for &#39;read_file&#39;</div>
+<div class="text-xs text-stone-500">path=&#39;users.json&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Response contains valid JSON</div>
+                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">JSON contains fields [&#39;count&#39;, &#39;users&#39;]</div>
+<div class="text-xs text-stone-500">all fields present</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">count == 4</div>
+<div class="text-xs text-stone-500">actual=4</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">users.ids == [1001, 1003, 1004, 1006]</div>
+<div class="text-xs text-stone-500">actual=[1001, 1003, 1004, 1006]</div>                </div>
+              </li>
+          </ul>
+
+        <div class="px-4 py-3">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Final answer</div>
+          <pre class="text-sm whitespace-pre-wrap">{
+  &#34;count&#34;: 4,
+  &#34;users&#34;: [
+    {
+      &#34;id&#34;: 1001,
+      &#34;name&#34;: &#34;Anja Sommer&#34;,
+      &#34;role&#34;: &#34;admin&#34;
+    },
+    {
+      &#34;id&#34;: 1003,
+      &#34;name&#34;: &#34;Cara Lindgren&#34;,
+      &#34;role&#34;: &#34;editor&#34;
+    },
+    {
+      &#34;id&#34;: 1004,
+      &#34;name&#34;: &#34;Dennis Pohl&#34;,
+      &#34;role&#34;: &#34;editor&#34;
+    },
+    {
+      &#34;id&#34;: 1006,
+      &#34;name&#34;: &#34;Frederik Otto&#34;,
+      &#34;role&#34;: &#34;admin&#34;
+    }
+  ]
+}</pre>
+        </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div>
+            <span class="font-medium">medium_weather_alert</span>
+            <span class="ml-2 text-xs uppercase tracking-wider px-1.5 py-0.5 rounded
+bg-amber-50 text-amber-700 border border-amber-200
+">mittel</span>
+          </div>
+            <div class="text-sm num">
+              <span class="font-medium text-emerald-700">100%</span>
+              <span class="text-stone-500"> · 7/7 checks</span>
+            </div>
+        </div>
+
+        <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">Lies config.json und hol das Wetter für die dort eingetragene Stadt. Antworte AUSSCHLIESSLICH mit einem JSON-Objekt {&#34;city&#34;: ..., &#34;temp_c&#34;: ..., &#34;condition&#34;: ..., &#34;alert&#34;: &lt;bool&gt;}, wobei alert genau dann true ist, wenn temp_c den Schwellwert aus config.json überschreitet.</div>
+
+          <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool calls</div>
+            <ol class="space-y-2 text-sm num">
+                <li>
+                  <span class="font-medium text-stone-900">1. read_file</span>
+                  <span class="text-stone-600">({"path": "config.json"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{
+  &#34;service&#34;: &#34;owb-test-fixture&#34;,
+  &#34;city&#34;: &#34;München&#34;,
+  &#34;language&#34;: &#34;de&#34;,
+  &#34;alert_threshold_celsius&#34;: 30
+}
+</pre>
+                  </details>
+                </li>
+                <li>
+                  <span class="font-medium text-stone-900">2. get_weather</span>
+                  <span class="text-stone-600">({"city": "M\u00fcnchen"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{&#34;city&#34;: &#34;M\u00fcnchen&#34;, &#34;temp_c&#34;: 9, &#34;condition&#34;: &#34;bew\u00f6lkt&#34;, &#34;wind_kmh&#34;: 7}</pre>
+                  </details>
+                </li>
+            </ol>
+          </div>
+
+          <ul class="px-4 py-3 border-b border-stone-100 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;read_file&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: read_file, get_weather</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;get_weather&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: read_file, get_weather</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Arguments for &#39;read_file&#39;</div>
+<div class="text-xs text-stone-500">path=&#39;config.json&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Arguments for &#39;get_weather&#39;</div>
+<div class="text-xs text-stone-500">city=&#39;München&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Response contains valid JSON</div>
+                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">JSON contains fields [&#39;city&#39;, &#39;temp_c&#39;, &#39;condition&#39;, &#39;alert&#39;]</div>
+<div class="text-xs text-stone-500">all fields present</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">alert == False</div>
+<div class="text-xs text-stone-500">actual=False</div>                </div>
+              </li>
+          </ul>
+
+        <div class="px-4 py-3">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Final answer</div>
+          <pre class="text-sm whitespace-pre-wrap">{&#34;city&#34;: &#34;München&#34;, &#34;temp_c&#34;: 9, &#34;condition&#34;: &#34;bewölkt&#34;, &#34;alert&#34;: false}</pre>
+        </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div>
+            <span class="font-medium">hard_rename_function</span>
+            <span class="ml-2 text-xs uppercase tracking-wider px-1.5 py-0.5 rounded
+bg-red-50 text-red-700 border border-red-200">schwer</span>
+          </div>
+            <div class="text-sm num">
+              <span class="font-medium text-emerald-700">88%</span>
+              <span class="text-stone-500"> · 7/8 checks</span>
+            </div>
+        </div>
+
+        <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">Die Funktion calculate_total in inventory.py soll konsistent zum Projekt-Stil in compute_total umbenannt werden. Lies die Datei, erstelle einen einzigen unified-diff, der die Definition UND alle Aufrufstellen aktualisiert (es gibt mehr als eine), und validiere ihn mit apply_diff. Achte darauf, keine anderen Identifier-Vorkommen zu verändern. Antworte am Ende kurz, wie viele Stellen du geändert hast.</div>
+
+          <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool calls</div>
+            <ol class="space-y-2 text-sm num">
+                <li>
+                  <span class="font-medium text-stone-900">1. read_file</span>
+                  <span class="text-stone-600">({"path": "inventory.py"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">&#34;&#34;&#34;Mini inventory accounting module — used as fixture for diff-edit benchmark.
+
+The function calculate_total() is called from 3 different places. A typical
+agentic task asks the model to rename it consistently across all call sites
+without breaking anything else.
+&#34;&#34;&#34;
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Iterable
+
+
+@dataclass
+class LineItem:
+    sku: str
+    quantity: int
+    unit_price_cents: int
+    discount_pct: float = 0.0
+
+
+def calculate_total(items: Iterable[LineItem]) -&gt; int:
+    &#34;&#34;&#34;Return total in cents, applying per-item discount.&#34;&#34;&#34;</pre>
+                  </details>
+                </li>
+                <li>
+                  <span class="font-medium text-stone-900">2. apply_diff</span>
+                  <span class="text-stone-600">({})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{&#34;ok&#34;: false, &#34;errors&#34;: [&#34;missing path or diff&#34;]}</pre>
+                  </details>
+                </li>
+                <li>
+                  <span class="font-medium text-stone-900">3. apply_diff</span>
+                  <span class="text-stone-600">({"diff": "--- inventory.py\t(original)\n+++ inventory.py\t(renamed)\n@@ -10,7 +10,7 @@\n from typing import Iterable\n\n\n @dataclass\nclass LineItem:\n     sku: str\n     quantity: int\n     unit_price_cents: int\n-    discount_pct: float = 0.0\n+    discount_pct: float = 0.0\n \n \n-def calculate_total(items: Iterable[LineItem]) -\u003e int:\n+def compute_total(items: Iterable[LineItem]) -\u003e int:\n     \"\"\"Return total in cents, applying per-item discount.\"\"\"\n     total = 0\n     for item in items:\n@@ -35,7 +35,7 @@\n         lines.append(\n             f\"{it.sku:\u003c10} x{it.quantity:\u003e3}  {it.unit_price_cents / 100:\u003e7.2f} {currency}\"\n             + (f\"  (-{int(it.discount_pct * 100)}%)\") if it.discount_pct else \"\")\n-    grand_total = calculate_total(items)\n+    grand_total = compute_total(items)\n     lines.append(\"-\" * 40)\n     lines.append(f\"{\u0027TOTAL\u0027:\u003c10}        {grand_total / 100:\u003e7.2f} {currency}\")\n     return \"\\n\".join(lines)\n@@ -46,7 +46,7 @@\n     \"\"\"Mean basket value across multiple baskets, in EUR.\"\"\"\n     if not baskets:\n         return 0.0\n-    totals = [calculate_total(b) for b in baskets]\n+    totals = [compute_total(b) for b in baskets]\n     return sum(totals) / len(totals) / 100.0\n \n \ndef basket_above_threshold(items: list[LineItem], threshold_eur: float) -\u003e bool:\n-    return calculate_total(items) \u003e threshold_eur * 100\n+    return compute_total(items) \u003e threshold_eur * 100", "path": "inventory.py"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{&#34;ok&#34;: true, &#34;applied&#34;: 10, &#34;added_lines&#34;: 5, &#34;removed_lines&#34;: 5, &#34;note&#34;: &#34;structural-validation only; no real write performed&#34;}</pre>
+                  </details>
+                </li>
+            </ol>
+          </div>
+
+          <ul class="px-4 py-3 border-b border-stone-100 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;read_file&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: read_file, apply_diff, apply_diff</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;apply_diff&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: read_file, apply_diff, apply_diff</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Arguments for &#39;read_file&#39;</div>
+<div class="text-xs text-stone-500">path=&#39;inventory.py&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-red-600">✗</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Arguments for &#39;apply_diff&#39;</div>
+<div class="text-xs text-stone-500">path=None</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Diff for inventory.py validates structurally</div>
+<div class="text-xs text-stone-500">applied=10, calls=1</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Diff changes ≥8 lines</div>
+<div class="text-xs text-stone-500">applied: 10</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Diff contains &#39;compute_total&#39;</div>
+                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Diff contains &#39;calculate_total&#39;</div>
+                </div>
+              </li>
+          </ul>
+
+        <div class="px-4 py-3">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Final answer</div>
+          <pre class="text-sm whitespace-pre-wrap">Es wurden 4 Stellen geändert. Die Definition von `calculate_total` wurde in `compute_total` umbenannt und alle Aufrufstellen wurden entsprechend angepasst.</pre>
+        </div>
+      </div>
+      <div class="mt-5 bg-white border border-stone-200 rounded">
+        <div class="px-4 py-2 border-b border-stone-200 flex items-baseline justify-between">
+          <div>
+            <span class="font-medium">hard_compose_report</span>
+            <span class="ml-2 text-xs uppercase tracking-wider px-1.5 py-0.5 rounded
+bg-red-50 text-red-700 border border-red-200">schwer</span>
+          </div>
+            <div class="text-sm num">
+              <span class="font-medium text-emerald-700">100%</span>
+              <span class="text-stone-500"> · 7/7 checks</span>
+            </div>
+        </div>
+
+        <div class="px-4 py-3 border-b border-stone-100 text-sm text-stone-700">Erstelle eine Zusammenfassung aus zwei Quellen. Lies users.json und config.json. Antworte AUSSCHLIESSLICH mit einem JSON-Objekt der Form {&#34;service&#34;: &lt;Service-Name aus config&gt;, &#34;city&#34;: &lt;Stadt aus config&gt;, &#34;active_users&#34;: &lt;Anzahl aktiver Nutzer aus users.json&gt;, &#34;admin_emails&#34;: [&lt;E-Mails aller aktiven Admins, sortiert&gt;]}. Keine Markdown-Fences.</div>
+
+          <div class="px-4 py-3 border-b border-stone-100 bg-stone-50">
+            <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Tool calls</div>
+            <ol class="space-y-2 text-sm num">
+                <li>
+                  <span class="font-medium text-stone-900">1. list_files</span>
+                  <span class="text-stone-600">({})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">[&#34;config.json&#34;, &#34;fizzbuzz.py&#34;, &#34;inventory.py&#34;, &#34;notes.md&#34;, &#34;users.json&#34;]</pre>
+                  </details>
+                </li>
+                <li>
+                  <span class="font-medium text-stone-900">2. read_file</span>
+                  <span class="text-stone-600">({"path": "config.json"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{
+  &#34;service&#34;: &#34;owb-test-fixture&#34;,
+  &#34;city&#34;: &#34;München&#34;,
+  &#34;language&#34;: &#34;de&#34;,
+  &#34;alert_threshold_celsius&#34;: 30
+}
+</pre>
+                  </details>
+                </li>
+                <li>
+                  <span class="font-medium text-stone-900">3. read_file</span>
+                  <span class="text-stone-600">({"path": "users.json"})</span>
+                  <details class="mt-1">
+                    <summary class="cursor-pointer text-xs text-stone-500 hover:text-stone-900">Tool result</summary>
+                    <pre class="mt-1 text-xs bg-white border border-stone-200 rounded p-2 overflow-x-auto whitespace-pre-wrap">{
+  &#34;exported_at&#34;: &#34;2026-04-28T08:30:00Z&#34;,
+  &#34;users&#34;: [
+    {
+      &#34;id&#34;: 1001,
+      &#34;name&#34;: &#34;Anja Sommer&#34;,
+      &#34;email&#34;: &#34;anja.sommer@example.com&#34;,
+      &#34;role&#34;: &#34;admin&#34;,
+      &#34;active&#34;: true,
+      &#34;last_login_iso&#34;: &#34;2026-04-27T11:42:18Z&#34;
+    },
+    {
+      &#34;id&#34;: 1002,
+      &#34;name&#34;: &#34;Bernd Wagner&#34;,
+      &#34;email&#34;: &#34;bernd.wagner@example.com&#34;,
+      &#34;role&#34;: &#34;viewer&#34;,
+      &#34;active&#34;: false,
+      &#34;last_login_iso&#34;: &#34;2025-11-03T07:15:02Z&#34;
+    },
+    {
+      &#34;id&#34;: 1003,
+      &#34;name&#34;: &#34;Cara Lindgren&#34;,
+      &#34;email&#34;: &#34;cara@example.com&#34;,
+      &#34;role&#34;: &#34;editor&#34;,
+      &#34;active&#34;: true,
+      &#34;last_logi</pre>
+                  </details>
+                </li>
+            </ol>
+          </div>
+
+          <ul class="px-4 py-3 border-b border-stone-100 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Tool &#39;read_file&#39; aufgerufen</div>
+<div class="text-xs text-stone-500">history: list_files, read_file, read_file</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">Response contains valid JSON</div>
+                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">JSON contains fields [&#39;service&#39;, &#39;city&#39;, &#39;active_users&#39;, &#39;admin_emails&#39;]</div>
+<div class="text-xs text-stone-500">all fields present</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">service == &#39;owb-test-fixture&#39;</div>
+<div class="text-xs text-stone-500">actual=&#39;owb-test-fixture&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">city == &#39;München&#39;</div>
+<div class="text-xs text-stone-500">actual=&#39;München&#39;</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">active_users == 4</div>
+<div class="text-xs text-stone-500">actual=4</div>                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-0.5"><span class="text-emerald-600">✓</span></span>
+                <div>
+                  <div class="font-medium text-stone-900">admin_emails == [&#39;anja.sommer@example.com&#39;, &#39;frederik.otto@example.com&#39;]</div>
+<div class="text-xs text-stone-500">actual=[&#39;anja.sommer@example.com&#39;, &#39;frederik.otto@example.com&#39;]</div>                </div>
+              </li>
+          </ul>
+
+        <div class="px-4 py-3">
+          <div class="text-xs uppercase tracking-wider text-stone-500 mb-2">Final answer</div>
+          <pre class="text-sm whitespace-pre-wrap">{
+  &#34;service&#34;: &#34;owb-test-fixture&#34;,
+  &#34;city&#34;: &#34;München&#34;,
+  &#34;active_users&#34;: 4,
+  &#34;admin_emails&#34;: [&#34;anja.sommer@example.com&#34;, &#34;frederik.otto@example.com&#34;]
+}</pre>
+        </div>
+      </div>
+
+
+    <div class="mt-4 text-xs text-stone-500">
+      Artefacts:
+        <a class="text-stone-700 hover:text-stone-900 underline mr-3" href="../assets/artifacts/qwen_qwen2.5-coder-32b/tool_use/scenarios.json" target="_blank">Scenarios + Tool-Call-Verlauf</a>
     </div>
 </section>
 <section id="hallucination" class="mb-12 scroll-mt-24">

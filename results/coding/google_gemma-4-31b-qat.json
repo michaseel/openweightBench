@@ -1,0 +1,201 @@
+{
+  "task": "coding",
+  "model_id": "google/gemma-4-31b-qat",
+  "model_info": {
+    "id": "google/gemma-4-31b-qat",
+    "type": "vlm",
+    "publisher": "google",
+    "arch": "gemma4",
+    "compatibility_type": "gguf",
+    "quantization": "Q4_0",
+    "state": "not-loaded",
+    "max_context_length": 262144,
+    "capabilities": [
+      "tool_use"
+    ],
+    "loaded_context_length": null
+  },
+  "started_at": "2026-08-11T15:01:35.161910Z",
+  "completed_at": "2026-08-11T15:06:50.136769Z",
+  "metrics": {
+    "wall_seconds": 314.96856487495825,
+    "tokens_generated": 6346,
+    "tokens_per_second": 22.05391487136731,
+    "time_to_first_token_ms": 2379.79,
+    "peak_rss_mb": 17978.5
+  },
+  "score": 0.9166666666666667,
+  "score_breakdown": {
+    "looks_like_html": true,
+    "html_length": 18811,
+    "raw_length": 18823,
+    "lint_checks": [
+      {
+        "id": "col_backlog",
+        "label": "Spalte 'Backlog'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_in_progress",
+        "label": "Spalte 'In Progress'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_review",
+        "label": "Spalte 'Review'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "col_done",
+        "label": "Spalte 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "drag_drop",
+        "label": "HTML5 drag & drop or sortable lib",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "local_storage",
+        "label": "localStorage persistence",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "tailwind_cdn",
+        "label": "Tailwind via CDN",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "confetti",
+        "label": "Confetti animation on 'Done'",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Add card button",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "vanilla_js",
+        "label": "Vanilla JS (no React/Vue/Angular/Svelte)",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_alert_prompt",
+        "label": "No window.alert/prompt for CRUD",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "editable_cards",
+        "label": "Editable cards (contenteditable / input)",
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "lint_passed": 12,
+    "lint_total": 12,
+    "lint_score": 1.0,
+    "e2e_checks": [
+      {
+        "id": "renders",
+        "label": "Page loads with all 4 columns",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "add_card",
+        "label": "Add card via button",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_double_add",
+        "label": "Card is added exactly 1× (no double submit)",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "delete_card",
+        "label": "Delete card via button + confirmation",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "persistence",
+        "label": "Cards survive a reload",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "id": "no_console_errors",
+        "label": "No JS console errors",
+        "passed": false,
+        "detail": "pageerror: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node."
+      }
+    ],
+    "e2e_passed": 5,
+    "e2e_total": 6,
+    "e2e_score": 0.8333333333333334,
+    "judge": {
+      "scored_at": "2026-08-11T15:07:06.525407+00:00",
+      "judge_model": "openai/gpt-5.4",
+      "scores": {
+        "board_renders": 1.0,
+        "column_completeness": 1.0,
+        "cards_present": 1.0,
+        "ui_affordances": 0.85,
+        "design_quality": 0.86,
+        "code_structure": 0.78,
+        "dom_safety": 0.72,
+        "robustness": 0.34,
+        "code_quality": 0.62,
+        "render_matches_code": 0.94
+      },
+      "judge_score": 0.797,
+      "comment_visual": "Das Board rendert vollständig mit allen vier klar beschrifteten Spalten, mehreren gut lesbaren Karten und sichtbaren Add-Card-Buttons. Die Oberfläche wirkt modern und aufgeräumt; Drag-&-Drop wird textlich und über Cursor/Styling gut angedeutet, Inline-Edit/Delete sind im statischen Screenshot aber nicht unmittelbar sichtbar.",
+      "comment_code": "Der Code ist insgesamt ordentlich in State, Render, Aktionen, Modal und Drag-and-Drop gegliedert. Positiv ist die Verwendung von createElement/textContent für Kartentexte; zugleich gibt es unnötiges innerHTML für SVG-Buttons und vor allem schwache Robustheit ohne try/catch um localStorage/JSON.parse, plus ein klarer Bug in showAddInput(), wo document.body.removeChild(inputWrapper) nach container.prepend(...) fehlschlagen kann.",
+      "comment_consistency": "Screenshot und Code passen weitgehend sehr gut zusammen: Spalten, Karten, Header und Add-Buttons erscheinen wie im HTML/JS angelegt. Kleinere nicht sichtbare Features wie Delete-Hover, Inline-Edit oder Confetti sind normale statische Abweichungen, kein Laufzeit-Widerspruch."
+    }
+  },
+  "raw_response": "```html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Vibrant Kanban Board</title>\n    <!-- Tailwind CSS for modern styling -->\n    <script src=\"https://cdn.tailwindcss.com\"></script>\n    <!-- Canvas Confetti for the \"Done\" celebration -->\n    <script src=\"https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js\"></script>\n    <style>\n        /* Custom styles for drag and drop visual cues */\n        .dragging {\n            opacity: 0.5;\n            transform: scale(0.95);\n            cursor: grabbing;\n        }\n        .drop-zone-active {\n            background-color: rgba(99, 102, 241, 0.1);\n            outline: 2px dashed #6366f1;\n        }\n        .card-transition {\n            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);\n        }\n        /* Hide scrollbar but keep functionality */\n        .no-scrollbar::-webkit-scrollbar {\n            display: none;\n        }\n        .no-scrollbar {\n            -ms-overflow-style: none;\n            scrollbar-width: none;\n        }\n    </style>\n</head>\n<body class=\"bg-slate-50 min-h-screen font-sans text-slate-900\">\n\n    <!-- Header -->\n    <header class=\"bg-white border-b border-slate-200 py-6 px-8 mb-8\">\n        <div class=\"max-w-7xl mx-auto flex justify-between items-center\">\n            <h1 class=\"text-3xl font-extrabold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent\">\n                TaskFlow Kanban\n            </h1>\n            <div class=\"text-sm text-slate-500 font-medium italic\">Drag & Drop to organize your workflow</div>\n        </div>\n    </header>\n\n    <!-- Kanban Board Container -->\n    <main class=\"max-w-7xl mx-auto px-4 pb-12\">\n        <div class=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6\">\n            \n            <!-- Backlog Column -->\n            <div class=\"flex flex-col h-full\">\n                <div class=\"flex items-center justify-be",
+  "artifacts": [
+    {
+      "kind": "html",
+      "label": "Generierte App",
+      "path": "artifacts/google_gemma-4-31b-qat/coding/output.html",
+      "mime": "text/html"
+    },
+    {
+      "kind": "text",
+      "label": "Raw model response",
+      "path": "artifacts/google_gemma-4-31b-qat/coding/raw_response.txt",
+      "mime": "text/plain"
+    },
+    {
+      "kind": "image",
+      "label": "Screenshot der gerenderten App",
+      "path": "artifacts/google_gemma-4-31b-qat/coding/screenshot.png",
+      "mime": "image/png"
+    }
+  ],
+  "error": null,
+  "hardware": {
+    "platform": "macOS-26.5.2-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "ram_total_gb": 128.0,
+    "cpu_count": 16
+  },
+  "bench_version": "0.1.0"
+}

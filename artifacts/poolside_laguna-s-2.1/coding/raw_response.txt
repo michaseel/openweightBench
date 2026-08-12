@@ -1,0 +1,709 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Modern Kanban Board</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Custom scrollbar for better UX */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 3px;
+    }
+
+    /* Confetti animation styles */
+    .confetti-piece {
+      position: absolute;
+      top: 0;
+      width: 10px;
+      height: 10px;
+      opacity: 0.7;
+      animation: fall linear infinite;
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(110vh) rotate(360deg);
+      }
+    }
+
+    /* Subtle transitions */
+    .transition-smooth {
+      transition: all 0.3s ease-in-out;
+    }
+
+    /* Modal backdrop blur effect */
+    .modal-backdrop {
+      backdrop-filter: blur(4px);
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 min-h-screen py-8">
+
+  <!-- Header -->
+  <header class="text-center mb-8">
+  <div class="mb-4"></div>
+    <h1 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-500 mb-2">
+      Modern Kanban Board
+    </h1>
+    <p class="text-gray-500">Organize your tasks with drag-and-drop simplicity</p>
+  </header>
+
+  <!-- Main board container -->
+  <main class="max-w-6xl mx-auto px-4">
+    <div class="flex flex-col sm:flex-row justify-between gap-6 overflow-x-auto pb-4">
+      <!-- Backlog Column -->
+      <section 
+        data-testid="column-backlog"
+        class="bg-white rounded-xl shadow-md p-4 min-w-[280px] flex-1 transition-smooth hover:shadow-lg"
+      >
+        <h2 class="text-lg font-semibold mb-4 text-purple-700">Backlog</h2>
+        <div id="backlog-cards" class="space-y-3 mb-4 min-h-[60px]"></div>
+        <button 
+          data-testid="add-card"
+          onclick="openAddCardModal('backlog')"
+          class="w-full py-2 px-4 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-smooth flex items-center justify-center gap-2"
+        >
+          <span>+</span> Add card
+        </button>
+      </section>
+
+      <!-- In Progress Column -->
+      <section 
+        data-testid="column-in-progress"
+        class="bg-white rounded-xl shadow-md p-4 min-w-[280px] flex-1 transition-smooth hover:shadow-lg"
+      >
+        <h2 class="text-lg font-semibold mb-4 text-yellow-700">In Progress</h2>
+        <div id="in-progress-cards" class="space-y-3 mb-4 min-h-[60px]"></div>
+        <button 
+          data-testid="add-card"
+          onclick="openAddCardModal('in-progress')"
+          class="w-full py-2 px-4 bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 transition-smooth flex items-center justify-center gap-2"
+        >
+          <span>+</span> Add card
+        </button>
+      </section>
+
+      <!-- Review Column -->
+      <section 
+        data-testid="column-review"
+        class="bg-white rounded-xl shadow-md p-4 min-w-[280px] flex-1 transition-smooth hover:shadow-lg"
+      >
+        <h2 class="text-lg font-semibold mb-4 text-blue-700">Review</h2>
+        <div id="review-cards" class="space-y-3 mb-4 min-h-[60px]"></div>
+        <button 
+          data-testid="add-card"
+          onclick="openAddCardModal('review')"
+          class="w-full py-2 px-4 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-smooth flex items-center justify-center gap-2"
+        >
+          <span>+</span> Add card
+        </button>
+      </section>
+
+      <!-- Done Column -->
+      <section 
+        data-testid="column-done"
+        class="bg-white rounded-xl shadow-md p-4 min-w-[280px] flex-1 transition-smooth hover:shadow-lg"
+      >
+        <h2 class="text-lg font-semibold mb-4 text-green-700">Done</h2>
+        <div id="done-cards" class="space-y-3 mb-4 min-h-[60px]"></div>
+        <button 
+          data-testid="add-card"
+          onclick="openAddCardModal('done')"
+          class="w-full py-2 px-4 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-smooth flex items-center justify-center gap-2"
+        >
+          <span>+</span> Add card
+        </button>
+      </section>
+    </div>
+  </main>
+
+  <!-- Add/Edit Card Modal -->
+  <dialog id="card-modal" class="rounded-xl p-0 border-none">
+    <form method="dialog" class="p-6 w-full max-w-md">
+      <h3 id="modal-title" class="text-xl font-bold mb-4 text-gray-800">Add New Card</h3>
+      
+      <!-- Editable content area -->
+      <div 
+        data-testid="card-input" 
+        contenteditable="true" 
+        spellcheck="true"
+        class="w-full min-h-[100px] p-3 border-2 border-dashed border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 resize-y overflow-auto text-sm mb-4"
+      ></div>
+
+      <div class="flex justify-end gap-3">
+        <button 
+          id="cancel-btn"
+          type="button"
+          onclick="closeCardModal()"
+          class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-smooth"
+        >
+          Cancel
+        </button>
+        <button 
+          id="save-btn"
+          type="submit"
+          class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-smooth"
+        >
+          Save
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Delete Confirmation Modal -->
+  <dialog id="delete-modal" class="rounded-xl p-0 border-none">
+    <form method="dialog" class="p-6 w-full max-w-sm">
+      <h3 class="text-xl font-bold mb-4 text-red-700">Confirm Deletion</h3>
+      <p class="mb-6 text-gray-600">Are you sure you want to delete this card? This action cannot be undone.</p>
+
+      <div class="flex justify-end gap-3">
+        <button 
+          type="button"
+          onclick="closeDeleteModal()"
+          class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-smooth"
+        >
+          Cancel
+        </button>
+        <button 
+          data-testid="confirm-delete"
+          type="submit"
+          class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-smooth"
+        >
+          Delete
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Confetti container -->
+  <div id="confetti-container" class="fixed top-0 left-0 w-full h-full pointer-events-none z-50"></div>
+
+  <script>
+    // ===== Configuration & Constants =====
+    
+    /** Unique namespace for localStorage to avoid conflicts */
+    const STORAGE_NAMESPACE = 'modern-kanban-v1';
+    
+    /** Column identifiers matching DOM structure */
+    const COLUMNS = ['backlog', 'in-progress', 'review', 'done'];
+
+    // ===== State Management =====
+    
+    /** 
+     * Application state holds all cards grouped by column.
+     * Structure: { [columnId]: Array<Card> }
+     */
+    let appState = {};
+
+    // Track currently edited card and its original column for move detection
+    let currentEditingCard = null;
+    let previousColumnOfEditedCard = null;
+
+    // Reference to delete confirmation modal elements
+    const deleteModal = document.getElementById('delete-modal');
+    const cardModal = document.getElementById('card-modal');
+
+    // ===== Initialization Functions =====
+
+    /**
+     * Initialize the application: load state, render cards, set up event listeners.
+     */
+    function initApp() {
+      appState = loadFromStorage();
+      
+      // If no saved data exists, populate with sample dummy cards
+      if (isEmpty(appState)) {
+        createDummyCards();
+      }
+
+      renderAllColumns();
+      setupGlobalEventListeners();
+    }
+
+    /**
+     * Generate placeholder/dummy card content for first-time users.
+     */
+    function createDummyCards() {
+      appState = {
+        'backlog': [
+          { id: generateId(), title: "Research competitors' pricing models", createdAt: Date.now() },
+          { id: generateId(), title: "Draft product requirements document", createdAt: Date.now() }
+        ],
+        'in-progress': [
+          { id: generateId(), title: "Design homepage layout mockups", createdAt: Date.now() }
+        ],
+        'review': [],
+        'done': []
+      };
+    }
+
+    // ===== Persistence Layer (localStorage) =====
+
+    /**
+     * Load application state from localStorage using namespaced key.
+     */
+    function loadFromStorage() {
+      try {
+        const serialized = localStorage.getItem(STORAGE_NAMESPACE);
+        return serialized ? JSON.parse(serialized) : {};
+      } catch (err) {
+        console.error("Failed to parse stored Kanban state:", err);
+        return {};
+      }
+    }
+
+    /**
+     * Persist current application state into localStorage.
+     */
+    function saveToStorage() {
+      try {
+        const serialized = JSON.stringify(appState);
+        localStorage.setItem(STORAGE_NAMESPACE, serialized);
+      } catch (err) {
+        console.error("Failed saving Kanban state:", err);
+      }
+    }
+
+    // ===== Rendering Engine =====
+
+    /**
+     * Render all four columns with their respective cards.
+     */
+    function renderAllColumns() {
+      COLUMNS.forEach(col => {
+        const container = document.getElementById(`${col}-cards`);
+        if (!container) return;
+        
+        // Clear existing children before re-rendering
+        container.innerHTML = '';
+
+        appState[col]?.forEach(card => {
+          const cardEl = createCardElement(card, col);
+          container.appendChild(cardEl);
+        });
+      });
+    }
+
+    /**
+     * Create a single interactive card DOM element.
+     * @param {Object} card - Card object containing id and title.
+     * @param {string} columnId - The column this card belongs to.
+     */
+    function createCardElement(card, columnId) {
+      const el = document.createElement('div');
+      el.setAttribute('data-testid', 'card');
+      el.draggable = true;
+      el.dataset.cardId = card.id;
+
+      // Apply visual styling based on which column it's in
+      let bgColorClass = '';
+      switch(columnId) {
+        case 'backlog':     bgColorClass = 'bg-purple-50 border-l-4 border-purple-400'; break;
+        case 'in-progress': bgColorClass = 'bg-yellow-50 border-l-4 border-yellow-400'; break;
+        case 'review':      bgColorClass = 'bg-blue-50 border-l-4 border-blue-400'; break;
+        case 'done':        bgColorClass = 'bg-green-50 border-l-4 border-green-400 line-through opacity-80'; break;
+      }
+
+      el.className = `${bgColorClass} p-3 rounded-lg shadow-sm mb-3 cursor-move transition-smooth hover:shadow-md`;
+
+      // Card body content (title + actions)
+      const titleSpan = document.createElement('span');
+      titleSpan.textContent = card.title || '(Untitled)';
+      titleSpan.className = 'block text-gray-800 font-medium break-words';
+
+      // Delete button trigger
+      const deleteBtn = document.createElement('button');
+      deleteBtn.setAttribute('data-testid', 'delete-card');
+      deleteBtn.innerHTML = '&times;';
+      deleteBtn.title = "Delete card";
+      deleteBtn.className = "absolute top-1 right-2 text-red-400 hover:text-red-600 font-bold text-xl leading-none";
+      
+      // Wrapper for positioning relative elements like delete button
+      const wrapper = document.createElement('div');
+      wrapper.className = 'relative';
+      wrapper.appendChild(titleSpan);
+      wrapper.appendChild(deleteBtn);
+
+      el.appendChild(wrapper);
+
+      // Attach event handlers per card instance
+      attachCardEvents(el, card, columnId);
+
+      return el;
+    }
+
+    /**
+     * Bind drag/drop and interaction events to a specific card element.
+     */
+    function attachCardEvents(cardEl, cardData, sourceColumn) {
+      // --- Drag Start Handler ---
+      cardEl.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', JSON.stringify({
+          id: cardData.id,
+          fromColumn: sourceColumn
+        }));
+        
+        // Visual feedback during drag
+        setTimeout(() => {
+          cardEl.classList.add('opacity-50');
+        }, 0);
+      });
+
+      // Restore opacity after dragging ends
+      cardEl.addEventListener('dragend', () => {
+        cardEl.classList.remove('opacity-50');
+      });
+
+      // --- Click-to-edit handler on title span ---
+      const titleSpan = cardEl.querySelector('span');
+      if (titleSpan) {
+        titleSpan.title = "Click to edit";
+        titleSpan.style.cursor = "pointer";
+        titleSpan.addEventListener('click', () => openEditCardModal(cardData, sourceColumn));
+      }
+
+      // --- Delete confirmation trigger ---
+      const deleteBtn = cardEl.querySelector('[data-testid="delete-card"]');
+      if (deleteBtn) {
+        deleteBtn.addEventListener('click', (e) => {
+          e.stopPropagation(); // Prevent triggering edit modal accidentally
+          prepareDeleteCard(cardData, sourceColumn);
+        });
+      }
+    }
+
+    // ===== Modal Interactions =====
+
+    /**
+     * Opens the add-card modal for creating new cards in a given column.
+     */
+    function openAddCardModal(columnId) {
+      currentEditingCard = null;
+      previousColumnOfEditedCard = null;
+      
+      const inputField = document.querySelector('#card-modal [data-testid="card-input"]');
+      if (inputField) {
+        inputField.textContent = ''; // Reset field value
+        inputField.focus();
+      }
+
+      document.getElementById('modal-title').textContent = `Add Card to ${capitalize(columnId)}`;
+      cardModal.showModal();
+    }
+
+    /**
+     * Opens the edit-card modal pre-filled with existing card details.
+     */
+    function openEditCardModal(cardData, columnId) {
+      currentEditingCard = cardData;
+      previousColumnOfEditedCard = columnId;
+
+      const inputField = document.querySelector('#card-modal [data-testid="card-input"]');
+      if (inputField) {
+        inputField.textContent = cardData.title || '';
+        inputField.focus();
+      }
+
+      document.getElementById('modal-title').textContent = `Edit Card`;
+      cardModal.showModal();
+    }
+
+    /**
+     * Closes the add/edit modal without saving changes.
+     */
+    function closeCardModal() {
+      currentEditingCard = null;
+      previousColumnOfEditedCard = null;
+      cardModal.close();
+    }
+
+    /**
+     * Saves a new or updated card from the modal input field.
+     */
+    function saveCardFromModal(targetColumn) {
+      const inputField = document.querySelector('#card-modal [data-testid="card-input"]');
+      let titleText = inputField?.textContent.trim();
+
+      if (!titleText) {
+        // Show inline warning instead of alert()
+        showInlineWarning(inputField, "Please enter a valid card title.");
+        return;
+      }
+
+      if (currentEditingCard) {
+        updateExistingCard(currentEditingCard.id, previousColumnOfEditedCard, targetColumn, titleText);
+      } else {
+        addNewCard(targetColumn, titleText);
+      }
+
+      saveToStorage();
+      renderAllColumns();
+      closeCardModal();
+    }
+
+    /**
+     * Adds a brand-new card to the specified column.
+     */
+    function addNewCard(columnId, title) {
+      const newCard = { id: generateId(), title, createdAt: Date.now() };
+      if (!appState[columnId]) appState[columnId] = [];
+      appState[columnId].push(newCard);
+    }
+
+    /**
+     * Updates an existing card's properties including possible column change.
+     */
+    function updateExistingCard(cardId, oldColumn, newColumn, title) {
+      removeFromArray(appState[oldColumn], item => item.id === cardId);
+      const updatedCard = appState[oldColumn].find(c => c.id === cardId) || 
+                          { id: cardId };
+
+      updatedCard.title = title;
+
+      if (!appState[newColumn]) appState[newColumn] = [];
+      appState[newColumn].push(updatedCard);
+    }
+
+    /**
+     * Prepares the delete confirmation modal for a given card.
+     */
+    function prepareDeleteCard(cardData, columnId) {
+      // Store references so we can act upon them after confirmation
+      currentEditingCard = cardData;
+      previousColumnOfEditedCard = columnId;
+
+      deleteModal.showModal();
+    }
+
+    /**
+     * Confirms deletion of the pending card and removes it permanently.
+     */
+    function confirmDeleteCard() {
+      if (!currentEditingCard) return;
+
+      removeFromArray(appState[previousColumnOfEditedCard], 
+                      item => item.id === currentEditingCard.id);
+
+      saveToStorage();
+      renderAllColumns();
+      closeDeleteModal();
+      
+      currentEditingCard = null;
+    }
+
+    /**
+     * Cancels deletion operation and closes the modal.
+     */
+    function closeDeleteModal() {
+      deleteModal.close();
+      currentEditingCard = null;
+    }
+
+    // ===== Drag & Drop Column Handling =====
+
+    /**
+     * Set up global event listeners for drag-over behavior across all columns.
+     */
+    function setupGlobalEventListeners() {
+      COLUMNS.forEach(colId => {
+        const colEl = document.querySelector(`[data-testid="column-${colId}"]`);
+        if (!colEl) return;
+
+        // Allow dropping over the column area itself
+        colEl.addEventListener('dragover', (e) => e.preventDefault());
+
+        colEl.addEventListener('drop', handleCardDrop);
+      });
+
+      // Handle Enter key press inside modal input field to commit card creation/editing
+      const modalInput = document.querySelector('#card-modal [data-testid="card-input"]');
+      if (modalInput) {
+        modalInput.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault(); // Avoid form submission side effects
+            
+            const targetCol = determineTargetColumnFromContext();
+            saveCardFromModal(targetCol);
+          }
+        });
+      }
+
+      // Submit handler for modal form
+      document.getElementById('card-modal').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const targetCol = determineTargetColumnFromContext();
+        saveCardFromModal(targetCol);
+      });
+
+      // Confirm delete button click listener
+      document.querySelector('[data-testid="confirm-delete"]')?.addEventListener('click', () => confirmDeleteCard());
+    }
+
+    /**
+     * Determine where to place the card when saving from modal context.
+     */
+    function determineTargetColumnFromContext() {
+      if (!currentEditingCard) {
+        // New card – infer target column from last opened "Add Card" action stored in title text
+        const titleText = document.getElementById('modal-title').textContent.toLowerCase();
+        for (const col of COLUMNS) {
+          if (titleText.includes(col.replace('-', ' '))) return col;
+        }
+      } else {
+        // Existing card being edited – keep same column unless changed elsewhere
+        return previousColumnOfEditedCard || 'backlog';
+      }
+      return 'backlog';
+    }
+
+    /**
+     * Handles dropping a dragged card onto any valid drop zone (column).
+     */
+    function handleCardDrop(e) {
+      e.preventDefault();
+
+      const targetColEl = e.currentTarget;
+      const targetColumnId = targetColEl.dataset.testid.replace('column-', '');
+
+      try {
+        const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+        const cardId = data.id;
+        const sourceColumn = data.fromColumn;
+
+        if (sourceColumn === targetColumnId) return; // No need to move within same column
+
+        moveCardBetweenColumns(cardId, sourceColumn, targetColumnId);
+      } catch (err) {
+        console.warn("Invalid drop data received", err);
+      }
+    }
+
+    /**
+     * Move a card between two columns and trigger confetti if moved to "Done".
+     */
+    function moveCardBetweenColumns(cardId, fromCol, toCol) {
+      const cardsInSource = appState[fromCol] || [];
+      const movingCardIndex = cardsInSource.findIndex(c => c.id === cardId);
+
+      if (movingCardIndex < 0) return; // Card not found in source column
+
+      const [movedCard] = cardsInSource.splice(movingCardIndex, 1);
+
+      appState[toCol] = appState[toCol] || [];
+      appState[toCol].push(movedCard);
+
+      saveToStorage();
+      renderAllColumns();
+
+      // Trigger celebratory effect only when entering "Done" column
+      if (toCol === 'done') {
+        launchConfetti();
+      }
+    }
+
+    // ===== Utility Helpers =====
+
+    /**
+     * Generate a unique identifier string for new cards.
+     */
+    function generateId() {
+      return `card_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+    }
+
+    /**
+     * Capitalize the first letter of a word/phrase.
+     */
+    function capitalize(str) {
+      if (!str) return '';
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    /**
+     * Check whether an object has no enumerable keys.
+     */
+    function isEmpty(obj) {
+      return Object.keys(obj).length === 0;
+    }
+
+    /**
+     * Remove items matching predicate from array in-place.
+     */
+    function removeFromArray(arr, predicateFn) {
+      const idx = arr.findIndex(predicateFn);
+      if (idx >= 0) arr.splice(idx, 1);
+    }
+
+    /**
+     * Display a temporary inline warning message near an element.
+     */
+    function showInlineWarning(elementRef, msg) {
+      let warnEl = document.getElementById('inline-warning');
+      if (!warnEl) {
+        warnEl = document.createElement('div');
+        warnEl.id = 'inline-warning';
+        warnEl.className = "text-red-500 text-xs mt-1";
+        elementRef.parentNode.insertBefore(warnEl, elementRef.nextSibling);
+      }
+
+      warnEl.textContent = msg;
+
+      // Auto-hide after short delay
+      clearTimeout(window._warningTimer);
+      window._warningTimer = setTimeout(() => {
+        if (warnEl && warnEl.parentNode) {
+          warnEl.remove();
+        }
+      }, 3000);
+    }
+
+    /**
+     * Launch confetti particles celebrating successful completion.
+     */
+    function launchConfetti() {
+      const container = document.getElementById('confetti-container');
+      if (!container) return;
+
+      // Clean up previous animations to prevent buildup
+      while (container.firstChild) {
+        container.removeChild(container.firstChild);
+      }
+
+      const colors = ['#fAcc15', '#34d399', '#60a5fa', '#c084fc'];
+      for (let i = 0; i < 50; i++) {
+        const piece = document.createElement('div');
+        piece.classList.add('confetti-piece');
+
+        // Randomize size, color, start position and duration
+        const size = Math.random() * 8 + 6;
+        piece.style.width = `${size}px`;
+        piece.style.height = `${size}px`;
+        piece.style.left = `${Math.random() * 100}vw`;
+        piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+
+        const duration = Math.random() * 3 + 2;
+        piece.style.animationDuration = `${duration}s`;
+
+        container.appendChild(piece);
+      }
+
+      // Clear confetti after animation completes
+      setTimeout(() => {
+        while (container.firstChild) {
+          container.removeChild(container.firstChild);
+        }
+      }, 5000);
+    }
+
+    // ===== Bootstrap App on Load =====
+    window.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>
+```

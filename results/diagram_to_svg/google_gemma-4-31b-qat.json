@@ -1,0 +1,253 @@
+{
+  "task": "diagram_to_svg",
+  "model_id": "google/gemma-4-31b-qat",
+  "model_info": {
+    "id": "google/gemma-4-31b-qat",
+    "type": "vlm",
+    "publisher": "google",
+    "arch": "gemma4",
+    "compatibility_type": "gguf",
+    "quantization": "Q4_0",
+    "state": "not-loaded",
+    "max_context_length": 262144,
+    "capabilities": [
+      "tool_use"
+    ],
+    "loaded_context_length": null
+  },
+  "started_at": "2026-08-11T15:07:00.298641Z",
+  "completed_at": "2026-08-11T15:17:03.307051Z",
+  "metrics": {
+    "wall_seconds": 601.0243578330847,
+    "tokens_generated": 12975,
+    "tokens_per_second": 22.03474228691095,
+    "time_to_first_token_ms": null,
+    "peak_rss_mb": 17978.5
+  },
+  "score": 0.6666666666666666,
+  "score_breakdown": {
+    "diagrams": [
+      {
+        "id": "diagram_eisenhower",
+        "image_name": "diagram_eisenhower.png",
+        "image_path": "artifacts/google_gemma-4-31b-qat/diagram_to_svg/diagram_eisenhower.png",
+        "svg_path": "artifacts/google_gemma-4-31b-qat/diagram_to_svg/diagram_eisenhower.svg",
+        "render_path": null,
+        "raw_length": 6782,
+        "svg_length": 6782,
+        "grade": {
+          "score": 0.0,
+          "parsed": false,
+          "has_root": false,
+          "element_count": 0,
+          "text_count": 0,
+          "matched_terms": [],
+          "missing_terms": [
+            "Wichtig",
+            "Dringend",
+            "Nicht wichtig",
+            "Nicht dringend",
+            "Content-Strategie",
+            "Brand schärfen",
+            "SEO",
+            "Zielgruppen",
+            "Kampagne retten",
+            "Shitstorm",
+            "Newsletter",
+            "falschem Link",
+            "viral gehen",
+            "Merch-Ideen",
+            "Glitzer",
+            "Buzzword-Bingo",
+            "TikTok",
+            "Maskottchen",
+            "Hashtag",
+            "Last-Minute-Meeting",
+            "Logo größer",
+            "LinkedIn-Post",
+            "Weltag der Büroklammer",
+            "Folie 27"
+          ],
+          "parse_error": "not well-formed (invalid token): line 57, column 24"
+        },
+        "score": 0.0,
+        "error": null
+      },
+      {
+        "id": "diagram_service_architecture",
+        "image_name": "diagram_service_architecture.png",
+        "image_path": "artifacts/google_gemma-4-31b-qat/diagram_to_svg/diagram_service_architecture.png",
+        "svg_path": "artifacts/google_gemma-4-31b-qat/diagram_to_svg/diagram_service_architecture.svg",
+        "render_path": "artifacts/google_gemma-4-31b-qat/diagram_to_svg/diagram_service_architecture.render.png",
+        "raw_length": 9736,
+        "svg_length": 9736,
+        "grade": {
+          "score": 1.0,
+          "parsed": true,
+          "has_root": true,
+          "element_count": 89,
+          "text_count": 36,
+          "matched_terms": [
+            "Frontend",
+            "React",
+            "API Gateway",
+            "Kong",
+            "Auth Service",
+            "JWT",
+            "User DB",
+            "Backend",
+            "FastAPI",
+            "Database",
+            "External API",
+            "Payment Provider",
+            "Message Queue",
+            "RabbitMQ",
+            "Worker Service",
+            "File Storage",
+            "S3",
+            "Monitoring",
+            "Prometheus",
+            "Grafana"
+          ],
+          "missing_terms": [],
+          "parse_error": null
+        },
+        "score": 1.0,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-08-11T15:17:09.780857+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "scores": {
+            "completeness": 0.98,
+            "labels": 0.95,
+            "connections": 0.56,
+            "direction": 0.45,
+            "grouping": 0.72,
+            "layout_readability": 0.82,
+            "diagram_kind_match": 0.95,
+            "aesthetic_quality": 0.8
+          },
+          "judge_score": 0.7811111111111112,
+          "comment": "Fast alle relevanten Elemente aus dem Original sind vorhanden, einschließlich Goals, Notes, Legende und aller Hauptservices mit Datenbanken/Speicher. Die Beschriftungen sind weitgehend korrekt, nur einzelne Details sind leicht vereinfacht oder kleiner gesetzt. Mehrere Verbindungen stimmen jedoch topologisch nicht: Frontend ist fälschlich per gestrichelter Linie mit External API verbunden, External API ist fälschlich mit Message Queue verbunden, und die Originalbeziehungen Backend→Message Queue sowie Worker Service→Monitoring sind anders dargestellt; zudem werden einige bidirektionale Datenbank-/Storage-Verbindungen als einseitige Pfeile gezeigt. Das Layout ist insgesamt sauber und gut lesbar, wirkt visuell ordentlich, auch wenn die Pfeilsemantik gegenüber dem Whiteboard an mehreren Stellen nicht korrekt übernommen wurde."
+        }
+      },
+      {
+        "id": "diagram_sso_sequence",
+        "image_name": "diagram_sso_sequence.png",
+        "image_path": "artifacts/google_gemma-4-31b-qat/diagram_to_svg/diagram_sso_sequence.png",
+        "svg_path": "artifacts/google_gemma-4-31b-qat/diagram_to_svg/diagram_sso_sequence.svg",
+        "render_path": "artifacts/google_gemma-4-31b-qat/diagram_to_svg/diagram_sso_sequence.render.png",
+        "raw_length": 5892,
+        "svg_length": 5892,
+        "grade": {
+          "score": 1.0,
+          "parsed": true,
+          "has_root": true,
+          "element_count": 56,
+          "text_count": 24,
+          "matched_terms": [
+            "Benutzer",
+            "App",
+            "Service Provider",
+            "Identity Provider",
+            "IdP",
+            "Login-Seite",
+            "Anmeldedaten",
+            "Authentifizierung",
+            "Token",
+            "Assertion",
+            "SSO-Response",
+            "Zugriff",
+            "Ressourcen",
+            "Nein",
+            "Ja"
+          ],
+          "missing_terms": [],
+          "parse_error": null
+        },
+        "score": 1.0,
+        "error": null,
+        "judge": {
+          "scored_at": "2026-08-11T15:17:15.202090+00:00",
+          "judge_model": "openai/gpt-5.4",
+          "scores": {
+            "completeness": 0.95,
+            "labels": 0.78,
+            "connections": 0.42,
+            "direction": 0.55,
+            "layout_readability": 0.18,
+            "diagram_kind_match": 0.9,
+            "aesthetic_quality": 0.12
+          },
+          "judge_score": 0.5025000000000001,
+          "comment": "Die Hauptknoten sind fast alle vorhanden: Benutzer, App/Service Provider, Identity Provider, Login-Seite, Entscheidungsdiamant und „Zugriff gewährt“ sind erkennbar. Mehrere Labels stimmen semantisch, aber einige Texte sind abgeschnitten oder fehlen teilweise, z. B. „4. Authentifiz...“, die durchgestrichene „zur Login-Seite“ und der abgeschnittene Text bei „7. Zugriff auf Ressourcen“. Die Struktur des Ablaufdiagramms ist grundsätzlich erhalten, aber die Verbindungen sind teils stark fehlerhaft gerendert: Ein großer schwarzer Polygonblock überdeckt den Rückpfad/Token-Fluss, und die gestrichelte Nein-Schleife zur Login-Seite ist als massiver schwarzer Balken statt als sauberer Rückweg dargestellt. Dadurch sind Pfeilführung und Lesbarkeit deutlich beeinträchtigt, obwohl der Diagrammtyp insgesamt noch zum Original passt."
+        }
+      }
+    ],
+    "judge": {
+      "scored_at": "2026-08-11T15:17:15.202104+00:00",
+      "judge_model": "openai/gpt-5.4",
+      "judge_score": 0.6418055555555556
+    }
+  },
+  "raw_response": "",
+  "artifacts": [
+    {
+      "kind": "image",
+      "label": "Source diagram_eisenhower",
+      "path": "artifacts/google_gemma-4-31b-qat/diagram_to_svg/diagram_eisenhower.png",
+      "mime": "image/jpeg"
+    },
+    {
+      "kind": "text",
+      "label": "SVG diagram_eisenhower",
+      "path": "artifacts/google_gemma-4-31b-qat/diagram_to_svg/diagram_eisenhower.svg",
+      "mime": "image/svg+xml"
+    },
+    {
+      "kind": "image",
+      "label": "Source diagram_service_architecture",
+      "path": "artifacts/google_gemma-4-31b-qat/diagram_to_svg/diagram_service_architecture.png",
+      "mime": "image/jpeg"
+    },
+    {
+      "kind": "text",
+      "label": "SVG diagram_service_architecture",
+      "path": "artifacts/google_gemma-4-31b-qat/diagram_to_svg/diagram_service_architecture.svg",
+      "mime": "image/svg+xml"
+    },
+    {
+      "kind": "image",
+      "label": "Render diagram_service_architecture",
+      "path": "artifacts/google_gemma-4-31b-qat/diagram_to_svg/diagram_service_architecture.render.png",
+      "mime": "image/png"
+    },
+    {
+      "kind": "image",
+      "label": "Source diagram_sso_sequence",
+      "path": "artifacts/google_gemma-4-31b-qat/diagram_to_svg/diagram_sso_sequence.png",
+      "mime": "image/jpeg"
+    },
+    {
+      "kind": "text",
+      "label": "SVG diagram_sso_sequence",
+      "path": "artifacts/google_gemma-4-31b-qat/diagram_to_svg/diagram_sso_sequence.svg",
+      "mime": "image/svg+xml"
+    },
+    {
+      "kind": "image",
+      "label": "Render diagram_sso_sequence",
+      "path": "artifacts/google_gemma-4-31b-qat/diagram_to_svg/diagram_sso_sequence.render.png",
+      "mime": "image/png"
+    }
+  ],
+  "error": null,
+  "hardware": {
+    "platform": "macOS-26.5.2-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "ram_total_gb": 128.0,
+    "cpu_count": 16
+  },
+  "bench_version": "0.1.0"
+}
